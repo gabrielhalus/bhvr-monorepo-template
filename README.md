@@ -32,7 +32,7 @@ Each app/package has its own `.env.example` file. Copy it to `.env.local` (ignor
 cp apps/api/.env.example apps/api/.env.local
 
 # Web frontend
-cp apps/dashboard/.env.example apps/dashboard/.env.local
+cp apps/web/.env.example apps/web/.env.local
 ```
 
 > For a complete list of all environment variables, their purpose, default values, and which apps use them, check the [Environment Variables Documentation](docs/env.md).
@@ -61,7 +61,7 @@ cd apps/api
 bun run dev
 
 # Dashboard (includes auth routes)
-cd apps/dashboard
+cd apps/web
 bun run dev
 ```
 

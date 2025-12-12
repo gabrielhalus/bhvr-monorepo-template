@@ -1,6 +1,6 @@
 import auth from "./auth.json";
 import common from "./common.json";
-import dashboard from "./dashboard.json";
 import ui from "./react.json";
+import web from "./web.json";
 
-export default { auth, common, ui, dashboard } as const;
+export default { auth, common, ui, web } as const;

@@ -2,7 +2,8 @@
   "files": [],
   "references": [
     { "path": "apps/api" },
-    { "path": "apps/dashboard" },
+    { "path": "apps/com" },
+    { "path": "apps/web" },
     { "path": "packages/env" },
     { "path": "packages/shared" },
     { "path": "packages/react" }

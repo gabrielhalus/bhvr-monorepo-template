@@ -12,7 +12,7 @@ import type { TFunction } from "i18next";
  *
  * @example
  * ```tsx
- * const { t } = useTranslation("dashboard");
+ * const { t } = useTranslation("web");
  * const translatedErrors = translateErrors(field.state.meta.errors, t);
  * <FieldError errors={translatedErrors} />
  * ```

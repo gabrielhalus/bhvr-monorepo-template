@@ -7,7 +7,7 @@
 | SUPPORT_EMAIL  | Email address for support contact            | -           | ✅        | api                   |
 | DATABASE_URL   | Database connection string                   | -           | ✅        | api                   |
 | RESEND_API_KEY | Resend full-access API key                   | -           | ✅        | api                   |
-| VITE_API_URL   | Backend API URL for frontend                 | -           | ✅        | site, dashboard       |
-| VITE_SITE_URL  | Public site URL                              | -           | ✅        | dashboard             |
-| VITE_AUTH_URL  | Dashboard URL (where auth routes are hosted) | -           | ✅        | api, dashboard        |
-| JWT_SECRET     | Secret key for signing JWTs                  | -           | ✅        | dashboard             |
+| VITE_API_URL   | Backend API URL for frontend                 | -           | ✅        | web                   |
+| VITE_SITE_URL  | Public site URL                              | -           | ✅        | web                   |
+| VITE_AUTH_URL  | Dashboard URL (where auth routes are hosted) | -           | ✅        | api, web              |
+| JWT_SECRET     | Secret key for signing JWTs                  | -           | ✅        | web                   |

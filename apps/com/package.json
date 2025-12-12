@@ -1,0 +1,28 @@
+{
+  "name": "@bunstack/com",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check-types": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/react": "^3.6.0",
+    "@bunstack/react": "workspace:*",
+    "@tailwindcss/vite": "^4.1.8",
+    "astro": "^5.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.0",
+    "@bunstack/typescript-config": "workspace:*",
+    "@types/node": "^24.7.2",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.1",
+    "typescript": "5.8.2"
+  }
+}
