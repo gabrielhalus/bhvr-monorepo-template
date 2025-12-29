@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 
 import { drizzle } from "@/database";
 import { NotificationChannels } from "@bunstack/shared/models/notifications-channels.model";
-import { NotificationChannelSchema } from "@bunstack/shared/schemas/notification-channels.schemas";
+import { NotificationChannelSchema } from "@bunstack/shared/schemas/db/notification-channels.schemas";
 
 // ============================================================================
 // Core CRUD Operations

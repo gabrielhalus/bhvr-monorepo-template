@@ -1,15 +1,8 @@
-import type { RoleRelations } from "../types/roles.types";
+import type { RoleRelations } from "../../types/roles.types";
 
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { arrayParam } from "../lib/helpers";
-import { Roles } from "../models/roles.model";
-
-/**
- * Schemas for roles
- */
-export const RoleSchema = createSelectSchema(Roles);
+import { arrayParam } from "../../lib/helpers";
 
 /**
  * Role relation keys
@@ -29,14 +22,10 @@ export const RoleRelationsQuerySchema = z.object({
 });
 
 /**
- * Schema for inserting a new role
- */
-export const InsertRoleSchema = createInsertSchema(Roles).omit({ id: true, createdAt: true, updatedAt: true, verifiedAt: true });
-
-/**
  * Schema for updating a role
  */
 export const UpdateRoleSchema = z.object({
   label: z.string(),
   description: z.string().nullable(),
 });
+

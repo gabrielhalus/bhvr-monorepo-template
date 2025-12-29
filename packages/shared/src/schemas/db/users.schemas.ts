@@ -1,32 +1,12 @@
-import type { UserRelations } from "../types/users.types";
-
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { arrayParam } from "../lib/helpers";
-import { Users } from "../models/users.model";
+import { Users } from "../../models/users.model";
 
 /**
  * Schema for users
  */
 export const UserSchema = createSelectSchema(Users);
-
-/**
- * User relation keys
- */
-const userRelationKeys = ["roles", "tokens"] as const satisfies (keyof UserRelations)[];
-
-/**
- * Schema for user relations
- */
-export const UserRelationsSchema = z.array(z.enum(userRelationKeys));
-
-/**
- * Schema for user relations query
- */
-export const UserRelationsQuerySchema = z.object({
-  includes: arrayParam(z.enum(userRelationKeys)).optional(),
-});
 
 /**
  * Schema for inserting a new user
@@ -60,12 +40,3 @@ export const UpdateUserSchema = createUpdateSchema(Users).extend({
     .never(),
 }).partial();
 
-/**
- * Schema for updating a user's password
- */
-export const UpdateUserPasswordSchema = z.object({
-  password: z
-    .string()
-    .min(8)
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).+$/),
-});

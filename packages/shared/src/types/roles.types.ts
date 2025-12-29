@@ -3,7 +3,7 @@ import type { Permission } from "./permissions.types";
 import type { Policy } from "./policies.types";
 import type { User } from "./users.types";
 import type { WithRelations } from "@/lib/type-utils";
-import type { RoleRelationsSchema } from "@/schemas/roles.schemas";
+import type { RoleRelationsSchema } from "@/schemas/api/roles.schemas";
 import type z from "zod";
 
 export type Role = typeof Roles.$inferSelect;

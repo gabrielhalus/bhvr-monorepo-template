@@ -5,8 +5,7 @@ import { Check, Eye, EyeOff, X } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@bunstack/react/components/button";
-import { Input } from "@bunstack/react/components/input";
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@bunstack/react/components/input-group";
 import { cn } from "@bunstack/react/lib/utils";
 
 export type PasswordInputProps = {
@@ -114,20 +113,24 @@ export function PasswordInput({
 
   return (
     <div className="space-y-2">
-      <div className="relative">
-        <Input {...props} type={!showPassword ? "password" : "text"} onChange={handleChange} data-slot="input" className="pr-7" />
-        <Button
-          size="icon"
-          variant="ghost"
-          className="absolute right-0 top-0 h-full hover:bg-transparent"
-          aria-label={!showPassword ? t("passwordInput.ariaLabels.showPassword") : t("passwordInput.ariaLabels.hidePassword")}
-          type="button"
-          tabIndex={-1}
-          onClick={togglePasswordVisibility}
-        >
-          {!showPassword ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
-        </Button>
-      </div>
+      <InputGroup>
+        <InputGroupInput
+          {...props}
+          type={!showPassword ? "password" : "text"}
+          onChange={handleChange}
+        />
+        <InputGroupAddon align="inline-end">
+          <InputGroupButton
+            variant="ghost"
+            aria-label={!showPassword ? t("passwordInput.ariaLabels.showPassword") : t("passwordInput.ariaLabels.hidePassword")}
+            type="button"
+            tabIndex={-1}
+            onClick={togglePasswordVisibility}
+          >
+            {!showPassword ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
+          </InputGroupButton>
+        </InputGroupAddon>
+      </InputGroup>
 
       {showRequirements && rules && (
         <div className="space-y-1 rounded-md border border-border bg-muted/30 p-3">

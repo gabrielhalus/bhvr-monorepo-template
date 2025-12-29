@@ -7,8 +7,8 @@ import { getSessionContext } from "@bunstack/api/middlewares/auth";
 import { validationMiddleware } from "@bunstack/api/middlewares/validation";
 import { deleteRole, getRole, getRoleByName, getRoles, updateRole } from "@bunstack/db/queries/roles.queries";
 import { createUserRole, deleteUserRole } from "@bunstack/db/queries/user-roles.queries";
-import { RoleRelationsQuerySchema, UpdateRoleSchema } from "@bunstack/shared/schemas/roles.schemas";
-import { UserRoleSchema } from "@bunstack/shared/schemas/user-roles.schemas";
+import { RoleRelationsQuerySchema, UpdateRoleSchema } from "@bunstack/shared/schemas/api/roles.schemas";
+import { AssignRoleMembersSchema, RemoveRoleMembersSchema } from "@bunstack/shared/schemas/api/user-roles.schemas";
 
 export const rolesRoutes = new Hono()
   // --- All routes below this point require authentication
@@ -60,7 +60,7 @@ export const rolesRoutes = new Hono()
     }
   })
 
-  .put("/:id", requirePermissionFactory("role:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateRoleSchema), async (c) => {
+  .put("/:id{[0-9]+}", requirePermissionFactory("role:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateRoleSchema), async (c) => {
     try {
       const id = Number(c.req.param("id"));
       const data = c.req.valid("json");
@@ -72,7 +72,7 @@ export const rolesRoutes = new Hono()
     }
   })
 
-  .delete("/:id", requirePermissionFactory("role:delete", c => ({ id: c.req.param("id") })), async (c) => {
+  .delete("/:id{[0-9]+}", requirePermissionFactory("role:delete", c => ({ id: c.req.param("id") })), async (c) => {
     const id = Number(c.req.param("id"));
 
     try {
@@ -83,23 +83,29 @@ export const rolesRoutes = new Hono()
     }
   })
 
-  .post("/assign", requirePermissionFactory("userRole:create"), validationMiddleware("json", UserRoleSchema), async (c) => {
-    const { userId, roleId } = c.req.valid("json");
+  .post("/:id{[0-9]+}/members", requirePermissionFactory("userRole:create"), validationMiddleware("json", AssignRoleMembersSchema), async (c) => {
+    const id = Number(c.req.param("id"));
+    const { userIds } = c.req.valid("json");
 
     try {
-      const userRole = await createUserRole({ userId, roleId });
-      return c.json({ success: true as const, userRole });
+      for (const userId of userIds) {
+        await createUserRole({ userId, roleId: id });
+      }
+      return c.json({ success: true as const });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
   })
 
-  .post("/remove", requirePermissionFactory("userRole:create"), validationMiddleware("json", UserRoleSchema), async (c) => {
-    const { userId, roleId } = c.req.valid("json");
+  .delete("/:id{[0-9]+}/members", requirePermissionFactory("userRole:create"), validationMiddleware("json", RemoveRoleMembersSchema), async (c) => {
+    const id = Number(c.req.param("id"));
+    const { userIds } = c.req.valid("json");
 
     try {
-      const userRole = await deleteUserRole({ userId, roleId });
-      return c.json({ success: true as const, userRole });
+      for (const userId of userIds) {
+        await deleteUserRole({ userId, roleId: id });
+      }
+      return c.json({ success: true as const });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }

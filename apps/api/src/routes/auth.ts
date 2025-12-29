@@ -9,7 +9,7 @@ import { validationMiddleware } from "@bunstack/api/middlewares/validation";
 import { isAuthorized } from "@bunstack/auth";
 import { deleteToken, insertToken } from "@bunstack/db/queries/tokens.queries";
 import { createUser, signIn } from "@bunstack/db/queries/users.queries";
-import { isAuthorizedSchema, LoginSchema, RegisterSchema } from "@bunstack/shared/schemas/auth.schemas";
+import { isAuthorizedSchema, LoginSchema, RegisterSchema } from "@bunstack/shared/schemas/api/auth.schemas";
 
 export const authRoutes = new Hono()
   /**

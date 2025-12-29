@@ -5,13 +5,13 @@ import { toast } from "sonner";
 
 import { Button } from "@bunstack/react/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@bunstack/react/components/card";
+import { Field, FieldContent, FieldError, FieldLabel } from "@bunstack/react/components/field";
 import { Input } from "@bunstack/react/components/input";
-import { Label } from "@bunstack/react/components/label";
 import { PasswordInput } from "@bunstack/react/components/password-input";
 import { Spinner } from "@bunstack/react/components/spinner";
 import { api } from "@bunstack/react/lib/http";
 import { cn } from "@bunstack/react/lib/utils";
-import { LoginSchema } from "@bunstack/shared/schemas/auth.schemas";
+import { LoginSchema } from "@bunstack/shared/schemas/api/auth.schemas";
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const { t } = useTranslation("auth");
@@ -54,12 +54,12 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
           >
             <div className="grid gap-6">
               <div className="grid gap-6">
-                <div className="grid gap-3">
-                  <form.Field
-                    name="email"
-                    children={field => (
-                      <>
-                        <Label htmlFor={field.name}>{t("fields.email")}</Label>
+                <form.Field
+                  name="email"
+                  children={field => (
+                    <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                      <FieldLabel htmlFor={field.name}>{t("fields.email")}</FieldLabel>
+                      <FieldContent>
                         <Input
                           name={field.name}
                           value={field.state.value}
@@ -69,23 +69,21 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                           placeholder="m@example.com"
                           required
                         />
-                        {field.state.meta.isTouched && !field.state.meta.isValid
-                          ? (
-                              <p className="text-destructive text-sm">
-                                {t(`errors.${field.name}.${field.state.meta.errors[0]?.message}`)}
-                              </p>
-                            )
-                          : null}
-                      </>
-                    )}
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <form.Field
-                    name="password"
-                    children={field => (
-                      <>
-                        <Label htmlFor={field.name}>{t("fields.password")}</Label>
+                        <FieldError errors={field.state.meta.errors}>
+                          {field.state.meta.isTouched && !field.state.meta.isValid && field.state.meta.errors[0]?.message
+                            ? t(`errors.${field.name}.${field.state.meta.errors[0]?.message}`)
+                            : null}
+                        </FieldError>
+                      </FieldContent>
+                    </Field>
+                  )}
+                />
+                <form.Field
+                  name="password"
+                  children={field => (
+                    <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                      <FieldLabel htmlFor={field.name}>{t("fields.password")}</FieldLabel>
+                      <FieldContent>
                         <PasswordInput
                           name={field.name}
                           value={field.state.value}
@@ -93,17 +91,15 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                           onChange={e => field.handleChange(e.target.value)}
                           required
                         />
-                        {field.state.meta.isTouched && !field.state.meta.isValid
-                          ? (
-                              <p className="text-destructive text-sm">
-                                {t(`errors.${field.name}.${field.state.meta.errors[0]?.message}`)}
-                              </p>
-                            )
-                          : null}
-                      </>
-                    )}
-                  />
-                </div>
+                        <FieldError errors={field.state.meta.errors}>
+                          {field.state.meta.isTouched && !field.state.meta.isValid && field.state.meta.errors[0]?.message
+                            ? t(`errors.${field.name}.${field.state.meta.errors[0]?.message}`)
+                            : null}
+                        </FieldError>
+                      </FieldContent>
+                    </Field>
+                  )}
+                />
                 <form.Subscribe
                   selector={state => [state.canSubmit, state.isSubmitting]}
                   children={([canSubmit, isSubmitting]) => (

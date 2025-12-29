@@ -9,7 +9,7 @@ import { createAccessToken, getCookieSettings } from "@bunstack/api/lib/jwt";
 import { factory } from "@bunstack/api/utils/hono";
 import { deleteToken, getToken } from "@bunstack/db/queries/tokens.queries";
 import { getUser } from "@bunstack/db/queries/users.queries";
-import { AccessTokenSchema, RefreshTokenSchema } from "@bunstack/shared/schemas/tokens.schemas";
+import { AccessTokenSchema, RefreshTokenSchema } from "@bunstack/shared/schemas/api/tokens.schemas";
 
 /**
  * Get the user from the JWT token and set the session context

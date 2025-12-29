@@ -1,6 +1,6 @@
 import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-import { nanoid } from "@/lib/nanoid";
+import { nanoid } from "../lib/nanoid";
 
 export const Tokens = pgTable("tokens", {
   id: text("id").primaryKey().$defaultFn(() => nanoid()),

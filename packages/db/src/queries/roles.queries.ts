@@ -1,5 +1,6 @@
 import type { WithRelations } from "@bunstack/shared/lib/type-utils";
-import type { InsertRoleSchema, UpdateRoleSchema } from "@bunstack/shared/schemas/roles.schemas";
+import type { UpdateRoleSchema } from "@bunstack/shared/schemas/api/roles.schemas";
+import type { InsertRoleSchema } from "@bunstack/shared/schemas/db/roles.schemas";
 import type { Role, RoleRelationKeys, RoleRelations, RoleWithRelations } from "@bunstack/shared/types/roles.types";
 import type { z } from "zod";
 
@@ -12,9 +13,9 @@ import { RolePermissions } from "@bunstack/shared/models/role-permissions.model"
 import { Roles } from "@bunstack/shared/models/roles.model";
 import { UserRoles } from "@bunstack/shared/models/user-roles.model";
 import { Users } from "@bunstack/shared/models/users.model";
-import { PolicySchema } from "@bunstack/shared/schemas/policies.schemas";
-import { RoleSchema } from "@bunstack/shared/schemas/roles.schemas";
-import { UserSchema } from "@bunstack/shared/schemas/users.schemas";
+import { PolicySchema } from "@bunstack/shared/schemas/db/policies.schemas";
+import { RoleSchema } from "@bunstack/shared/schemas/db/roles.schemas";
+import { UserSchema } from "@bunstack/shared/schemas/db/users.schemas";
 
 // ============================================================================
 // Relation Loaders

@@ -1,4 +1,4 @@
-import type { PasswordRules } from "../types/auth.types";
+import type { PasswordRules } from "../../types/auth.types";
 
 import { z } from "zod";
 
@@ -44,3 +44,4 @@ export const isAuthorizedSchema = z.object({
   permission: PermissionSchema,
   resource: z.record(z.string(), z.unknown()).optional(),
 });
+

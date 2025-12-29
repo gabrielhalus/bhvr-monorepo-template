@@ -9,9 +9,9 @@ import { Roles } from "@bunstack/shared/models/roles.model";
 import { Tokens } from "@bunstack/shared/models/tokens.model";
 import { UserRoles } from "@bunstack/shared/models/user-roles.model";
 import { Users } from "@bunstack/shared/models/users.model";
-import { RoleSchema } from "@bunstack/shared/schemas/roles.schemas";
-import { TokenSchema } from "@bunstack/shared/schemas/tokens.schemas";
-import { InsertUserSchema, UpdateUserSchema, UserSchema } from "@bunstack/shared/schemas/users.schemas";
+import { RoleSchema } from "@bunstack/shared/schemas/db/roles.schemas";
+import { TokenSchema } from "@bunstack/shared/schemas/db/tokens.schemas";
+import { InsertUserSchema, UpdateUserSchema, UserSchema } from "@bunstack/shared/schemas/db/users.schemas";
 
 // ============================================================================
 // Relation Loaders

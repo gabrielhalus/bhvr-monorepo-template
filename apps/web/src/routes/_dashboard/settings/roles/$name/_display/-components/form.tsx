@@ -1,29 +1,28 @@
 import type { z } from "zod";
 
 import { useForm } from "@tanstack/react-form";
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { Route } from "../index";
-import { getAllRolesQueryOptions, getRoleByNameQueryOptions } from "@/queries/roles";
+import { Route as Layout } from "../../route";
+import { getAllRolesQueryOptions } from "@/queries/roles";
 import { Button } from "@bunstack/react/components/button";
+import { Field, FieldContent, FieldError, FieldLabel } from "@bunstack/react/components/field";
 import { Input } from "@bunstack/react/components/input";
-import { Label } from "@bunstack/react/components/label";
 import { Spinner } from "@bunstack/react/components/spinner";
 import { api } from "@bunstack/react/lib/http";
-import { UpdateRoleSchema } from "@bunstack/shared/schemas/roles.schemas";
+import { UpdateRoleSchema } from "@bunstack/shared/schemas/api/roles.schemas";
 
 type UpdateRoleData = z.infer<typeof UpdateRoleSchema>;
 
 export function Form() {
   const { t } = useTranslation(["common", "web"]);
   const queryClient = useQueryClient();
-  const params = Route.useParams();
+  const params = Layout.useParams();
 
-  const { data } = useSuspenseQuery(getRoleByNameQueryOptions(params.name));
-  const role = data.role;
+  const { role } = Layout.useLoaderData();
 
   const formRef = useRef<{ reset: (values: UpdateRoleData) => void } | null>(null);
 
@@ -59,7 +58,9 @@ export function Form() {
       description: role.description ?? null,
     },
     onSubmit: async ({ value }) => {
-      mutation.mutate({ id: role.id, data: value });
+      if (role) {
+        mutation.mutate({ id: role.id, data: value });
+      }
     },
   });
 
@@ -77,50 +78,44 @@ export function Form() {
           <form.Field
             name="label"
             children={field => (
-              <>
-                <Label htmlFor={field.name}>
-                  {t("dashboard:pages.settings.roles.detail.pages.display.fields.label")}
-                </Label>
-                <Input
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={e => field.handleChange(e.target.value)}
-                  type="text"
-                  placeholder="Role"
-                  required
-                />
-                {field.state.meta.isTouched && !field.state.meta.isValid && (
-                  <p className="text-destructive text-sm">
-                    {field.state.meta.errors[0]?.message}
-                  </p>
-                )}
-              </>
+              <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                <FieldLabel htmlFor={field.name}>
+                  {t("web:pages.settings.roles.detail.pages.display.fields.label")}
+                </FieldLabel>
+                <FieldContent>
+                  <Input
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={e => field.handleChange(e.target.value)}
+                    type="text"
+                    placeholder="Role"
+                    required
+                  />
+                  <FieldError errors={field.state.meta.errors} />
+                </FieldContent>
+              </Field>
             )}
           />
-        </div>
-        <div className="grid gap-3">
           <form.Field
             name="description"
             children={field => (
-              <>
-                <Label htmlFor={field.name}>
-                  {t("dashboard:pages.settings.roles.detail.pages.display.fields.description")}
-                </Label>
-                <Input
-                  name={field.name}
-                  value={field.state.value ?? ""}
-                  onBlur={field.handleBlur}
-                  onChange={e => field.handleChange(e.target.value)}
-                  type="text"
-                  placeholder="Description"
-                />
-                {field.state.meta.isTouched && !field.state.meta.isValid && (
-                  <p className="text-destructive text-sm">
-                    {field.state.meta.errors[0]?.message}
-                  </p>
-                )}
-              </>
+              <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                <FieldLabel htmlFor={field.name}>
+                  {t("web:pages.settings.roles.detail.pages.display.fields.description")}
+                </FieldLabel>
+                <FieldContent>
+                  <Input
+                    name={field.name}
+                    value={field.state.value ?? ""}
+                    onBlur={field.handleBlur}
+                    onChange={e => field.handleChange(e.target.value)}
+                    type="text"
+                    placeholder="Description"
+                  />
+                  <FieldError errors={field.state.meta.errors} />
+                </FieldContent>
+              </Field>
             )}
           />
         </div>

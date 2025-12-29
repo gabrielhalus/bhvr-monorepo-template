@@ -39,13 +39,11 @@ async function bootstrap() {
       <ThemeProvider>
         <I18nextProvider i18n={i18n}>
           <QueryClientProvider client={queryClient}>
-            <Suspense fallback={<div>Loading...</div>}>
-              <AuthProvider>
-                <RouterProvider router={router} />
-                <Toaster position="bottom-center" />
-                <Sayno />
-              </AuthProvider>
-            </Suspense>
+            <AuthProvider>
+              <RouterProvider router={router} />
+              <Toaster position="bottom-center" />
+              <Sayno />
+            </AuthProvider>
           </QueryClientProvider>
         </I18nextProvider>
       </ThemeProvider>

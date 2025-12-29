@@ -3,7 +3,7 @@ import { Search } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-// import { AddMembersDialog } from "./-components/add-members-dialog";
+import { AssignRoleDialog } from "./-components/assign-role-dialog";
 import { RoleMembersList } from "./-components/members-list";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@bunstack/react/components/input-group";
 
@@ -28,7 +28,7 @@ function RoleMembers() {
           </InputGroupAddon>
           <InputGroupInput placeholder={t("pages.settings.roles.detail.pages.members.searchMembers")} value={globalFilter} onChange={e => setGlobalFilter(e.target.value)} />
         </InputGroup>
-        {/* <AddMembersDialog /> */}
+        <AssignRoleDialog />
       </div>
       <RoleMembersList search={globalFilter} />
     </div>

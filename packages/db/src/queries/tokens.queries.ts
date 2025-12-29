@@ -1,4 +1,4 @@
-import type { InsertTokenSchema, UpdateTokenSchema } from "@bunstack/shared/schemas/tokens.schemas";
+import type { InsertTokenSchema, UpdateTokenSchema } from "@bunstack/shared/schemas/db/tokens.schemas";
 import type { Token } from "@bunstack/shared/types/tokens.types";
 import type { z } from "zod";
 

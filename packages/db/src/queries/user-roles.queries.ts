@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 
 import { drizzle } from "@/database";
 import { UserRoles } from "@bunstack/shared/models/user-roles.model";
-import { UserRoleSchema } from "@bunstack/shared/schemas/user-roles.schemas";
+import { UserRoleSchema } from "@bunstack/shared/schemas/db/user-roles.schemas";
 
 /**
  * Create a new user-role relation.

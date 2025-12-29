@@ -1,7 +1,7 @@
 import type { Tokens } from "../models/tokens.model";
 import type { User } from "./users.types";
 import type { WithRelations } from "@/lib/type-utils";
-import type { AccessTokenSchema, RefreshTokenSchema, VerificationTokenSchema } from "@/schemas/tokens.schemas";
+import type { AccessTokenSchema, RefreshTokenSchema, VerificationTokenSchema } from "@/schemas/api/tokens.schemas";
 import type z from "zod";
 
 export type Token = typeof Tokens.$inferSelect;
