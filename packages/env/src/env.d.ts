@@ -3,7 +3,7 @@ declare global {
   // We need to use interface here to extend the global ImportMeta type
   /* eslint-disable-next-line */
   interface ImportMeta {
-    readonly env?: Record<string, string | undefined>;
+    env?: Record<string, string | undefined>;
   }
 }
 

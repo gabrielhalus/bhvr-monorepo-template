@@ -1,26 +1,23 @@
-import type { User } from "@bunstack/shared/types/users";
-
 import { Hono } from "hono";
+import { z } from "zod";
 
-import { requirePermission } from "@bunstack/api/middlewares/access-control";
-import { getAuthContext } from "@bunstack/api/middlewares/auth";
+import { requirePermissionFactory } from "@bunstack/api/middlewares/access-control";
+import { getSessionContext } from "@bunstack/api/middlewares/auth";
 import { validationMiddleware } from "@bunstack/api/middlewares/validation";
-import { deleteUserById, findUserById, getUsers, userEmailExists } from "@bunstack/db/queries/users";
-import { paginationInputSchema } from "@bunstack/shared/contracts/pagination";
-import { checkEmailSchema } from "@bunstack/shared/contracts/users";
+import { deleteUser, emailExists, getUser, getUsers, updateUser } from "@bunstack/db/queries/users.queries";
+import { UpdateUserSchema, UserRelationsQuerySchema } from "@bunstack/shared/schemas/users.schemas";
 
 export const usersRoutes = new Hono()
   /**
-   * Check if an email is available
-   * This endpoint does NOT require authentication.
+   * Check if an email is available.
    *
    * @param c - The context
    * @returns Whether the email is available
    */
-  .get("/check-email", validationMiddleware("query", checkEmailSchema), async (c) => {
+  .get("/check-email", validationMiddleware("query", z.object({ email: z.email() })), async (c) => {
     try {
       const { email } = c.req.valid("query");
-      const exists = await userEmailExists(email);
+      const exists = await emailExists(email);
 
       return c.json({ success: true as const, available: !exists });
     } catch (error) {
@@ -29,38 +26,38 @@ export const usersRoutes = new Hono()
   })
 
   // --- All routes below this point require authentication
-  .use(getAuthContext)
+  .use(getSessionContext)
 
   /**
-   * Get all users
+   * Get all users.
    *
    * @param c - The context
    * @returns All users
    */
-  .get("/", requirePermission("user:list"), validationMiddleware("query", paginationInputSchema), async (c) => {
+  .get("/", validationMiddleware("query", UserRelationsQuerySchema), requirePermissionFactory("user:list"), async (c) => {
+    const { includes } = c.req.valid("query");
+
     try {
-      const { page, pageSize, search, sortField, sortDirection } = c.req.valid("query");
+      const users = await getUsers(includes);
 
-      const orderBy = sortField ? { field: sortField as keyof User, direction: sortDirection } : undefined;
-      const { users, total } = await getUsers(page, pageSize, orderBy, search);
-
-      return c.json({ success: true as const, users, total });
+      return c.json({ success: true as const, users });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
   })
 
   /**
-   * Get a user by their ID
+   * Get a user by id.
    *
    * @param c - The context
    * @returns The user
    */
-  .get("/:id", requirePermission("user:read", c => ({ id: c.req.param("id") })), async (c) => {
+  .get("/:id", validationMiddleware("query", UserRelationsQuerySchema), requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), async (c) => {
     const { id } = c.req.param();
+    const { includes } = c.req.valid("query");
 
     try {
-      const user = await findUserById(id);
+      const user = await getUser(id, includes);
 
       if (!user) {
         return c.json({ success: false, error: "Not Found" }, 404);
@@ -72,17 +69,35 @@ export const usersRoutes = new Hono()
     }
   })
 
+/**
+ * Update a user by id.
+ *
+ * @param c - The context
+ * @returns The updated user
+ */
+  .put("/:id", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateUserSchema), async (c) => {
+    const { id } = c.req.param();
+    const data = c.req.valid("json");
+
+    try {
+      const user = await updateUser(id, data);
+      return c.json({ success: true as const, user });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
   /**
-   * Delete a user by their ID
+   * Delete a user by id.
    *
    * @param c - The context
-   * @returns The user
+   * @returns The deleted user
    */
-  .delete("/:id", requirePermission("user:delete", c => ({ id: c.req.param("id") })), async (c) => {
+  .delete("/:id", requirePermissionFactory("user:delete", c => ({ id: c.req.param("id") })), async (c) => {
     const { id } = c.req.param();
 
     try {
-      const user = await deleteUserById(id);
+      const user = await deleteUser(id);
       return c.json({ success: true as const, user });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);

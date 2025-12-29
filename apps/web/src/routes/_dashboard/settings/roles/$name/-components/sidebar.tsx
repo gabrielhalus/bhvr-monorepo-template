@@ -3,21 +3,13 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { getAllRolesQueryOptions } from "@/queries/roles";
+import { getRolesQueryOptions } from "@/queries/roles";
 import { Button } from "@bunstack/react/components/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@bunstack/react/components/tooltip";
 
 export function Sidebar() {
   const { t } = useTranslation("common");
-  const { isPending, isError, data } = useQuery(getAllRolesQueryOptions);
-
-  if (isPending) {
-    return null;
-  }
-
-  if (isError) {
-    return null;
-  }
+  const { data } = useQuery(getRolesQueryOptions());
 
   return (
     <aside className="h-full w-75 p-2 border-r-1">
@@ -40,7 +32,7 @@ export function Sidebar() {
         </Tooltip>
       </div>
       <div className="flex p-2 flex-col space-y-1">
-        {data.roles.map(role => (
+        {data?.roles.map(role => (
           <Button asChild key={role.id} variant="ghost" className="justify-start">
             <Link to="/settings/roles/$name" params={{ name: role.name }} activeProps={() => ({ className: "bg-muted" })}>
               {role.label}

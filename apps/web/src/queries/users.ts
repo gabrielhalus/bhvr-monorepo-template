@@ -1,4 +1,4 @@
-import type { PaginationInput } from "@bunstack/shared/contracts/pagination";
+import type { UserRelationKeys } from "@bunstack/shared/types/users.types";
 
 import { queryOptions } from "@tanstack/react-query";
 
@@ -18,17 +18,11 @@ export const getAllUsersQueryOptions = queryOptions({
   staleTime: 1000 * 60 * 5,
 });
 
-export function getUsersPaginatedQueryOptions(props: PaginationInput) {
+export function getUsersQueryOptions(includes?: UserRelationKeys) {
   return queryOptions({
-    queryKey: ["get-users-paginated", props],
+    queryKey: ["get-users", includes],
     queryFn: async () => {
-      const params = {
-        ...props,
-        page: String(props.page),
-        pageSize: String(props.pageSize),
-      };
-
-      const res = await api.users.$get({ query: params });
+      const res = await api.users.$get({ query: { includes } });
 
       if (!res.ok) {
         throw new Error("Failed to fetch users");
@@ -40,11 +34,11 @@ export function getUsersPaginatedQueryOptions(props: PaginationInput) {
   });
 }
 
-export function getUserQueryOptions(id: string) {
+export function getUserQueryOptions(id: string, includes?: UserRelationKeys) {
   return queryOptions({
-    queryKey: ["get-user", id],
+    queryKey: ["get-user", id, includes],
     queryFn: async () => {
-      const res = await api.users[":id"].$get({ param: { id } });
+      const res = await api.users[":id"].$get({ param: { id }, query: { includes } });
 
       if (!res.ok) {
         throw new Error("Failed to fetch user");

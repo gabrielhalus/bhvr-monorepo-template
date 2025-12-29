@@ -1,5 +1,5 @@
-import type { Role, RoleWithMembers } from "@bunstack/shared/types/roles";
-import type { User } from "@bunstack/shared/types/users";
+import type { Role, RoleWithRelations } from "@bunstack/shared/types/roles.types";
+import type { User } from "@bunstack/shared/types/users.types";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
@@ -11,19 +11,19 @@ import { AvatarUser } from "@/components/avatar-user";
 import { getRoleByNameQueryOptions } from "@/queries/roles";
 import { Button } from "@bunstack/react/components/button";
 import { Spinner } from "@bunstack/react/components/spinner";
-import { useAuth } from "@bunstack/react/hooks/use-auth";
 import { api } from "@bunstack/react/lib/http";
 import sayno from "@bunstack/react/lib/sayno";
+import { authorizeQueryOptions } from "@bunstack/react/queries/auth";
 
 export function RoleMembersList({ search }: { search: string }) {
   const { role } = Layout.useLoaderData();
 
   const query = useQuery({
-    ...getRoleByNameQueryOptions(role.name),
-    initialData: { success: true, role: role as RoleWithMembers },
+    ...getRoleByNameQueryOptions(role.name, ["members"]),
+    initialData: { success: true, role },
   });
 
-  const filteredMembers = query.data?.role.members.filter(member =>
+  const filteredMembers = query.data?.role.members?.filter(member =>
     member.name.toLowerCase().includes(search.toLowerCase()),
   );
 
@@ -37,24 +37,27 @@ export function RoleMembersList({ search }: { search: string }) {
 }
 
 function RoleMemberItem({ user, role }: { user: User; role: Role }) {
-  const { can } = useAuth();
   const queryClient = useQueryClient();
+
+  const { data: canDelete } = useQuery(authorizeQueryOptions("role:delete", role));
 
   const mutation = useMutation({
     mutationFn: async (userId: string) => {
       const res = await api.roles.remove.$post({ json: { userId, roleId: role.id } });
+      console.log(res);
 
       if (!res.ok) {
         throw new Error("Failed to remove user role");
       }
 
+      
       const data = await res.json();
       return data.userRole;
     },
-    onError: () => toast.error("Failed to remove user role 2222"),
+    onError: () => toast.error("Failed to remove user role"),
     onSuccess: () => {
       toast.success("User role removed successfully");
-      queryClient.setQueryData<{ success: true; role: RoleWithMembers }>(getRoleByNameQueryOptions(role.name).queryKey, (old) => {
+      queryClient.setQueryData<{ success: true; role: RoleWithRelations<["members"]> }>(getRoleByNameQueryOptions(role.name).queryKey, (old) => {
         if (!old) {
           return old;
         }
@@ -63,7 +66,7 @@ function RoleMemberItem({ user, role }: { user: User; role: Role }) {
           ...old,
           role: {
             ...old.role,
-            members: old.role.members.filter((member: User) => member.id !== user.id),
+            members: old.role.members?.filter((member: User) => member.id !== user.id),
           },
         });
       });
@@ -88,12 +91,11 @@ function RoleMemberItem({ user, role }: { user: User; role: Role }) {
         <AvatarUser {...user} />
         <Link to="/settings/users/$userId" params={{ userId: encodeURIComponent(user.id) }} className="text-sm text-foreground hover:underline">{user.name}</Link>
       </div>
-      { can("userRole:delete")
-        && (
-          <Button variant="ghost" size="icon" onClick={event => handleRemove(user, event)}>
-            {mutation.isPending ? <Spinner /> : <XIcon className="size-4" />}
-          </Button>
-        )}
+      { canDelete && (
+        <Button variant="ghost" size="icon" onClick={event => handleRemove(user, event)}>
+          {mutation.isPending ? <Spinner /> : <XIcon className="size-4" />}
+        </Button>
+      )}
     </div>
   );
 }

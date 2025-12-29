@@ -4,6 +4,10 @@ import { cors } from "hono/cors";
 
 import { env } from "@bunstack/api/lib/env";
 
+/**
+ * The CORS middleware.
+ * @returns The CORS middleware.
+ */
 export default function (): MiddlewareHandler {
   return cors({
     origin: (originHeader) => {

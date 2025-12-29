@@ -1,7 +1,8 @@
-import type { UpdateRoleInput } from "@bunstack/shared/contracts/roles";
+import type { z } from "zod";
 
 import { useForm } from "@tanstack/react-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -12,20 +13,26 @@ import { Input } from "@bunstack/react/components/input";
 import { Label } from "@bunstack/react/components/label";
 import { Spinner } from "@bunstack/react/components/spinner";
 import { api } from "@bunstack/react/lib/http";
-import { updateRoleInputSchema } from "@bunstack/shared/contracts/roles";
+import { UpdateRoleSchema } from "@bunstack/shared/schemas/roles.schemas";
+
+type UpdateRoleData = z.infer<typeof UpdateRoleSchema>;
 
 export function Form() {
   const { t } = useTranslation(["common", "web"]);
-
   const queryClient = useQueryClient();
   const params = Route.useParams();
 
-  const { data } = useQuery(getRoleByNameQueryOptions(params.name));
-  const { role } = data!;
+  const { data } = useSuspenseQuery(getRoleByNameQueryOptions(params.name));
+  const role = data.role;
+
+  const formRef = useRef<{ reset: (values: UpdateRoleData) => void } | null>(null);
 
   const mutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: UpdateRoleInput }) => {
-      const res = await api.roles[":id"].$put({ param: { id: String(id) }, json: data });
+    mutationFn: async ({ id, data }: { id: number; data: UpdateRoleData }) => {
+      const res = await api.roles[":id"].$put({
+        param: { id: String(id) },
+        json: data,
+      });
 
       if (!res.ok) {
         throw new Error("Failed to update role");
@@ -33,13 +40,12 @@ export function Form() {
 
       return res.json();
     },
-    onSuccess: ({ role: data }) => {
+    onSuccess: (response) => {
       toast.success(`Role successfully updated`);
       queryClient.refetchQueries(getAllRolesQueryOptions);
       queryClient.invalidateQueries({ queryKey: ["get-role-by-name", params.name] });
       queryClient.invalidateQueries({ queryKey: ["get-roles-paginated"] });
-      // eslint-disable-next-line ts/no-use-before-define
-      form.reset(data);
+      formRef.current?.reset(response.role);
     },
     onError: () => {
       toast.error("Failed to update role");
@@ -47,16 +53,17 @@ export function Form() {
   });
 
   const form = useForm({
-    validators: {
-      onChange: updateRoleInputSchema,
-    },
+    validators: { onChange: UpdateRoleSchema },
     defaultValues: {
-      label: role.label,
-      description: role.description,
+      label: role.label || "",
+      description: role.description ?? null,
     },
-
-    onSubmit: async ({ value }) => mutation.mutate({ id: role.id, data: value }),
+    onSubmit: async ({ value }) => {
+      mutation.mutate({ id: role.id, data: value });
+    },
   });
+
+  formRef.current = form;
 
   return (
     <form onSubmit={(e) => {
@@ -71,23 +78,23 @@ export function Form() {
             name="label"
             children={field => (
               <>
-                <Label htmlFor={field.name}>{t("dashboard:pages.settings.roles.detail.pages.display.fields.label")}</Label>
+                <Label htmlFor={field.name}>
+                  {t("dashboard:pages.settings.roles.detail.pages.display.fields.label")}
+                </Label>
                 <Input
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={e => field.handleChange(e.target.value)}
-                  type="label"
+                  type="text"
                   placeholder="Role"
                   required
                 />
-                {field.state.meta.isTouched && !field.state.meta.isValid
-                  ? (
-                      <p className="text-destructive text-sm">
-                        {field.state.meta.errors[0]?.message}
-                      </p>
-                    )
-                  : null}
+                {field.state.meta.isTouched && !field.state.meta.isValid && (
+                  <p className="text-destructive text-sm">
+                    {field.state.meta.errors[0]?.message}
+                  </p>
+                )}
               </>
             )}
           />
@@ -97,23 +104,22 @@ export function Form() {
             name="description"
             children={field => (
               <>
-                <Label htmlFor={field.name}>{t("dashboard:pages.settings.roles.detail.pages.display.fields.description")}</Label>
+                <Label htmlFor={field.name}>
+                  {t("dashboard:pages.settings.roles.detail.pages.display.fields.description")}
+                </Label>
                 <Input
                   name={field.name}
                   value={field.state.value ?? ""}
                   onBlur={field.handleBlur}
                   onChange={e => field.handleChange(e.target.value)}
                   type="text"
-                  placeholder="Role"
-                  required
+                  placeholder="Description"
                 />
-                {field.state.meta.isTouched && !field.state.meta.isValid
-                  ? (
-                      <p className="text-destructive text-sm">
-                        {field.state.meta.errors[0]?.message}
-                      </p>
-                    )
-                  : null}
+                {field.state.meta.isTouched && !field.state.meta.isValid && (
+                  <p className="text-destructive text-sm">
+                    {field.state.meta.errors[0]?.message}
+                  </p>
+                )}
               </>
             )}
           />
@@ -121,18 +127,22 @@ export function Form() {
         <form.Subscribe
           selector={state => [state.canSubmit, state.isSubmitting, state.isDefaultValue]}
           children={([canSubmit, isSubmitting, isDefaultValue]) => (
-            <>
-              <Button type="submit" disabled={!canSubmit || isDefaultValue}>
-                { isSubmitting
+            <Button type="submit" disabled={!canSubmit || isDefaultValue}>
+              {isSubmitting
+                ? (
+                    <span className="flex items-center space-x-2">
+                      <Spinner />
+                      {t("form.saving")}
+                    </span>
+                  )
+                : isDefaultValue
                   ? (
-                      <span className="flex items-center space-x-2">
-                        <Spinner />
-                        {t("form.saving")}
-                      </span>
+                      t("form.noChanges")
                     )
-                  : isDefaultValue ? t("form.noChanges") : t("form.save") }
-              </Button>
-            </>
+                  : (
+                      t("form.save")
+                    )}
+            </Button>
           )}
         />
       </div>

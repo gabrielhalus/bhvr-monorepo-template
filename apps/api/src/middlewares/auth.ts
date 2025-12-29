@@ -1,49 +1,49 @@
+import type { AppContext } from "@bunstack/api/utils/hono";
+import type { AccessToken } from "@bunstack/shared/types/tokens.types";
+
 import { getCookie, setCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
 
-import { createAccessToken, getCookieSettings, verifyToken } from "@bunstack/api/lib/auth";
 import { env } from "@bunstack/api/lib/env";
+import { createAccessToken, getCookieSettings } from "@bunstack/api/lib/jwt";
 import { factory } from "@bunstack/api/utils/hono";
-import { deleteToken, getTokenById } from "@bunstack/db/queries/tokens";
-import { findUserWithContext } from "@bunstack/db/queries/users";
+import { deleteToken, getToken } from "@bunstack/db/queries/tokens.queries";
+import { getUser } from "@bunstack/db/queries/users.queries";
+import { AccessTokenSchema, RefreshTokenSchema } from "@bunstack/shared/schemas/tokens.schemas";
 
 /**
- * Get the user from the JWT token and set the auth context
+ * Get the user from the JWT token and set the session context
  * Automatically refreshes the access token if it's expired but refresh token is valid
  * @param c - The context
  * @param next - The next middleware
  * @returns The user
  */
-export const getAuthContext = factory.createMiddleware(async (c, next) => {
+export const getSessionContext = factory.createMiddleware(async (c, next) => {
   const accessToken = getCookie(c, "accessToken");
-  let decoded;
+  let decoded: AccessToken | null = null;
 
-  // Try to verify the access token
-  if (accessToken) {
-    try {
-      decoded = await verify(accessToken, env.JWT_SECRET);
-    } catch {
-      // Access token is invalid/expired, try to refresh
+  try {
+    if (accessToken) {
+      const verified = await verify(accessToken, env.JWT_SECRET);
+      decoded = AccessTokenSchema.parse(verified);
+    } else {
       decoded = await attemptTokenRefresh(c);
-      if (!decoded) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
     }
-  } else {
-    // No access token, try to refresh
+  } catch {
     decoded = await attemptTokenRefresh(c);
-    if (!decoded) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
   }
 
-  const { user, ...context } = await findUserWithContext(decoded.sub as string);
+  if (!decoded) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const user = await getUser(decoded.sub, ["roles"]);
 
   if (!user) {
     return c.json({ error: "Unauthorized" }, 401);
   }
 
-  c.set("authContext", { user, ...context });
+  c.set("sessionContext", { user });
 
   await next();
 });
@@ -53,7 +53,7 @@ export const getAuthContext = factory.createMiddleware(async (c, next) => {
  * @param c - The context
  * @returns The decoded access token payload or null if refresh failed
  */
-async function attemptTokenRefresh(c: any) {
+async function attemptTokenRefresh(c: AppContext): Promise<AccessToken | null> {
   const refreshToken = getCookie(c, "refreshToken");
 
   if (!refreshToken) {
@@ -61,28 +61,25 @@ async function attemptTokenRefresh(c: any) {
   }
 
   try {
-    const payload = await verifyToken(refreshToken, "refresh");
-    if (!payload) {
-      return null;
-    }
+    const verified = await verify(refreshToken, env.JWT_SECRET);
+    const decoded = RefreshTokenSchema.parse(verified);
 
-    const { sub, jti } = payload;
-    const tokenRecord = await getTokenById(jti);
+    const tokenRecord = await getToken(decoded.jti);
 
     if (!tokenRecord || tokenRecord.expiresAt < new Date().toISOString() || tokenRecord.revokedAt) {
-      // Clean up expired token
-      if (jti) {
-        await deleteToken(jti);
+      if (decoded.jti) {
+        await deleteToken(decoded.jti);
       }
       return null;
     }
 
-    // Create new access token
-    const newAccessToken = await createAccessToken(sub);
+    const newAccessToken = await createAccessToken(decoded.sub);
     setCookie(c, "accessToken", newAccessToken, getCookieSettings("access"));
 
-    // Verify and return the new token
-    return await verify(newAccessToken, env.JWT_SECRET);
+    const newVerified = await verify(newAccessToken, env.JWT_SECRET);
+    const newDecoded = AccessTokenSchema.parse(newVerified);
+
+    return newDecoded;
   } catch {
     return null;
   }

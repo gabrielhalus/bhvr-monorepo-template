@@ -19,6 +19,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@bunstack/db": "workspace:*",
     "@bunstack/shared": "workspace:*"
   },
   "devDependencies": {

@@ -11,8 +11,8 @@ import { PasswordInput } from "@bunstack/react/components/password-input";
 import { Spinner } from "@bunstack/react/components/spinner";
 import { api } from "@bunstack/react/lib/http";
 import { cn } from "@bunstack/react/lib/utils";
-import { passwordChecks, passwordRules, registerInputSchema } from "@bunstack/shared/contracts/auth";
 import { debounceAsync } from "@bunstack/shared/lib/debounce";
+import { passwordChecks, passwordRules, RegisterSchema } from "@bunstack/shared/schemas/auth.schemas";
 
 const checkEmail = debounceAsync(async (email: string): Promise<string | void> => {
   const res = await api.users["check-email"].$get({ query: { email } });
@@ -38,7 +38,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
 
   const form = useForm({
     validators: {
-      onChange: registerInputSchema,
+      onChange: RegisterSchema,
     },
     defaultValues: {
       name: "",
@@ -50,7 +50,6 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
       const json = await res.json();
 
       if (json.success) {
-        await api.email["send-account-verification"].$post();
         return navigate({ href: redirectTo, replace: true });
       }
 

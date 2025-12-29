@@ -1,4 +1,4 @@
-import type { RoleWithMembersCount } from "@bunstack/shared/types/roles";
+import type { RoleWithRelations } from "@bunstack/shared/types/roles.types";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { Link } from "@tanstack/react-router";
@@ -9,7 +9,7 @@ import { Button } from "@bunstack/react/components/button";
 import { SortableHeader } from "@bunstack/react/components/sortable-header";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@bunstack/react/components/tooltip";
 
-export const columns: ColumnDef<RoleWithMembersCount>[] = [
+export const columns: ColumnDef<RoleWithRelations<["members"]>>[] = [
   {
     accessorKey: "label",
     header: ({ column }) => <SortableHeader column={column} title="Name" />,
@@ -33,7 +33,7 @@ export const columns: ColumnDef<RoleWithMembersCount>[] = [
         <TooltipTrigger asChild>
           <Button asChild variant="ghost" size="sm">
             <Link to="/settings/roles/$name/members" params={{ name: row.original.name }} className="flex items-center gap-2">
-              {row.original.members}
+              {row.original.members.length}
               <UserRound className="size-4" />
             </Link>
           </Button>

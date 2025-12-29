@@ -1,4 +1,4 @@
-import type { PasswordRules } from "@bunstack/shared/contracts/auth";
+import type { PasswordRules } from "@bunstack/shared/types/auth.types";
 import type { MouseEvent } from "react";
 
 import { Check, Eye, EyeOff, X } from "lucide-react";

@@ -1,58 +1,55 @@
-import type { Permission, Policy, Role, Session, User } from "./types";
+import type { Permission } from "@bunstack/shared/types/permissions.types";
+import type { UserWithRelations } from "@bunstack/shared/types/users.types";
 
 import { evaluateCondition } from "./evaluate-condition";
+import { hydrateRoles } from "@bunstack/db/queries/roles.queries";
 
 /**
- * Checks if a user has permission to perform an action.
- *
+ * Check if a user has a specific permission
  * @param permission - The permission to check
- * @param user - The user context
- * @param roles - The user's roles with permissions
- * @param policies - The applicable policies
+ * @param user - The user with roles
  * @param resource - Optional resource context for policy evaluation
- * @returns `true` if the user has permission, `false` otherwise
+ * @returns True if the user has the permission, false otherwise
  */
-export function can(permission: Permission, user: User, roles: Role[], policies: Policy[], resource?: Record<string, unknown>): boolean {
-  // Super admins bypass all checks
-  if (roles.some(r => r.isSuperAdmin)) {
+export async function isAuthorized(permission: Permission, user: UserWithRelations<["roles"]>, resource?: Record<string, unknown>): Promise<boolean> {
+  if (!user.roles || user.roles.length === 0) {
+    return false;
+  }
+
+  if (user.roles.some(role => role.isSuperAdmin)) {
     return true;
   }
 
-  // Sort roles by index (descending) to check highest priority roles first
-  const sortedRoles = [...roles].sort((a, b) => b.index - a.index);
+  const hydratedRoles = await hydrateRoles(user.roles, ["permissions", "policies"]);
 
-  for (const role of sortedRoles) {
-    // Get policies for this role and permission (or global policies)
-    const rolePolicies = policies.filter(p =>
-      (p.permission === null || p.permission === permission)
-      && (p.roleId === null || p.roleId === role.id),
-    );
+  for (const role of hydratedRoles) {
+    const { policies, permissions } = role;
 
-    // If no policies exist for this role-permission combination
-    if (!rolePolicies.length) {
-      // Check if the role has the permission directly
-      if (role.permissions.includes(permission)) {
+    if (!policies || policies.length === 0) {
+      if (permissions?.includes(permission)) {
         return true;
       }
       continue;
     }
 
-    // Evaluate policies in order
-    for (const policy of rolePolicies) {
-      const validCondition = policy.condition
+    for (const policy of policies) {
+      const satisfiesCondition = policy.condition
         ? evaluateCondition(policy.condition, user, resource)
         : true;
 
-      if (!validCondition) {
-        continue;
+      if (satisfiesCondition && policy.effect === "allow") {
+        return true;
       }
 
-      // First matching policy determines the result
-      return policy.effect === "allow";
+      if (satisfiesCondition && policy.effect === "deny") {
+        return false;
+      }
+    }
+
+    if (permissions?.includes(permission)) {
+      return true;
     }
   }
 
   return false;
 }
-
-export type { Condition, Operand, Permission, Policy, Role, Session, User } from "./types";

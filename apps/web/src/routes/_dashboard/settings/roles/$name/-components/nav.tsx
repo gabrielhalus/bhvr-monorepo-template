@@ -1,4 +1,4 @@
-import type { RoleWithMembers } from "@bunstack/shared/types/roles";
+import type { RoleWithRelations } from "@bunstack/shared/types/roles.types";
 import type { LinkOptions } from "@tanstack/react-router";
 
 import { useQuery } from "@tanstack/react-query";
@@ -15,11 +15,11 @@ export function Nav() {
   const { role } = Route.useLoaderData();
 
   const query = useQuery({
-    ...getRoleByNameQueryOptions(role.name),
+    ...getRoleByNameQueryOptions(role.name, ["members"]),
     initialData: { success: true, role },
   });
 
-  const nav = (role: RoleWithMembers) => [
+  const nav = (role: RoleWithRelations<["members"]>) => [
     {
       label: t("pages.settings.roles.detail.nav.display"),
       linkOptions: {
@@ -28,7 +28,7 @@ export function Nav() {
       } as LinkOptions,
     },
     {
-      label: t("pages.settings.roles.detail.nav.members", { count: role.members.length }),
+      label: t("pages.settings.roles.detail.nav.members", { count: role.members?.length }),
       linkOptions: {
         to: "/settings/roles/$name/members",
         params: { name: role.name },

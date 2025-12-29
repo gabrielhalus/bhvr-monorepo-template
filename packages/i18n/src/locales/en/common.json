@@ -44,9 +44,11 @@
     "ok": "OK",
     "language": "Language: {{lang}}",
     "theme": "Theme: {{theme}}",
+    "themeSystem": "System",
     "themeLight": "Light",
     "themeDark": "Dark",
-    "themeSystem": "System"
+    "themeModernMinimalLight": "Modern Light",
+    "themeModernMinimalDark": "Modern Dark"
   },
   "table": {
     "columns": "Columns",

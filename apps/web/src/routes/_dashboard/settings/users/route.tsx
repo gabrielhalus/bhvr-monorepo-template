@@ -1,9 +1,13 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
+import { authorizeQueryOptions } from "@bunstack/react/queries/auth";
+
 export const Route = createFileRoute("/_dashboard/settings/users")({
   component: UsersLayout,
-  beforeLoad: async ({ context: { session } }) => {
-    if (!session?.can("user:list")) {
+  beforeLoad: async ({ context }) => {
+    const canList = await context.queryClient.ensureQueryData(authorizeQueryOptions("user:list"));
+
+    if (!canList) {
       throw redirect({ to: "/" });
     }
   },

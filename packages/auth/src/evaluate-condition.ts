@@ -1,4 +1,5 @@
-import type { Condition, Operand, User } from "./types";
+import type { Condition, Operand } from "@bunstack/shared/types/auth.types";
+import type { User } from "@bunstack/shared/types/users.types";
 
 function getNested(obj: unknown, path: string): unknown {
   return path.split(".").reduce((acc, part) => {

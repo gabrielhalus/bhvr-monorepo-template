@@ -3,13 +3,13 @@
   "type": "module",
   "version": "0.0.0",
   "exports": {
-    "./contracts/*": {
-      "types": "./dist/contracts/*/index.d.ts",
-      "import": "./dist/contracts/*/index.js"
-    },
     "./lib/*": {
       "types": "./dist/lib/*.d.ts",
       "import": "./dist/lib/*.js"
+    },
+    "./models/*": {
+      "types": "./dist/models/*.d.ts",
+      "import": "./dist/models/*.js"
     },
     "./schemas/*": {
       "types": "./dist/schemas/*.d.ts",

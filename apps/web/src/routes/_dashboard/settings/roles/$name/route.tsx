@@ -4,22 +4,25 @@ import { useTranslation } from "react-i18next";
 import { Nav } from "./-components/nav";
 import { Sidebar } from "./-components/sidebar";
 import { getRoleByNameQueryOptions } from "@/queries/roles";
-import { getAllUsersQueryOptions } from "@/queries/users";
+import { getUsersQueryOptions } from "@/queries/users";
+import { authorizeQueryOptions } from "@bunstack/react/queries/auth";
 
 export const Route = createFileRoute("/_dashboard/settings/roles/$name")({
   component: RoleLayout,
-  beforeLoad: async ({ params, context: { queryClient, session } }) => {
-    const { role } = await queryClient.ensureQueryData(getRoleByNameQueryOptions(params.name));
+  beforeLoad: async ({ params, context }) => {
+    const { role } = await context.queryClient.ensureQueryData(getRoleByNameQueryOptions(params.name, ["members"]));
 
-    if (!session?.can("role:read", role)) {
+    const canRead = await context.queryClient.ensureQueryData(authorizeQueryOptions("role:read", role));
+
+    if (!canRead) {
       throw redirect({ to: "/" });
     }
 
     return { role };
   },
   loader: async ({ params, context: { queryClient } }) => {
-    const { role } = await queryClient.ensureQueryData(getRoleByNameQueryOptions(params.name));
-    await queryClient.ensureQueryData(getAllUsersQueryOptions);
+    const { role } = await queryClient.ensureQueryData(getRoleByNameQueryOptions(params.name, ["members"]));
+    await queryClient.ensureQueryData(getUsersQueryOptions());
 
     return { role, crumb: role.label };
   },

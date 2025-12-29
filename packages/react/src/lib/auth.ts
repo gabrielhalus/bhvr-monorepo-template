@@ -1,4 +1,4 @@
-import type { Session } from "@bunstack/auth/types";
+import type { Session } from "@bunstack/shared/types/auth.types";
 
 import { redirect } from "@tanstack/react-router";
 
@@ -55,7 +55,7 @@ export function createAuth({
       return session;
     }
 
-    if (redirectOnUnauthenticated) {
+    if (redirectOnUnauthenticated && currentUrl !== env.VITE_AUTH_URL) {
       const authUrl = `${env.VITE_AUTH_URL}/login?redirect=${encodeURIComponent(currentUrl)}`;
       throw redirect({ href: authUrl, replace: true });
     }

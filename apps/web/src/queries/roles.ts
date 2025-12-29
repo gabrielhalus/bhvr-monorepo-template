@@ -1,4 +1,4 @@
-import type { PaginationInput } from "@bunstack/shared/contracts/pagination";
+import type { RoleRelationKeys } from "@bunstack/shared/types/roles.types";
 
 import { queryOptions } from "@tanstack/react-query";
 
@@ -18,17 +18,11 @@ export const getAllRolesQueryOptions = queryOptions({
   staleTime: 1000 * 60 * 5,
 });
 
-export function getRolesPaginatedQueryOptions(props: PaginationInput) {
+export function getRolesQueryOptions(includes?: RoleRelationKeys) {
   return queryOptions({
-    queryKey: ["get-roles-paginated", props],
+    queryKey: ["get-roles-paginated", includes],
     queryFn: async () => {
-      const params = {
-        ...props,
-        page: String(props.page),
-        pageSize: String(props.pageSize),
-      };
-
-      const res = await api.roles.$get({ query: params });
+      const res = await api.roles.$get({ query: { includes } });
 
       if (!res.ok) {
         throw new Error("Failed to fetch roles");
@@ -40,11 +34,11 @@ export function getRolesPaginatedQueryOptions(props: PaginationInput) {
   });
 }
 
-export function getRoleByNameQueryOptions(name: string) {
+export function getRoleByNameQueryOptions(name: string, includes?: RoleRelationKeys) {
   return queryOptions({
-    queryKey: ["get-role-by-name", name],
+    queryKey: ["get-role-by-name", name, includes],
     queryFn: async () => {
-      const res = await api.roles[":name"].$get({ param: { name } });
+      const res = await api.roles[":name"].$get({ param: { name }, query: { includes } });
 
       if (!res.ok) {
         throw new Error("Failed to fetch role");

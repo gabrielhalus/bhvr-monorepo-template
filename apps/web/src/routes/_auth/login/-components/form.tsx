@@ -11,7 +11,7 @@ import { PasswordInput } from "@bunstack/react/components/password-input";
 import { Spinner } from "@bunstack/react/components/spinner";
 import { api } from "@bunstack/react/lib/http";
 import { cn } from "@bunstack/react/lib/utils";
-import { loginInputSchema } from "@bunstack/shared/contracts/auth";
+import { LoginSchema } from "@bunstack/shared/schemas/auth.schemas";
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const { t } = useTranslation("auth");
@@ -19,10 +19,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
   const navigate = useNavigate();
   const location = useRouterState({ select: s => s.location });
   const searchParams = new URLSearchParams(location.searchStr);
-  const redirectTo = searchParams.get("redirect") || "/web";
+  const redirectTo = searchParams.get("redirect") || "/";
 
   const form = useForm({
-    validators: { onChange: loginInputSchema },
+    validators: { onChange: LoginSchema },
     defaultValues: {
       email: "",
       password: "",

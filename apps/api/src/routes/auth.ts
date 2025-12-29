@@ -3,12 +3,13 @@ import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 
 import { getClientInfo } from "@bunstack/api/helpers/get-client-info";
-import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN_EXPIRATION_SECONDS, validateUser, verifyToken } from "@bunstack/api/lib/auth";
-import { getAuthContext } from "@bunstack/api/middlewares/auth";
+import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN_EXPIRATION_SECONDS, verifyToken } from "@bunstack/api/lib/jwt";
+import { getSessionContext } from "@bunstack/api/middlewares/auth";
 import { validationMiddleware } from "@bunstack/api/middlewares/validation";
-import { deleteToken, getTokenById, insertToken } from "@bunstack/db/queries/tokens";
-import { insertUser, updateUserById } from "@bunstack/db/queries/users";
-import { loginInputSchema, registerInputSchema, verifyAccountSchema } from "@bunstack/shared/contracts/auth";
+import { isAuthorized } from "@bunstack/auth";
+import { deleteToken, insertToken } from "@bunstack/db/queries/tokens.queries";
+import { createUser, signIn } from "@bunstack/db/queries/users.queries";
+import { isAuthorizedSchema, LoginSchema, RegisterSchema } from "@bunstack/shared/schemas/auth.schemas";
 
 export const authRoutes = new Hono()
   /**
@@ -17,12 +18,12 @@ export const authRoutes = new Hono()
    * @param c - The context
    * @returns The access token
    */
-  .post("/register", validationMiddleware("json", registerInputSchema), async (c) => {
+  .post("/register", validationMiddleware("json", RegisterSchema), async (c) => {
     const user = c.req.valid("json");
     const hashedPassword = await password.hash(user.password);
 
     try {
-      const insertedUser = await insertUser({ ...user, password: hashedPassword });
+      const insertedUser = await createUser({ ...user, password: hashedPassword });
 
       const insertedToken = await insertToken({
         userId: insertedUser.id,
@@ -53,11 +54,11 @@ export const authRoutes = new Hono()
    * @param c - The context
    * @returns The access token
    */
-  .post("/login", validationMiddleware("json", loginInputSchema), async (c) => {
-    const credentials = c.req.valid("json");
+  .post("/login", validationMiddleware("json", LoginSchema), async (c) => {
+    const { email, password } = c.req.valid("json");
 
     try {
-      const userId = await validateUser(credentials);
+      const userId = await signIn(email, password);
       if (!userId) {
         return c.json({ success: false as const, error: "Invalid credentials" }, 200);
       }
@@ -107,51 +108,8 @@ export const authRoutes = new Hono()
     return c.json({ success: true as const });
   })
 
-  /**
-   * Verify user
-   *
-   * @param c - The context
-   * @returns Success
-   */
-  .get("/verify", validationMiddleware("query", verifyAccountSchema), async (c) => {
-    const { token } = c.req.valid("query");
-
-    try {
-      const payload = await verifyToken(token, "verification");
-      if (!payload) {
-        return c.json({ success: false as const, error: "Invalid token" }, 401);
-      }
-
-      const { sub: userId, jti } = payload;
-      if (!jti) {
-        return c.json({ success: false as const, error: "Invalid token" }, 401);
-      }
-
-      const tokenRecord = await getTokenById(jti);
-      if (!tokenRecord || tokenRecord.expiresAt < new Date().toISOString() || tokenRecord.revokedAt) {
-        if (tokenRecord) {
-          await deleteToken(jti);
-        }
-        return c.json({ success: false as const, error: "Invalid token" }, 401);
-      }
-
-      const user = await updateUserById(userId, { verifiedAt: new Date().toISOString() });
-      if (!user) {
-        return c.json({ success: false as const, error: "User not found" }, 404);
-      }
-
-      await deleteToken(jti);
-
-      return c.json({ success: true as const });
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Unknown error";
-      console.error("Verify account error:", errorMsg);
-      return c.json({ success: false as const, error: errorMsg }, 500);
-    }
-  })
-
   // --- All routes below this point require authentication
-  .use(getAuthContext)
+  .use(getSessionContext)
 
   /**
    * Get the authenticated user
@@ -160,6 +118,22 @@ export const authRoutes = new Hono()
    * @returns The authenticated user
    */
   .get("/", async (c) => {
-    const authContext = c.var.authContext;
-    return c.json({ success: true as const, ...authContext });
+    const sessionContext = c.var.sessionContext;
+    return c.json({ success: true as const, ...sessionContext });
+  })
+
+  /**
+   *
+   */
+  .post("/authorize", validationMiddleware("json", isAuthorizedSchema), async (c) => {
+    const sessionContext = c.var.sessionContext;
+    const { permission, resource } = c.req.valid("json");
+
+    try {
+      const authorize = await isAuthorized(permission, sessionContext.user, resource);
+
+      return c.json({ success: true as const, authorize });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
   });

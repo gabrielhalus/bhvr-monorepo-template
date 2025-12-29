@@ -1,4 +1,5 @@
-import type { UserWithRoles } from "@bunstack/shared/types/users";
+import type { Role } from "@bunstack/shared/types/roles.types";
+import type { UserWithRelations } from "@bunstack/shared/types/users.types";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { Link } from "@tanstack/react-router";
@@ -7,7 +8,7 @@ import { ActionDropdown } from "./action-dropdown";
 import { AvatarUser } from "@/components/avatar-user";
 import { SortableHeader } from "@bunstack/react/components/sortable-header";
 
-export const columns: ColumnDef<UserWithRoles>[] = [
+export const columns: ColumnDef<UserWithRelations<["roles"]>>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => <SortableHeader column={column} title="Name" />,
@@ -30,7 +31,7 @@ export const columns: ColumnDef<UserWithRoles>[] = [
     header: "Roles",
     cell: ({ row }) => (
       <div className="text-muted-foreground overflow-hidden text-ellipsis">
-        { row.original.roles.map(r => r.label).join(", ") }
+        { row.original.roles?.map(r => r.label).join(", ") }
       </div>
     ),
     size: 200,

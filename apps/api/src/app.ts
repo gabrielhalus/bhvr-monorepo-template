@@ -3,8 +3,6 @@ import { logger } from "hono/logger";
 
 import cors from "@bunstack/api/middlewares/cors";
 import { authRoutes } from "@bunstack/api/routes/auth";
-import { emailRoutes } from "@bunstack/api/routes/email";
-import { notificationsRoutes } from "@bunstack/api/routes/notifications";
 import { rolesRoutes } from "@bunstack/api/routes/roles";
 import { usersRoutes } from "@bunstack/api/routes/users";
 
@@ -25,8 +23,6 @@ app.use(cors());
 // -------------------
 const _api = app
   .route("/auth", authRoutes)
-  .route("/email", emailRoutes)
-  .route("/notifications", notificationsRoutes)
   .route("/roles", rolesRoutes)
   .route("/users", usersRoutes);
 

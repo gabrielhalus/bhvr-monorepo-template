@@ -4,6 +4,7 @@ import { LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
+import { env } from "@/lib/env";
 import { Button } from "@bunstack/react/components/button";
 import { DropdownMenuItem } from "@bunstack/react/components/dropdown-menu";
 import { Spinner } from "@bunstack/react/components/spinner";
@@ -22,7 +23,7 @@ export function LogoutButton({ variant = "button", className }: CommonProps) {
   const { t } = useTranslation("auth");
   const navigate = useNavigate();
 
-  const { isAuthenticated } = useAuth();
+  const { authenticated } = useAuth();
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -45,7 +46,7 @@ export function LogoutButton({ variant = "button", className }: CommonProps) {
       }
 
       // Redirect to login
-      navigate({ href: `/?redirect=${encodeURIComponent(location.href)}`, replace: true });
+      navigate({ href: `${env.VITE_AUTH_URL}/login`, replace: true });
     },
     onError: () => {
       toast.error(t("logout.error"));
@@ -61,7 +62,7 @@ export function LogoutButton({ variant = "button", className }: CommonProps) {
     </>
   );
 
-  if (!isAuthenticated) {
+  if (!authenticated) {
     return null;
   }
 

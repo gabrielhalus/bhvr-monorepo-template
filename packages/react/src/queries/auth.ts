@@ -1,10 +1,10 @@
-import type { Session } from "@bunstack/auth/types";
-import type { Permission } from "@bunstack/shared/types/permissions";
+import type { Session } from "@bunstack/shared/types/auth.types";
+import type { Permission } from "@bunstack/shared/types/permissions.types";
+import type { InferResponseType } from "hono";
 
 import { queryOptions } from "@tanstack/react-query";
 
 import { api } from "../lib/http";
-import { can } from "@bunstack/auth";
 
 export const authQueryOptions = queryOptions({
   queryKey: ["auth"],
@@ -15,18 +15,31 @@ export const authQueryOptions = queryOptions({
       return null;
     }
 
-    const data = await res.json();
-
-    const policies = data.policies.map(({ id, ...policy }: any) => policy);
+    const { user } = await res.json() as InferResponseType<typeof api.auth.$get>;
 
     return {
-      ...data,
-      policies,
-      isAdmin: data.roles.some(({ isSuperAdmin }) => isSuperAdmin),
-      isAuthenticated: true,
-      can: (permission: Permission, resource?: Record<string, unknown>) => can(permission, data.user, data.roles, policies, resource),
-    } satisfies Session;
+      user,
+      authenticated: true,
+    };
   },
   staleTime: Infinity,
   retry: false,
 });
+
+export function authorizeQueryOptions(permission: Permission, resource?: Record<string, unknown>) {
+  return queryOptions({
+    queryKey: ["authorize", permission, resource],
+    queryFn: async (): Promise<boolean> => {
+      const res = await api.auth.authorize.$post({ json: { permission, resource } });
+
+      if (!res.ok) {
+        return false;
+      }
+
+      const { authorize } = await res.json();
+      return authorize;
+    },
+    staleTime: Infinity,
+    retry: false,
+  });
+}

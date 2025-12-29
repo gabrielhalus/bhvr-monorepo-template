@@ -10,6 +10,7 @@
     "outDir": "dist"
   },
   "references": [
+    { "path": "../db" },
     { "path": "../shared" }
   ],
   "include": ["src"],

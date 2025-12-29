@@ -3,10 +3,13 @@ import type z from "zod";
 
 import { zValidator } from "@hono/zod-validator";
 
-export function validationMiddleware<
-  T extends z.ZodSchema,
-  U extends keyof ValidationTargets,
->(target: U, schema: T) {
+/**
+ * The validation middleware.
+ * @param target - The target to validate.
+ * @param schema - The schema to validate against.
+ * @returns The validation middleware.
+ */
+export function validationMiddleware<T extends z.ZodSchema, U extends keyof ValidationTargets>(target: U, schema: T) {
   return zValidator(target, schema, (result, c) => {
     if (!result.success) {
       return c.json({

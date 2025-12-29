@@ -6,6 +6,10 @@
     "./*": {
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js"
+    },
+    "./queries/*": {
+      "types": "./dist/queries/*.d.ts",
+      "import": "./dist/queries/*.js"
     }
   },
   "scripts": {
@@ -20,6 +24,7 @@
   "dependencies": {
     "@bunstack/env": "workspace:*",
     "@bunstack/shared": "workspace:*",
+    "dotenv": "^17.2.2",
     "drizzle-orm": "^0.44.2",
     "postgres": "^3.4.7"
   },

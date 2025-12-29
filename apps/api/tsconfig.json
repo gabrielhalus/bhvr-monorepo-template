@@ -18,6 +18,7 @@
   },
   "references": [
     { "path": "../../packages/auth" },
+    { "path": "../../packages/db" },
     { "path": "../../packages/env" },
     { "path": "../../packages/shared" }
   ],

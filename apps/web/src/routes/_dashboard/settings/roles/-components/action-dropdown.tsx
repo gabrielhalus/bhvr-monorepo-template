@@ -1,21 +1,21 @@
-import type { Role } from "@bunstack/shared/types/roles";
+import type { Role } from "@bunstack/shared/types/roles.types";
 import type { Row } from "@tanstack/react-table";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, MoreHorizontal, Trash } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@bunstack/react/components/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@bunstack/react/components/dropdown-menu";
 import { Spinner } from "@bunstack/react/components/spinner";
-import { useAuth } from "@bunstack/react/hooks/use-auth";
 import { api } from "@bunstack/react/lib/http";
 import sayno from "@bunstack/react/lib/sayno";
+import { authorizeQueryOptions } from "@bunstack/react/queries/auth";
 
 export function ActionDropdown({ row: { original: role } }: { row: Row<Role> }) {
-  const { can } = useAuth();
-
   const queryClient = useQueryClient();
+
+  const { data: canDelete } = useQuery(authorizeQueryOptions("role:delete", role));
 
   const mutation = useMutation({
     mutationFn: async (id: number) => {
@@ -60,7 +60,7 @@ export function ActionDropdown({ row: { original: role } }: { row: Row<Role> }) 
           <Copy className="size-4" />
           Copy Role ID
         </DropdownMenuItem>
-        {can("role:delete") && (
+        {canDelete && (
           <Button
             disabled={mutation.isPending}
             onClick={handleDeleteClick}

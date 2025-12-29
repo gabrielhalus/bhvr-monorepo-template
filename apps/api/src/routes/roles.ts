@@ -1,38 +1,37 @@
-import type { Role } from "@bunstack/shared/types/roles";
+import type { RoleRelationKeys } from "@bunstack/shared/types/roles.types";
 
 import { Hono } from "hono";
 
-import { requirePermission } from "@bunstack/api/middlewares/access-control";
-import { getAuthContext } from "@bunstack/api/middlewares/auth";
+import { requirePermissionFactory } from "../middlewares/access-control";
+import { getSessionContext } from "@bunstack/api/middlewares/auth";
 import { validationMiddleware } from "@bunstack/api/middlewares/validation";
-import { deleteRoleById, getRoleByName, getRoles, updateRoleById } from "@bunstack/db/queries/roles";
-import { assignUserRole, removeUserRole } from "@bunstack/db/queries/user-roles";
-import { paginationInputSchema } from "@bunstack/shared/contracts/pagination";
-import { updateRoleInputSchema } from "@bunstack/shared/contracts/roles";
-import { assignRoleInputSchema, removeRoleInputSchema } from "@bunstack/shared/contracts/user-roles";
+import { deleteRole, getRole, getRoleByName, getRoles, updateRole } from "@bunstack/db/queries/roles.queries";
+import { createUserRole, deleteUserRole } from "@bunstack/db/queries/user-roles.queries";
+import { RoleRelationsQuerySchema, UpdateRoleSchema } from "@bunstack/shared/schemas/roles.schemas";
+import { UserRoleSchema } from "@bunstack/shared/schemas/user-roles.schemas";
 
 export const rolesRoutes = new Hono()
   // --- All routes below this point require authentication
-  .use(getAuthContext)
+  .use(getSessionContext)
 
-  .get("/", requirePermission("role:list"), validationMiddleware("query", paginationInputSchema), async (c) => {
+  .get("/", requirePermissionFactory("role:list"), async (c) => {
+    const { includes } = c.req.queries();
+
     try {
-      const { page, pageSize, search, sortField, sortDirection } = c.req.valid("query");
+      const roles = await getRoles(includes as RoleRelationKeys);
 
-      const orderBy = sortField ? { field: sortField as keyof Role, direction: sortDirection } : undefined;
-      const { roles, total } = await getRoles(page, pageSize, orderBy, search);
-
-      return c.json({ success: true as const, roles, total });
+      return c.json({ success: true as const, roles });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
   })
 
-  .get("/:name", requirePermission("role:read"), async (c) => {
-    const { name } = c.req.param();
+  .get("/:id{[0-9]+}", validationMiddleware("query", RoleRelationsQuerySchema), requirePermissionFactory("role:read"), async (c) => {
+    const { id } = c.req.param();
+    const { includes } = c.req.valid("query");
 
     try {
-      const role = await getRoleByName(name);
+      const role = await getRole(Number(id), includes);
 
       if (!role) {
         return c.json({ success: false as const, error: "Role not found" }, 404);
@@ -44,45 +43,62 @@ export const rolesRoutes = new Hono()
     }
   })
 
-  .put("/:id", requirePermission("role:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", updateRoleInputSchema), async (c) => {
-    try {
-      const id = Number(c.req.param("id"));
-      const role = c.req.valid("json");
-
-      const updatedRole = await updateRoleById(id, role);
-      return c.json({ success: true as const, role: updatedRole });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
-  })
-
-  .delete("/:id", requirePermission("role:delete", c => ({ id: c.req.param("id") })), async (c) => {
-    const id = Number(c.req.param("id"));
+  .get("/:name", validationMiddleware("query", RoleRelationsQuerySchema), requirePermissionFactory("role:read"), async (c) => {
+    const { name } = c.req.param();
+    const { includes } = c.req.valid("query");
 
     try {
-      const role = await deleteRoleById(id);
+      const role = await getRoleByName(name, includes);
+
+      if (!role) {
+        return c.json({ success: false as const, error: "Role not found" }, 404);
+      }
+
       return c.json({ success: true as const, role });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
   })
 
-  .post("/assign", requirePermission("userRole:create"), validationMiddleware("json", assignRoleInputSchema), async (c) => {
+  .put("/:id", requirePermissionFactory("role:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateRoleSchema), async (c) => {
+    try {
+      const id = Number(c.req.param("id"));
+      const data = c.req.valid("json");
+
+      const role = await updateRole(id, data);
+      return c.json({ success: true as const, role });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  .delete("/:id", requirePermissionFactory("role:delete", c => ({ id: c.req.param("id") })), async (c) => {
+    const id = Number(c.req.param("id"));
+
+    try {
+      const role = await deleteRole(id);
+      return c.json({ success: true as const, role });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  .post("/assign", requirePermissionFactory("userRole:create"), validationMiddleware("json", UserRoleSchema), async (c) => {
     const { userId, roleId } = c.req.valid("json");
 
     try {
-      const userRole = await assignUserRole({ userId, roleId });
+      const userRole = await createUserRole({ userId, roleId });
       return c.json({ success: true as const, userRole });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
   })
 
-  .post("/remove", requirePermission("userRole:create"), validationMiddleware("json", removeRoleInputSchema), async (c) => {
+  .post("/remove", requirePermissionFactory("userRole:create"), validationMiddleware("json", UserRoleSchema), async (c) => {
     const { userId, roleId } = c.req.valid("json");
 
     try {
-      const userRole = await removeUserRole({ userId, roleId });
+      const userRole = await deleteUserRole({ userId, roleId });
       return c.json({ success: true as const, userRole });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);

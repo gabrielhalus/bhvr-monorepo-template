@@ -9,7 +9,7 @@ import fr from "./locales/fr";
 
 type ArbitraryNamespace = string & { __brand?: "ArbitraryNamespace" };
 type Namespace = keyof typeof en | ArbitraryNamespace;
-type NsOption = Namespace | readonly Namespace[];
+type NsOption = Namespace | Namespace[];
 
 const bundledResources = { en, fr };
 
