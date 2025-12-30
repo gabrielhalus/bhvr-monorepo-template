@@ -4,7 +4,7 @@ import type { z } from "zod";
 import { and, eq } from "drizzle-orm";
 
 import { drizzle } from "@/database";
-import { UserRoles } from "@bunstack/shared/models/user-roles.model";
+import { UserRolesModel } from "@bunstack/shared/models/user-roles.model";
 import { UserRoleSchema } from "@bunstack/shared/schemas/db/user-roles.schemas";
 
 /**
@@ -15,7 +15,7 @@ import { UserRoleSchema } from "@bunstack/shared/schemas/db/user-roles.schemas";
  */
 export async function createUserRole(userRole: z.infer<typeof UserRoleSchema>): Promise<UserRole> {
   const [createdUserRole] = await drizzle
-    .insert(UserRoles)
+    .insert(UserRolesModel)
     .values(userRole)
     .returning();
 
@@ -34,8 +34,8 @@ export async function createUserRole(userRole: z.infer<typeof UserRoleSchema>): 
  */
 export async function deleteUserRole(userRole: z.infer<typeof UserRoleSchema>): Promise<UserRole | null> {
   const [deletedUserRole] = await drizzle
-    .delete(UserRoles)
-    .where(and(eq(UserRoles.userId, userRole.userId), eq(UserRoles.roleId, userRole.roleId)))
+    .delete(UserRolesModel)
+    .where(and(eq(UserRolesModel.userId, userRole.userId), eq(UserRolesModel.roleId, userRole.roleId)))
     .returning();
 
   if (!deletedUserRole) {

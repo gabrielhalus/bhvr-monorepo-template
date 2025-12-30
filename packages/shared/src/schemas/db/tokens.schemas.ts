@@ -1,10 +1,10 @@
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 
-import { Tokens } from "../../models/tokens.model";
+import { TokensModel } from "../../models/tokens.model";
 
-export const TokenSchema = createSelectSchema(Tokens);
+export const TokenSchema = createSelectSchema(TokensModel);
 
-export const InsertTokenSchema = createInsertSchema(Tokens);
+export const InsertTokenSchema = createInsertSchema(TokensModel);
 
-export const UpdateTokenSchema = createUpdateSchema(Tokens);
+export const UpdateTokenSchema = createUpdateSchema(TokensModel);
 

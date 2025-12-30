@@ -5,10 +5,10 @@ import { eq } from "drizzle-orm";
 
 import { drizzle } from "@/database";
 import { attachRelation } from "@bunstack/shared/lib/helpers";
-import { Roles } from "@bunstack/shared/models/roles.model";
-import { Tokens } from "@bunstack/shared/models/tokens.model";
-import { UserRoles } from "@bunstack/shared/models/user-roles.model";
-import { Users } from "@bunstack/shared/models/users.model";
+import { RolesModel } from "@bunstack/shared/models/roles.model";
+import { TokensModel } from "@bunstack/shared/models/tokens.model";
+import { UserRolesModel } from "@bunstack/shared/models/user-roles.model";
+import { UsersModel } from "@bunstack/shared/models/users.model";
 import { RoleSchema } from "@bunstack/shared/schemas/db/roles.schemas";
 import { TokenSchema } from "@bunstack/shared/schemas/db/tokens.schemas";
 import { InsertUserSchema, UpdateUserSchema, UserSchema } from "@bunstack/shared/schemas/db/users.schemas";
@@ -20,10 +20,10 @@ import { InsertUserSchema, UpdateUserSchema, UserSchema } from "@bunstack/shared
 const relationLoaders: { [K in keyof UserRelations]: (userId: string) => Promise<UserRelations[K]> } = {
   roles: async (userId) => {
     const userWithRelations = await drizzle
-      .select({ role: Roles })
-      .from(UserRoles)
-      .leftJoin(Roles, eq(UserRoles.roleId, Roles.id))
-      .where(eq(UserRoles.userId, userId));
+      .select({ role: RolesModel })
+      .from(UserRolesModel)
+      .leftJoin(RolesModel, eq(UserRolesModel.roleId, RolesModel.id))
+      .where(eq(UserRolesModel.userId, userId));
 
     return userWithRelations
       .map(r => r.role)
@@ -32,9 +32,9 @@ const relationLoaders: { [K in keyof UserRelations]: (userId: string) => Promise
   },
   tokens: async (userId) => {
     const userWithRelations = await drizzle
-      .select({ token: Tokens })
-      .from(Tokens)
-      .where(eq(Tokens.userId, userId));
+      .select({ token: TokensModel })
+      .from(TokensModel)
+      .where(eq(TokensModel.userId, userId));
 
     return userWithRelations
       .map(r => r.token)
@@ -54,7 +54,7 @@ const relationLoaders: { [K in keyof UserRelations]: (userId: string) => Promise
  * @throws An error if a loader is not defined for a relation.
  */
 export async function getUsers<T extends UserRelationKeys>(includes?: T): Promise<UserWithRelations<T>[]> {
-  const users = await drizzle.select().from(Users);
+  const users = await drizzle.select().from(UsersModel);
   const parsedUsers = users.map(u => UserSchema.parse(u));
 
   return Promise.all(parsedUsers.map(async (user) => {
@@ -84,8 +84,8 @@ export async function getUsers<T extends UserRelationKeys>(includes?: T): Promis
 export async function getUser<T extends UserRelationKeys>(id: string, includes?: T): Promise<UserWithRelations<T> | null> {
   const [user] = await drizzle
     .select()
-    .from(Users)
-    .where(eq(Users.id, id));
+    .from(UsersModel)
+    .where(eq(UsersModel.id, id));
 
   if (!user) {
     return null;
@@ -137,7 +137,7 @@ export async function hydrateUsers<T extends UserRelationKeys>(users: User[], in
  */
 export async function createUser(user: z.infer<typeof InsertUserSchema>): Promise<User> {
   const [createdUser] = await drizzle
-    .insert(Users)
+    .insert(UsersModel)
     .values(InsertUserSchema.parse(user))
     .returning();
 
@@ -157,9 +157,9 @@ export async function createUser(user: z.infer<typeof InsertUserSchema>): Promis
  */
 export async function updateUser(id: string, user: z.infer<typeof UpdateUserSchema>): Promise<User> {
   const [updatedUser] = await drizzle
-    .update(Users)
+    .update(UsersModel)
     .set(UpdateUserSchema.parse(user))
-    .where(eq(Users.id, id))
+    .where(eq(UsersModel.id, id))
     .returning();
 
   if (!updatedUser) {
@@ -177,8 +177,8 @@ export async function updateUser(id: string, user: z.infer<typeof UpdateUserSche
  */
 export async function deleteUser(id: string): Promise<User> {
   const [deletedUser] = await drizzle
-    .delete(Users)
-    .where(eq(Users.id, id))
+    .delete(UsersModel)
+    .where(eq(UsersModel.id, id))
     .returning();
 
   if (!deletedUser) {
@@ -202,8 +202,8 @@ export async function deleteUser(id: string): Promise<User> {
 export async function getUserByEmail<T extends UserRelationKeys>(email: string, includes?: T): Promise<UserWithRelations<T> | null> {
   const [user] = await drizzle
     .select()
-    .from(Users)
-    .where(eq(Users.email, email));
+    .from(UsersModel)
+    .where(eq(UsersModel.email, email));
 
   if (!user) {
     return null;
@@ -232,9 +232,9 @@ export async function getUserByEmail<T extends UserRelationKeys>(email: string, 
  */
 export async function signIn(email: string, password: string): Promise<string | null> {
   const [user] = await drizzle
-    .select({ id: Users.id, password: Users.password })
-    .from(Users)
-    .where(eq(Users.email, email))
+    .select({ id: UsersModel.id, password: UsersModel.password })
+    .from(UsersModel)
+    .where(eq(UsersModel.email, email))
     .limit(1);
 
   if (!user?.password) {
@@ -259,9 +259,9 @@ export async function signIn(email: string, password: string): Promise<string | 
  */
 export async function emailExists(email: string): Promise<boolean> {
   const [user] = await drizzle
-    .select({ exists: Users.id })
-    .from(Users)
-    .where(eq(Users.email, email))
+    .select({ exists: UsersModel.id })
+    .from(UsersModel)
+    .where(eq(UsersModel.email, email))
     .limit(1);
 
   return !!user;

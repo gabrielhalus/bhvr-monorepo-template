@@ -1,14 +1,14 @@
 import { z } from "zod";
 
 export const PermissionSchema = z.enum([
-  // Users
+  // UsersModel
   "user:create",
   "user:read",
   "user:list",
   "user:update",
   "user:delete",
 
-  // Roles
+  // RolesModel
   "role:create",
   "role:read",
   "role:list",

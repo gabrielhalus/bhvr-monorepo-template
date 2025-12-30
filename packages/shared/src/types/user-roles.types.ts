@@ -1,3 +1,3 @@
-import type { UserRoles } from "@/models/user-roles.model";
+import type { UserRolesModel } from "@/models/user-roles.model";
 
-export type UserRole = typeof UserRoles.$inferSelect;
+export type UserRole = typeof UserRolesModel.$inferSelect;

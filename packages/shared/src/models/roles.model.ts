@@ -1,6 +1,6 @@
 import { boolean, integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
-export const Roles = pgTable("roles", {
+export const RolesModel = pgTable("roles", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(),
   label: text("label").notNull(),

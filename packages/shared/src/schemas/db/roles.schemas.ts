@@ -1,13 +1,13 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-import { Roles } from "../../models/roles.model";
+import { RolesModel } from "../../models/roles.model";
 
 /**
  * Schemas for roles
  */
-export const RoleSchema = createSelectSchema(Roles);
+export const RoleSchema = createSelectSchema(RolesModel);
 
 /**
  * Schema for inserting a new role
  */
-export const InsertRoleSchema = createInsertSchema(Roles).omit({ id: true, createdAt: true, updatedAt: true, verifiedAt: true });
+export const InsertRoleSchema = createInsertSchema(RolesModel).omit({ id: true, createdAt: true, updatedAt: true, verifiedAt: true });

@@ -2,7 +2,7 @@ import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 import { nanoid } from "../lib/nanoid";
 
-export const Tokens = pgTable("tokens", {
+export const TokensModel = pgTable("tokens", {
   id: text("id").primaryKey().$defaultFn(() => nanoid()),
   userId: text("user_id").notNull(),
   issuedAt: timestamp("issued_at", { mode: "string" }).notNull(),

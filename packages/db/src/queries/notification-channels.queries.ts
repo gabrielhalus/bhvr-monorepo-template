@@ -3,7 +3,7 @@ import type { NotificationChannelUnion } from "@bunstack/shared/types/notificati
 import { eq } from "drizzle-orm";
 
 import { drizzle } from "@/database";
-import { NotificationChannels } from "@bunstack/shared/models/notifications-channels.model";
+import { NotificationChannelsModel } from "@bunstack/shared/models/notifications-channels.model";
 import { NotificationChannelSchema } from "@bunstack/shared/schemas/db/notification-channels.schemas";
 
 // ============================================================================
@@ -17,7 +17,7 @@ import { NotificationChannelSchema } from "@bunstack/shared/schemas/db/notificat
 export async function getNotificationChannels(): Promise<NotificationChannelUnion[]> {
   const rows = await drizzle
     .select()
-    .from(NotificationChannels);
+    .from(NotificationChannelsModel);
 
   return rows.map(row => NotificationChannelSchema.parse(row));
 }
@@ -29,7 +29,7 @@ export async function getNotificationChannels(): Promise<NotificationChannelUnio
  * @throws An error if the notification channel could not be created.
  */
 export async function createNotificationChannel(channel: NotificationChannelUnion): Promise<NotificationChannelUnion> {
-  const [createdChannel] = await drizzle.insert(NotificationChannels).values(channel).returning();
+  const [createdChannel] = await drizzle.insert(NotificationChannelsModel).values(channel).returning();
 
   if (!createdChannel) {
     throw new Error(`Failed to create notification channel: ${channel.id}`);
@@ -46,9 +46,9 @@ export async function createNotificationChannel(channel: NotificationChannelUnio
  */
 export async function updateNotificationChannel(channel: NotificationChannelUnion): Promise<NotificationChannelUnion> {
   const [updatedChannel] = await drizzle
-    .update(NotificationChannels)
+    .update(NotificationChannelsModel)
     .set(channel)
-    .where(eq(NotificationChannels.id, channel.id))
+    .where(eq(NotificationChannelsModel.id, channel.id))
     .returning();
 
   if (!updatedChannel) {
@@ -65,7 +65,7 @@ export async function updateNotificationChannel(channel: NotificationChannelUnio
  * @throws An error if the notification channel could not be deleted.
  */
 export async function deleteNotificationChannel(id: string): Promise<NotificationChannelUnion> {
-  const [deletedChannel] = await drizzle.delete(NotificationChannels).where(eq(NotificationChannels.id, id)).returning();
+  const [deletedChannel] = await drizzle.delete(NotificationChannelsModel).where(eq(NotificationChannelsModel.id, id)).returning();
 
   if (!deletedChannel) {
     throw new Error(`Notification channel not found: ${id}`);

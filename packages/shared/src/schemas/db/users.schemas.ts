@@ -1,17 +1,17 @@
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { Users } from "../../models/users.model";
+import { UsersModel } from "../../models/users.model";
 
 /**
  * Schema for users
  */
-export const UserSchema = createSelectSchema(Users);
+export const UserSchema = createSelectSchema(UsersModel);
 
 /**
  * Schema for inserting a new user
  */
-export const InsertUserSchema = createInsertSchema(Users).omit({ id: true, createdAt: true, updatedAt: true, verifiedAt: true }).extend({
+export const InsertUserSchema = createInsertSchema(UsersModel).omit({ id: true, createdAt: true, updatedAt: true, verifiedAt: true }).extend({
   name: z
     .string()
     .min(3)
@@ -28,7 +28,7 @@ export const InsertUserSchema = createInsertSchema(Users).omit({ id: true, creat
 /**
  * Schema for updating a user
  */
-export const UpdateUserSchema = createUpdateSchema(Users).extend({
+export const UpdateUserSchema = createUpdateSchema(UsersModel).extend({
   name: z
     .string()
     .min(3)

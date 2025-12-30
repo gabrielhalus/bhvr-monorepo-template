@@ -2,7 +2,7 @@ import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 import { nanoid } from "../lib/nanoid";
 
-export const Users = pgTable("users", {
+export const UsersModel = pgTable("users", {
   id: text("id").primaryKey().$defaultFn(() => nanoid()),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),

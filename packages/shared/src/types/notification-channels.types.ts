@@ -1,7 +1,7 @@
-import type { NotificationChannels } from "../models/notifications-channels.model";
+import type { NotificationChannelsModel } from "../models/notifications-channels.model";
 import type { Merge } from "@/lib/type-utils";
 
-export type NotificationChannelRow = typeof NotificationChannels.$inferSelect;
+export type NotificationChannelRow = typeof NotificationChannelsModel.$inferSelect;
 
 export type DiscordConfig = {
   webhookUrl: string;

@@ -5,7 +5,7 @@ import type { z } from "zod";
 import { eq } from "drizzle-orm";
 
 import { drizzle } from "@/database";
-import { Tokens } from "@bunstack/shared/models/tokens.model";
+import { TokensModel } from "@bunstack/shared/models/tokens.model";
 
 // ============================================================================
 // Core CRUD Operations
@@ -18,7 +18,7 @@ import { Tokens } from "@bunstack/shared/models/tokens.model";
 export async function getTokens(): Promise<Token[]> {
   return drizzle
     .select()
-    .from(Tokens);
+    .from(TokensModel);
 }
 
 /**
@@ -29,8 +29,8 @@ export async function getTokens(): Promise<Token[]> {
 export async function getToken(id: string): Promise<Token | null> {
   const [token] = await drizzle
     .select()
-    .from(Tokens)
-    .where(eq(Tokens.id, id))
+    .from(TokensModel)
+    .where(eq(TokensModel.id, id))
     .limit(1);
 
   if (!token) {
@@ -48,7 +48,7 @@ export async function getToken(id: string): Promise<Token | null> {
  */
 export async function insertToken(token: z.infer<typeof InsertTokenSchema>): Promise<Token> {
   const [insertedToken] = await drizzle
-    .insert(Tokens)
+    .insert(TokensModel)
     .values(token)
     .returning();
 
@@ -68,9 +68,9 @@ export async function insertToken(token: z.infer<typeof InsertTokenSchema>): Pro
  */
 export async function updateToken(id: string, token: z.infer<typeof UpdateTokenSchema>): Promise<Token> {
   const [updatedToken] = await drizzle
-    .update(Tokens)
+    .update(TokensModel)
     .set(token)
-    .where(eq(Tokens.id, id))
+    .where(eq(TokensModel.id, id))
     .returning();
 
   if (!updatedToken) {
@@ -87,7 +87,7 @@ export async function updateToken(id: string, token: z.infer<typeof UpdateTokenS
  * @throws An error if the token could not be deleted.
  */
 export async function deleteToken(id: string): Promise<Token> {
-  const [deletedToken] = await drizzle.delete(Tokens).where(eq(Tokens.id, id)).returning();
+  const [deletedToken] = await drizzle.delete(TokensModel).where(eq(TokensModel.id, id)).returning();
 
   if (!deletedToken) {
     throw new Error("Failed to delete token");
@@ -104,7 +104,7 @@ export async function deleteToken(id: string): Promise<Token> {
 export async function deleteAllTokens(): Promise<Token[]> {
   // eslint-disable-next-line drizzle/enforce-delete-with-where
   const deletedTokens = await drizzle
-    .delete(Tokens)
+    .delete(TokensModel)
     .returning();
 
   if (!deletedTokens) {

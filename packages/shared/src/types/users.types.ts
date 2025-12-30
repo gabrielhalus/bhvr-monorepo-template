@@ -1,11 +1,11 @@
 import type { WithRelations } from "../lib/type-utils";
-import type { Users } from "../models/users.model";
+import type { UsersModel } from "../models/users.model";
 import type { UserRelationsSchema } from "../schemas/api/users.schemas";
 import type { Role } from "./roles.types";
 import type { Token } from "./tokens.types";
 import type { z } from "zod";
 
-export type User = typeof Users.$inferSelect;
+export type User = typeof UsersModel.$inferSelect;
 
 export type UserRelations = {
   roles: Role[];

@@ -1,9 +1,9 @@
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { NotificationChannels } from "../../models/notifications-channels.model";
+import { NotificationChannelsModel } from "../../models/notifications-channels.model";
 
-const BaseChannelSchema = createSelectSchema(NotificationChannels).omit({ type: true, config: true });
+const BaseChannelSchema = createSelectSchema(NotificationChannelsModel).omit({ type: true, config: true });
 
 /**
  * Schema for Discord notification channels

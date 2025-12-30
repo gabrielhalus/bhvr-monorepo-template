@@ -8,11 +8,11 @@ import { eq } from "drizzle-orm";
 
 import { drizzle } from "@/database";
 import { attachRelation } from "@bunstack/shared/lib/helpers";
-import { Policies } from "@bunstack/shared/models/policies.model";
-import { RolePermissions } from "@bunstack/shared/models/role-permissions.model";
-import { Roles } from "@bunstack/shared/models/roles.model";
-import { UserRoles } from "@bunstack/shared/models/user-roles.model";
-import { Users } from "@bunstack/shared/models/users.model";
+import { PoliciesModel } from "@bunstack/shared/models/policies.model";
+import { RolePermissionsModel } from "@bunstack/shared/models/role-permissions.model";
+import { RolesModel } from "@bunstack/shared/models/roles.model";
+import { UserRolesModel } from "@bunstack/shared/models/user-roles.model";
+import { UsersModel } from "@bunstack/shared/models/users.model";
 import { PolicySchema } from "@bunstack/shared/schemas/db/policies.schemas";
 import { RoleSchema } from "@bunstack/shared/schemas/db/roles.schemas";
 import { UserSchema } from "@bunstack/shared/schemas/db/users.schemas";
@@ -24,10 +24,10 @@ import { UserSchema } from "@bunstack/shared/schemas/db/users.schemas";
 const relationLoaders: { [K in keyof RoleRelations]: (roleId: number) => Promise<RoleRelations[K]> } = {
   members: async (roleId) => {
     const rows = await drizzle
-      .select({ member: Users })
-      .from(UserRoles)
-      .leftJoin(Users, eq(UserRoles.userId, Users.id))
-      .where(eq(UserRoles.roleId, roleId));
+      .select({ member: UsersModel })
+      .from(UserRolesModel)
+      .leftJoin(UsersModel, eq(UserRolesModel.userId, UsersModel.id))
+      .where(eq(UserRolesModel.roleId, roleId));
 
     return rows
       .map(r => r.member)
@@ -36,9 +36,9 @@ const relationLoaders: { [K in keyof RoleRelations]: (roleId: number) => Promise
   },
   permissions: async (roleId) => {
     const rows = await drizzle
-      .select({ permission: RolePermissions.permission })
-      .from(RolePermissions)
-      .where(eq(RolePermissions.roleId, roleId));
+      .select({ permission: RolePermissionsModel.permission })
+      .from(RolePermissionsModel)
+      .where(eq(RolePermissionsModel.roleId, roleId));
 
     return rows
       .map(r => r.permission)
@@ -46,9 +46,9 @@ const relationLoaders: { [K in keyof RoleRelations]: (roleId: number) => Promise
   },
   policies: async (roleId) => {
     const rows = await drizzle
-      .select({ policy: Policies })
-      .from(Policies)
-      .where(eq(Policies.roleId, roleId));
+      .select({ policy: PoliciesModel })
+      .from(PoliciesModel)
+      .where(eq(PoliciesModel.roleId, roleId));
 
     return rows
       .map(r => r.policy)
@@ -68,7 +68,7 @@ const relationLoaders: { [K in keyof RoleRelations]: (roleId: number) => Promise
  * @throws An error if a loader is not defined for a relation.
  */
 export async function getRoles<T extends RoleRelationKeys>(includes?: T): Promise<RoleWithRelations<T>[]> {
-  const roles = await drizzle.select().from(Roles);
+  const roles = await drizzle.select().from(RolesModel);
   const parsedRoles = roles.map(r => RoleSchema.parse(r));
 
   return Promise.all(parsedRoles.map(async (role) => {
@@ -95,7 +95,7 @@ export async function getRoles<T extends RoleRelationKeys>(includes?: T): Promis
  * @throws An error if a loader is not defined for a relation.
  */
 export async function getRole<T extends RoleRelationKeys>(id: number, includes?: T): Promise<RoleWithRelations<T> | null> {
-  const [role] = await drizzle.select().from(Roles).where(eq(Roles.id, id));
+  const [role] = await drizzle.select().from(RolesModel).where(eq(RolesModel.id, id));
 
   if (!role) {
     return null;
@@ -147,7 +147,7 @@ export async function hydrateRoles<T extends RoleRelationKeys>(roles: Role[], in
  */
 export async function createRole(role: z.infer<typeof InsertRoleSchema>): Promise<Role> {
   const [createdRole] = await drizzle
-    .insert(Roles)
+    .insert(RolesModel)
     .values(role)
     .returning();
 
@@ -167,9 +167,9 @@ export async function createRole(role: z.infer<typeof InsertRoleSchema>): Promis
  */
 export async function updateRole(id: number, role: z.infer<typeof UpdateRoleSchema>): Promise<Role> {
   const [updatedRole] = await drizzle
-    .update(Roles)
+    .update(RolesModel)
     .set(role)
-    .where(eq(Roles.id, id))
+    .where(eq(RolesModel.id, id))
     .returning();
 
   if (!updatedRole) {
@@ -187,8 +187,8 @@ export async function updateRole(id: number, role: z.infer<typeof UpdateRoleSche
  */
 export async function deleteRole(id: number): Promise<Role> {
   const [deletedRole] = await drizzle
-    .delete(Roles)
-    .where(eq(Roles.id, id))
+    .delete(RolesModel)
+    .where(eq(RolesModel.id, id))
     .returning();
 
   if (!deletedRole) {
@@ -210,7 +210,7 @@ export async function deleteRole(id: number): Promise<Role> {
  * @throws An error if a loader is not defined for a relation.
  */
 export async function getRoleByName<T extends RoleRelationKeys>(name: string, includes?: T): Promise<WithRelations<Role, RoleRelations, T> | null> {
-  const [role] = await drizzle.select().from(Roles).where(eq(Roles.name, name)).limit(1);
+  const [role] = await drizzle.select().from(RolesModel).where(eq(RolesModel.name, name)).limit(1);
 
   if (!role) {
     return null;
