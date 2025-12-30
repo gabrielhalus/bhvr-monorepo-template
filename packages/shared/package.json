@@ -3,6 +3,10 @@
   "type": "module",
   "version": "0.0.0",
   "exports": {
+    "./config": {
+      "types": "./dist/config/*.d.ts",
+      "import": "./dist/config/*.js"
+    },
     "./lib/*": {
       "types": "./dist/lib/*.d.ts",
       "import": "./dist/lib/*.js"
