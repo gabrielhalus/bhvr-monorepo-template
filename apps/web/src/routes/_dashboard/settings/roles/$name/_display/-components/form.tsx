@@ -28,7 +28,7 @@ export function Form() {
 
   const mutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: UpdateRoleData }) => {
-      const res = await api.roles[":id"].$put({
+      const res = await api.roles[":id{[0-9]+}"].$put({
         param: { id: String(id) },
         json: data,
       });

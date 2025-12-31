@@ -19,7 +19,7 @@ export function ActionDropdown({ row: { original: role } }: { row: Row<Role> }) 
 
   const mutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await api.roles[":id"].$delete({ param: { id: String(id) } });
+      const res = await api.roles[":id{[0-9]+}"].$delete({ param: { id: String(id) } });
 
       if (!res.ok) {
         throw new Error("Failed to delete role");

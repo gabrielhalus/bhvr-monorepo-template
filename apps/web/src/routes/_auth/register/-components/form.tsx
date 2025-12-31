@@ -34,7 +34,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
   const navigate = useNavigate();
   const location = useRouterState({ select: s => s.location });
   const searchParams = new URLSearchParams(location.searchStr);
-  const redirectTo = searchParams.get("redirect") || "/web";
+  const redirectTo = searchParams.get("redirect") || "/";
 
   const form = useForm({
     validators: {
