@@ -7,6 +7,6 @@ export const RuntimeConfigModel = pgTable("runtime_config", {
   value: text("value").notNull(),
   updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow(),
   updatedBy: varchar("updated_by", { length: 21 }).references(() => UsersModel.id),
-});
-
-export const configKeyPrefixIdx = index("idx_config_key_prefix").on(RuntimeConfigModel.configKey);
+}, table => [
+  index("idx_config_key_prefix").on(table.configKey),
+]);
