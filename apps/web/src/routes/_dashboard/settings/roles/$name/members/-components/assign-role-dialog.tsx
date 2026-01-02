@@ -5,9 +5,6 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { Route as Layout } from "../../route";
-import { AvatarUser } from "@/components/avatar-user";
-import { getRoleByNameQueryOptions } from "@/queries/roles";
-import { getUsersQueryOptions } from "@/queries/users";
 import { Button } from "@bunstack/react/components/button";
 import { Checkbox } from "@bunstack/react/components/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@bunstack/react/components/dialog";
@@ -15,6 +12,9 @@ import { Field, FieldContent, FieldError, FieldLabel } from "@bunstack/react/com
 import { Spinner } from "@bunstack/react/components/spinner";
 import { api } from "@bunstack/react/lib/http";
 import { AssignRoleMembersSchema } from "@bunstack/shared/schemas/api/user-roles.schemas";
+import { AvatarUser } from "@bunstack/web/components/avatar-user";
+import { getRoleByNameQueryOptions } from "@bunstack/web/queries/roles";
+import { getUsersQueryOptions } from "@bunstack/web/queries/users";
 
 export function AssignRoleDialog() {
   const { t } = useTranslation(["common", "web"]);

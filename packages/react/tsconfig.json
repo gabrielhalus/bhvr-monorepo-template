@@ -3,13 +3,6 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": "src",
-    "paths": {
-      "@bunstack/react/*": ["./src/*"],
-
-      "@bunstack/api/*": ["../shared/src/*"],
-      "@bunstack/env/*": ["../shared/src/*"],
-      "@bunstack/shared/*": ["../shared/src/*"]
-    },
     "declaration": true,
     "emitDeclarationOnly": true,
     "noEmit": false,

@@ -1,7 +1,7 @@
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { UsersModel } from "../../models/users.model";
+import { UsersModel } from "@bunstack/shared/models/users.model";
 
 /**
  * Schema for users
@@ -39,4 +39,3 @@ export const UpdateUserSchema = createUpdateSchema(UsersModel).extend({
   password: z
     .never(),
 }).partial();
-

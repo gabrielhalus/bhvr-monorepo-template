@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
-import { getUserQueryOptions } from "@/queries/users";
+import { getUserQueryOptions } from "@bunstack/web/queries/users";
 
 export const Route = createFileRoute("/_dashboard/settings/users/$userId/")({
   component: User,

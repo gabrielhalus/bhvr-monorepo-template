@@ -1,4 +1,4 @@
-import type { RoleRelationKeys } from "@bunstack/shared/types/roles.types";
+import type { RoleRelationKeys } from "@bunstack/shared/types/db/roles.types";
 
 import { queryOptions } from "@tanstack/react-query";
 

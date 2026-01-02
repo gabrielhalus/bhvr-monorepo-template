@@ -1,4 +1,4 @@
-import type { UserWithRelations } from "@bunstack/shared/types/users.types";
+import type { UserWithRelations } from "@bunstack/shared/types/db/users.types";
 import type { Context } from "hono";
 
 import { createFactory } from "hono/factory";

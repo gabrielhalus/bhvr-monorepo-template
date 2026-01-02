@@ -25,4 +25,3 @@ export const VerificationTokenSchema = z.object({
   jti: z.string(),
   iss: z.string(),
 });
-

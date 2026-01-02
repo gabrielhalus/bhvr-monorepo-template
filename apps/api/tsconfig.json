@@ -2,14 +2,7 @@
   "extends": "@bunstack/typescript-config/react.json",
   "compilerOptions": {
     "composite": true,
-    "baseUrl": ".",
     "rootDir": "src",
-    "paths": {
-      "@bunstack/api/*": ["./src/*"],
-
-      "@bunstack/env": ["../../packages/env/src/index.ts"],
-      "@bunstack/shared/*": ["../../packages/shared/src/*"]
-    },
     "types": ["bun", "node"],
     "declaration": true,
     "emitDeclarationOnly": true,

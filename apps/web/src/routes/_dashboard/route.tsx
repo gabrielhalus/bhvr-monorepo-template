@@ -1,10 +1,10 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-import { AppSidebar } from "@/components/layout/app-sidebar";
-import { Breadcrumbs } from "@/components/layout/breadcrumbs";
-import { auth } from "@/lib/auth";
 import { Separator } from "@bunstack/react/components/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@bunstack/react/components/sidebar";
+import { AppSidebar } from "@bunstack/web/components/layout/app-sidebar";
+import { Breadcrumbs } from "@bunstack/web/components/layout/breadcrumbs";
+import { auth } from "@bunstack/web/lib/auth";
 
 export const Route = createFileRoute("/_dashboard")({
   component: DashboardLayout,

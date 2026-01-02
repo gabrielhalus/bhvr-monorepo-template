@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-import { auth } from "@/lib/auth";
+import { auth } from "@bunstack/web/lib/auth";
 
 export const Route = createFileRoute("/_auth")({
   component: AuthLayout,

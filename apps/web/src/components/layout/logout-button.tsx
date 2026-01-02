@@ -4,13 +4,13 @@ import { LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { env } from "@/lib/env";
 import { Button } from "@bunstack/react/components/button";
 import { DropdownMenuItem } from "@bunstack/react/components/dropdown-menu";
 import { Spinner } from "@bunstack/react/components/spinner";
 import { useAuth } from "@bunstack/react/hooks/use-auth";
 import { api } from "@bunstack/react/lib/http";
 import sayno from "@bunstack/react/lib/sayno";
+import { env } from "@bunstack/web/lib/env";
 
 type Variant = "button" | "dropdown";
 

@@ -3,9 +3,9 @@ import { useTranslation } from "react-i18next";
 
 import { Nav } from "./-components/nav";
 import { Sidebar } from "./-components/sidebar";
-import { getRoleByNameQueryOptions } from "@/queries/roles";
-import { getUsersQueryOptions } from "@/queries/users";
 import { authorizeQueryOptions } from "@bunstack/react/queries/auth";
+import { getRoleByNameQueryOptions } from "@bunstack/web/queries/roles";
+import { getUsersQueryOptions } from "@bunstack/web/queries/users";
 
 export const Route = createFileRoute("/_dashboard/settings/roles/$name")({
   component: RoleLayout,

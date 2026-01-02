@@ -1,8 +1,8 @@
-import type { NotificationChannelUnion } from "@bunstack/shared/types/notification-channels.types";
+import type { NotificationChannelUnion } from "@bunstack/shared/types/db/notification-channels.types";
 
 import { eq } from "drizzle-orm";
 
-import { drizzle } from "@/database";
+import { drizzle } from "@bunstack/db/database";
 import { NotificationChannelsModel } from "@bunstack/shared/models/notifications-channels.model";
 import { NotificationChannelSchema } from "@bunstack/shared/schemas/db/notification-channels.schemas";
 

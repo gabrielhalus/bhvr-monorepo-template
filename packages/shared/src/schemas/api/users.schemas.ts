@@ -1,8 +1,8 @@
-import type { UserRelations } from "../../types/users.types";
+import type { UserRelations } from "@bunstack/shared/types/db/users.types";
 
 import { z } from "zod";
 
-import { arrayParam } from "../../helpers";
+import { arrayParam } from "@bunstack/shared/helpers";
 
 /**
  * User relation keys
@@ -30,4 +30,3 @@ export const UpdateUserPasswordSchema = z.object({
     .min(8)
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).+$/),
 });
-

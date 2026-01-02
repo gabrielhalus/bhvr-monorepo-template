@@ -1,8 +1,8 @@
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { inferConfigValue } from "@/helpers";
-import { RuntimeConfigModel } from "@/models/runtime-config.model";
+import { inferConfigValue } from "@bunstack/shared/helpers";
+import { RuntimeConfigModel } from "@bunstack/shared/models/runtime-config.model";
 
 /**
  * Schema for runtime-configurations

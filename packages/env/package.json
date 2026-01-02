@@ -13,9 +13,6 @@
     "build": "tsc -b",
     "lint": "eslint ."
   },
-  "peerDependencies": {
-    "zod": "^4.1.11"
-  },
   "devDependencies": {
     "@bunstack/eslint-config": "workspace:*",
     "@bunstack/typescript-config": "workspace:*"

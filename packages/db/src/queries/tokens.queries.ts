@@ -1,10 +1,10 @@
 import type { InsertTokenSchema, UpdateTokenSchema } from "@bunstack/shared/schemas/db/tokens.schemas";
-import type { Token } from "@bunstack/shared/types/tokens.types";
+import type { Token } from "@bunstack/shared/types/db/tokens.types";
 import type { z } from "zod";
 
 import { eq } from "drizzle-orm";
 
-import { drizzle } from "@/database";
+import { drizzle } from "@bunstack/db/database";
 import { TokensModel } from "@bunstack/shared/models/tokens.model";
 
 // ============================================================================

@@ -1,8 +1,8 @@
-import type { RoleRelations } from "../../types/roles.types";
+import type { RoleRelations } from "@bunstack/shared/types/db/roles.types";
 
 import { z } from "zod";
 
-import { arrayParam } from "../../helpers";
+import { arrayParam } from "@bunstack/shared/helpers";
 
 /**
  * Role relation keys
@@ -28,4 +28,3 @@ export const UpdateRoleSchema = z.object({
   label: z.string(),
   description: z.string().nullable(),
 });
-

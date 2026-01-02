@@ -1,4 +1,4 @@
-import type { RoleWithRelations } from "@bunstack/shared/types/roles.types";
+import type { RoleWithRelations } from "@bunstack/shared/types/db/roles.types";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { Link } from "@tanstack/react-router";

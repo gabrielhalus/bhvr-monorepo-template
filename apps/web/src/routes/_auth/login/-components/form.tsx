@@ -35,7 +35,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
         return navigate({ href: redirectTo, replace: true });
       }
 
-      toast.error(json.error);
+      throw toast.error(typeof json.error === "string" ? json.error : json.error.message);
     },
   });
 

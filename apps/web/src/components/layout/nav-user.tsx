@@ -5,7 +5,6 @@ import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
 
 import { AvatarUser } from "../avatar-user";
-import { LogoutButton } from "@/components/layout/logout-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +26,7 @@ import {
 } from "@bunstack/react/components/sidebar";
 import { useAuth } from "@bunstack/react/hooks/use-auth";
 import { cn } from "@bunstack/react/lib/utils";
+import { LogoutButton } from "@bunstack/web/components/layout/logout-button";
 
 export function NavUser() {
   const { isMobile } = useSidebar();

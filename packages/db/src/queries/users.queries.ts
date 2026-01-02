@@ -1,9 +1,9 @@
-import type { User, UserRelationKeys, UserRelations, UserWithRelations } from "@bunstack/shared/types/users.types";
+import type { User, UserRelationKeys, UserRelations, UserWithRelations } from "@bunstack/shared/types/db/users.types";
 import type { z } from "zod";
 
 import { eq } from "drizzle-orm";
 
-import { drizzle } from "@/database";
+import { drizzle } from "@bunstack/db/database";
 import { attachRelation } from "@bunstack/shared/helpers";
 import { RolesModel } from "@bunstack/shared/models/roles.model";
 import { TokensModel } from "@bunstack/shared/models/tokens.model";

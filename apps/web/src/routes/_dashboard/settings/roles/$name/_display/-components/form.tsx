@@ -7,13 +7,13 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { Route as Layout } from "../../route";
-import { getAllRolesQueryOptions } from "@/queries/roles";
 import { Button } from "@bunstack/react/components/button";
 import { Field, FieldContent, FieldError, FieldLabel } from "@bunstack/react/components/field";
 import { Input } from "@bunstack/react/components/input";
 import { Spinner } from "@bunstack/react/components/spinner";
 import { api } from "@bunstack/react/lib/http";
 import { UpdateRoleSchema } from "@bunstack/shared/schemas/api/roles.schemas";
+import { getAllRolesQueryOptions } from "@bunstack/web/queries/roles";
 
 type UpdateRoleData = z.infer<typeof UpdateRoleSchema>;
 

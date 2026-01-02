@@ -1,7 +1,7 @@
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { NotificationChannelsModel } from "../../models/notifications-channels.model";
+import { NotificationChannelsModel } from "@bunstack/shared/models/notifications-channels.model";
 
 const BaseChannelSchema = createSelectSchema(NotificationChannelsModel).omit({ type: true, config: true });
 
@@ -56,4 +56,3 @@ export const ChannelSchemaMap = {
   TELEGRAM: TelegramChannelSchema,
   SLACK: SlackChannelSchema,
 };
-

@@ -19,4 +19,3 @@ export const PermissionSchema = z.enum([
   "userRole:create",
   "userRole:delete",
 ]);
-

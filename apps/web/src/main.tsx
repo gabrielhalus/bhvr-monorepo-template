@@ -1,17 +1,17 @@
 import "@bunstack/react/styles/globals.css";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
-import { StrictMode, Suspense } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { I18nextProvider } from "react-i18next";
 
-import i18n from "@/i18n";
-import { routeTree } from "@/routeTree.gen";
 import { Sayno } from "@bunstack/react/components/sayno";
 import { Toaster } from "@bunstack/react/components/sonner";
 import { queryClient } from "@bunstack/react/lib/query-client";
 import { AuthProvider } from "@bunstack/react/providers/auth-provider";
 import { ThemeProvider } from "@bunstack/react/providers/theme-provider";
+import i18n from "@bunstack/web/i18n";
+import { routeTree } from "@bunstack/web/routeTree.gen";
 
 export const router = createRouter({
   routeTree,

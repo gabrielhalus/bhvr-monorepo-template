@@ -1,8 +1,8 @@
-import type { PasswordRules } from "../../types/auth.types";
+import type { PasswordRules } from "@bunstack/shared/types/auth.types";
 
 import { z } from "zod";
 
-import { PermissionSchema } from "./permissions.schemas";
+import { PermissionSchema } from "@bunstack/shared/schemas/api/permissions.schemas";
 
 export const passwordRules: PasswordRules = {
   minLength: 8,
@@ -44,4 +44,3 @@ export const isAuthorizedSchema = z.object({
   permission: PermissionSchema,
   resource: z.record(z.string(), z.unknown()).optional(),
 });
-

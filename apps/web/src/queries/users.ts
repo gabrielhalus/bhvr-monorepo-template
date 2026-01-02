@@ -1,4 +1,4 @@
-import type { UserRelationKeys } from "@bunstack/shared/types/users.types";
+import type { UserRelationKeys } from "@bunstack/shared/types/db/users.types";
 
 import { queryOptions } from "@tanstack/react-query";
 

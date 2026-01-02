@@ -1,5 +1,5 @@
 import type { AppContext } from "@bunstack/api/utils/hono";
-import type { AccessToken } from "@bunstack/shared/types/tokens.types";
+import type { AccessToken } from "@bunstack/shared/types/db/tokens.types";
 
 import { getCookie, setCookie } from "hono/cookie";
 import { verify } from "hono/jwt";

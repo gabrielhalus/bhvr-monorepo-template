@@ -1,8 +1,8 @@
-import type { ConfigValue, RuntimeConfig } from "@bunstack/shared/types/runtime-config.types";
+import type { ConfigValue, RuntimeConfig } from "@bunstack/shared/types/db/runtime-config.types";
 
 import { eq, inArray } from "drizzle-orm";
 
-import { drizzle } from "@/database";
+import { drizzle } from "@bunstack/db/database";
 import { RuntimeConfigModel } from "@bunstack/shared/models/runtime-config.model";
 import { RuntimeConfigSchema } from "@bunstack/shared/schemas/db/runtime-config.schemas";
 

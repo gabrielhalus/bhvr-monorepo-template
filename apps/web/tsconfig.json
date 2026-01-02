@@ -1,16 +1,6 @@
 {
   "extends": "@bunstack/typescript-config/react.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-
-      "@bunstack/api/*": ["../api/src/*"],
-      "@bunstack/i18n/*": ["../../packages/i18n/src/*"],
-      "@bunstack/env": ["../../packages/env/src/index.ts"],
-      "@bunstack/shared/*": ["../../packages/shared/src/*"],
-      "@bunstack/react/*": ["../../packages/react/src/*"]
-    },
     "outDir": "dist"
   },
   "references": [

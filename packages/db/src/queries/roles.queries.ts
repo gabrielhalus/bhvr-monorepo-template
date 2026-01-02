@@ -1,12 +1,12 @@
 import type { WithRelations } from "@bunstack/shared/lib/type-utils";
 import type { UpdateRoleSchema } from "@bunstack/shared/schemas/api/roles.schemas";
 import type { InsertRoleSchema } from "@bunstack/shared/schemas/db/roles.schemas";
-import type { Role, RoleRelationKeys, RoleRelations, RoleWithRelations } from "@bunstack/shared/types/roles.types";
+import type { Role, RoleRelationKeys, RoleRelations, RoleWithRelations } from "@bunstack/shared/types/db/roles.types";
 import type { z } from "zod";
 
 import { eq } from "drizzle-orm";
 
-import { drizzle } from "@/database";
+import { drizzle } from "@bunstack/db/database";
 import { attachRelation } from "@bunstack/shared/helpers";
 import { PoliciesModel } from "@bunstack/shared/models/policies.model";
 import { RolePermissionsModel } from "@bunstack/shared/models/role-permissions.model";

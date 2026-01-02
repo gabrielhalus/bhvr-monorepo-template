@@ -1,5 +1,5 @@
+import type { UserWithRelations } from "@bunstack/shared/types/db/users.types";
 import type { Permission } from "@bunstack/shared/types/permissions.types";
-import type { UserWithRelations } from "@bunstack/shared/types/users.types";
 
 import { evaluateCondition } from "./evaluate-condition";
 import { hydrateRoles } from "@bunstack/db/queries/roles.queries";

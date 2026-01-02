@@ -1,12 +1,11 @@
-import type { Role } from "@bunstack/shared/types/roles.types";
-import type { UserWithRelations } from "@bunstack/shared/types/users.types";
+import type { UserWithRelations } from "@bunstack/shared/types/db/users.types";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { Link } from "@tanstack/react-router";
 
 import { ActionDropdown } from "./action-dropdown";
-import { AvatarUser } from "@/components/avatar-user";
 import { SortableHeader } from "@bunstack/react/components/sortable-header";
+import { AvatarUser } from "@bunstack/web/components/avatar-user";
 
 export const columns: ColumnDef<UserWithRelations<["roles"]>>[] = [
   {

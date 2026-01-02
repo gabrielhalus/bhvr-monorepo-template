@@ -5,8 +5,8 @@ import { requirePermissionFactory } from "@bunstack/api/middlewares/access-contr
 import { getSessionContext } from "@bunstack/api/middlewares/auth";
 import { validationMiddleware } from "@bunstack/api/middlewares/validation";
 import { deleteUser, emailExists, getUser, getUsers, updateUser } from "@bunstack/db/queries/users.queries";
-import { UpdateUserSchema } from "@bunstack/shared/schemas/db/users.schemas";
 import { UserRelationsQuerySchema } from "@bunstack/shared/schemas/api/users.schemas";
+import { UpdateUserSchema } from "@bunstack/shared/schemas/db/users.schemas";
 
 export const usersRoutes = new Hono()
   /**

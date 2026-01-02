@@ -13,7 +13,7 @@ export default defineConfig(() => ({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@bunstack/web": path.resolve(__dirname, "./src"),
       "@bunstack/api": path.resolve(__dirname, "../api/src"),
       "@bunstack/i18n": path.resolve(__dirname, "../../packages/i18n/src"),
       "@bunstack/shared": path.resolve(__dirname, "../../packages/shared/src"),
