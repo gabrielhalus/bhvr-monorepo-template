@@ -7,6 +7,10 @@ import { drizzle } from "@/database";
 import { UserRolesModel } from "@bunstack/shared/models/user-roles.model";
 import { UserRoleSchema } from "@bunstack/shared/schemas/db/user-roles.schemas";
 
+// ============================================================================
+// Core CRUD Operations
+// ============================================================================
+
 /**
  * Create a new user-role relation.
  * @param userRole - The relation object.

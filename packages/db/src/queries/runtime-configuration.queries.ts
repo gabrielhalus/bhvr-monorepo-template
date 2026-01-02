@@ -1,30 +1,35 @@
+import type { ConfigValue, RuntimeConfig } from "@bunstack/shared/types/runtime-config.types";
+
+import { eq, inArray } from "drizzle-orm";
+
+import { drizzle } from "@/database";
+import { RuntimeConfigModel } from "@bunstack/shared/models/runtime-config.model";
+import { RuntimeConfigSchema } from "@bunstack/shared/schemas/db/runtime-config.schemas";
+
 // ============================================================================
 // Core CRUD Operations
 // ============================================================================
 
-import { eq } from "drizzle-orm";
-
-import { drizzle } from "@/database";
-import { RuntimeConfigModel } from "@bunstack/shared/models/runtime-config.model";
-
 /**
  * Get all runtime-configurations.
+ * @param keys - Optional array of runtime-configuration keys to filter by.
  * @returns The runtime-configurations.
  */
-export async function getRuntimeConfigurations(_keys?: string[]) {
+export async function getRuntimeConfigurations(keys?: string[]): Promise<RuntimeConfig[]> {
   const runtimeConfigs = await drizzle
     .select()
-    .from(RuntimeConfigModel);
+    .from(RuntimeConfigModel)
+    .where(keys ? inArray(RuntimeConfigModel.configKey, keys) : undefined);
 
-  return runtimeConfigs;
+  return runtimeConfigs.map(rc => RuntimeConfigSchema.parse(rc));
 }
 
 /**
  * Get a runtime-configuration by key.
- * @param key - The runtime-configuration key
+ * @param key - The runtime-configuration key.
  * @returns The runtime-configuration.
  */
-export async function getRuntimeConfiguration(key: string) {
+export async function getRuntimeConfiguration(key: string): Promise<RuntimeConfig | null> {
   const [runtimeConfig] = await drizzle
     .select()
     .from(RuntimeConfigModel)
@@ -34,12 +39,26 @@ export async function getRuntimeConfiguration(key: string) {
     return null;
   }
 
-  return runtimeConfig;
+  return RuntimeConfigSchema.parse(runtimeConfig);
 }
 
 /**
- *
+ * Update a runtime-configuration.
+ * @param key - The runtime-configuration key.
+ * @param value - The value to update.
+ * @returns The updated runtime-configuration.
+ * @throws An error if the runtime-configuration could not be updated.
  */
-export async function updateRuntimeConfiguration() {
+export async function updateRuntimeConfiguration(key: string, value: ConfigValue): Promise<RuntimeConfig> {
+  const [updatedRuntimeConfig] = await drizzle
+    .update(RuntimeConfigModel)
+    .set({ value: String(value) })
+    .where(eq(RuntimeConfigModel.configKey, key))
+    .returning();
 
+  if (!updatedRuntimeConfig) {
+    throw new Error("Failed to update runtime-configuration");
+  }
+
+  return RuntimeConfigSchema.parse(updatedRuntimeConfig);
 }
