@@ -2,7 +2,7 @@ import type { RoleRelations } from "../../types/roles.types";
 
 import { z } from "zod";
 
-import { arrayParam } from "../../lib/helpers";
+import { arrayParam } from "../../helpers";
 
 /**
  * Role relation keys

@@ -7,7 +7,7 @@ import type { z } from "zod";
 import { eq } from "drizzle-orm";
 
 import { drizzle } from "@/database";
-import { attachRelation } from "@bunstack/shared/lib/helpers";
+import { attachRelation } from "@bunstack/shared/helpers";
 import { PoliciesModel } from "@bunstack/shared/models/policies.model";
 import { RolePermissionsModel } from "@bunstack/shared/models/role-permissions.model";
 import { RolesModel } from "@bunstack/shared/models/roles.model";

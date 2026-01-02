@@ -2,7 +2,7 @@ import type { UserRelations } from "../../types/users.types";
 
 import { z } from "zod";
 
-import { arrayParam } from "../../lib/helpers";
+import { arrayParam } from "../../helpers";
 
 /**
  * User relation keys

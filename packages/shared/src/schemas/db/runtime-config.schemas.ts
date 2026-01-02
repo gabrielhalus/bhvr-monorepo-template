@@ -1,7 +1,7 @@
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { inferConfigValue } from "@/lib/helpers";
+import { inferConfigValue } from "@/helpers";
 import { RuntimeConfigModel } from "@/models/runtime-config.model";
 
 /**

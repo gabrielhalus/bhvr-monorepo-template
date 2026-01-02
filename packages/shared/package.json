@@ -8,6 +8,10 @@
       "types": "./dist/app.config.d.ts",
       "import": "./dist/config/app.config.js"
     },
+    "./helpers": {
+      "types": "./dist/helpers/index.d.ts",
+      "import": "./dist/helpers/index.js"
+    },
     "./lib/*": {
       "types": "./dist/lib/*.d.ts",
       "import": "./dist/lib/*.js"
