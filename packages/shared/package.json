@@ -5,8 +5,8 @@
   "exports": {
 
     "./config": {
-      "types": "./dist/app.config.d.ts",
-      "import": "./dist/config/app.config.js"
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config/config.js"
     },
     "./helpers": {
       "types": "./dist/helpers/index.d.ts",
