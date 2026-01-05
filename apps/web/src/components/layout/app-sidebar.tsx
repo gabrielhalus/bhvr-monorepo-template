@@ -4,11 +4,12 @@ import { Box, Home, ShieldUser, UsersRound } from "lucide-react";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-import { NavSettings } from "./nav-settings";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "~react/components/sidebar";
-import { authorizeQueryOptions } from "~react/queries/auth";
 import { NavMain } from "@/components/layout/nav-main";
 import { NavUser } from "@/components/layout/nav-user";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "~react/components/sidebar";
+import { authorizeQueryOptions } from "~react/queries/auth";
+
+import { NavSettings } from "./nav-settings";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { t } = useTranslation("web");

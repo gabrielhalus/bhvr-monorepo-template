@@ -1,13 +1,14 @@
-import type { RoleWithRelations } from "~shared/types/db/roles.types";
 import type { LinkOptions } from "@tanstack/react-router";
+import type { RoleWithRelations } from "~shared/types/db/roles.types";
 
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
-import { Route } from "../route";
-import { Button } from "~react/components/button";
 import { getRoleByNameQueryOptions } from "@/queries/roles";
+import { Button } from "~react/components/button";
+
+import { Route } from "../route";
 
 export function Nav() {
   const { t } = useTranslation("web");

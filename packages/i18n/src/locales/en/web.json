@@ -6,16 +6,16 @@
     "settings": {
       "title": "Settings",
       "users": {
-        "title": "UsersModel",
+        "title": "Users",
         "list": {
-          "title": "UsersModel",
+          "title": "Users",
           "subtitle": "Manage your users."
         }
       },
       "roles": {
-        "title": "RolesModel",
+        "title": "Roles",
         "list": {
-          "title": "RolesModel",
+          "title": "Roles",
           "subtitle": "Manage your roles."
         },
         "detail": {

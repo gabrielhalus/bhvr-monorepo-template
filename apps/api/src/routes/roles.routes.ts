@@ -2,13 +2,14 @@ import type { RoleRelationKeys } from "~shared/types/db/roles.types";
 
 import { Hono } from "hono";
 
-import { requirePermissionFactory } from "../middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
 import { deleteRole, getRole, getRoleByName, getRoles, updateRole } from "~db/queries/roles.queries";
 import { createUserRole, deleteUserRole } from "~db/queries/user-roles.queries";
 import { RoleRelationsQuerySchema, UpdateRoleSchema } from "~shared/schemas/api/roles.schemas";
 import { AssignRoleMembersSchema, RemoveRoleMembersSchema } from "~shared/schemas/api/user-roles.schemas";
+
+import { requirePermissionFactory } from "../middlewares/access-control";
 
 export const rolesRoutes = new Hono()
   // --- All routes below this point require authentication

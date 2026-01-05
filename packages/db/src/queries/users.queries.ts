@@ -1,6 +1,8 @@
 import type { User, UserRelationKeys, UserRelations, UserWithRelations } from "~shared/types/db/users.types";
 import type { z } from "zod";
 
+import { eq } from "drizzle-orm";
+
 import { drizzle } from "~db/database";
 import { attachRelation } from "~shared/helpers";
 import { RolesModel } from "~shared/models/roles.model";
@@ -10,7 +12,6 @@ import { UsersModel } from "~shared/models/users.model";
 import { RoleSchema } from "~shared/schemas/db/roles.schemas";
 import { TokenSchema } from "~shared/schemas/db/tokens.schemas";
 import { InsertUserSchema, UpdateUserSchema, UserSchema } from "~shared/schemas/db/users.schemas";
-import { eq } from "drizzle-orm";
 
 // ============================================================================
 // Relation Loaders
@@ -53,7 +54,10 @@ const relationLoaders: { [K in keyof UserRelations]: (userId: string) => Promise
  * @throws An error if a loader is not defined for a relation.
  */
 export async function getUsers<T extends UserRelationKeys>(includes?: T): Promise<UserWithRelations<T>[]> {
-  const users = await drizzle.select().from(UsersModel);
+  const users = await drizzle
+    .select()
+    .from(UsersModel);
+
   const parsedUsers = users.map(u => UserSchema.parse(u));
 
   return Promise.all(parsedUsers.map(async (user) => {

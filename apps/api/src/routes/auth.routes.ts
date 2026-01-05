@@ -78,6 +78,7 @@ export const authRoutes = new Hono()
 
       return c.json({ success: true as const });
     } catch (error) {
+      console.log(error);
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
   })

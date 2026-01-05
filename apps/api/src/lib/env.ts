@@ -1,5 +1,5 @@
 import { z } from "zod";
-import "dotenv/config"; // loads default .env in current folder
+import "dotenv/config";
 
 import { validateEnv } from "~env";
 

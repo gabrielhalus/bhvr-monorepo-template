@@ -3,9 +3,10 @@ import { Search } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { InputGroup, InputGroupAddon, InputGroupInput } from "~react/components/input-group";
+
 import { AssignRoleDialog } from "./-components/assign-role-dialog";
 import { RoleMembersList } from "./-components/members-list";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "~react/components/input-group";
 
 export const Route = createFileRoute(
   "/_dashboard/settings/roles/$name/members/",

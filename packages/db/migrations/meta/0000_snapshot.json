@@ -1,5 +1,5 @@
 {
-  "id": "c3eef976-e3b3-4927-98fd-bb18650d8099",
+  "id": "8e9fd0b2-ac8c-46b3-aa28-bd4c4c1437df",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -265,8 +265,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.runtime_config": {
-      "name": "runtime_config",
+    "public.runtime_configs": {
+      "name": "runtime_configs",
       "schema": "",
       "columns": {
         "config_key": {
@@ -313,9 +313,9 @@
         }
       },
       "foreignKeys": {
-        "runtime_config_updated_by_users_id_fk": {
-          "name": "runtime_config_updated_by_users_id_fk",
-          "tableFrom": "runtime_config",
+        "runtime_configs_updated_by_users_id_fk": {
+          "name": "runtime_configs_updated_by_users_id_fk",
+          "tableFrom": "runtime_configs",
           "tableTo": "users",
           "columnsFrom": [
             "updated_by"

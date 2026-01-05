@@ -38,7 +38,7 @@ CREATE TABLE "roles" (
 	CONSTRAINT "roles_index_unique" UNIQUE("index")
 );
 --> statement-breakpoint
-CREATE TABLE "runtime_config" (
+CREATE TABLE "runtime_configs" (
 	"config_key" varchar(255) PRIMARY KEY NOT NULL,
 	"value" text NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE "users" (
 --> statement-breakpoint
 ALTER TABLE "policies" ADD CONSTRAINT "policies_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."roles"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "role_permissions" ADD CONSTRAINT "role_permissions_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."roles"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE "runtime_config" ADD CONSTRAINT "runtime_config_updated_by_users_id_fk" FOREIGN KEY ("updated_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "runtime_configs" ADD CONSTRAINT "runtime_configs_updated_by_users_id_fk" FOREIGN KEY ("updated_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."roles"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
-CREATE INDEX "idx_config_key_prefix" ON "runtime_config" USING btree ("config_key");
+CREATE INDEX "idx_config_key_prefix" ON "runtime_configs" USING btree ("config_key");

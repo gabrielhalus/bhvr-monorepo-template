@@ -6,14 +6,15 @@ import { Link } from "@tanstack/react-router";
 import { XIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import { Route as Layout } from "../../route";
+import { AvatarUser } from "@/components/avatar-user";
+import { getRoleByNameQueryOptions } from "@/queries/roles";
 import { Button } from "~react/components/button";
 import { Spinner } from "~react/components/spinner";
 import { api } from "~react/lib/http";
 import sayno from "~react/lib/sayno";
 import { authorizeQueryOptions } from "~react/queries/auth";
-import { AvatarUser } from "@/components/avatar-user";
-import { getRoleByNameQueryOptions } from "@/queries/roles";
+
+import { Route as Layout } from "../../route";
 
 export function RoleMembersList({ search }: { search: string }) {
   const { role: initialRole } = Layout.useLoaderData();

@@ -1,5 +1,5 @@
-import type { User } from "~shared/types/db/users.types";
 import type { Row } from "@tanstack/react-table";
+import type { User } from "~shared/types/db/users.types";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, MoreHorizontal, Trash } from "lucide-react";

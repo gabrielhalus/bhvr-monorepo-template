@@ -3,9 +3,9 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { getRolesQueryOptions } from "@/queries/roles";
 import { Button } from "~react/components/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~react/components/tooltip";
-import { getRolesQueryOptions } from "@/queries/roles";
 
 export function Sidebar() {
   const { t } = useTranslation("common");

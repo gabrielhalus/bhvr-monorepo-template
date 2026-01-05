@@ -1,5 +1,5 @@
-import type { Role } from "~shared/types/db/roles.types";
 import type { Row } from "@tanstack/react-table";
+import type { Role } from "~shared/types/db/roles.types";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, MoreHorizontal, Trash } from "lucide-react";

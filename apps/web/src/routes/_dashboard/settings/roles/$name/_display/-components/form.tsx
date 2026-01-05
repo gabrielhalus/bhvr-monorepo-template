@@ -6,14 +6,15 @@ import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { Route as Layout } from "../../route";
+import { getAllRolesQueryOptions } from "@/queries/roles";
 import { Button } from "~react/components/button";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
 import { Input } from "~react/components/input";
 import { Spinner } from "~react/components/spinner";
 import { api } from "~react/lib/http";
 import { UpdateRoleSchema } from "~shared/schemas/api/roles.schemas";
-import { getAllRolesQueryOptions } from "@/queries/roles";
+
+import { Route as Layout } from "../../route";
 
 type UpdateRoleData = z.infer<typeof UpdateRoleSchema>;
 

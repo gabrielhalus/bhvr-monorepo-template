@@ -2,9 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
-import { columns } from "./-components/columns";
-import { DataTable } from "~react/components/data-table";
 import { getRolesQueryOptions } from "@/queries/roles";
+import { DataTable } from "~react/components/data-table";
+
+import { columns } from "./-components/columns";
 
 export const Route = createFileRoute("/_dashboard/settings/roles/")({
   component: Roles,

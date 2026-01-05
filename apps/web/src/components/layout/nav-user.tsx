@@ -4,7 +4,7 @@ import { Languages, Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
 
-import { AvatarUser } from "../avatar-user";
+import { LogoutButton } from "@/components/layout/logout-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +26,8 @@ import {
 } from "~react/components/sidebar";
 import { useAuth } from "~react/hooks/use-auth";
 import { cn } from "~react/lib/utils";
-import { LogoutButton } from "@/components/layout/logout-button";
+
+import { AvatarUser } from "../avatar-user";
 
 export function NavUser() {
   const { isMobile } = useSidebar();

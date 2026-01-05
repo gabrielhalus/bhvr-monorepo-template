@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { Route as Layout } from "../../route";
+import { AvatarUser } from "@/components/avatar-user";
+import { getRoleByNameQueryOptions } from "@/queries/roles";
+import { getUsersQueryOptions } from "@/queries/users";
 import { Button } from "~react/components/button";
 import { Checkbox } from "~react/components/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~react/components/dialog";
@@ -12,9 +14,8 @@ import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/f
 import { Spinner } from "~react/components/spinner";
 import { api } from "~react/lib/http";
 import { AssignRoleMembersSchema } from "~shared/schemas/api/user-roles.schemas";
-import { AvatarUser } from "@/components/avatar-user";
-import { getRoleByNameQueryOptions } from "@/queries/roles";
-import { getUsersQueryOptions } from "@/queries/users";
+
+import { Route as Layout } from "../../route";
 
 export function AssignRoleDialog() {
   const { t } = useTranslation(["common", "web"]);

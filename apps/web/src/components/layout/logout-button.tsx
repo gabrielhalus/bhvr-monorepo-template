@@ -4,13 +4,13 @@ import { LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
+import { env } from "@/lib/env";
 import { Button } from "~react/components/button";
 import { DropdownMenuItem } from "~react/components/dropdown-menu";
 import { Spinner } from "~react/components/spinner";
 import { useAuth } from "~react/hooks/use-auth";
 import { api } from "~react/lib/http";
 import sayno from "~react/lib/sayno";
-import { env } from "@/lib/env";
 
 type Variant = "button" | "dropdown";
 

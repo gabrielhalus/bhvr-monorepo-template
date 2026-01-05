@@ -29,9 +29,11 @@ export default function createConfig(options, ...userConfigs) {
             groups: [
               "type",
               ["builtin", "external"],
-              ["internal", "parent", "sibling", "index"],
+              "internal",
+              ["parent", "sibling", "index"],
             ],
-            internalPattern: ["^@bunstack/", "^@/"],
+            internalPattern: ["^@bunstack/", "^@/", "^~"],
+            newlinesBetween: "always",
           },
         ],
         "unicorn/filename-case": [
