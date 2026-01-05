@@ -2,10 +2,10 @@ import { Hono } from "hono";
 import { logger } from "hono/logger";
 
 import cors from "@/middlewares/cors";
-import { authRoutes } from "@/routes/auth";
-import { rolesRoutes } from "@/routes/roles";
-import { configRoutes } from "@/routes/runtime-configs";
-import { usersRoutes } from "@/routes/users";
+import { authRoutes } from "@/routes/auth.routes";
+import { rolesRoutes } from "@/routes/roles.routes";
+import { configRoutes } from "@/routes/runtime-configs.routes";
+import { usersRoutes } from "@/routes/users.routes";
 
 const app = new Hono({ strict: false });
 
