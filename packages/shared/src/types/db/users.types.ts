@@ -1,8 +1,8 @@
-import type { WithRelations } from "@bunstack/shared/lib/type-utils";
-import type { UsersModel } from "@bunstack/shared/models/users.model";
-import type { UserRelationsSchema } from "@bunstack/shared/schemas/api/users.schemas";
-import type { Role } from "@bunstack/shared/types/db/roles.types";
-import type { Token } from "@bunstack/shared/types/db/tokens.types";
+import type { WithRelations } from "~shared/lib/type-utils";
+import type { UsersModel } from "~shared/models/users.model";
+import type { UserRelationsSchema } from "~shared/schemas/api/users.schemas";
+import type { Role } from "~shared/types/db/roles.types";
+import type { Token } from "~shared/types/db/tokens.types";
 import type { z } from "zod";
 
 export type User = typeof UsersModel.$inferSelect;

@@ -5,8 +5,8 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@bunstack/react/components/collapsible";
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from "@bunstack/react/components/sidebar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~react/components/collapsible";
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from "~react/components/sidebar";
 
 export function NavSettings({ items }: { items: { title: string; icon: LucideIcon; href: LinkOptions; items?: { title: string; href: LinkOptions }[] }[] }) {
   const { t } = useTranslation("web");

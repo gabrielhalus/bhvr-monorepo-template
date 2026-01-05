@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-import { authorizeQueryOptions } from "@bunstack/react/queries/auth";
+import { authorizeQueryOptions } from "~react/queries/auth";
 
 export const Route = createFileRoute("/_dashboard/settings/users")({
   component: UsersLayout,

@@ -5,8 +5,8 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { NavSettings } from "./nav-settings";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@bunstack/react/components/sidebar";
-import { authorizeQueryOptions } from "@bunstack/react/queries/auth";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "~react/components/sidebar";
+import { authorizeQueryOptions } from "~react/queries/auth";
 import { NavMain } from "@/components/layout/nav-main";
 import { NavUser } from "@/components/layout/nav-user";
 

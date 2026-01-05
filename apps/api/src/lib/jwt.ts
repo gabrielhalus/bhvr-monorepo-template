@@ -1,5 +1,5 @@
 import type { CookieType } from "./types";
-import type { JwtPayload } from "@bunstack/shared/types/db/tokens.types";
+import type { JwtPayload } from "~shared/types/db/tokens.types";
 
 import { sign, verify } from "hono/jwt";
 

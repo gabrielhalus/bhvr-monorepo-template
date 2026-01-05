@@ -1,8 +1,8 @@
-import type { UserRelationKeys } from "@bunstack/shared/types/db/users.types";
+import type { UserRelationKeys } from "~shared/types/db/users.types";
 
 import { queryOptions } from "@tanstack/react-query";
 
-import { api } from "@bunstack/react/lib/http";
+import { api } from "~react/lib/http";
 
 export const getAllUsersQueryOptions = queryOptions({
   queryKey: ["get-all-users"],

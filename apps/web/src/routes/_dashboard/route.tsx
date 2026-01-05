@@ -1,16 +1,19 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-import { Separator } from "@bunstack/react/components/separator";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@bunstack/react/components/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { auth } from "@/lib/auth";
+import { Separator } from "~react/components/separator";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "~react/components/sidebar";
+import { getDefaultConfigValue } from "~shared/helpers";
 
 export const Route = createFileRoute("/_dashboard")({
   component: DashboardLayout,
   beforeLoad: async () => {
     const session = await auth();
-    return { session };
+    const register = getDefaultConfigValue("authentication.register");
+
+    return { session, register };
   },
   loader: () => {
     return {
@@ -20,6 +23,8 @@ export const Route = createFileRoute("/_dashboard")({
 });
 
 function DashboardLayout() {
+  const { register } = Route.useRouteContext();
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -29,6 +34,7 @@ function DashboardLayout() {
             <SidebarTrigger className="-ml-" />
             <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
             <Breadcrumbs />
+            {JSON.stringify(register, null, 2)}
           </div>
         </header>
         <Outlet />

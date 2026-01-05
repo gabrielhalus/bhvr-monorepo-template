@@ -1,7 +1,12 @@
 import { Hono } from "hono";
 
 export const configRoutes = new Hono()
+  /**
+   * Get all runtime-configurations
+   *
+   * @param c - The context
+   * @returns The runtime-configurations
+   */
   .get("/", (c) => {
-    console.log("Hello");
-    return c.json({ success: true as const, message: "Hello world" });
+    return c.json({ success: true as const });
   });

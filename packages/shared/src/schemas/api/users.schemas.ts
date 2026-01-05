@@ -1,8 +1,8 @@
-import type { UserRelations } from "@bunstack/shared/types/db/users.types";
+import type { UserRelations } from "~shared/types/db/users.types";
 
 import { z } from "zod";
 
-import { arrayParam } from "@bunstack/shared/helpers";
+import { arrayParam } from "~shared/helpers";
 
 /**
  * User relation keys

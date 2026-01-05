@@ -2,7 +2,12 @@
   "extends": "@bunstack/typescript-config/base.json",
   "compilerOptions": {
     "composite": true,
+    "baseUrl": ".",
     "rootDir": "src",
+    "paths": {
+      "~i18n": ["../i18n/src/index"],
+      "~i18n/*": ["../i18n/src/*"],
+    },
     "resolveJsonModule": true,
     "types": ["bun", "node"],
     "declaration": true,

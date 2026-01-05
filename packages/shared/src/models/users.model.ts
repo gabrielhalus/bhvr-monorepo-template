@@ -1,6 +1,6 @@
 import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-import { nanoid } from "@bunstack/shared/lib/nanoid";
+import { nanoid } from "~shared/lib/nanoid";
 
 export const UsersModel = pgTable("users", {
   id: text("id").primaryKey().$defaultFn(() => nanoid()),

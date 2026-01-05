@@ -12,16 +12,16 @@ import {
 import { ChevronDown, Search, Settings2 } from "lucide-react";
 import * as React from "react";
 
-import { Button } from "@bunstack/react/components/button";
+import { Button } from "~react/components/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@bunstack/react/components/dropdown-menu";
-import { Input } from "@bunstack/react/components/input";
-import { Skeleton } from "@bunstack/react/components/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@bunstack/react/components/table";
+} from "~react/components/dropdown-menu";
+import { Input } from "~react/components/input";
+import { Skeleton } from "~react/components/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~react/components/table";
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];

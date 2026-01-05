@@ -1,7 +1,7 @@
-import type { WithRelations } from "@bunstack/shared/lib/type-utils";
-import type { TokensModel } from "@bunstack/shared/models/tokens.model";
-import type { AccessTokenSchema, RefreshTokenSchema, VerificationTokenSchema } from "@bunstack/shared/schemas/api/tokens.schemas";
-import type { User } from "@bunstack/shared/types/db/users.types";
+import type { WithRelations } from "~shared/lib/type-utils";
+import type { TokensModel } from "~shared/models/tokens.model";
+import type { AccessTokenSchema, RefreshTokenSchema, VerificationTokenSchema } from "~shared/schemas/api/tokens.schemas";
+import type { User } from "~shared/types/db/users.types";
 import type z from "zod";
 
 export type Token = typeof TokensModel.$inferSelect;

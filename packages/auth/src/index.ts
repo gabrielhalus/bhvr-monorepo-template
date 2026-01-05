@@ -1,8 +1,9 @@
-import type { UserWithRelations } from "@bunstack/shared/types/db/users.types";
-import type { Permission } from "@bunstack/shared/types/permissions.types";
+import type { UserWithRelations } from "~shared/types/db/users.types";
+import type { Permission } from "~shared/types/permissions.types";
+
+import { hydrateRoles } from "~db/queries/roles.queries";
 
 import { evaluateCondition } from "./evaluate-condition";
-import { hydrateRoles } from "@bunstack/db/queries/roles.queries";
 
 /**
  * Check if a user has a specific permission

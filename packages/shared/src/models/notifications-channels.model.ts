@@ -1,6 +1,6 @@
 import { jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-import { nanoid } from "@bunstack/shared/lib/nanoid";
+import { nanoid } from "~shared/lib/nanoid";
 
 export const NotificationChannelsModel = pgTable("notification_channels", {
   id: text("id").primaryKey().$defaultFn(nanoid),

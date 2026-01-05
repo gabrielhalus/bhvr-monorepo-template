@@ -1,7 +1,7 @@
 import { Cookie } from "lucide-react";
 import * as React from "react";
 
-import { Button } from "@bunstack/react/components/button";
+import { Button } from "~react/components/button";
 import {
   Card,
   CardContent,
@@ -9,8 +9,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@bunstack/react/components/card";
-import { cn } from "@bunstack/react/lib/utils";
+} from "~react/components/card";
+import { cn } from "~react/lib/utils";
 
 // Define prop types
 type CookieConsentProps = {

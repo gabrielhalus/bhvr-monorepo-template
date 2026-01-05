@@ -4,9 +4,9 @@ import { z } from "zod";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { deleteUser, emailExists, getUser, getUsers, updateUser } from "@bunstack/db/queries/users.queries";
-import { UserRelationsQuerySchema } from "@bunstack/shared/schemas/api/users.schemas";
-import { UpdateUserSchema } from "@bunstack/shared/schemas/db/users.schemas";
+import { deleteUser, emailExists, getUser, getUsers, updateUser } from "~db/queries/users.queries";
+import { UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
+import { UpdateUserSchema } from "~shared/schemas/db/users.schemas";
 
 export const usersRoutes = new Hono()
   /**

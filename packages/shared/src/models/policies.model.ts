@@ -1,4 +1,4 @@
-import type { Permission } from "@bunstack/shared/types/permissions.types";
+import type { Permission } from "~shared/types/permissions.types";
 
 import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 

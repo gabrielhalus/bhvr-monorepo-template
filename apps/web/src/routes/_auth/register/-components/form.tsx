@@ -3,16 +3,16 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Trans, useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { Button } from "@bunstack/react/components/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@bunstack/react/components/card";
-import { Field, FieldContent, FieldError, FieldLabel } from "@bunstack/react/components/field";
-import { Input } from "@bunstack/react/components/input";
-import { PasswordInput } from "@bunstack/react/components/password-input";
-import { Spinner } from "@bunstack/react/components/spinner";
-import { api } from "@bunstack/react/lib/http";
-import { cn } from "@bunstack/react/lib/utils";
-import { debounceAsync } from "@bunstack/shared/lib/debounce";
-import { passwordChecks, passwordRules, RegisterSchema } from "@bunstack/shared/schemas/api/auth.schemas";
+import { Button } from "~react/components/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~react/components/card";
+import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
+import { Input } from "~react/components/input";
+import { PasswordInput } from "~react/components/password-input";
+import { Spinner } from "~react/components/spinner";
+import { api } from "~react/lib/http";
+import { cn } from "~react/lib/utils";
+import { debounceAsync } from "~shared/lib/debounce";
+import { passwordChecks, passwordRules, RegisterSchema } from "~shared/schemas/api/auth.schemas";
 
 const checkEmail = debounceAsync(async (email: string): Promise<string | void> => {
   const res = await api.users["check-email"].$get({ query: { email } });

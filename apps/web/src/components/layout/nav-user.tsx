@@ -16,16 +16,16 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@bunstack/react/components/dropdown-menu";
-import { Separator } from "@bunstack/react/components/separator";
+} from "~react/components/dropdown-menu";
+import { Separator } from "~react/components/separator";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@bunstack/react/components/sidebar";
-import { useAuth } from "@bunstack/react/hooks/use-auth";
-import { cn } from "@bunstack/react/lib/utils";
+} from "~react/components/sidebar";
+import { useAuth } from "~react/hooks/use-auth";
+import { cn } from "~react/lib/utils";
 import { LogoutButton } from "@/components/layout/logout-button";
 
 export function NavUser() {

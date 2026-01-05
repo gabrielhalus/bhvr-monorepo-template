@@ -1,4 +1,4 @@
-import { cn } from "@bunstack/react/lib/utils";
+import { cn } from "~react/lib/utils";
 
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (

@@ -1,10 +1,10 @@
-import type { Session } from "@bunstack/shared/types/auth.types";
-import type { Permission } from "@bunstack/shared/types/permissions.types";
+import type { Session } from "~shared/types/auth.types";
+import type { Permission } from "~shared/types/permissions.types";
 import type { InferResponseType } from "hono";
 
 import { queryOptions } from "@tanstack/react-query";
 
-import { api } from "../lib/http";
+import { api } from "~react/lib/http";
 
 export const authQueryOptions = queryOptions({
   queryKey: ["auth"],

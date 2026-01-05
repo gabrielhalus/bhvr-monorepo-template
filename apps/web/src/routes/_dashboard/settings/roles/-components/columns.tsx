@@ -1,13 +1,13 @@
-import type { RoleWithRelations } from "@bunstack/shared/types/db/roles.types";
+import type { RoleWithRelations } from "~shared/types/db/roles.types";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { Link } from "@tanstack/react-router";
 import { UserRound } from "lucide-react";
 
 import { ActionDropdown } from "./action-dropdown";
-import { Button } from "@bunstack/react/components/button";
-import { SortableHeader } from "@bunstack/react/components/sortable-header";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@bunstack/react/components/tooltip";
+import { Button } from "~react/components/button";
+import { SortableHeader } from "~react/components/sortable-header";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~react/components/tooltip";
 
 export const columns: ColumnDef<RoleWithRelations<["members"]>>[] = [
   {

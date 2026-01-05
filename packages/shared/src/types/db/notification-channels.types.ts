@@ -1,5 +1,5 @@
-import type { Merge } from "@bunstack/shared/lib/type-utils";
-import type { NotificationChannelsModel } from "@bunstack/shared/models/notifications-channels.model";
+import type { Merge } from "~shared/lib/type-utils";
+import type { NotificationChannelsModel } from "~shared/models/notifications-channels.model";
 
 export type NotificationChannelRow = typeof NotificationChannelsModel.$inferSelect;
 

@@ -2,8 +2,8 @@ import type { Column } from "@tanstack/react-table";
 
 import { ArrowDownNarrowWide, ArrowUpDown, ArrowUpNarrowWide } from "lucide-react";
 
-import { Button } from "@bunstack/react/components/button";
-import { cn } from "@bunstack/react/lib/utils";
+import { Button } from "~react/components/button";
+import { cn } from "~react/lib/utils";
 
 type SortableHeaderProps<TData> = {
   column: Column<TData, unknown>;

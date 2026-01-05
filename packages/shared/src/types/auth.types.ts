@@ -1,4 +1,4 @@
-import type { UserWithRelations } from "@bunstack/shared/types/db/users.types";
+import type { UserWithRelations } from "~shared/types/db/users.types";
 
 export type Operand
   = | { type: "user_attr"; key: string }

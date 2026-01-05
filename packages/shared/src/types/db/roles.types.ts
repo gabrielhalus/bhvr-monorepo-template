@@ -1,9 +1,9 @@
-import type { WithRelations } from "@bunstack/shared/lib/type-utils";
-import type { RolesModel } from "@bunstack/shared/models/roles.model";
-import type { RoleRelationsSchema } from "@bunstack/shared/schemas/api/roles.schemas";
-import type { Policy } from "@bunstack/shared/types/db/policies.types";
-import type { User } from "@bunstack/shared/types/db/users.types";
-import type { Permission } from "@bunstack/shared/types/permissions.types";
+import type { WithRelations } from "~shared/lib/type-utils";
+import type { RolesModel } from "~shared/models/roles.model";
+import type { RoleRelationsSchema } from "~shared/schemas/api/roles.schemas";
+import type { Policy } from "~shared/types/db/policies.types";
+import type { User } from "~shared/types/db/users.types";
+import type { Permission } from "~shared/types/permissions.types";
 import type z from "zod";
 
 export type Role = typeof RolesModel.$inferSelect;

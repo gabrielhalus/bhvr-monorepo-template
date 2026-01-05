@@ -1,6 +1,6 @@
 import { createSelectSchema } from "drizzle-zod";
 
-import { UserRolesModel } from "@bunstack/shared/models/user-roles.model";
+import { UserRolesModel } from "~shared/models/user-roles.model";
 
 /**
  * Schema for user-roles

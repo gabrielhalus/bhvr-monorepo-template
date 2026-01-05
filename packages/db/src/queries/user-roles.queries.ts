@@ -1,11 +1,11 @@
-import type { UserRole } from "@bunstack/shared/types/db/user-roles.types";
+import type { UserRole } from "~shared/types/db/user-roles.types";
 import type { z } from "zod";
 
 import { and, eq } from "drizzle-orm";
 
-import { drizzle } from "@bunstack/db/database";
-import { UserRolesModel } from "@bunstack/shared/models/user-roles.model";
-import { UserRoleSchema } from "@bunstack/shared/schemas/db/user-roles.schemas";
+import { drizzle } from "~db/database";
+import { UserRolesModel } from "~shared/models/user-roles.model";
+import { UserRoleSchema } from "~shared/schemas/db/user-roles.schemas";
 
 // ============================================================================
 // Core CRUD Operations

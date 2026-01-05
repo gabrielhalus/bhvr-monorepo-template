@@ -3,8 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@bunstack/react/components/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@bunstack/react/components/tooltip";
+import { Button } from "~react/components/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~react/components/tooltip";
 import { getRolesQueryOptions } from "@/queries/roles";
 
 export function Sidebar() {

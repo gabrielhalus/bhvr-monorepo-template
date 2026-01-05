@@ -1,17 +1,16 @@
-import type { User, UserRelationKeys, UserRelations, UserWithRelations } from "@bunstack/shared/types/db/users.types";
+import type { User, UserRelationKeys, UserRelations, UserWithRelations } from "~shared/types/db/users.types";
 import type { z } from "zod";
 
+import { drizzle } from "~db/database";
+import { attachRelation } from "~shared/helpers";
+import { RolesModel } from "~shared/models/roles.model";
+import { TokensModel } from "~shared/models/tokens.model";
+import { UserRolesModel } from "~shared/models/user-roles.model";
+import { UsersModel } from "~shared/models/users.model";
+import { RoleSchema } from "~shared/schemas/db/roles.schemas";
+import { TokenSchema } from "~shared/schemas/db/tokens.schemas";
+import { InsertUserSchema, UpdateUserSchema, UserSchema } from "~shared/schemas/db/users.schemas";
 import { eq } from "drizzle-orm";
-
-import { drizzle } from "@bunstack/db/database";
-import { attachRelation } from "@bunstack/shared/helpers";
-import { RolesModel } from "@bunstack/shared/models/roles.model";
-import { TokensModel } from "@bunstack/shared/models/tokens.model";
-import { UserRolesModel } from "@bunstack/shared/models/user-roles.model";
-import { UsersModel } from "@bunstack/shared/models/users.model";
-import { RoleSchema } from "@bunstack/shared/schemas/db/roles.schemas";
-import { TokenSchema } from "@bunstack/shared/schemas/db/tokens.schemas";
-import { InsertUserSchema, UpdateUserSchema, UserSchema } from "@bunstack/shared/schemas/db/users.schemas";
 
 // ============================================================================
 // Relation Loaders

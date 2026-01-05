@@ -1,8 +1,8 @@
-import type { PasswordRules } from "@bunstack/shared/types/auth.types";
+import type { PasswordRules } from "~shared/types/auth.types";
 
 import { z } from "zod";
 
-import { PermissionSchema } from "@bunstack/shared/schemas/api/permissions.schemas";
+import { PermissionSchema } from "~shared/schemas/api/permissions.schemas";
 
 export const passwordRules: PasswordRules = {
   minLength: 8,

@@ -2,8 +2,17 @@
   "extends": "@bunstack/typescript-config/react.json",
   "compilerOptions": {
     "composite": true,
-    "rootDir": "src",
     "declaration": true,
+    "baseUrl": ".",
+    "rootDir": "src",
+    "paths": {
+      "~auth": ["../auth/src/index"],
+      "~auth/*": ["../auth/src/*"],
+      "~env": ["../env/src/index"],
+      "~env/*": ["../env/src/*"],
+      "~react/*": ["../react/src/*"],
+      "~shared/*": ["../shared/src/*"]
+    },
     "emitDeclarationOnly": true,
     "noEmit": false,
     "outDir": "dist"

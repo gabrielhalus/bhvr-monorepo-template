@@ -1,3 +1,3 @@
-import { createAuth } from "@bunstack/react/lib/auth";
+import { createAuth } from "~react/lib/auth";
 
 export const auth = createAuth();

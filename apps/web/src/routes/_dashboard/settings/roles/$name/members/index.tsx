@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { AssignRoleDialog } from "./-components/assign-role-dialog";
 import { RoleMembersList } from "./-components/members-list";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@bunstack/react/components/input-group";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "~react/components/input-group";
 
 export const Route = createFileRoute(
   "/_dashboard/settings/roles/$name/members/",

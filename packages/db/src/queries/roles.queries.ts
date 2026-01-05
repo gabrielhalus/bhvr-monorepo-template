@@ -1,21 +1,21 @@
-import type { WithRelations } from "@bunstack/shared/lib/type-utils";
-import type { UpdateRoleSchema } from "@bunstack/shared/schemas/api/roles.schemas";
-import type { InsertRoleSchema } from "@bunstack/shared/schemas/db/roles.schemas";
-import type { Role, RoleRelationKeys, RoleRelations, RoleWithRelations } from "@bunstack/shared/types/db/roles.types";
+import type { WithRelations } from "~shared/lib/type-utils";
+import type { UpdateRoleSchema } from "~shared/schemas/api/roles.schemas";
+import type { InsertRoleSchema } from "~shared/schemas/db/roles.schemas";
+import type { Role, RoleRelationKeys, RoleRelations, RoleWithRelations } from "~shared/types/db/roles.types";
 import type { z } from "zod";
 
 import { eq } from "drizzle-orm";
 
-import { drizzle } from "@bunstack/db/database";
-import { attachRelation } from "@bunstack/shared/helpers";
-import { PoliciesModel } from "@bunstack/shared/models/policies.model";
-import { RolePermissionsModel } from "@bunstack/shared/models/role-permissions.model";
-import { RolesModel } from "@bunstack/shared/models/roles.model";
-import { UserRolesModel } from "@bunstack/shared/models/user-roles.model";
-import { UsersModel } from "@bunstack/shared/models/users.model";
-import { PolicySchema } from "@bunstack/shared/schemas/db/policies.schemas";
-import { RoleSchema } from "@bunstack/shared/schemas/db/roles.schemas";
-import { UserSchema } from "@bunstack/shared/schemas/db/users.schemas";
+import { drizzle } from "~db/database";
+import { attachRelation } from "~shared/helpers";
+import { PoliciesModel } from "~shared/models/policies.model";
+import { RolePermissionsModel } from "~shared/models/role-permissions.model";
+import { RolesModel } from "~shared/models/roles.model";
+import { UserRolesModel } from "~shared/models/user-roles.model";
+import { UsersModel } from "~shared/models/users.model";
+import { PolicySchema } from "~shared/schemas/db/policies.schemas";
+import { RoleSchema } from "~shared/schemas/db/roles.schemas";
+import { UserSchema } from "~shared/schemas/db/users.schemas";
 
 // ============================================================================
 // Relation Loaders

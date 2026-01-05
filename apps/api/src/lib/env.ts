@@ -1,7 +1,7 @@
 import { z } from "zod";
 import "dotenv/config"; // loads default .env in current folder
 
-import { validateEnv } from "@bunstack/env";
+import { validateEnv } from "~env";
 
 export const env = validateEnv({
   NODE_ENV: z.enum(["development", "production"]).default("development"),

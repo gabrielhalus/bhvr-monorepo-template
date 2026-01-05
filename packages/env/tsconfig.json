@@ -2,7 +2,12 @@
   "extends": "@bunstack/typescript-config/base.json",
   "compilerOptions": {
     "composite": true,
+    "baseUrl": ".",
     "rootDir": "src",
+    "paths": {
+      "~env": ["../env/src/index"],
+      "~env/*": ["../env/src/*"],
+    },
     "types": ["node"],
     "declaration": true,
     "emitDeclarationOnly": false,

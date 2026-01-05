@@ -1,12 +1,12 @@
-import type { PasswordRules } from "@bunstack/shared/types/auth.types";
+import type { PasswordRules } from "~shared/types/auth.types";
 import type { MouseEvent } from "react";
 
 import { Check, Eye, EyeOff, X } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@bunstack/react/components/input-group";
-import { cn } from "@bunstack/react/lib/utils";
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "~react/components/input-group";
+import { cn } from "~react/lib/utils";
 
 export type PasswordInputProps = {
   rules?: PasswordRules;

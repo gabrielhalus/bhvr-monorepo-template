@@ -1,10 +1,10 @@
-import type { ButtonProps } from "@bunstack/react/components/button";
+import type { ButtonProps } from "~react/components/button";
 
 import { motion } from "framer-motion";
 import * as React from "react";
 
-import { Button } from "@bunstack/react/components/button";
-import { cn } from "@bunstack/react/lib/utils";
+import { Button } from "~react/components/button";
+import { cn } from "~react/lib/utils";
 
 type TimeoutButtonProps = {
   onClick: () => void;

@@ -14,10 +14,12 @@ export default defineConfig(() => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@bunstack/api": path.resolve(__dirname, "../api/src"),
-      "@bunstack/i18n": path.resolve(__dirname, "../../packages/i18n/src"),
-      "@bunstack/shared": path.resolve(__dirname, "../../packages/shared/src"),
-      "@bunstack/react": path.resolve(__dirname, "../../packages/react/src"),
+      "~auth": path.resolve(__dirname, "../../packages/auth/src"),
+      "~db": path.resolve(__dirname, "../../packages/db/src"),
+      "~env": path.resolve(__dirname, "../../packages/env/src"),
+      "~i18n": path.resolve(__dirname, "../../packages/i18n/src"),
+      "~react": path.resolve(__dirname, "../../packages/react/src"),
+      "~shared": path.resolve(__dirname, "../../packages/shared/src"),
     },
   },
   server: {

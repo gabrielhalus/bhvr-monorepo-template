@@ -5,7 +5,16 @@
     "baseUrl": ".",
     "rootDir": "src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "~auth": ["../../packages/auth/src/index"],
+      "~auth/*": ["../../packages/auth/src/*"],
+      "~db/*": ["../../packages/db/src/*"],
+      "~env": ["../../packages/env/src/index"],
+      "~env/*": ["../../packages/env/src/*"],
+      "~i18n": ["../../packages/i18n/src/index"],
+      "~i18n/*": ["../../packages/i18n/src/*"],
+      "~react/*": ["../../packages/react/src/*"],
+      "~shared/*": ["../../packages/shared/src/*"]
     },
     "types": ["bun", "node"],
     "declaration": true,

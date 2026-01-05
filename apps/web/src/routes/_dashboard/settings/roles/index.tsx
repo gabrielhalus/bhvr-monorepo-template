@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 import { columns } from "./-components/columns";
-import { DataTable } from "@bunstack/react/components/data-table";
+import { DataTable } from "~react/components/data-table";
 import { getRolesQueryOptions } from "@/queries/roles";
 
 export const Route = createFileRoute("/_dashboard/settings/roles/")({

@@ -1,4 +1,4 @@
-import type { WithRelations } from "@bunstack/shared/lib/type-utils";
+import type { WithRelations } from "~shared/lib/type-utils";
 
 /**
  * Attach a relation to a target.

@@ -1,8 +1,8 @@
-import type { RoleRelations } from "@bunstack/shared/types/db/roles.types";
+import type { RoleRelations } from "~shared/types/db/roles.types";
 
 import { z } from "zod";
 
-import { arrayParam } from "@bunstack/shared/helpers";
+import { arrayParam } from "~shared/helpers";
 
 /**
  * Role relation keys

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { Nav } from "./-components/nav";
 import { Sidebar } from "./-components/sidebar";
-import { authorizeQueryOptions } from "@bunstack/react/queries/auth";
+import { authorizeQueryOptions } from "~react/queries/auth";
 import { getRoleByNameQueryOptions } from "@/queries/roles";
 import { getUsersQueryOptions } from "@/queries/users";
 

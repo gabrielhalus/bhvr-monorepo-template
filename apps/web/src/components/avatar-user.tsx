@@ -2,8 +2,8 @@ import type { VariantProps } from "class-variance-authority";
 
 import { cva } from "class-variance-authority";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@bunstack/react/components/avatar";
-import { cn } from "@bunstack/react/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "~react/components/avatar";
+import { cn } from "~react/lib/utils";
 import { generateAvatarFallback } from "@/helpers/generate-avatar-fallback";
 
 type AvatarUserProps = {

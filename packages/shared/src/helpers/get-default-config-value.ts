@@ -1,6 +1,6 @@
 import type { ConfigValue } from "src/types/db/runtime-configs.types";
 
-import { config } from "@bunstack/shared/config";
+import { config } from "~shared/config";
 
 /**
  * Helper to extract default value from nested appConfig object.

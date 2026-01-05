@@ -1,4 +1,4 @@
-import type { Session } from "@bunstack/shared/types/auth.types";
+import type { Session } from "~shared/types/auth.types";
 import type { QueryClient } from "@tanstack/react-query";
 
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";

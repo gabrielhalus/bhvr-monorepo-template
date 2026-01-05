@@ -4,6 +4,9 @@
     "composite": true,
     "baseUrl": ".",
     "rootDir": "src",
+    "paths": {
+      "~shared/*": ["./src/*"]
+    },
     "types": ["bun", "node"],
     "declaration": true,
     "emitDeclarationOnly": false,

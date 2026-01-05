@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@bunstack/react/components/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@bunstack/react/components/dialog";
-import { handleDialogResult } from "@bunstack/react/lib/sayno";
+import { Button } from "~react/components/button";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~react/components/dialog";
+import { handleDialogResult } from "~react/lib/sayno";
 
 type DialogState = {
   open: boolean;

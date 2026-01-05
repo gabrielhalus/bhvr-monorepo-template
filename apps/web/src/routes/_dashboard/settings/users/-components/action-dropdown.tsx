@@ -1,16 +1,16 @@
-import type { User } from "@bunstack/shared/types/db/users.types";
+import type { User } from "~shared/types/db/users.types";
 import type { Row } from "@tanstack/react-table";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, MoreHorizontal, Trash } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@bunstack/react/components/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@bunstack/react/components/dropdown-menu";
-import { Spinner } from "@bunstack/react/components/spinner";
-import { api } from "@bunstack/react/lib/http";
-import sayno from "@bunstack/react/lib/sayno";
-import { authorizeQueryOptions } from "@bunstack/react/queries/auth";
+import { Button } from "~react/components/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "~react/components/dropdown-menu";
+import { Spinner } from "~react/components/spinner";
+import { api } from "~react/lib/http";
+import sayno from "~react/lib/sayno";
+import { authorizeQueryOptions } from "~react/queries/auth";
 
 export function ActionDropdown({ row: { original: user } }: { row: Row<User> }) {
   const queryClient = useQueryClient();

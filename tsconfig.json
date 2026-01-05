@@ -1,19 +1,5 @@
 {
   "files": [],
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@bunstack/web/*": ["./apps/web/src/*"],
-      "@bunstack/api/*": ["./apps/api/src/*"],
-
-      "@bunstack/auth/*": ["./packages/auth/src/*"],
-      "@bunstack/db/*": ["./packages/db/src/*"],
-      "@bunstack/env/*": ["./packages/env/src/*"],
-      "@bunstack/i18n/*": ["./packages/i18n/src/*"],
-      "@bunstack/react/*": ["./packages/react/src/*"],
-      "@bunstack/shared/*": ["./packages/shared/src/*"],
-    },
-  },
   "references": [
     { "path": "apps/api" },
     { "path": "apps/web" },
@@ -22,6 +8,6 @@
     { "path": "packages/env" },
     { "path": "packages/i18n" },
     { "path": "packages/react" },
-    { "path": "packages/shared" },
-  ],
+    { "path": "packages/shared" }
+  ]
 }

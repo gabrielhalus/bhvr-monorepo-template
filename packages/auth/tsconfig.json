@@ -2,7 +2,14 @@
   "extends": "@bunstack/typescript-config/base.json",
   "compilerOptions": {
     "composite": true,
+    "baseUrl": ".",
     "rootDir": "src",
+    "paths": {
+      "~auth": ["../auth/src/index"],
+      "~auth/*": ["../auth/src/*"],
+      "~db/*": ["../db/src/*"],
+      "~shared/*": ["../shared/src/*"]
+    },
     "types": ["bun", "node"],
     "declaration": true,
     "emitDeclarationOnly": false,
