@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { AvatarUser } from "@/components/avatar-user";
-import { getRoleByNameQueryOptions } from "@/queries/roles";
+import { getRoleByNameQueryOptions, getRolesQueryOptions } from "@/queries/roles";
 import { getUsersQueryOptions } from "@/queries/users";
 import { Button } from "~react/components/button";
 import { Checkbox } from "~react/components/checkbox";
@@ -51,7 +51,9 @@ export function AssignRoleDialog() {
     },
     onSuccess: () => {
       toast.success("Users assigned to role successfully");
-      queryClient.invalidateQueries({ queryKey: ["get-role-by-name", role.name] });
+      queryClient.invalidateQueries(getRolesQueryOptions(["members"]));
+      queryClient.invalidateQueries(getRoleByNameQueryOptions(role.name, ["members"]));
+      queryClient.invalidateQueries(getUsersQueryOptions(["roles"]));
       setOpen(false);
     },
   });
@@ -107,7 +109,7 @@ export function AssignRoleDialog() {
                   </div>
                 )
               : (
-                  <div className="space-y-4 py-4 max-h-[400px] overflow-y-auto">
+                  <div className="space-y-4 py-4 max-h-100 overflow-y-auto">
                     <form.Field
                       name="userIds"
                       children={field => (

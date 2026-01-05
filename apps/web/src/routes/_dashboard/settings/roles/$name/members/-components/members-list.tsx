@@ -7,7 +7,8 @@ import { XIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { AvatarUser } from "@/components/avatar-user";
-import { getRoleByNameQueryOptions } from "@/queries/roles";
+import { getRoleByNameQueryOptions, getRolesQueryOptions } from "@/queries/roles";
+import { getUsersQueryOptions } from "@/queries/users";
 import { Button } from "~react/components/button";
 import { Spinner } from "~react/components/spinner";
 import { api } from "~react/lib/http";
@@ -60,7 +61,9 @@ function RoleMemberItem({ user, role }: { user: User; role: Role }) {
     onError: () => toast.error("Failed to remove user role"),
     onSuccess: () => {
       toast.success("User role removed successfully");
+      queryClient.invalidateQueries(getRolesQueryOptions(["members"]));
       queryClient.invalidateQueries(getRoleByNameQueryOptions(role.name, ["members"]));
+      queryClient.invalidateQueries(getUsersQueryOptions(["roles"]));
     },
   });
 
