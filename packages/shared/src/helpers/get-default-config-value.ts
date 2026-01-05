@@ -1,4 +1,4 @@
-import type { ConfigValue } from "src/types/db/runtime-config.types";
+import type { ConfigValue } from "src/types/db/runtime-configs.types";
 
 import { config } from "@bunstack/shared/config";
 

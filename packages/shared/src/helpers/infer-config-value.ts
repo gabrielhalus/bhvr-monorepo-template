@@ -1,4 +1,4 @@
-import type { ConfigValue } from "@bunstack/shared/types/db/runtime-config.types";
+import type { ConfigValue } from "@bunstack/shared/types/db/runtime-configs.types";
 
 /**
  * Infers and parses a configuration value from its string representation.
