@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { Button } from "@bunstack/react/components/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@bunstack/react/components/tooltip";
-import { getRolesQueryOptions } from "@bunstack/web/queries/roles";
+import { getRolesQueryOptions } from "@/queries/roles";
 
 export function Sidebar() {
   const { t } = useTranslation("common");

@@ -17,8 +17,11 @@
   "references": [
     { "path": "apps/api" },
     { "path": "apps/web" },
+    { "path": "packages/auth" },
+    { "path": "packages/db" },
     { "path": "packages/env" },
+    { "path": "packages/i18n" },
+    { "path": "packages/react" },
     { "path": "packages/shared" },
-    { "path": "packages/react" }
   ],
 }

@@ -13,7 +13,7 @@ import { Input } from "@bunstack/react/components/input";
 import { Spinner } from "@bunstack/react/components/spinner";
 import { api } from "@bunstack/react/lib/http";
 import { UpdateRoleSchema } from "@bunstack/shared/schemas/api/roles.schemas";
-import { getAllRolesQueryOptions } from "@bunstack/web/queries/roles";
+import { getAllRolesQueryOptions } from "@/queries/roles";
 
 type UpdateRoleData = z.infer<typeof UpdateRoleSchema>;
 

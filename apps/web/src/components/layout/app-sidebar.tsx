@@ -7,8 +7,8 @@ import { useTranslation } from "react-i18next";
 import { NavSettings } from "./nav-settings";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@bunstack/react/components/sidebar";
 import { authorizeQueryOptions } from "@bunstack/react/queries/auth";
-import { NavMain } from "@bunstack/web/components/layout/nav-main";
-import { NavUser } from "@bunstack/web/components/layout/nav-user";
+import { NavMain } from "@/components/layout/nav-main";
+import { NavUser } from "@/components/layout/nav-user";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { t } = useTranslation("web");

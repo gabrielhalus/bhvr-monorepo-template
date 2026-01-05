@@ -2,7 +2,7 @@ import type { MiddlewareHandler } from "hono";
 
 import { cors } from "hono/cors";
 
-import { env } from "@bunstack/api/lib/env";
+import { env } from "@/lib/env";
 
 /**
  * The CORS middleware.

@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { columns } from "./-components/columns";
 import { DataTable } from "@bunstack/react/components/data-table";
-import { getUsersQueryOptions } from "@bunstack/web/queries/users";
+import { getUsersQueryOptions } from "@/queries/users";
 
 export const Route = createFileRoute("/_dashboard/settings/users/")({
   component: Users,

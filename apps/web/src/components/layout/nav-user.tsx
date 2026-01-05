@@ -26,7 +26,7 @@ import {
 } from "@bunstack/react/components/sidebar";
 import { useAuth } from "@bunstack/react/hooks/use-auth";
 import { cn } from "@bunstack/react/lib/utils";
-import { LogoutButton } from "@bunstack/web/components/layout/logout-button";
+import { LogoutButton } from "@/components/layout/logout-button";
 
 export function NavUser() {
   const { isMobile } = useSidebar();

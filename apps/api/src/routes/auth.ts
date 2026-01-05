@@ -2,10 +2,10 @@ import { password } from "bun";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 
-import { getClientInfo } from "@bunstack/api/helpers/get-client-info";
-import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN_EXPIRATION_SECONDS, verifyToken } from "@bunstack/api/lib/jwt";
-import { getSessionContext } from "@bunstack/api/middlewares/auth";
-import { validationMiddleware } from "@bunstack/api/middlewares/validation";
+import { getClientInfo } from "@/helpers/get-client-info";
+import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN_EXPIRATION_SECONDS, verifyToken } from "@/lib/jwt";
+import { getSessionContext } from "@/middlewares/auth";
+import { validationMiddleware } from "@/middlewares/validation";
 import { isAuthorized } from "@bunstack/auth";
 import { deleteToken, insertToken } from "@bunstack/db/queries/tokens.queries";
 import { createUser, signIn } from "@bunstack/db/queries/users.queries";

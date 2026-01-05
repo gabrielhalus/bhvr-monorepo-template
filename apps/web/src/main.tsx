@@ -10,8 +10,8 @@ import { Toaster } from "@bunstack/react/components/sonner";
 import { queryClient } from "@bunstack/react/lib/query-client";
 import { AuthProvider } from "@bunstack/react/providers/auth-provider";
 import { ThemeProvider } from "@bunstack/react/providers/theme-provider";
-import i18n from "@bunstack/web/i18n";
-import { routeTree } from "@bunstack/web/routeTree.gen";
+import i18n from "@/i18n";
+import { routeTree } from "@/routeTree.gen";
 
 export const router = createRouter({
   routeTree,

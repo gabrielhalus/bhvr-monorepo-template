@@ -10,7 +10,7 @@ import { Spinner } from "@bunstack/react/components/spinner";
 import { useAuth } from "@bunstack/react/hooks/use-auth";
 import { api } from "@bunstack/react/lib/http";
 import sayno from "@bunstack/react/lib/sayno";
-import { env } from "@bunstack/web/lib/env";
+import { env } from "@/lib/env";
 
 type Variant = "button" | "dropdown";
 

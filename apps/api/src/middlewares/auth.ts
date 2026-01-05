@@ -1,12 +1,12 @@
-import type { AppContext } from "@bunstack/api/utils/hono";
+import type { AppContext } from "@/utils/hono";
 import type { AccessToken } from "@bunstack/shared/types/db/tokens.types";
 
 import { getCookie, setCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
 
-import { env } from "@bunstack/api/lib/env";
-import { createAccessToken, getCookieSettings } from "@bunstack/api/lib/jwt";
-import { factory } from "@bunstack/api/utils/hono";
+import { env } from "@/lib/env";
+import { createAccessToken, getCookieSettings } from "@/lib/jwt";
+import { factory } from "@/utils/hono";
 import { deleteToken, getToken } from "@bunstack/db/queries/tokens.queries";
 import { getUser } from "@bunstack/db/queries/users.queries";
 import { AccessTokenSchema, RefreshTokenSchema } from "@bunstack/shared/schemas/api/tokens.schemas";

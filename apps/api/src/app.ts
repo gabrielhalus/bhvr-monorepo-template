@@ -1,10 +1,11 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 
-import cors from "@bunstack/api/middlewares/cors";
-import { authRoutes } from "@bunstack/api/routes/auth";
-import { rolesRoutes } from "@bunstack/api/routes/roles";
-import { usersRoutes } from "@bunstack/api/routes/users";
+import cors from "@/middlewares/cors";
+import { authRoutes } from "@/routes/auth";
+import { rolesRoutes } from "@/routes/roles";
+import { configRoutes } from "@/routes/runtime-configs";
+import { usersRoutes } from "@/routes/users";
 
 const app = new Hono({ strict: false });
 
@@ -24,6 +25,7 @@ app.use(cors());
 const _api = app
   .route("/auth", authRoutes)
   .route("/roles", rolesRoutes)
+  .route("/config", configRoutes)
   .route("/users", usersRoutes);
 
 export default app;

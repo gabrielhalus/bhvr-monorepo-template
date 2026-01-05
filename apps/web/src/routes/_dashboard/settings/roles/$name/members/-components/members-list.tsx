@@ -12,8 +12,8 @@ import { Spinner } from "@bunstack/react/components/spinner";
 import { api } from "@bunstack/react/lib/http";
 import sayno from "@bunstack/react/lib/sayno";
 import { authorizeQueryOptions } from "@bunstack/react/queries/auth";
-import { AvatarUser } from "@bunstack/web/components/avatar-user";
-import { getRoleByNameQueryOptions } from "@bunstack/web/queries/roles";
+import { AvatarUser } from "@/components/avatar-user";
+import { getRoleByNameQueryOptions } from "@/queries/roles";
 
 export function RoleMembersList({ search }: { search: string }) {
   const { role: initialRole } = Layout.useLoaderData();

@@ -12,9 +12,9 @@ import { Field, FieldContent, FieldError, FieldLabel } from "@bunstack/react/com
 import { Spinner } from "@bunstack/react/components/spinner";
 import { api } from "@bunstack/react/lib/http";
 import { AssignRoleMembersSchema } from "@bunstack/shared/schemas/api/user-roles.schemas";
-import { AvatarUser } from "@bunstack/web/components/avatar-user";
-import { getRoleByNameQueryOptions } from "@bunstack/web/queries/roles";
-import { getUsersQueryOptions } from "@bunstack/web/queries/users";
+import { AvatarUser } from "@/components/avatar-user";
+import { getRoleByNameQueryOptions } from "@/queries/roles";
+import { getUsersQueryOptions } from "@/queries/users";
 
 export function AssignRoleDialog() {
   const { t } = useTranslation(["common", "web"]);

@@ -1,7 +1,7 @@
-import type { AppContext } from "@bunstack/api/utils/hono";
+import type { AppContext } from "@/utils/hono";
 import type { Permission } from "@bunstack/shared/types/permissions.types";
 
-import { factory } from "@bunstack/api/utils/hono";
+import { factory } from "@/utils/hono";
 import { isAuthorized } from "@bunstack/auth";
 
 /**

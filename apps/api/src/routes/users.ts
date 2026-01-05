@@ -1,9 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { requirePermissionFactory } from "@bunstack/api/middlewares/access-control";
-import { getSessionContext } from "@bunstack/api/middlewares/auth";
-import { validationMiddleware } from "@bunstack/api/middlewares/validation";
+import { requirePermissionFactory } from "@/middlewares/access-control";
+import { getSessionContext } from "@/middlewares/auth";
+import { validationMiddleware } from "@/middlewares/validation";
 import { deleteUser, emailExists, getUser, getUsers, updateUser } from "@bunstack/db/queries/users.queries";
 import { UserRelationsQuerySchema } from "@bunstack/shared/schemas/api/users.schemas";
 import { UpdateUserSchema } from "@bunstack/shared/schemas/db/users.schemas";
