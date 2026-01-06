@@ -4,13 +4,6 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "~auth": ["../../packages/auth/src/index"],
-      "~auth/*": ["../../packages/auth/src/*"],
-      "~db/*": ["../../packages/db/src/*"],
-      "~env": ["../../packages/env/src/index"],
-      "~env/*": ["../../packages/env/src/*"],
-      "~i18n": ["../../packages/i18n/src/index"],
-      "~i18n/*": ["../../packages/i18n/src/*"],
       "~react/*": ["../../packages/react/src/*"],
       "~shared/*": ["../../packages/shared/src/*"]
     },
@@ -18,7 +11,6 @@
   },
   "references": [
     { "path": "../api" },
-    { "path": "../../packages/env" },
     { "path": "../../packages/shared" },
     { "path": "../../packages/react" }
   ],

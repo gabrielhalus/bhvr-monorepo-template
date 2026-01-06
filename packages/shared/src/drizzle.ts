@@ -1,7 +1,12 @@
 import { drizzle as drizzleClient } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import { z } from "zod";
 
-import { env } from "~db/lib/env";
+import { validateEnv } from "./env";
+
+const env = validateEnv({
+  DATABASE_URL: z.string(),
+});
 
 const client = postgres(env.DATABASE_URL);
 export const drizzle = drizzleClient(client);

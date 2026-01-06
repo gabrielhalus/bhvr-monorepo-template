@@ -1,5 +1,5 @@
 import type { WithRelations } from "~shared/lib/type-utils";
-import type { TokensModel } from "~shared/models/tokens.model";
+import type { TokensModel } from "~shared/db/models/tokens.model";
 import type { AccessTokenSchema, RefreshTokenSchema, VerificationTokenSchema } from "~shared/schemas/api/tokens.schemas";
 import type { User } from "~shared/types/db/users.types";
 import type z from "zod";

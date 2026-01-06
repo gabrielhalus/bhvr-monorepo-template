@@ -4,8 +4,8 @@ import i18next from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
 
-import en from "./locales/en";
-import fr from "./locales/fr";
+import en from "./en";
+import fr from "./fr";
 
 type ArbitraryNamespace = string & { __brand?: "ArbitraryNamespace" };
 type Namespace = keyof typeof en | ArbitraryNamespace;
@@ -23,13 +23,13 @@ export function createClientI18n(extra: Partial<InitOptions> = {}): i18n {
   instance.init({
     fallbackLng: "en",
     defaultNS: "common",
-    ns: Object.keys(en),
+    ns: Object.keys(en) as string[],
     supportedLngs: ["en", "fr"],
     resources: bundledResources,
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
     ...extra,
-  });
+  } as I18NextInitOptions);
 
   return instance;
 }

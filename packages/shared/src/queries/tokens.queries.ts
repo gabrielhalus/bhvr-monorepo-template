@@ -1,11 +1,11 @@
-import type { InsertTokenSchema, UpdateTokenSchema } from "~shared/schemas/db/tokens.schemas";
-import type { Token } from "~shared/types/db/tokens.types";
+import type { InsertTokenSchema, UpdateTokenSchema } from "../schemas/db/tokens.schemas";
+import type { Token } from "../types/db/tokens.types";
 import type { z } from "zod";
 
 import { eq } from "drizzle-orm";
 
-import { drizzle } from "~db/database";
-import { TokensModel } from "~shared/models/tokens.model";
+import { TokensModel } from "../db/models/tokens.model";
+import { drizzle } from "../drizzle";
 
 // ============================================================================
 // Core CRUD Operations

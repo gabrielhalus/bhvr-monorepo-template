@@ -1,3 +1,11 @@
-import config from "@bunstack/eslint-config";
+import drizzle from "eslint-plugin-drizzle";
 
-export default config;
+import createConfig from "@bunstack/eslint-config/create-config";
+
+export default createConfig({
+  ignores: ["./migrations/*"],
+  plugins: { drizzle },
+  rules: {
+    ...drizzle.configs.recommended.rules,
+  },
+});

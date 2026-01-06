@@ -1,10 +1,10 @@
-import type { ConfigValue, RuntimeConfig } from "~shared/types/db/runtime-configs.types";
+import type { ConfigValue, RuntimeConfig } from "../types/db/runtime-configs.types";
 
 import { eq, inArray } from "drizzle-orm";
 
-import { drizzle } from "~db/database";
-import { RuntimeConfigModel } from "~shared/models/runtime-configs.model";
-import { RuntimeConfigSchema } from "~shared/schemas/db/runtime-configs.schemas";
+import { RuntimeConfigModel } from "../db/models/runtime-configs.model";
+import { RuntimeConfigSchema } from "../schemas/db/runtime-configs.schemas";
+import { drizzle } from "../drizzle";
 
 // ============================================================================
 // Core CRUD Operations

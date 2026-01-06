@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 
-import { TokensModel } from "~shared/models/tokens.model";
+import { TokensModel } from "~shared/db/models/tokens.model";
 
 export const TokenSchema = createSelectSchema(TokensModel);
 

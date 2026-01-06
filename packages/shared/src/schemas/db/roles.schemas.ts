@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-import { RolesModel } from "~shared/models/roles.model";
+import { RolesModel } from "~shared/db/models/roles.model";
 
 /**
  * Schemas for roles

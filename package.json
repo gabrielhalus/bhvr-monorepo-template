@@ -9,9 +9,9 @@
     "lint": "turbo run lint --",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "drizzle:generate": "turbo run drizzle:generate --filter=@bunstack/db",
-    "drizzle:push": "turbo run drizzle:push --filter=@bunstack/db",
-    "drizzle:studio": "turbo run drizzle:studio --filter=@bunstack/db"
+    "drizzle:generate": "turbo run drizzle:generate --filter=@bunstack/shared",
+    "drizzle:push": "turbo run drizzle:push --filter=@bunstack/shared",
+    "drizzle:studio": "turbo run drizzle:studio --filter=@bunstack/shared"
   },
   "devDependencies": {
     "@types/bun": "^1.3.0",

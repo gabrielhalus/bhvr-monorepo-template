@@ -1,17 +1,17 @@
-import type { User, UserRelationKeys, UserRelations, UserWithRelations } from "~shared/types/db/users.types";
+import type { User, UserRelationKeys, UserRelations, UserWithRelations } from "../types/db/users.types";
 import type { z } from "zod";
 
 import { eq } from "drizzle-orm";
 
-import { drizzle } from "~db/database";
-import { attachRelation } from "~shared/helpers";
-import { RolesModel } from "~shared/models/roles.model";
-import { TokensModel } from "~shared/models/tokens.model";
-import { UserRolesModel } from "~shared/models/user-roles.model";
-import { UsersModel } from "~shared/models/users.model";
-import { RoleSchema } from "~shared/schemas/db/roles.schemas";
-import { TokenSchema } from "~shared/schemas/db/tokens.schemas";
-import { InsertUserSchema, UpdateUserSchema, UserSchema } from "~shared/schemas/db/users.schemas";
+import { attachRelation } from "../helpers";
+import { RolesModel } from "../db/models/roles.model";
+import { TokensModel } from "../db/models/tokens.model";
+import { UserRolesModel } from "../db/models/user-roles.model";
+import { UsersModel } from "../db/models/users.model";
+import { RoleSchema } from "../schemas/db/roles.schemas";
+import { TokenSchema } from "../schemas/db/tokens.schemas";
+import { InsertUserSchema, UpdateUserSchema, UserSchema } from "../schemas/db/users.schemas";
+import { drizzle } from "../drizzle";
 
 // ============================================================================
 // Relation Loaders

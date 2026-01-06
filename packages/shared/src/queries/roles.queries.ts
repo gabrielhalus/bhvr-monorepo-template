@@ -1,21 +1,21 @@
-import type { WithRelations } from "~shared/lib/type-utils";
-import type { UpdateRoleSchema } from "~shared/schemas/api/roles.schemas";
-import type { InsertRoleSchema } from "~shared/schemas/db/roles.schemas";
-import type { Role, RoleRelationKeys, RoleRelations, RoleWithRelations } from "~shared/types/db/roles.types";
+import type { WithRelations } from "../lib/type-utils";
+import type { UpdateRoleSchema } from "../schemas/api/roles.schemas";
+import type { InsertRoleSchema } from "../schemas/db/roles.schemas";
+import type { Role, RoleRelationKeys, RoleRelations, RoleWithRelations } from "../types/db/roles.types";
 import type { z } from "zod";
 
 import { eq } from "drizzle-orm";
 
-import { drizzle } from "~db/database";
-import { attachRelation } from "~shared/helpers";
-import { PoliciesModel } from "~shared/models/policies.model";
-import { RolePermissionsModel } from "~shared/models/role-permissions.model";
-import { RolesModel } from "~shared/models/roles.model";
-import { UserRolesModel } from "~shared/models/user-roles.model";
-import { UsersModel } from "~shared/models/users.model";
-import { PolicySchema } from "~shared/schemas/db/policies.schemas";
-import { RoleSchema } from "~shared/schemas/db/roles.schemas";
-import { UserSchema } from "~shared/schemas/db/users.schemas";
+import { attachRelation } from "../helpers";
+import { PoliciesModel } from "../db/models/policies.model";
+import { RolePermissionsModel } from "../db/models/role-permissions.model";
+import { RolesModel } from "../db/models/roles.model";
+import { UserRolesModel } from "../db/models/user-roles.model";
+import { UsersModel } from "../db/models/users.model";
+import { PolicySchema } from "../schemas/db/policies.schemas";
+import { RoleSchema } from "../schemas/db/roles.schemas";
+import { UserSchema } from "../schemas/db/users.schemas";
+import { drizzle } from "../drizzle";
 
 // ============================================================================
 // Relation Loaders

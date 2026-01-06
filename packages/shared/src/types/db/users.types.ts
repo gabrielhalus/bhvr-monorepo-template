@@ -1,5 +1,5 @@
 import type { WithRelations } from "~shared/lib/type-utils";
-import type { UsersModel } from "~shared/models/users.model";
+import type { UsersModel } from "~shared/db/models/users.model";
 import type { UserRelationsSchema } from "~shared/schemas/api/users.schemas";
 import type { Role } from "~shared/types/db/roles.types";
 import type { Token } from "~shared/types/db/tokens.types";

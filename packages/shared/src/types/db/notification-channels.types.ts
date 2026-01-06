@@ -1,5 +1,5 @@
 import type { Merge } from "~shared/lib/type-utils";
-import type { NotificationChannelsModel } from "~shared/models/notifications-channels.model";
+import type { NotificationChannelsModel } from "~shared/db/models/notifications-channels.model";
 
 export type NotificationChannelRow = typeof NotificationChannelsModel.$inferSelect;
 

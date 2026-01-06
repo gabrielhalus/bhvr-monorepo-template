@@ -2,7 +2,7 @@ const { defineConfig } = require("drizzle-kit");
 require("dotenv").config({ path: ".env.local" });
 
 module.exports = defineConfig({
-  schema: "../shared/src/models/*.ts",
+  schema: "./src/db/models/*.ts",
   out: "./migrations",
   dialect: "postgresql",
   dbCredentials: {

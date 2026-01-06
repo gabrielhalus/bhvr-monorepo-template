@@ -6,9 +6,9 @@ import { getClientInfo } from "@/helpers/get-client-info";
 import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN_EXPIRATION_SECONDS, verifyToken } from "@/lib/jwt";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { isAuthorized } from "~auth";
-import { deleteToken, insertToken } from "~db/queries/tokens.queries";
-import { createUser, signIn } from "~db/queries/users.queries";
+import { isAuthorized } from "@bunstack/shared/auth";
+import { deleteToken, insertToken } from "@bunstack/shared/queries/tokens.queries";
+import { createUser, signIn } from "@bunstack/shared/queries/users.queries";
 import { isAuthorizedSchema, LoginSchema, RegisterSchema } from "~shared/schemas/api/auth.schemas";
 
 export const authRoutes = new Hono()

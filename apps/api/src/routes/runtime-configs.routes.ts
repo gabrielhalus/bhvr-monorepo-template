@@ -9,4 +9,9 @@ export const configRoutes = new Hono()
    */
   .get("/", (c) => {
     return c.json({ success: true as const });
+  })
+
+  .get("/:key", (c) => {
+    const { key } = c.req.param();
+    return c.json({ success: true, key });
   });

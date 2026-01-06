@@ -5,10 +5,6 @@
     "baseUrl": ".",
     "rootDir": "src",
     "paths": {
-      "~auth": ["../auth/src/index"],
-      "~auth/*": ["../auth/src/*"],
-      "~env": ["../env/src/index"],
-      "~env/*": ["../env/src/*"],
       "~react/*": ["../react/src/*"],
       "~shared/*": ["../shared/src/*"]
     },
@@ -19,8 +15,6 @@
   },
   "references": [
     { "path": "../../apps/api" },
-    { "path": "../auth" },
-    { "path": "../env" },
     { "path": "../shared" }
   ],
   "include": ["src"],

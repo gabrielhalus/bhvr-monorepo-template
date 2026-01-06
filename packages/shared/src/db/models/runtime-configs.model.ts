@@ -1,6 +1,6 @@
 import { index, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
-import { UsersModel } from "~shared/models/users.model";
+import { UsersModel } from "~shared/db/models/users.model";
 
 export const RuntimeConfigModel = pgTable("runtime_configs", {
   configKey: varchar("config_key", { length: 255 }).primaryKey(),

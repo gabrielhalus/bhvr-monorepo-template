@@ -2,7 +2,7 @@ import type { AppContext } from "@/utils/hono";
 import type { Permission } from "~shared/types/permissions.types";
 
 import { factory } from "@/utils/hono";
-import { isAuthorized } from "~auth";
+import { isAuthorized } from "@bunstack/shared/auth";
 
 /**
  * Core authorization middleware that checks permissions
@@ -16,7 +16,7 @@ export function requirePermissionFactory(permission: Permission, getResource?: (
 
     const resource = typeof getResource === "function" ? await getResource(c) : undefined;
 
-    const allowed = isAuthorized(permission, user, resource);
+    const allowed = await isAuthorized(permission, user, resource);
     if (!allowed) {
       return c.json({ error: "Forbidden" }, 403);
     }

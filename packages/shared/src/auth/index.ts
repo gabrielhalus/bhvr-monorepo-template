@@ -1,8 +1,7 @@
-import type { UserWithRelations } from "~shared/types/db/users.types";
-import type { Permission } from "~shared/types/permissions.types";
+import type { UserWithRelations } from "../types/db/users.types";
+import type { Permission } from "../types/permissions.types";
 
-import { hydrateRoles } from "~db/queries/roles.queries";
-
+import { hydrateRoles } from "../queries/roles.queries";
 import { evaluateCondition } from "./evaluate-condition";
 
 /**
@@ -54,3 +53,5 @@ export async function isAuthorized(permission: Permission, user: UserWithRelatio
 
   return false;
 }
+
+export { evaluateCondition, resolveOperand } from "./evaluate-condition";
