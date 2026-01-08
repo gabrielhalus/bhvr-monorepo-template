@@ -13,8 +13,12 @@ export function LocaleSubmenu() {
   const { t, i18n } = useTranslation("common");
 
   const locales = [
-    { code: "en", name: "English", flag: "🇺🇸" },
-    { code: "fr", name: "Français", flag: "🇫🇷" },
+    { code: "de", name: "Deutsch" },
+    { code: "en", name: "English" },
+    { code: "es", name: "Español" },
+    { code: "fr", name: "Français" },
+    { code: "it", name: "Italiano" },
+    { code: "nl", name: "Nederlands" },
   ];
 
   const currentLocale = locales.find(locale => locale.code === i18n.language) || locales[0];
@@ -31,17 +35,21 @@ export function LocaleSubmenu() {
         <Languages className="size-4 text-muted-foreground" />
         {t("generic.language", { lang: currentLocale?.name })}
       </DropdownMenuSubTrigger>
-      <DropdownMenuSubContent>
-        {locales.map(locale => (
-          <DropdownMenuItem
-            key={locale.code}
-            onClick={event => handleLocaleChange(locale.code, event)}
-            className={cn("flex items-center gap-2", i18n.language === locale.code && "bg-accent")}
-          >
-            <span className="text-sm">{locale.flag}</span>
-            <span className="text-sm">{locale.name}</span>
-          </DropdownMenuItem>
-        ))}
+      <DropdownMenuSubContent className="w-64">
+        <div className="grid grid-cols-2 gap-1 p-1">
+          {locales.map(locale => (
+            <DropdownMenuItem
+              key={locale.code}
+              onClick={event => handleLocaleChange(locale.code, event)}
+              className={cn(
+                "flex items-center justify-center px-3 py-2 text-sm",
+                i18n.language === locale.code && "bg-accent text-accent-foreground"
+              )}
+            >
+              {locale.name}
+            </DropdownMenuItem>
+          ))}
+        </div>
       </DropdownMenuSubContent>
     </DropdownMenuSub>
   );
