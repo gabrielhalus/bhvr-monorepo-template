@@ -51,9 +51,9 @@ export async function getRuntimeConfig(key: string): Promise<RuntimeConfig | nul
  */
 export async function updateRuntimeConfig(key: string, value: ConfigValue): Promise<RuntimeConfig> {
   const [updatedRuntimeConfig] = await drizzle
-    .update(RuntimeConfigModel)
-    .set({ value: String(value) })
-    .where(eq(RuntimeConfigModel.configKey, key))
+    .insert(RuntimeConfigModel)
+    .values({ configKey: key, value: String(value) })
+    .onConflictDoUpdate({ target: RuntimeConfigModel.configKey, set: { value: String(value) } })
     .returning();
 
   if (!updatedRuntimeConfig) {
