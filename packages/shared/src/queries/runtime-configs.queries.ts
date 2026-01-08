@@ -3,8 +3,8 @@ import type { ConfigValue, RuntimeConfig } from "../types/db/runtime-configs.typ
 import { eq, inArray } from "drizzle-orm";
 
 import { RuntimeConfigModel } from "../db/models/runtime-configs.model";
-import { RuntimeConfigSchema } from "../schemas/db/runtime-configs.schemas";
 import { drizzle } from "../drizzle";
+import { RuntimeConfigSchema } from "../schemas/db/runtime-configs.schemas";
 
 // ============================================================================
 // Core CRUD Operations
@@ -15,7 +15,7 @@ import { drizzle } from "../drizzle";
  * @param keys - Optional array of runtime-configuration keys to filter by.
  * @returns The runtime-configurations.
  */
-export async function getRuntimeConfigurations(keys?: string[]): Promise<RuntimeConfig[]> {
+export async function getRuntimeConfigs(keys?: string[]): Promise<RuntimeConfig[]> {
   const runtimeConfigs = await drizzle
     .select()
     .from(RuntimeConfigModel)
@@ -29,7 +29,7 @@ export async function getRuntimeConfigurations(keys?: string[]): Promise<Runtime
  * @param key - The runtime-configuration key.
  * @returns The runtime-configuration.
  */
-export async function getRuntimeConfiguration(key: string): Promise<RuntimeConfig | null> {
+export async function getRuntimeConfig(key: string): Promise<RuntimeConfig | null> {
   const [runtimeConfig] = await drizzle
     .select()
     .from(RuntimeConfigModel)
@@ -49,7 +49,7 @@ export async function getRuntimeConfiguration(key: string): Promise<RuntimeConfi
  * @returns The updated runtime-configuration.
  * @throws An error if the runtime-configuration could not be updated.
  */
-export async function updateRuntimeConfiguration(key: string, value: ConfigValue): Promise<RuntimeConfig> {
+export async function updateRuntimeConfig(key: string, value: ConfigValue): Promise<RuntimeConfig> {
   const [updatedRuntimeConfig] = await drizzle
     .update(RuntimeConfigModel)
     .set({ value: String(value) })

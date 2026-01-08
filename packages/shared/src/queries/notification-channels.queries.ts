@@ -3,8 +3,8 @@ import type { NotificationChannelUnion } from "../types/db/notification-channels
 import { eq } from "drizzle-orm";
 
 import { NotificationChannelsModel } from "../db/models/notifications-channels.model";
-import { NotificationChannelSchema } from "../schemas/db/notification-channels.schemas";
 import { drizzle } from "../drizzle";
+import { NotificationChannelSchema } from "../schemas/db/notification-channels.schemas";
 
 // ============================================================================
 // Core CRUD Operations
