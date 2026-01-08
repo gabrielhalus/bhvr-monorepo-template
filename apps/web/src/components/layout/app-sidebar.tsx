@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Box, Home, ShieldUser, UsersRound } from "lucide-react";
+import { Box, CogIcon, Home, ShieldUser, UsersRound } from "lucide-react";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -16,23 +16,32 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const { data: canListUsers } = useQuery(authorizeQueryOptions("user:list"));
   const { data: canListRoles } = useQuery(authorizeQueryOptions("role:list"));
+  const { data: canListConfigs } = useQuery(authorizeQueryOptions("runtimeConfig:list"));
 
   const data = useMemo(() => {
     const navSettings = [];
 
     if (canListUsers) {
       navSettings.push({
-        title: t("pages.settings.users.title"),
+        title: t("pages.users.title"),
         icon: UsersRound,
-        href: { to: "/settings/users" } as const,
+        href: { to: "/users" } as const,
       });
     }
 
     if (canListRoles) {
       navSettings.push({
-        title: t("pages.settings.roles.title"),
+        title: t("pages.roles.title"),
         icon: ShieldUser,
-        href: { to: "/settings/roles" } as const,
+        href: { to: "/roles" } as const,
+      });
+    }
+
+    if (canListConfigs) {
+      navSettings.push({
+        title: t("pages.settings.title"),
+        icon: CogIcon,
+        href: { to: "/settings" } as const,
       });
     }
 
@@ -46,7 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ],
       navSettings,
     };
-  }, [t, canListUsers, canListRoles]);
+  }, [t, canListUsers, canListRoles, canListConfigs]);
 
   return (
     <Sidebar collapsible="icon" {...props}>
