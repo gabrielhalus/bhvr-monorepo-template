@@ -15,8 +15,11 @@ export const authRoutes = new Hono()
   /**
    * Register a new user
    *
-   * @param c - The context
-   * @returns The access token
+   * @param c - The Hono context object
+   * @returns JSON response indicating success or failure of user registration
+   * @throws {400} If the email is already taken
+   * @throws {500} If an error occurs during user creation or token generation
+   * @access public
    */
   .post("/register", validationMiddleware("json", RegisterSchema), async (c) => {
     const user = c.req.valid("json");
@@ -51,8 +54,11 @@ export const authRoutes = new Hono()
   /**
    * Login a user
    *
-   * @param c - The context
-   * @returns The access token
+   * @param c - The Hono context object
+   * @returns JSON response with success status and authentication tokens set as cookies
+   * @throws {200} If the credentials are invalid (returns success: false)
+   * @throws {500} If an error occurs during authentication or token generation
+   * @access public
    */
   .post("/login", validationMiddleware("json", LoginSchema), async (c) => {
     const { email, password } = c.req.valid("json");
@@ -78,16 +84,17 @@ export const authRoutes = new Hono()
 
       return c.json({ success: true as const });
     } catch (error) {
-      console.log(error);
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
   })
 
   /**
-   * Logout a user by clearing the refresh token cookie
+   * Logout a user by clearing the refresh token cookie and invalidating the refresh token
    *
-   * @param c - The context
-   * @returns Success
+   * @param c - The Hono context object
+   * @returns JSON response indicating successful logout
+   * @throws {401} If the refresh token verification or deletion fails
+   * @access public
    */
   .post("/logout", async (c) => {
     const refreshToken = getCookie(c, "refreshToken");
@@ -113,10 +120,11 @@ export const authRoutes = new Hono()
   .use(getSessionContext)
 
   /**
-   * Get the authenticated user
+   * Get the authenticated user's session information
    *
-   * @param c - The context
-   * @returns The authenticated user
+   * @param c - The Hono context object with session context
+   * @returns JSON response containing the authenticated user's session data
+   * @access protected
    */
   .get("/", async (c) => {
     const sessionContext = c.var.sessionContext;
@@ -124,7 +132,12 @@ export const authRoutes = new Hono()
   })
 
   /**
+   * Check if the authenticated user is authorized to perform an action on a resource
    *
+   * @param c - The Hono context object with session context
+   * @returns JSON response indicating whether the user is authorized
+   * @throws {500} If an error occurs during authorization check
+   * @access protected
    */
   .post("/authorize", validationMiddleware("json", isAuthorizedSchema), async (c) => {
     const sessionContext = c.var.sessionContext;

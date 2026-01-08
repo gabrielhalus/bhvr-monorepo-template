@@ -15,6 +15,15 @@ export const rolesRoutes = new Hono()
   // --- All routes below this point require authentication
   .use(getSessionContext)
 
+  /**
+   * Get all roles with optional relation includes
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response containing all roles
+   * @throws {500} If an error occurs while retrieving roles
+   * @access protected
+   * @permission role:list
+   */
   .get("/", requirePermissionFactory("role:list"), async (c) => {
     const { includes } = c.req.queries();
 
@@ -27,8 +36,18 @@ export const rolesRoutes = new Hono()
     }
   })
 
+  /**
+   * Get a specific role by ID with optional relation includes
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response containing the role data
+   * @throws {404} If the role is not found
+   * @throws {500} If an error occurs while retrieving the role
+   * @access protected
+   * @permission role:read
+   */
   .get("/:id{[0-9]+}", validationMiddleware("query", RoleRelationsQuerySchema), requirePermissionFactory("role:read"), async (c) => {
-    const { id } = c.req.param();
+    const id = c.req.param("id");
     const { includes } = c.req.valid("query");
 
     try {
@@ -44,8 +63,18 @@ export const rolesRoutes = new Hono()
     }
   })
 
+  /**
+   * Get a specific role by name with optional relation includes
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response containing the role data
+   * @throws {404} If the role is not found
+   * @throws {500} If an error occurs while retrieving the role
+   * @access protected
+   * @permission role:read
+   */
   .get("/:name", validationMiddleware("query", RoleRelationsQuerySchema), requirePermissionFactory("role:read"), async (c) => {
-    const { name } = c.req.param();
+    const name = c.req.param("name");
     const { includes } = c.req.valid("query");
 
     try {
@@ -61,6 +90,15 @@ export const rolesRoutes = new Hono()
     }
   })
 
+  /**
+   * Update a specific role by ID
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response containing the updated role data
+   * @throws {500} If an error occurs while updating the role
+   * @access protected
+   * @permission role:update (resource-specific)
+   */
   .put("/:id{[0-9]+}", requirePermissionFactory("role:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateRoleSchema), async (c) => {
     try {
       const id = Number(c.req.param("id"));
@@ -73,6 +111,15 @@ export const rolesRoutes = new Hono()
     }
   })
 
+  /**
+   * Delete a specific role by ID
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response containing the deleted role data
+   * @throws {500} If an error occurs while deleting the role
+   * @access protected
+   * @permission role:delete (resource-specific)
+   */
   .delete("/:id{[0-9]+}", requirePermissionFactory("role:delete", c => ({ id: c.req.param("id") })), async (c) => {
     const id = Number(c.req.param("id"));
 
@@ -84,6 +131,15 @@ export const rolesRoutes = new Hono()
     }
   })
 
+  /**
+   * Assign multiple users as members to a specific role
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response indicating success
+   * @throws {500} If an error occurs while assigning role members
+   * @access protected
+   * @permission userRole:create
+   */
   .post("/:id{[0-9]+}/members", requirePermissionFactory("userRole:create"), validationMiddleware("json", AssignRoleMembersSchema), async (c) => {
     const id = Number(c.req.param("id"));
     const { userIds } = c.req.valid("json");
@@ -98,6 +154,15 @@ export const rolesRoutes = new Hono()
     }
   })
 
+  /**
+   * Remove multiple users as members from a specific role
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response indicating success
+   * @throws {500} If an error occurs while removing role members
+   * @access protected
+   * @permission userRole:create
+   */
   .delete("/:id{[0-9]+}/members", requirePermissionFactory("userRole:create"), validationMiddleware("json", RemoveRoleMembersSchema), async (c) => {
     const id = Number(c.req.param("id"));
     const { userIds } = c.req.valid("json");

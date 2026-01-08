@@ -10,10 +10,12 @@ import { UpdateUserSchema } from "~shared/schemas/db/users.schemas";
 
 export const usersRoutes = new Hono()
   /**
-   * Check if an email is available.
+   * Check if an email is available for registration
    *
-   * @param c - The context
-   * @returns Whether the email is available
+   * @param c - The Hono context object
+   * @returns JSON response indicating whether the email is available
+   * @throws {500} If an error occurs while checking email availability
+   * @access public
    */
   .get("/check-email", validationMiddleware("query", z.object({ email: z.email() })), async (c) => {
     try {
@@ -30,10 +32,13 @@ export const usersRoutes = new Hono()
   .use(getSessionContext)
 
   /**
-   * Get all users.
+   * Get all users with optional relation includes
    *
-   * @param c - The context
-   * @returns All users
+   * @param c - The Hono context object with session context
+   * @returns JSON response containing all users
+   * @throws {500} If an error occurs while retrieving users
+   * @access protected
+   * @permission user:list
    */
   .get("/", validationMiddleware("query", UserRelationsQuerySchema), requirePermissionFactory("user:list"), async (c) => {
     const { includes } = c.req.valid("query");
@@ -48,13 +53,17 @@ export const usersRoutes = new Hono()
   })
 
   /**
-   * Get a user by id.
+   * Get a specific user by ID with optional relation includes
    *
-   * @param c - The context
-   * @returns The user
+   * @param c - The Hono context object with session context
+   * @returns JSON response containing the user data
+   * @throws {404} If the user is not found
+   * @throws {500} If an error occurs while retrieving the user
+   * @access protected
+   * @permission user:read (resource-specific)
    */
   .get("/:id", validationMiddleware("query", UserRelationsQuerySchema), requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), async (c) => {
-    const { id } = c.req.param();
+    const id = c.req.param("id");
     const { includes } = c.req.valid("query");
 
     try {
@@ -70,14 +79,17 @@ export const usersRoutes = new Hono()
     }
   })
 
-/**
- * Update a user by id.
- *
- * @param c - The context
- * @returns The updated user
- */
+  /**
+   * Update a specific user by ID
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response containing the updated user data
+   * @throws {500} If an error occurs while updating the user
+   * @access protected
+   * @permission user:update (resource-specific)
+   */
   .put("/:id", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateUserSchema), async (c) => {
-    const { id } = c.req.param();
+    const id = c.req.param("id");
     const data = c.req.valid("json");
 
     try {
@@ -89,13 +101,16 @@ export const usersRoutes = new Hono()
   })
 
   /**
-   * Delete a user by id.
+   * Delete a specific user by ID
    *
-   * @param c - The context
-   * @returns The deleted user
+   * @param c - The Hono context object with session context
+   * @returns JSON response containing the deleted user data
+   * @throws {500} If an error occurs while deleting the user
+   * @access protected
+   * @permission user:delete (resource-specific)
    */
   .delete("/:id", requirePermissionFactory("user:delete", c => ({ id: c.req.param("id") })), async (c) => {
-    const { id } = c.req.param();
+    const id = c.req.param("id");
 
     try {
       const user = await deleteUser(id);
