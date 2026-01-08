@@ -1,0 +1,185 @@
+{
+  "pages": {
+    "home": {
+      "title": "Panel de control"
+    },
+    "settings": {
+      "title": "Configuración",
+      "users": {
+        "title": "Usuarios",
+        "list": {
+          "title": "Usuarios",
+          "subtitle": "Gestiona tus usuarios."
+        }
+      },
+      "roles": {
+        "title": "Roles",
+        "list": {
+          "title": "Roles",
+          "subtitle": "Gestiona tus roles."
+        },
+        "detail": {
+          "title": "Editar rol - {{role}}",
+          "pages": {
+            "display": {
+              "fields": {
+                "label": "Etiqueta",
+                "description": "Descripción"
+              }
+            },
+            "members": {
+              "title": "Miembros",
+              "addMembers": {
+                "label": "Añadir miembros",
+                "description": "Añadir miembros al rol <b>{{role}}</b>."
+              },
+              "searchMembers": "Buscar miembros..."
+            },
+            "permissions": {
+              "title": "Permisos"
+            }
+          },
+          "nav": {
+            "display": "Mostrar",
+            "members": "Gestionar miembros ({{count}})",
+            "permissions": "Permisos"
+          }
+        }
+      },
+      "notifications": {
+        "title": "Notificaciones",
+        "list": {
+          "title": "Notificaciones",
+          "subtitle": "Gestiona tus proveedores de notificaciones.",
+          "searchPlaceholder": "Buscar proveedores...",
+          "createButton": "Crear notificación"
+        },
+        "create": {
+          "title": "Crear notificación",
+          "providerType": "Tipo de proveedor"
+        },
+        "edit": {
+          "title": "Editar proveedor de notificaciones"
+        },
+        "forms": {
+          "discord": {
+            "name": {
+              "label": "Nombre",
+              "placeholder": "Bot de Discord"
+            },
+            "webhookUrl": {
+              "label": "URL del webhook",
+              "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
+            },
+            "decorations": {
+              "label": "Decoraciones",
+              "description": "Envía notificaciones como mensajes embebidos de Discord."
+            },
+            "testNotification": "Probar notificación",
+            "testing": "Probando...",
+            "delete": "Eliminar",
+            "deleting": "Eliminando...",
+            "submit": "Enviar",
+            "submitting": "Enviando...",
+            "deleteConfirm": {
+              "title": "Eliminar proveedor de Discord",
+              "description": "¿Estás seguro de que quieres eliminar este proveedor de Discord?",
+              "confirmText": "Eliminar",
+              "cancelText": "Cancelar"
+            },
+            "success": {
+              "created": "Proveedor de Discord creado exitosamente",
+              "updated": "Proveedor de Discord actualizado exitosamente",
+              "deleted": "Proveedor de Discord eliminado exitosamente",
+              "testSent": "Notificación enviada exitosamente"
+            },
+            "error": {
+              "create": "Error al crear el proveedor de Discord",
+              "update": "Error al actualizar el proveedor de Discord",
+              "delete": "Error al eliminar el proveedor de Discord",
+              "test": "Error al probar la notificación"
+            }
+          },
+          "telegram": {
+            "name": {
+              "label": "Nombre",
+              "placeholder": "Bot de Telegram"
+            },
+            "botToken": {
+              "label": "Token del bot",
+              "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            },
+            "chatId": {
+              "label": "ID del chat",
+              "placeholder": "1234567890"
+            },
+            "threadId": {
+              "label": "ID del hilo de mensajes",
+              "placeholder": "1234567890",
+              "description": "Opcional. Úsalo cuando quieras enviar notificaciones a un tema específico en un grupo."
+            },
+            "testNotification": "Probar notificación",
+            "testing": "Probando...",
+            "delete": "Eliminar",
+            "deleting": "Eliminando...",
+            "submit": "Enviar",
+            "submitting": "Enviando...",
+            "deleteConfirm": {
+              "title": "Eliminar proveedor de Telegram",
+              "description": "¿Estás seguro de que quieres eliminar este proveedor de Telegram?",
+              "confirmText": "Eliminar",
+              "cancelText": "Cancelar"
+            },
+            "success": {
+              "created": "Proveedor de Telegram creado exitosamente",
+              "updated": "Proveedor de Telegram actualizado exitosamente",
+              "deleted": "Proveedor de Telegram eliminado exitosamente",
+              "testSent": "Notificación enviada exitosamente"
+            },
+            "error": {
+              "create": "Error al crear el proveedor de Telegram",
+              "update": "Error al actualizar el proveedor de Telegram",
+              "delete": "Error al eliminar el proveedor de Telegram",
+              "test": "Error al probar la notificación"
+            }
+          }
+        },
+        "columns": {
+          "name": "Nombre",
+          "type": "Tipo"
+        },
+        "providers": {
+          "discord": "Discord",
+          "telegram": "Telegram"
+        },
+        "actions": {
+          "edit": "Editar proveedor de notificaciones"
+        }
+      }
+    }
+  },
+  "errors": {
+    "notification": {
+      "name": {
+        "required": "El nombre es obligatorio"
+      },
+      "type": {
+        "required": "El tipo de proveedor es obligatorio"
+      },
+      "discord": {
+        "webhookUrl": {
+          "required": "La URL del webhook es obligatoria",
+          "invalid": "La URL del webhook debe ser una URL válida"
+        }
+      },
+      "telegram": {
+        "botToken": {
+          "required": "El token del bot es obligatorio"
+        },
+        "chatId": {
+          "required": "El ID del chat es obligatorio"
+        }
+      }
+    }
+  }
+}

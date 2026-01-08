@@ -1,0 +1,64 @@
+{
+  "core": {
+    "name": "Bunstack.",
+    "caption": "Kit di avvio BHVR"
+  },
+  "actions": {
+    "cancel": "Annulla",
+    "confirm": "Conferma",
+    "save": "Salva",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "close": "Chiudi",
+    "submit": "Invia",
+    "reset": "Reimposta",
+    "retry": "Riprova",
+    "add": "Aggiungi"
+  },
+  "navigation": {
+    "next": "Avanti",
+    "previous": "Precedente",
+    "back": "Indietro"
+  },
+  "status": {
+    "loading": "Caricamento...",
+    "success": "Successo",
+    "error": "Si è verificato un errore",
+    "noData": "Nessun dato disponibile"
+  },
+  "form": {
+    "required": "Questo campo è obbligatorio",
+    "optional": "Opzionale",
+    "invalid": "Input non valido",
+    "noChanges": "Nessuna modifica",
+    "save": "Salva",
+    "saving": "Salvataggio..."
+  },
+  "dialog": {
+    "confirmTitle": "Sei sicuro?",
+    "confirmDescription": "Sei sicuro di voler continuare?"
+  },
+  "generic": {
+    "yes": "Sì",
+    "no": "No",
+    "ok": "OK",
+    "language": "Lingua: {{lang}}",
+    "theme": "Tema: {{theme}}",
+    "themeSystem": "Sistema",
+    "themeLight": "Chiaro",
+    "themeDark": "Scuro",
+    "themeModernMinimalLight": "Moderno Chiaro",
+    "themeModernMinimalDark": "Moderno Scuro"
+  },
+  "table": {
+    "columns": "Colonne",
+    "noResults": "Nessun risultato.",
+    "of": "di",
+    "rows": "riga(e)",
+    "selected": "selezionata(e).",
+    "total": "in totale.",
+    "page": "Pagina",
+    "previous": "Precedente",
+    "next": "Avanti"
+  }
+}

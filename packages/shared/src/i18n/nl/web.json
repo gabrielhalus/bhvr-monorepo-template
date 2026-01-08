@@ -1,0 +1,185 @@
+{
+  "pages": {
+    "home": {
+      "title": "Dashboard"
+    },
+    "settings": {
+      "title": "Instellingen",
+      "users": {
+        "title": "Gebruikers",
+        "list": {
+          "title": "Gebruikers",
+          "subtitle": "Beheer je gebruikers."
+        }
+      },
+      "roles": {
+        "title": "Rollen",
+        "list": {
+          "title": "Rollen",
+          "subtitle": "Beheer je rollen."
+        },
+        "detail": {
+          "title": "Rol bewerken - {{role}}",
+          "pages": {
+            "display": {
+              "fields": {
+                "label": "Label",
+                "description": "Beschrijving"
+              }
+            },
+            "members": {
+              "title": "Leden",
+              "addMembers": {
+                "label": "Leden toevoegen",
+                "description": "Voeg leden toe aan de rol <b>{{role}}</b>."
+              },
+              "searchMembers": "Zoek leden..."
+            },
+            "permissions": {
+              "title": "Machtigingen"
+            }
+          },
+          "nav": {
+            "display": "Weergave",
+            "members": "Leden beheren ({{count}})",
+            "permissions": "Machtigingen"
+          }
+        }
+      },
+      "notifications": {
+        "title": "Meldingen",
+        "list": {
+          "title": "Meldingen",
+          "subtitle": "Beheer je meldingsproviders.",
+          "searchPlaceholder": "Zoek providers...",
+          "createButton": "Melding maken"
+        },
+        "create": {
+          "title": "Melding maken",
+          "providerType": "Providertype"
+        },
+        "edit": {
+          "title": "Meldingsprovider bewerken"
+        },
+        "forms": {
+          "discord": {
+            "name": {
+              "label": "Naam",
+              "placeholder": "Discord Bot"
+            },
+            "webhookUrl": {
+              "label": "Webhook-URL",
+              "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
+            },
+            "decorations": {
+              "label": "Decoraties",
+              "description": "Verstuurt meldingen als ingesloten Discord-berichten."
+            },
+            "testNotification": "Test melding",
+            "testing": "Testen...",
+            "delete": "Verwijderen",
+            "deleting": "Verwijderen...",
+            "submit": "Verzenden",
+            "submitting": "Verzenden...",
+            "deleteConfirm": {
+              "title": "Discord-provider verwijderen",
+              "description": "Weet je zeker dat je deze Discord-provider wilt verwijderen?",
+              "confirmText": "Verwijderen",
+              "cancelText": "Annuleren"
+            },
+            "success": {
+              "created": "Discord-provider succesvol aangemaakt",
+              "updated": "Discord-provider succesvol bijgewerkt",
+              "deleted": "Discord-provider succesvol verwijderd",
+              "testSent": "Melding succesvol verzonden"
+            },
+            "error": {
+              "create": "Fout bij het aanmaken van de Discord-provider",
+              "update": "Fout bij het bijwerken van de Discord-provider",
+              "delete": "Fout bij het verwijderen van de Discord-provider",
+              "test": "Fout bij het testen van de melding"
+            }
+          },
+          "telegram": {
+            "name": {
+              "label": "Naam",
+              "placeholder": "Telegram Bot"
+            },
+            "botToken": {
+              "label": "Bot-token",
+              "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            },
+            "chatId": {
+              "label": "Chat-ID",
+              "placeholder": "1234567890"
+            },
+            "threadId": {
+              "label": "Berichtthread-ID",
+              "placeholder": "1234567890",
+              "description": "Optioneel. Gebruik dit wanneer je meldingen naar een specifiek onderwerp in een groep wilt sturen."
+            },
+            "testNotification": "Test melding",
+            "testing": "Testen...",
+            "delete": "Verwijderen",
+            "deleting": "Verwijderen...",
+            "submit": "Verzenden",
+            "submitting": "Verzenden...",
+            "deleteConfirm": {
+              "title": "Telegram-provider verwijderen",
+              "description": "Weet je zeker dat je deze Telegram-provider wilt verwijderen?",
+              "confirmText": "Verwijderen",
+              "cancelText": "Annuleren"
+            },
+            "success": {
+              "created": "Telegram-provider succesvol aangemaakt",
+              "updated": "Telegram-provider succesvol bijgewerkt",
+              "deleted": "Telegram-provider succesvol verwijderd",
+              "testSent": "Melding succesvol verzonden"
+            },
+            "error": {
+              "create": "Fout bij het aanmaken van de Telegram-provider",
+              "update": "Fout bij het bijwerken van de Telegram-provider",
+              "delete": "Fout bij het verwijderen van de Telegram-provider",
+              "test": "Fout bij het testen van de melding"
+            }
+          }
+        },
+        "columns": {
+          "name": "Naam",
+          "type": "Type"
+        },
+        "providers": {
+          "discord": "Discord",
+          "telegram": "Telegram"
+        },
+        "actions": {
+          "edit": "Meldingsprovider bewerken"
+        }
+      }
+    }
+  },
+  "errors": {
+    "notification": {
+      "name": {
+        "required": "Naam is verplicht"
+      },
+      "type": {
+        "required": "Providertype is verplicht"
+      },
+      "discord": {
+        "webhookUrl": {
+          "required": "Webhook-URL is verplicht",
+          "invalid": "Webhook-URL moet een geldige URL zijn"
+        }
+      },
+      "telegram": {
+        "botToken": {
+          "required": "Bot-token is verplicht"
+        },
+        "chatId": {
+          "required": "Chat-ID is verplicht"
+        }
+      }
+    }
+  }
+}

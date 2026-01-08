@@ -1,0 +1,23 @@
+{
+  "passwordInput": {
+    "ariaLabels": {
+      "hidePassword": "Wachtwoord verbergen",
+      "showPassword": "Wachtwoord tonen"
+    },
+    "requirements": {
+      "label": "Je wachtwoord moet bevatten:",
+      "rules": {
+        "minLength_one": "Minstens {{count}} teken",
+        "minLength_other": "Minstens {{count}} tekens",
+        "minUppercase_one": "Een hoofdletter",
+        "minUppercase_other": "Minstens {{count}} hoofdletters",
+        "minLowercase_one": "Een kleine letter",
+        "minLowercase_other": "Minstens {{count}} kleine letters",
+        "minDigits_one": "Een cijfer",
+        "minDigits_other": "Minstens {{count}} cijfers",
+        "minSpecialChars_one": "Een speciaal teken (bijv. !@#$%)",
+        "minSpecialChars_other": "Minstens {{count}} speciale tekens (bijv. !@#$%)"
+      }
+    }
+  }
+}

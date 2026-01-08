@@ -12,7 +12,7 @@
         "minUppercase_one": "An uppercase letter",
         "minUppercase_other": "At least {{count}} uppercase letters",
         "minLowercase_one": "A lowercase letter",
-        "minLowercase_other": "At least {count}} lowercase letters",
+        "minLowercase_other": "At least {{count}} lowercase letters",
         "minDigits_one": "A number",
         "minDigits_other": "At least {{count}} numbers",
         "minSpecialChars_one": "A special character (e.g., !@#$%)",

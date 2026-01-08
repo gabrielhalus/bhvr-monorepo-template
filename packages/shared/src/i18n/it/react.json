@@ -1,0 +1,23 @@
+{
+  "passwordInput": {
+    "ariaLabels": {
+      "hidePassword": "Nascondi password",
+      "showPassword": "Mostra password"
+    },
+    "requirements": {
+      "label": "La tua password dovrebbe includere:",
+      "rules": {
+        "minLength_one": "Almeno {{count}} carattere",
+        "minLength_other": "Almeno {{count}} caratteri",
+        "minUppercase_one": "Una lettera maiuscola",
+        "minUppercase_other": "Almeno {{count}} lettere maiuscole",
+        "minLowercase_one": "Una lettera minuscola",
+        "minLowercase_other": "Almeno {{count}} lettere minuscole",
+        "minDigits_one": "Un numero",
+        "minDigits_other": "Almeno {{count}} numeri",
+        "minSpecialChars_one": "Un carattere speciale (es: !@#$%)",
+        "minSpecialChars_other": "Almeno {{count}} caratteri speciali (es: !@#$%)"
+      }
+    }
+  }
+}
