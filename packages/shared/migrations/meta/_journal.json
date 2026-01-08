@@ -8,6 +8,13 @@
       "when": 1767879240849,
       "tag": "0000_funny_prism",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1767911037216,
+      "tag": "0001_purple_red_ghost",
+      "breakpoints": true
     }
   ]
 }

@@ -3,158 +3,168 @@
     "home": {
       "title": "Dashboard"
     },
+    "users": {
+      "title": "Users",
+      "list": {
+        "title": "Users",
+        "subtitle": "Manage your users."
+      }
+    },
+    "roles": {
+      "title": "Roles",
+      "list": {
+        "title": "Roles",
+        "subtitle": "Manage your roles."
+      },
+      "detail": {
+        "title": "Edit role - {{role}}",
+        "pages": {
+          "display": {
+            "fields": {
+              "label": "Label",
+              "description": "Description"
+            }
+          },
+          "members": {
+            "title": "Members",
+            "addMembers": {
+              "label": "Add members",
+              "description": "Add members to the <b>{{role}}</b> role."
+            },
+            "searchMembers": "Search members..."
+          },
+          "permissions": {
+            "title": "Permissions"
+          }
+        },
+        "nav": {
+          "display": "Display",
+          "members": "Manage Members ({{count}})",
+          "permissions": "Permissions"
+        }
+      }
+    },
     "settings": {
       "title": "Settings",
-      "users": {
-        "title": "Users",
-        "list": {
-          "title": "Users",
-          "subtitle": "Manage your users."
-        }
-      },
-      "roles": {
-        "title": "Roles",
-        "list": {
-          "title": "Roles",
-          "subtitle": "Manage your roles."
-        },
-        "detail": {
-          "title": "Edit role - {{role}}",
-          "pages": {
-            "display": {
-              "fields": {
-                "label": "Label",
-                "description": "Description"
-              }
-            },
-            "members": {
-              "title": "Members",
-              "addMembers": {
-                "label": "Add members",
-                "description": "Add members to the <b>{{role}}</b> role."
-              },
-              "searchMembers": "Search members..."
-            },
-            "permissions": {
-              "title": "Permissions"
-            }
+      "config": {
+        "section": {
+          "authentication": {
+            "label": "Authentication"
           },
-          "nav": {
-            "display": "Display",
-            "members": "Manage Members ({{count}})",
-            "permissions": "Permissions"
+          "appearance": {
+            "label": "Appearance"
           }
         }
-      },
-      "notifications": {
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "list": {
         "title": "Notifications",
-        "list": {
-          "title": "Notifications",
-          "subtitle": "Manage your notification providers.",
-          "searchPlaceholder": "Search providers...",
-          "createButton": "Create Notification"
-        },
-        "create": {
-          "title": "Create Notification",
-          "providerType": "Provider Type"
-        },
-        "edit": {
-          "title": "Edit Notification Provider"
-        },
-        "forms": {
-          "discord": {
-            "name": {
-              "label": "Name",
-              "placeholder": "Discord Bot"
-            },
-            "webhookUrl": {
-              "label": "Webhook URL",
-              "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
-            },
-            "decorations": {
-              "label": "Decorations",
-              "description": "Sends notifications as Discord embedded messages."
-            },
-            "testNotification": "Test Notification",
-            "testing": "Testing...",
-            "delete": "Delete",
-            "deleting": "Deleting...",
-            "submit": "Submit",
-            "submitting": "Submitting...",
-            "deleteConfirm": {
-              "title": "Delete Discord Provider",
-              "description": "Are you sure you want to delete this discord provider?",
-              "confirmText": "Delete",
-              "cancelText": "Cancel"
-            },
-            "success": {
-              "created": "Discord provider created successfully",
-              "updated": "Discord provider updated successfully",
-              "deleted": "Discord provider deleted successfully",
-              "testSent": "Notification sent successfully"
-            },
-            "error": {
-              "create": "Failed to create discord provider",
-              "update": "Failed to update discord provider",
-              "delete": "Failed to delete discord provider",
-              "test": "Failed to test notification"
-            }
+        "subtitle": "Manage your notification providers.",
+        "searchPlaceholder": "Search providers...",
+        "createButton": "Create Notification"
+      },
+      "create": {
+        "title": "Create Notification",
+        "providerType": "Provider Type"
+      },
+      "edit": {
+        "title": "Edit Notification Provider"
+      },
+      "forms": {
+        "discord": {
+          "name": {
+            "label": "Name",
+            "placeholder": "Discord Bot"
           },
-          "telegram": {
-            "name": {
-              "label": "Name",
-              "placeholder": "Telegram Bot"
-            },
-            "botToken": {
-              "label": "Bot Token",
-              "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            },
-            "chatId": {
-              "label": "Chat ID",
-              "placeholder": "1234567890"
-            },
-            "threadId": {
-              "label": "Message Thread ID",
-              "placeholder": "1234567890",
-              "description": "Optional. Use it when you want to send notifications to a specific topic in a group."
-            },
-            "testNotification": "Test Notification",
-            "testing": "Testing...",
-            "delete": "Delete",
-            "deleting": "Deleting...",
-            "submit": "Submit",
-            "submitting": "Submitting...",
-            "deleteConfirm": {
-              "title": "Delete Telegram Provider",
-              "description": "Are you sure you want to delete this telegram provider?",
-              "confirmText": "Delete",
-              "cancelText": "Cancel"
-            },
-            "success": {
-              "created": "Telegram provider created successfully",
-              "updated": "Telegram provider updated successfully",
-              "deleted": "Telegram provider deleted successfully",
-              "testSent": "Notification sent successfully"
-            },
-            "error": {
-              "create": "Failed to create telegram provider",
-              "update": "Failed to update telegram provider",
-              "delete": "Failed to delete telegram provider",
-              "test": "Failed to test notification"
-            }
+          "webhookUrl": {
+            "label": "Webhook URL",
+            "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
+          },
+          "decorations": {
+            "label": "Decorations",
+            "description": "Sends notifications as Discord embedded messages."
+          },
+          "testNotification": "Test Notification",
+          "testing": "Testing...",
+          "delete": "Delete",
+          "deleting": "Deleting...",
+          "submit": "Submit",
+          "submitting": "Submitting...",
+          "deleteConfirm": {
+            "title": "Delete Discord Provider",
+            "description": "Are you sure you want to delete this discord provider?",
+            "confirmText": "Delete",
+            "cancelText": "Cancel"
+          },
+          "success": {
+            "created": "Discord provider created successfully",
+            "updated": "Discord provider updated successfully",
+            "deleted": "Discord provider deleted successfully",
+            "testSent": "Notification sent successfully"
+          },
+          "error": {
+            "create": "Failed to create discord provider",
+            "update": "Failed to update discord provider",
+            "delete": "Failed to delete discord provider",
+            "test": "Failed to test notification"
           }
         },
-        "columns": {
-          "name": "Name",
-          "type": "Type"
-        },
-        "providers": {
-          "discord": "Discord",
-          "telegram": "Telegram"
-        },
-        "actions": {
-          "edit": "Edit notification provider"
+        "telegram": {
+          "name": {
+            "label": "Name",
+            "placeholder": "Telegram Bot"
+          },
+          "botToken": {
+            "label": "Bot Token",
+            "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+          },
+          "chatId": {
+            "label": "Chat ID",
+            "placeholder": "1234567890"
+          },
+          "threadId": {
+            "label": "Message Thread ID",
+            "placeholder": "1234567890",
+            "description": "Optional. Use it when you want to send notifications to a specific topic in a group."
+          },
+          "testNotification": "Test Notification",
+          "testing": "Testing...",
+          "delete": "Delete",
+          "deleting": "Deleting...",
+          "submit": "Submit",
+          "submitting": "Submitting...",
+          "deleteConfirm": {
+            "title": "Delete Telegram Provider",
+            "description": "Are you sure you want to delete this telegram provider?",
+            "confirmText": "Delete",
+            "cancelText": "Cancel"
+          },
+          "success": {
+            "created": "Telegram provider created successfully",
+            "updated": "Telegram provider updated successfully",
+            "deleted": "Telegram provider deleted successfully",
+            "testSent": "Notification sent successfully"
+          },
+          "error": {
+            "create": "Failed to create telegram provider",
+            "update": "Failed to update telegram provider",
+            "delete": "Failed to delete telegram provider",
+            "test": "Failed to test notification"
+          }
         }
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type"
+      },
+      "providers": {
+        "discord": "Discord",
+        "telegram": "Telegram"
+      },
+      "actions": {
+        "edit": "Edit notification provider"
       }
     }
   },

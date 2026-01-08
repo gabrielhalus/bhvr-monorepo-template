@@ -20,5 +20,6 @@ export const PermissionSchema = z.enum([
   "userRole:delete",
 
   // Runtime-config
+  "runtimeConfig:list",
   "runtimeConfig:update",
 ]);
