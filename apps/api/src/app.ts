@@ -20,7 +20,7 @@ app.use(logger());
 app.use(cors());
 
 // -------------------
-// API (Hono @ port 4002)
+// API (Hono @ port 3030)
 // -------------------
 const _api = app
   .route("/auth", authRoutes)

@@ -40,5 +40,5 @@ COPY --from=build /usr/src/app/apps ./apps
 COPY --from=build /usr/src/app/packages ./packages
 COPY package.json bun.lock turbo.json ./
 
-EXPOSE 4000/tcp
+EXPOSE 3000/tcp
 ENTRYPOINT ["bun", "run", "start", "--filter=@bunstack/api", "--ui=stream"]
