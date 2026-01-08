@@ -3,13 +3,12 @@ import { Hono } from "hono";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { getRuntimeConfigValue } from "@/services/runtime-config.service";
-import { getRuntimeConfigs, updateRuntimeConfig } from "@bunstack/shared/queries/runtime-configs.queries";
+import { getRuntimeConfig, getRuntimeConfigs, updateRuntimeConfig } from "@bunstack/shared/queries/runtime-configs.queries";
 import { UpdateRuntimeConfigSchema } from "@bunstack/shared/schemas/api/runtime-configs.schemas";
 
 export const configRoutes = new Hono()
   /**
-   * @returns JSON response containing all runtime configuration key-value pairs
+   * @returns JSON response containing all runtime configurations
    * @throws 500 if an error occurs while retrieving the configurations
    * @access public
    */
@@ -30,7 +29,7 @@ export const configRoutes = new Hono()
    * Get a specific runtime-configuration value by key
    *
    * @param c - The Hono context object
-   * @returns JSON response containing the configuration value for the specified key
+   * @returns JSON response containing the configuration for the specified key
    * @throws 404 if the configuration key is not found
    * @throws 500 if an error occurs while retrieving the configuration
    * @access public
@@ -39,7 +38,7 @@ export const configRoutes = new Hono()
     const key = c.req.param("key");
 
     try {
-      const value = await getRuntimeConfigValue(key);
+      const value = await getRuntimeConfig(key);
 
       if (!value) {
         return c.json({ success: false as const, error: "Config not found" }, 404);
