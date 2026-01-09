@@ -1,6 +1,6 @@
 import type { ConfigNode } from "@bunstack/shared/types/db/runtime-configs.types";
 
-import { Link } from "@tanstack/react-router";
+import { Link, useMatchRoute } from "@tanstack/react-router";
 import { ChevronRightIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,14 @@ export function ConfigSection({ node, depth = 0 }: { node: ConfigNode; depth?: n
   const { t } = useTranslation("web");
   const [isExpanded, setIsExpanded] = useState(depth === 0);
 
+  const matchRoute = useMatchRoute();
+  const pathParts = node.fullKey.split(".");
+
+  const isActive = matchRoute({
+    to: "/settings/$",
+    params: { _splat: pathParts.join("/") },
+  });
+
   if (node.isLeaf) {
     return null;
   }
@@ -21,7 +29,11 @@ export function ConfigSection({ node, depth = 0 }: { node: ConfigNode; depth?: n
   if (!hasNonLeafChildren) {
     const pathParts = node.fullKey.split(".");
     return (
-      <Link to="/settings/$" params={{ _splat: pathParts.join("/") }} className={cn(buttonVariants({ variant: "ghost" }), "justify-start")} activeProps={{ className: cn(buttonVariants(), "justify-start") }}>
+      <Link
+        to="/settings/$"
+        params={{ _splat: pathParts.join("/") }}
+        className={cn(buttonVariants({ variant: isActive ? "default" : "ghost", size: "sm" }), "w-full justify-start")}
+      >
         {t(`pages.settings.config.section.${node.fullKey}.label`)}
       </Link>
     );
@@ -29,7 +41,7 @@ export function ConfigSection({ node, depth = 0 }: { node: ConfigNode; depth?: n
 
   return (
     <div className="space-y-1">
-      <Button variant="ghost" className="w-full justify-start" onClick={() => setIsExpanded(!isExpanded)}>
+      <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => setIsExpanded(!isExpanded)}>
         <ChevronRightIcon className={cn("size-4 transition-transform", isExpanded && "rotate-90")} />
         {t(`pages.settings.config.section.${node.fullKey}.label`)}
       </Button>
