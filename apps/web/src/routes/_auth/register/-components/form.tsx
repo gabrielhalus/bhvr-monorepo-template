@@ -113,9 +113,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={e => field.handleChange(e.target.value)}
-                          type="email"
                           placeholder="m@example.com"
-                          required
                         />
                         <FieldError errors={field.state.meta.errors}>
                           {field.state.meta.isTouched && !field.state.meta.isValid && field.state.meta.errors[0]?.message
@@ -140,7 +138,6 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                           rules={passwordRules}
                           checks={passwordChecks}
                           showRequirements
-                          required
                         />
                       </FieldContent>
                     </Field>

@@ -26,7 +26,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
   const redirectTo = searchParams.get("redirect") || "/";
 
   const form = useForm({
-    validators: { onChange: LoginSchema },
+    validators: { onSubmit: LoginSchema },
     defaultValues: {
       email: "",
       password: "",
@@ -50,12 +50,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
           <CardTitle className="text-xl">{t("login.title")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit(e);
-          }}
-          >
+          <form onSubmit={form.handleSubmit}>
             <div className="grid gap-6">
               <div className="grid gap-6">
                 <form.Field
@@ -69,9 +64,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={e => field.handleChange(e.target.value)}
-                          type="email"
                           placeholder="m@example.com"
-                          required
                         />
                         <FieldError errors={field.state.meta.errors}>
                           {field.state.meta.isTouched && !field.state.meta.isValid && field.state.meta.errors[0]?.message
@@ -93,7 +86,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={e => field.handleChange(e.target.value)}
-                          required
                         />
                         <FieldError errors={field.state.meta.errors}>
                           {field.state.meta.isTouched && !field.state.meta.isValid && field.state.meta.errors[0]?.message
@@ -107,18 +99,16 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                 <form.Subscribe
                   selector={state => [state.canSubmit, state.isSubmitting]}
                   children={([canSubmit, isSubmitting]) => (
-                    <>
-                      <Button type="submit" disabled={!canSubmit}>
-                        {isSubmitting
-                          ? (
-                              <span className="flex items-center gap-2">
-                                <Spinner />
-                                {t("login.pending")}
-                              </span>
-                            )
-                          : t("login.submit")}
-                      </Button>
-                    </>
+                    <Button type="submit" disabled={!canSubmit}>
+                      {isSubmitting
+                        ? (
+                            <span className="flex items-center gap-2">
+                              <Spinner />
+                              {t("login.pending")}
+                            </span>
+                          )
+                        : t("login.submit")}
+                    </Button>
                   )}
                 />
               </div>
