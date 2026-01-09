@@ -19,7 +19,6 @@
     "paths": {
       "@bunstack/api/*": ["apps/api/src/*"],
       "@bunstack/web/*": ["apps/web/src/*"],
-      "@bunstack/env": ["packages/env/src/index.ts"],
       "@bunstack/shared/*": ["packages/shared/src/*"],
       "@bunstack/react/*": ["packages/react/src/*"],
       "@bunstack/eslint-config": ["packages/eslint-config/*"],
