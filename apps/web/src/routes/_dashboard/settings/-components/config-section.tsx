@@ -9,7 +9,7 @@ import { Button, buttonVariants } from "~react/components/button";
 import { cn } from "~react/lib/utils";
 
 export function ConfigSection({ node, depth = 0 }: { node: ConfigNode; depth?: number }) {
-  const { t } = useTranslation("web");
+  const { t } = useTranslation("web", { keyPrefix: "pages.settings.config" });
   const [isExpanded, setIsExpanded] = useState(depth === 0);
 
   const matchRoute = useMatchRoute();
@@ -34,7 +34,7 @@ export function ConfigSection({ node, depth = 0 }: { node: ConfigNode; depth?: n
         params={{ _splat: pathParts.join("/") }}
         className={cn(buttonVariants({ variant: isActive ? "default" : "ghost", size: "sm" }), "w-full justify-start")}
       >
-        {t(`pages.settings.config.section.${node.fullKey}.label`)}
+        {t(`${node.fullKey}.label`)}
       </Link>
     );
   }
@@ -43,7 +43,7 @@ export function ConfigSection({ node, depth = 0 }: { node: ConfigNode; depth?: n
     <div className="space-y-1">
       <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => setIsExpanded(!isExpanded)}>
         <ChevronRightIcon className={cn("size-4 transition-transform", isExpanded && "rotate-90")} />
-        {t(`pages.settings.config.section.${node.fullKey}.label`)}
+        {t(`${node.fullKey}.label`)}
       </Button>
 
       {isExpanded && (

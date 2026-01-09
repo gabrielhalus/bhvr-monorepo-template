@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { getRuntimeConfigsQueryOptions } from "@/queries/runtime-configs";
 import { buildConfigTree, findFirstLeafSection, findNodeBySegments } from "~shared/helpers/config-tree";
 
-import NodeView from "./-components/node-view";
+import { NodeForm } from "./-components/node-form";
 
 export const Route = createFileRoute("/_dashboard/settings/$")(
   {
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_dashboard/settings/$")(
       const { _splat: splat } = params;
       if (splat) {
         const segments = splat.split("/");
-        return { crumb: [`pages.settings.config.section.${segments.join(".")}.label`, `pages.settings.config.section.${segments.join(".")}.label`] };
+        return { crumb: [`pages.settings.config.${segments.join(".")}.label`, `pages.settings.config.${segments.join(".")}.label`] };
       }
     },
   },
@@ -52,6 +52,10 @@ function RouteComponent() {
   }
 
   return (
-    <NodeView node={node} allConfigs={data?.configs ?? []} />
+    <>
+      {Array.from(node.children.values()).map(child => (
+        <NodeForm node={child} allConfigs={data?.configs ?? []} key={child.fullKey} />
+      ))}
+    </>
   );
 }

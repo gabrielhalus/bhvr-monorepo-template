@@ -1,15 +1,12 @@
-import type { ConfigNode } from "~shared/types/db/runtime-configs.types";
+import type { ConfigNode, RuntimeConfig } from "~shared/types/db/runtime-configs.types";
 
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
-import { PlusIcon, XIcon } from "lucide-react";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { Badge } from "@bunstack/react/components/badge";
-import { Button } from "@bunstack/react/components/button";
 import { Checkbox } from "@bunstack/react/components/checkbox";
 import { Input } from "@bunstack/react/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@bunstack/react/components/select";
@@ -18,7 +15,7 @@ import { useDebouncedCallback } from "@bunstack/react/hooks/use-debounced-callba
 import { api } from "~react/lib/http";
 import { inferConfigValue } from "~shared/helpers/infer-config-value";
 
-function createSchema(type: "string" | "number" | "boolean" | "list", nullable: boolean) {
+function createSchema(type: "string" | "number" | "boolean", nullable: boolean) {
   let schema;
 
   switch (type) {
@@ -31,9 +28,6 @@ function createSchema(type: "string" | "number" | "boolean" | "list", nullable: 
     case "boolean":
       schema = z.boolean();
       break;
-    case "list":
-      schema = z.string();
-      break;
     default:
       schema = z.string();
   }
@@ -41,40 +35,17 @@ function createSchema(type: "string" | "number" | "boolean" | "list", nullable: 
   return nullable ? schema.nullable() : schema;
 }
 
-function parseValue(value: string, type: "string" | "number" | "boolean" | "list") {
-  switch (type) {
-    case "number":
-      return value === "" ? null : Number(value);
-    case "boolean":
-      return value === "true";
-    case "list":
-    case "string":
-    default:
-      return value;
-  }
-}
-
-function stringifyValue(value: unknown) {
-  if (value === null || value === undefined) {
-    return "";
-  }
-  return String(value);
-}
-
-type RuntimeConfig = ConfigNode["config"];
-
-function evaluateDisabledCondition(
-  disabledWhen: string | null | undefined,
-  allConfigs: RuntimeConfig[],
-): boolean {
-  if (!disabledWhen)
+function evaluateDisabledCondition(disabledWhen: string | null | undefined, allConfigs: RuntimeConfig[]): boolean {
+  if (!disabledWhen) {
     return false;
+  }
 
   const notEqualIndex = disabledWhen.indexOf("!=");
   const equalIndex = disabledWhen.indexOf("=");
 
-  if (equalIndex === -1)
+  if (equalIndex === -1) {
     return false;
+  }
 
   const isNotEqual = notEqualIndex !== -1 && notEqualIndex < equalIndex;
   const operatorIndex = isNotEqual ? notEqualIndex : equalIndex;
@@ -85,8 +56,9 @@ function evaluateDisabledCondition(
 
   const config = allConfigs.find(c => c.configKey === configKey);
 
-  if (!config)
+  if (!config) {
     return false;
+  }
 
   const actualValue = String(config.value ?? "");
   const isEqual = actualValue === expectedValue;
@@ -94,77 +66,8 @@ function evaluateDisabledCondition(
   return isNotEqual ? !isEqual : isEqual;
 }
 
-function FreeListInput({ values, onChange, disabled }: { values: string[]; onChange: (values: string[]) => void; disabled?: boolean }) {
-  const [inputValue, setInputValue] = useState("");
-
-  const handleAdd = () => {
-    const trimmed = inputValue.trim();
-    if (trimmed && !values.includes(trimmed)) {
-      onChange([...values, trimmed]);
-      setInputValue("");
-    }
-  };
-
-  const handleRemove = (value: string) => {
-    onChange(values.filter(v => v !== value));
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAdd();
-    }
-  };
-
-  return (
-    <div className="flex flex-col gap-2 w-56">
-      <div className="flex gap-1.5">
-        <Input
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Add item..."
-          disabled={disabled}
-          className="flex-1 h-8 text-sm"
-        />
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleAdd}
-          disabled={disabled || !inputValue.trim()}
-          className="h-8 px-2.5"
-        >
-          <PlusIcon className="size-4" />
-        </Button>
-      </div>
-      {values.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {values.map(value => (
-            <Badge
-              key={value}
-              variant="secondary"
-              className="gap-1 pr-1 group hover:bg-secondary/80 transition-colors"
-            >
-              <span className="max-w-32 truncate">{value}</span>
-              <button
-                type="button"
-                onClick={() => handleRemove(value)}
-                className="rounded-sm p-0.5 hover:bg-destructive/20 hover:text-destructive transition-colors"
-                aria-label={`Remove ${value}`}
-              >
-                <XIcon className="size-3" />
-              </button>
-            </Badge>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: RuntimeConfig[] }) {
-  const { t } = useTranslation("web", { keyPrefix: "pages.settings.config.section" });
+  const { t } = useTranslation("web", { keyPrefix: "pages.settings.config" });
   const queryClient = useQueryClient();
 
   const { config } = node;
@@ -173,7 +76,7 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
   const schema = createSchema(config.type, config.nullable);
 
   const form = useForm({
-    defaultValues: { value: stringifyValue(parseValue(config.value, config.type)) },
+    defaultValues: { value: config.value },
     onSubmit: async ({ value: { value } }) => {
       try {
         const parsedValue = inferConfigValue(value);
@@ -189,8 +92,9 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
         }
 
         queryClient.setQueryData(["get-runtime-configs"], (oldData: { configs: RuntimeConfig[] } | undefined) => {
-          if (!oldData)
+          if (!oldData) {
             return oldData;
+          }
           return {
             ...oldData,
             configs: oldData.configs.map(c =>
@@ -226,10 +130,11 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
         name="value"
         validators={{
           onChange: ({ value }) => {
-            if (config.type === "boolean")
+            if (config.type === "boolean") {
               return undefined;
+            }
             try {
-              const parsed = parseValue(value, config.type);
+              const parsed = inferConfigValue(value);
               schema.parse(parsed);
               return undefined;
             } catch {
@@ -256,49 +161,36 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
           if (config.type === "list") {
             const currentValues = field.state.value ? field.state.value.split(";").filter(Boolean) : [];
 
-            if (config.options) {
-              const availableOptions = config.options.split(";");
-              return (
-                <div className="flex flex-col gap-1">
-                  {availableOptions.map((option: string) => {
-                    const isChecked = currentValues.includes(option);
-                    return (
-                      <label
-                        key={option}
-                        htmlFor={`${field.name}-${option}`}
-                        className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md cursor-pointer hover:bg-muted/50 transition-colors group"
-                      >
-                        <Checkbox
-                          id={`${field.name}-${option}`}
-                          checked={isChecked}
-                          disabled={isDisabled}
-                          onCheckedChange={(checked) => {
-                            const newValues = checked
-                              ? [...currentValues, option]
-                              : currentValues.filter((v: string) => v !== option);
-                            field.handleChange(newValues.join(";"));
-                            handleAutoSave();
-                          }}
-                        />
-                        <span className={`text-sm transition-colors ${isChecked ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"}`}>
-                          {option}
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-              );
-            }
-
+            const availableOptions = config.options.split(";");
             return (
-              <FreeListInput
-                values={currentValues}
-                disabled={isDisabled}
-                onChange={(newValues) => {
-                  field.handleChange(newValues.join(";"));
-                  handleAutoSave();
-                }}
-              />
+              <div className="flex flex-col gap-1">
+                {availableOptions.map((option: string) => {
+                  const isChecked = currentValues.includes(option);
+                  return (
+                    <label
+                      key={option}
+                      htmlFor={`${field.name}-${option}`}
+                      className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md cursor-pointer hover:bg-muted/50 transition-colors group"
+                    >
+                      <Checkbox
+                        id={`${field.name}-${option}`}
+                        checked={isChecked}
+                        disabled={isDisabled}
+                        onCheckedChange={(checked) => {
+                          const newValues = checked
+                            ? [...currentValues, option]
+                            : currentValues.filter((v: string) => v !== option);
+                          field.handleChange(newValues.join(";"));
+                          handleAutoSave();
+                        }}
+                      />
+                      <span className={`text-sm transition-colors ${isChecked ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"}`}>
+                        {option}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
             );
           }
 
