@@ -13,8 +13,12 @@ import { api } from "~react/lib/http";
 import { cn } from "~react/lib/utils";
 import { LoginSchema } from "~shared/schemas/api/auth.schemas";
 
+import { Route } from "../../route";
+
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const { t } = useTranslation("auth");
+
+  const { disableRegister } = Route.useRouteContext();
 
   const navigate = useNavigate();
   const location = useRouterState({ select: s => s.location });
@@ -118,9 +122,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                   )}
                 />
               </div>
-              <div className="text-center text-sm">
-                <Trans i18nKey="login.cta" ns="auth" components={{ Link: <Link key="link" to="/register" search={location.search} className="underline underline-offset-4" /> }} />
-              </div>
+              {!disableRegister && (
+                <div className="text-center text-sm">
+                  <Trans i18nKey="login.cta" ns="auth" components={{ Link: <Link key="link" to="/register" search={location.search} className="underline underline-offset-4" /> }} />
+                </div>
+              )}
             </div>
           </form>
         </CardContent>

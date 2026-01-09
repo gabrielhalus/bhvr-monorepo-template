@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Box } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -6,6 +6,11 @@ import { RegisterForm } from "./-components/form";
 
 export const Route = createFileRoute("/_auth/register/")({
   component: Register,
+  beforeLoad: ({ context }) => {
+    if (context.disableRegister) {
+      return redirect({ to: "/login", replace: true });
+    }
+  },
 });
 
 function Register() {

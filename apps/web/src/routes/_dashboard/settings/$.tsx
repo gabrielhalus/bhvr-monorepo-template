@@ -52,10 +52,10 @@ function RouteComponent() {
   }
 
   return (
-    <>
+    <div>
       {Array.from(node.children.values()).map(child => (
         <NodeForm node={child} allConfigs={data?.configs ?? []} key={child.fullKey} />
       ))}
-    </>
+    </div>
   );
 }
