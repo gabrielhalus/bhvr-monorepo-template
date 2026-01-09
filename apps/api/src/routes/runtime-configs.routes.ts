@@ -65,9 +65,10 @@ export const configRoutes = new Hono()
   .put("/:key", requirePermissionFactory("runtimeConfig:update", c => ({ key: c.req.param("key") })), validationMiddleware("json", UpdateRuntimeConfigSchema), async (c) => {
     const key = c.req.param("key");
     const { value } = c.req.valid("json");
+    const { user } = c.get("sessionContext");
 
     try {
-      const config = await updateRuntimeConfig(key, value);
+      const config = await updateRuntimeConfig(key, value, user.id);
 
       return c.json({ success: true as const, config });
     } catch (error) {

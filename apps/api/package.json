@@ -13,9 +13,6 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@bunstack/auth": "workspace:*",
-    "@bunstack/db": "workspace:*",
-    "@bunstack/env": "workspace:*",
     "@bunstack/shared": "workspace:*",
     "@hono/zod-validator": "^0.7.0",
     "dotenv": "^17.2.2",
