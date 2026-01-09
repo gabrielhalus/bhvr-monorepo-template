@@ -40,7 +40,11 @@ CREATE TABLE "roles" (
 --> statement-breakpoint
 CREATE TABLE "runtime_configs" (
 	"config_key" varchar(255) PRIMARY KEY NOT NULL,
-	"value" text NOT NULL,
+	"value" text,
+	"type" text NOT NULL,
+	"nullable" boolean NOT NULL,
+	"options" text,
+	"disabled_when" text,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"updated_by" varchar(21)
 );

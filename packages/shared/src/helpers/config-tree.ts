@@ -37,20 +37,17 @@ export function buildConfigTree(configs: any[]): Map<string, ConfigNode> {
 export function findFirstLeafSection(tree: Map<string, ConfigNode>): string | null {
   for (const node of tree.values()) {
     if (node.isLeaf) {
-      continue; // Skip actual leaves, we want sections
+      continue;
     }
 
-    // Check if all children are leaves (this is a section we can link to)
     const hasNonLeafChildren = Array.from(node.children.values()).some(
       child => !child.isLeaf,
     );
 
     if (!hasNonLeafChildren) {
-      // This section has only leaf children, return it
       return node.fullKey.split(".").join("/");
     }
 
-    // Otherwise, recursively search in children
     const childResult = findFirstLeafSection(node.children);
     if (childResult) {
       return childResult;
@@ -58,4 +55,21 @@ export function findFirstLeafSection(tree: Map<string, ConfigNode>): string | nu
   }
 
   return null;
+}
+
+export function findNodeBySegments(root: Map<string, ConfigNode>, segments: readonly string[]): ConfigNode | null {
+  let current: ConfigNode | undefined;
+
+  for (const segment of segments) {
+    if (!current) {
+      current = root.get(segment);
+    } else {
+      current = current.children?.get(segment);
+    }
+
+    if (!current)
+      return null;
+  }
+
+  return current ?? null;
 }

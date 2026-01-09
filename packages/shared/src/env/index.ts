@@ -1,9 +1,7 @@
 /* eslint-disable node/no-process-env */
-import type { ZodType } from "zod";
+import type { z, ZodRawShape } from "zod";
 
-import { z } from "zod";
-
-export type EnvSchema = Record<string, ZodType>;
+import { z as zod } from "zod";
 
 type EnvSource = Record<string, string | undefined>;
 
@@ -27,18 +25,18 @@ function getEnvSource(): EnvSource {
 /**
  * Validates environment variables against a Zod schema.
  */
-export function validateEnv<T extends EnvSchema>(schema: T): z.infer<z.ZodObject<T>> {
+export function validateEnv<T extends ZodRawShape>(schema: T): z.infer<z.ZodObject<T>> {
   const envSource = getEnvSource();
 
   const envObject = Object.fromEntries(
     Object.keys(schema).map(key => [key, envSource[key]]),
   );
 
-  const zodSchema = z.object(schema);
+  const zodSchema = zod.object(schema);
   const result = zodSchema.safeParse(envObject);
 
   if (!result.success) {
-    const errors = z.treeifyError(result.error);
+    const errors = zod.treeifyError(result.error);
     throw new Error(
       `Invalid environment variables:\n${JSON.stringify(errors, null, 2)}`,
     );

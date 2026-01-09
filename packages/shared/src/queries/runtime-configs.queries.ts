@@ -46,18 +46,19 @@ export async function getRuntimeConfig(key: string): Promise<RuntimeConfig | nul
  * Update a runtime-configuration.
  * @param key - The runtime-configuration key.
  * @param value - The value to update.
+ * @param updatedBy - The user ID of the user updating the configuration.
  * @returns The updated runtime-configuration.
  * @throws An error if the runtime-configuration could not be updated.
  */
-export async function updateRuntimeConfig(key: string, value: ConfigValue): Promise<RuntimeConfig> {
+export async function updateRuntimeConfig(key: string, value: ConfigValue, updatedBy: string): Promise<RuntimeConfig> {
   const [updatedRuntimeConfig] = await drizzle
-    .insert(RuntimeConfigModel)
-    .values({ configKey: key, value: String(value) })
-    .onConflictDoUpdate({ target: RuntimeConfigModel.configKey, set: { value: String(value) } })
+    .update(RuntimeConfigModel)
+    .set({ value: String(value), updatedAt: new Date().toISOString(), updatedBy })
+    .where(eq(RuntimeConfigModel.configKey, key))
     .returning();
 
   if (!updatedRuntimeConfig) {
-    throw new Error("Failed to update runtime-configuration");
+    throw new Error(`Runtime configuration '${key}' not found`);
   }
 
   return RuntimeConfigSchema.parse(updatedRuntimeConfig);

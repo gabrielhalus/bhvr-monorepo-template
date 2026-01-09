@@ -49,10 +49,23 @@
       "config": {
         "section": {
           "authentication": {
-            "label": "Authentication"
+            "label": "Authentication",
+            "00_disableRegister": {
+              "label": "Disable user registration",
+              "description": "Prevents new users from signing up. New accounts can only be created through invitations."
+            }
           },
           "appearance": {
-            "label": "Appearance"
+            "label": "Appearance",
+            "00_defaultLightTheme": {
+              "label": "Default light theme",
+              "description": "Theme used in light mode when system appearance is enabled."
+            },
+            "00_defaultDarkTheme": {
+              "label": "Default dark theme",
+              "description": "Theme used in dark mode when system appearance is enabled."
+            }
+
           }
         }
       }
