@@ -3,158 +3,178 @@
     "home": {
       "title": "Cruscotto"
     },
+    "users": {
+      "title": "Utenti",
+      "list": {
+        "title": "Utenti",
+        "subtitle": "Gestisci i tuoi utenti."
+      }
+    },
+    "roles": {
+      "title": "Ruoli",
+      "list": {
+        "title": "Ruoli",
+        "subtitle": "Gestisci i tuoi ruoli."
+      },
+      "detail": {
+        "title": "Modifica ruolo - {{role}}",
+        "pages": {
+          "display": {
+            "fields": {
+              "label": "Etichetta",
+              "description": "Descrizione"
+            }
+          },
+          "members": {
+            "title": "Membri",
+            "addMembers": {
+              "label": "Aggiungi membri",
+              "description": "Aggiungi membri al ruolo <b>{{role}}</b>."
+            },
+            "searchMembers": "Cerca membri..."
+          },
+          "permissions": {
+            "title": "Permessi"
+          }
+        },
+        "nav": {
+          "display": "Visualizza",
+          "members": "Gestisci membri ({{count}})",
+          "permissions": "Permessi"
+        }
+      }
+    },
     "settings": {
       "title": "Impostazioni",
-      "users": {
-        "title": "Utenti",
-        "list": {
-          "title": "Utenti",
-          "subtitle": "Gestisci i tuoi utenti."
-        }
-      },
-      "roles": {
-        "title": "Ruoli",
-        "list": {
-          "title": "Ruoli",
-          "subtitle": "Gestisci i tuoi ruoli."
+      "config": {
+        "authentication": {
+          "label": "Autenticazione",
+          "00_disableRegister": {
+            "label": "Disabilita registrazione utenti",
+            "description": "Impedisce ai nuovi utenti di registrarsi. I nuovi account possono essere creati solo tramite inviti."
+          }
         },
-        "detail": {
-          "title": "Modifica ruolo - {{role}}",
-          "pages": {
-            "display": {
-              "fields": {
-                "label": "Etichetta",
-                "description": "Descrizione"
-              }
-            },
-            "members": {
-              "title": "Membri",
-              "addMembers": {
-                "label": "Aggiungi membri",
-                "description": "Aggiungi membri al ruolo <b>{{role}}</b>."
-              },
-              "searchMembers": "Cerca membri..."
-            },
-            "permissions": {
-              "title": "Permessi"
-            }
+        "appearance": {
+          "label": "Aspetto",
+          "00_defaultLightTheme": {
+            "label": "Tema chiaro predefinito",
+            "description": "Tema utilizzato in modalità chiara quando l'aspetto di sistema è abilitato."
           },
-          "nav": {
-            "display": "Visualizza",
-            "members": "Gestisci membri ({{count}})",
-            "permissions": "Permessi"
+          "00_defaultDarkTheme": {
+            "label": "Tema scuro predefinito",
+            "description": "Tema utilizzato in modalità scura quando l'aspetto di sistema è abilitato."
           }
         }
-      },
-      "notifications": {
+      }
+    },
+    "notifications": {
+      "title": "Notifiche",
+      "list": {
         "title": "Notifiche",
-        "list": {
-          "title": "Notifiche",
-          "subtitle": "Gestisci i tuoi provider di notifiche.",
-          "searchPlaceholder": "Cerca provider...",
-          "createButton": "Crea notifica"
-        },
-        "create": {
-          "title": "Crea notifica",
-          "providerType": "Tipo di provider"
-        },
-        "edit": {
-          "title": "Modifica provider di notifiche"
-        },
-        "forms": {
-          "discord": {
-            "name": {
-              "label": "Nome",
-              "placeholder": "Bot Discord"
-            },
-            "webhookUrl": {
-              "label": "URL webhook",
-              "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
-            },
-            "decorations": {
-              "label": "Decorazioni",
-              "description": "Invia notifiche come messaggi incorporati di Discord."
-            },
-            "testNotification": "Testa notifica",
-            "testing": "Test in corso...",
-            "delete": "Elimina",
-            "deleting": "Eliminazione...",
-            "submit": "Invia",
-            "submitting": "Invio...",
-            "deleteConfirm": {
-              "title": "Elimina provider Discord",
-              "description": "Sei sicuro di voler eliminare questo provider Discord?",
-              "confirmText": "Elimina",
-              "cancelText": "Annulla"
-            },
-            "success": {
-              "created": "Provider Discord creato con successo",
-              "updated": "Provider Discord aggiornato con successo",
-              "deleted": "Provider Discord eliminato con successo",
-              "testSent": "Notifica inviata con successo"
-            },
-            "error": {
-              "create": "Errore nella creazione del provider Discord",
-              "update": "Errore nell'aggiornamento del provider Discord",
-              "delete": "Errore nell'eliminazione del provider Discord",
-              "test": "Errore nel test della notifica"
-            }
+        "subtitle": "Gestisci i tuoi provider di notifiche.",
+        "searchPlaceholder": "Cerca provider...",
+        "createButton": "Crea notifica"
+      },
+      "create": {
+        "title": "Crea notifica",
+        "providerType": "Tipo di provider"
+      },
+      "edit": {
+        "title": "Modifica provider di notifiche"
+      },
+      "forms": {
+        "discord": {
+          "name": {
+            "label": "Nome",
+            "placeholder": "Bot Discord"
           },
-          "telegram": {
-            "name": {
-              "label": "Nome",
-              "placeholder": "Bot Telegram"
-            },
-            "botToken": {
-              "label": "Token del bot",
-              "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            },
-            "chatId": {
-              "label": "ID chat",
-              "placeholder": "1234567890"
-            },
-            "threadId": {
-              "label": "ID thread messaggi",
-              "placeholder": "1234567890",
-              "description": "Opzionale. Usalo quando vuoi inviare notifiche a un argomento specifico in un gruppo."
-            },
-            "testNotification": "Testa notifica",
-            "testing": "Test in corso...",
-            "delete": "Elimina",
-            "deleting": "Eliminazione...",
-            "submit": "Invia",
-            "submitting": "Invio...",
-            "deleteConfirm": {
-              "title": "Elimina provider Telegram",
-              "description": "Sei sicuro di voler eliminare questo provider Telegram?",
-              "confirmText": "Elimina",
-              "cancelText": "Annulla"
-            },
-            "success": {
-              "created": "Provider Telegram creato con successo",
-              "updated": "Provider Telegram aggiornato con successo",
-              "deleted": "Provider Telegram eliminato con successo",
-              "testSent": "Notifica inviata con successo"
-            },
-            "error": {
-              "create": "Errore nella creazione del provider Telegram",
-              "update": "Errore nell'aggiornamento del provider Telegram",
-              "delete": "Errore nell'eliminazione del provider Telegram",
-              "test": "Errore nel test della notifica"
-            }
+          "webhookUrl": {
+            "label": "URL webhook",
+            "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
+          },
+          "decorations": {
+            "label": "Decorazioni",
+            "description": "Invia notifiche come messaggi incorporati di Discord."
+          },
+          "testNotification": "Testa notifica",
+          "testing": "Test in corso...",
+          "delete": "Elimina",
+          "deleting": "Eliminazione...",
+          "submit": "Invia",
+          "submitting": "Invio...",
+          "deleteConfirm": {
+            "title": "Elimina provider Discord",
+            "description": "Sei sicuro di voler eliminare questo provider Discord?",
+            "confirmText": "Elimina",
+            "cancelText": "Annulla"
+          },
+          "success": {
+            "created": "Provider Discord creato con successo",
+            "updated": "Provider Discord aggiornato con successo",
+            "deleted": "Provider Discord eliminato con successo",
+            "testSent": "Notifica inviata con successo"
+          },
+          "error": {
+            "create": "Errore nella creazione del provider Discord",
+            "update": "Errore nell'aggiornamento del provider Discord",
+            "delete": "Errore nell'eliminazione del provider Discord",
+            "test": "Errore nel test della notifica"
           }
         },
-        "columns": {
-          "name": "Nome",
-          "type": "Tipo"
-        },
-        "providers": {
-          "discord": "Discord",
-          "telegram": "Telegram"
-        },
-        "actions": {
-          "edit": "Modifica provider di notifiche"
+        "telegram": {
+          "name": {
+            "label": "Nome",
+            "placeholder": "Bot Telegram"
+          },
+          "botToken": {
+            "label": "Token del bot",
+            "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+          },
+          "chatId": {
+            "label": "ID chat",
+            "placeholder": "1234567890"
+          },
+          "threadId": {
+            "label": "ID thread messaggi",
+            "placeholder": "1234567890",
+            "description": "Opzionale. Usalo quando vuoi inviare notifiche a un argomento specifico in un gruppo."
+          },
+          "testNotification": "Testa notifica",
+          "testing": "Test in corso...",
+          "delete": "Elimina",
+          "deleting": "Eliminazione...",
+          "submit": "Invia",
+          "submitting": "Invio...",
+          "deleteConfirm": {
+            "title": "Elimina provider Telegram",
+            "description": "Sei sicuro di voler eliminare questo provider Telegram?",
+            "confirmText": "Elimina",
+            "cancelText": "Annulla"
+          },
+          "success": {
+            "created": "Provider Telegram creato con successo",
+            "updated": "Provider Telegram aggiornato con successo",
+            "deleted": "Provider Telegram eliminato con successo",
+            "testSent": "Notifica inviata con successo"
+          },
+          "error": {
+            "create": "Errore nella creazione del provider Telegram",
+            "update": "Errore nell'aggiornamento del provider Telegram",
+            "delete": "Errore nell'eliminazione del provider Telegram",
+            "test": "Errore nel test della notifica"
+          }
         }
+      },
+      "columns": {
+        "name": "Nome",
+        "type": "Tipo"
+      },
+      "providers": {
+        "discord": "Discord",
+        "telegram": "Telegram"
+      },
+      "actions": {
+        "edit": "Modifica provider di notifiche"
       }
     }
   },

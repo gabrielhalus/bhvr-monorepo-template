@@ -3,158 +3,178 @@
     "home": {
       "title": "Dashboard"
     },
+    "users": {
+      "title": "Benutzer",
+      "list": {
+        "title": "Benutzer",
+        "subtitle": "Verwalte deine Benutzer."
+      }
+    },
+    "roles": {
+      "title": "Rollen",
+      "list": {
+        "title": "Rollen",
+        "subtitle": "Verwalte deine Rollen."
+      },
+      "detail": {
+        "title": "Rolle bearbeiten - {{role}}",
+        "pages": {
+          "display": {
+            "fields": {
+              "label": "Bezeichnung",
+              "description": "Beschreibung"
+            }
+          },
+          "members": {
+            "title": "Mitglieder",
+            "addMembers": {
+              "label": "Mitglieder hinzufügen",
+              "description": "Mitglieder zur Rolle <b>{{role}}</b> hinzufügen."
+            },
+            "searchMembers": "Mitglieder suchen..."
+          },
+          "permissions": {
+            "title": "Berechtigungen"
+          }
+        },
+        "nav": {
+          "display": "Anzeige",
+          "members": "Mitglieder verwalten ({{count}})",
+          "permissions": "Berechtigungen"
+        }
+      }
+    },
     "settings": {
       "title": "Einstellungen",
-      "users": {
-        "title": "Benutzer",
-        "list": {
-          "title": "Benutzer",
-          "subtitle": "Verwalte deine Benutzer."
-        }
-      },
-      "roles": {
-        "title": "Rollen",
-        "list": {
-          "title": "Rollen",
-          "subtitle": "Verwalte deine Rollen."
+      "config": {
+        "authentication": {
+          "label": "Authentifizierung",
+          "00_disableRegister": {
+            "label": "Benutzerregistrierung deaktivieren",
+            "description": "Verhindert, dass neue Benutzer sich registrieren. Neue Konten können nur durch Einladungen erstellt werden."
+          }
         },
-        "detail": {
-          "title": "Rolle bearbeiten - {{role}}",
-          "pages": {
-            "display": {
-              "fields": {
-                "label": "Bezeichnung",
-                "description": "Beschreibung"
-              }
-            },
-            "members": {
-              "title": "Mitglieder",
-              "addMembers": {
-                "label": "Mitglieder hinzufügen",
-                "description": "Mitglieder zur Rolle <b>{{role}}</b> hinzufügen."
-              },
-              "searchMembers": "Mitglieder suchen..."
-            },
-            "permissions": {
-              "title": "Berechtigungen"
-            }
+        "appearance": {
+          "label": "Erscheinungsbild",
+          "00_defaultLightTheme": {
+            "label": "Standard-Hellthema",
+            "description": "Theme, das im hellen Modus verwendet wird, wenn die Systemdarstellung aktiviert ist."
           },
-          "nav": {
-            "display": "Anzeige",
-            "members": "Mitglieder verwalten ({{count}})",
-            "permissions": "Berechtigungen"
+          "00_defaultDarkTheme": {
+            "label": "Standard-Dunkelthema",
+            "description": "Theme, das im dunklen Modus verwendet wird, wenn die Systemdarstellung aktiviert ist."
           }
         }
-      },
-      "notifications": {
+      }
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "list": {
         "title": "Benachrichtigungen",
-        "list": {
-          "title": "Benachrichtigungen",
-          "subtitle": "Verwalte deine Benachrichtigungsanbieter.",
-          "searchPlaceholder": "Anbieter suchen...",
-          "createButton": "Benachrichtigung erstellen"
-        },
-        "create": {
-          "title": "Benachrichtigung erstellen",
-          "providerType": "Anbietertyp"
-        },
-        "edit": {
-          "title": "Benachrichtigungsanbieter bearbeiten"
-        },
-        "forms": {
-          "discord": {
-            "name": {
-              "label": "Name",
-              "placeholder": "Discord Bot"
-            },
-            "webhookUrl": {
-              "label": "Webhook-URL",
-              "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
-            },
-            "decorations": {
-              "label": "Dekorationen",
-              "description": "Sendet Benachrichtigungen als eingebettete Discord-Nachrichten."
-            },
-            "testNotification": "Benachrichtigung testen",
-            "testing": "Wird getestet...",
-            "delete": "Löschen",
-            "deleting": "Wird gelöscht...",
-            "submit": "Absenden",
-            "submitting": "Wird gesendet...",
-            "deleteConfirm": {
-              "title": "Discord-Anbieter löschen",
-              "description": "Möchtest du diesen Discord-Anbieter wirklich löschen?",
-              "confirmText": "Löschen",
-              "cancelText": "Abbrechen"
-            },
-            "success": {
-              "created": "Discord-Anbieter erfolgreich erstellt",
-              "updated": "Discord-Anbieter erfolgreich aktualisiert",
-              "deleted": "Discord-Anbieter erfolgreich gelöscht",
-              "testSent": "Benachrichtigung erfolgreich gesendet"
-            },
-            "error": {
-              "create": "Fehler beim Erstellen des Discord-Anbieters",
-              "update": "Fehler beim Aktualisieren des Discord-Anbieters",
-              "delete": "Fehler beim Löschen des Discord-Anbieters",
-              "test": "Fehler beim Testen der Benachrichtigung"
-            }
+        "subtitle": "Verwalte deine Benachrichtigungsanbieter.",
+        "searchPlaceholder": "Anbieter suchen...",
+        "createButton": "Benachrichtigung erstellen"
+      },
+      "create": {
+        "title": "Benachrichtigung erstellen",
+        "providerType": "Anbietertyp"
+      },
+      "edit": {
+        "title": "Benachrichtigungsanbieter bearbeiten"
+      },
+      "forms": {
+        "discord": {
+          "name": {
+            "label": "Name",
+            "placeholder": "Discord Bot"
           },
-          "telegram": {
-            "name": {
-              "label": "Name",
-              "placeholder": "Telegram Bot"
-            },
-            "botToken": {
-              "label": "Bot-Token",
-              "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            },
-            "chatId": {
-              "label": "Chat-ID",
-              "placeholder": "1234567890"
-            },
-            "threadId": {
-              "label": "Nachrichtenthread-ID",
-              "placeholder": "1234567890",
-              "description": "Optional. Verwende dies, wenn du Benachrichtigungen an ein bestimmtes Thema in einer Gruppe senden möchtest."
-            },
-            "testNotification": "Benachrichtigung testen",
-            "testing": "Wird getestet...",
-            "delete": "Löschen",
-            "deleting": "Wird gelöscht...",
-            "submit": "Absenden",
-            "submitting": "Wird gesendet...",
-            "deleteConfirm": {
-              "title": "Telegram-Anbieter löschen",
-              "description": "Möchtest du diesen Telegram-Anbieter wirklich löschen?",
-              "confirmText": "Löschen",
-              "cancelText": "Abbrechen"
-            },
-            "success": {
-              "created": "Telegram-Anbieter erfolgreich erstellt",
-              "updated": "Telegram-Anbieter erfolgreich aktualisiert",
-              "deleted": "Telegram-Anbieter erfolgreich gelöscht",
-              "testSent": "Benachrichtigung erfolgreich gesendet"
-            },
-            "error": {
-              "create": "Fehler beim Erstellen des Telegram-Anbieters",
-              "update": "Fehler beim Aktualisieren des Telegram-Anbieters",
-              "delete": "Fehler beim Löschen des Telegram-Anbieters",
-              "test": "Fehler beim Testen der Benachrichtigung"
-            }
+          "webhookUrl": {
+            "label": "Webhook-URL",
+            "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
+          },
+          "decorations": {
+            "label": "Dekorationen",
+            "description": "Sendet Benachrichtigungen als eingebettete Discord-Nachrichten."
+          },
+          "testNotification": "Benachrichtigung testen",
+          "testing": "Wird getestet...",
+          "delete": "Löschen",
+          "deleting": "Wird gelöscht...",
+          "submit": "Absenden",
+          "submitting": "Wird gesendet...",
+          "deleteConfirm": {
+            "title": "Discord-Anbieter löschen",
+            "description": "Möchtest du diesen Discord-Anbieter wirklich löschen?",
+            "confirmText": "Löschen",
+            "cancelText": "Abbrechen"
+          },
+          "success": {
+            "created": "Discord-Anbieter erfolgreich erstellt",
+            "updated": "Discord-Anbieter erfolgreich aktualisiert",
+            "deleted": "Discord-Anbieter erfolgreich gelöscht",
+            "testSent": "Benachrichtigung erfolgreich gesendet"
+          },
+          "error": {
+            "create": "Fehler beim Erstellen des Discord-Anbieters",
+            "update": "Fehler beim Aktualisieren des Discord-Anbieters",
+            "delete": "Fehler beim Löschen des Discord-Anbieters",
+            "test": "Fehler beim Testen der Benachrichtigung"
           }
         },
-        "columns": {
-          "name": "Name",
-          "type": "Typ"
-        },
-        "providers": {
-          "discord": "Discord",
-          "telegram": "Telegram"
-        },
-        "actions": {
-          "edit": "Benachrichtigungsanbieter bearbeiten"
+        "telegram": {
+          "name": {
+            "label": "Name",
+            "placeholder": "Telegram Bot"
+          },
+          "botToken": {
+            "label": "Bot-Token",
+            "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+          },
+          "chatId": {
+            "label": "Chat-ID",
+            "placeholder": "1234567890"
+          },
+          "threadId": {
+            "label": "Nachrichtenthread-ID",
+            "placeholder": "1234567890",
+            "description": "Optional. Verwende dies, wenn du Benachrichtigungen an ein bestimmtes Thema in einer Gruppe senden möchtest."
+          },
+          "testNotification": "Benachrichtigung testen",
+          "testing": "Wird getestet...",
+          "delete": "Löschen",
+          "deleting": "Wird gelöscht...",
+          "submit": "Absenden",
+          "submitting": "Wird gesendet...",
+          "deleteConfirm": {
+            "title": "Telegram-Anbieter löschen",
+            "description": "Möchtest du diesen Telegram-Anbieter wirklich löschen?",
+            "confirmText": "Löschen",
+            "cancelText": "Abbrechen"
+          },
+          "success": {
+            "created": "Telegram-Anbieter erfolgreich erstellt",
+            "updated": "Telegram-Anbieter erfolgreich aktualisiert",
+            "deleted": "Telegram-Anbieter erfolgreich gelöscht",
+            "testSent": "Benachrichtigung erfolgreich gesendet"
+          },
+          "error": {
+            "create": "Fehler beim Erstellen des Telegram-Anbieters",
+            "update": "Fehler beim Aktualisieren des Telegram-Anbieters",
+            "delete": "Fehler beim Löschen des Telegram-Anbieters",
+            "test": "Fehler beim Testen der Benachrichtigung"
+          }
         }
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Typ"
+      },
+      "providers": {
+        "discord": "Discord",
+        "telegram": "Telegram"
+      },
+      "actions": {
+        "edit": "Benachrichtigungsanbieter bearbeiten"
       }
     }
   },

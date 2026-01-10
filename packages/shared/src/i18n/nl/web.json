@@ -3,158 +3,178 @@
     "home": {
       "title": "Dashboard"
     },
+    "users": {
+      "title": "Gebruikers",
+      "list": {
+        "title": "Gebruikers",
+        "subtitle": "Beheer je gebruikers."
+      }
+    },
+    "roles": {
+      "title": "Rollen",
+      "list": {
+        "title": "Rollen",
+        "subtitle": "Beheer je rollen."
+      },
+      "detail": {
+        "title": "Rol bewerken - {{role}}",
+        "pages": {
+          "display": {
+            "fields": {
+              "label": "Label",
+              "description": "Beschrijving"
+            }
+          },
+          "members": {
+            "title": "Leden",
+            "addMembers": {
+              "label": "Leden toevoegen",
+              "description": "Voeg leden toe aan de rol <b>{{role}}</b>."
+            },
+            "searchMembers": "Zoek leden..."
+          },
+          "permissions": {
+            "title": "Machtigingen"
+          }
+        },
+        "nav": {
+          "display": "Weergave",
+          "members": "Leden beheren ({{count}})",
+          "permissions": "Machtigingen"
+        }
+      }
+    },
     "settings": {
       "title": "Instellingen",
-      "users": {
-        "title": "Gebruikers",
-        "list": {
-          "title": "Gebruikers",
-          "subtitle": "Beheer je gebruikers."
-        }
-      },
-      "roles": {
-        "title": "Rollen",
-        "list": {
-          "title": "Rollen",
-          "subtitle": "Beheer je rollen."
+      "config": {
+        "authentication": {
+          "label": "Authenticatie",
+          "00_disableRegister": {
+            "label": "Gebruikersregistratie uitschakelen",
+            "description": "Voorkomt dat nieuwe gebruikers zich registreren. Nieuwe accounts kunnen alleen via uitnodigingen worden aangemaakt."
+          }
         },
-        "detail": {
-          "title": "Rol bewerken - {{role}}",
-          "pages": {
-            "display": {
-              "fields": {
-                "label": "Label",
-                "description": "Beschrijving"
-              }
-            },
-            "members": {
-              "title": "Leden",
-              "addMembers": {
-                "label": "Leden toevoegen",
-                "description": "Voeg leden toe aan de rol <b>{{role}}</b>."
-              },
-              "searchMembers": "Zoek leden..."
-            },
-            "permissions": {
-              "title": "Machtigingen"
-            }
+        "appearance": {
+          "label": "Uiterlijk",
+          "00_defaultLightTheme": {
+            "label": "Standaard licht thema",
+            "description": "Thema dat wordt gebruikt in lichte modus wanneer systeemweergave is ingeschakeld."
           },
-          "nav": {
-            "display": "Weergave",
-            "members": "Leden beheren ({{count}})",
-            "permissions": "Machtigingen"
+          "00_defaultDarkTheme": {
+            "label": "Standaard donker thema",
+            "description": "Thema dat wordt gebruikt in donkere modus wanneer systeemweergave is ingeschakeld."
           }
         }
-      },
-      "notifications": {
+      }
+    },
+    "notifications": {
+      "title": "Meldingen",
+      "list": {
         "title": "Meldingen",
-        "list": {
-          "title": "Meldingen",
-          "subtitle": "Beheer je meldingsproviders.",
-          "searchPlaceholder": "Zoek providers...",
-          "createButton": "Melding maken"
-        },
-        "create": {
-          "title": "Melding maken",
-          "providerType": "Providertype"
-        },
-        "edit": {
-          "title": "Meldingsprovider bewerken"
-        },
-        "forms": {
-          "discord": {
-            "name": {
-              "label": "Naam",
-              "placeholder": "Discord Bot"
-            },
-            "webhookUrl": {
-              "label": "Webhook-URL",
-              "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
-            },
-            "decorations": {
-              "label": "Decoraties",
-              "description": "Verstuurt meldingen als ingesloten Discord-berichten."
-            },
-            "testNotification": "Test melding",
-            "testing": "Testen...",
-            "delete": "Verwijderen",
-            "deleting": "Verwijderen...",
-            "submit": "Verzenden",
-            "submitting": "Verzenden...",
-            "deleteConfirm": {
-              "title": "Discord-provider verwijderen",
-              "description": "Weet je zeker dat je deze Discord-provider wilt verwijderen?",
-              "confirmText": "Verwijderen",
-              "cancelText": "Annuleren"
-            },
-            "success": {
-              "created": "Discord-provider succesvol aangemaakt",
-              "updated": "Discord-provider succesvol bijgewerkt",
-              "deleted": "Discord-provider succesvol verwijderd",
-              "testSent": "Melding succesvol verzonden"
-            },
-            "error": {
-              "create": "Fout bij het aanmaken van de Discord-provider",
-              "update": "Fout bij het bijwerken van de Discord-provider",
-              "delete": "Fout bij het verwijderen van de Discord-provider",
-              "test": "Fout bij het testen van de melding"
-            }
+        "subtitle": "Beheer je meldingsproviders.",
+        "searchPlaceholder": "Zoek providers...",
+        "createButton": "Melding maken"
+      },
+      "create": {
+        "title": "Melding maken",
+        "providerType": "Providertype"
+      },
+      "edit": {
+        "title": "Meldingsprovider bewerken"
+      },
+      "forms": {
+        "discord": {
+          "name": {
+            "label": "Naam",
+            "placeholder": "Discord Bot"
           },
-          "telegram": {
-            "name": {
-              "label": "Naam",
-              "placeholder": "Telegram Bot"
-            },
-            "botToken": {
-              "label": "Bot-token",
-              "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            },
-            "chatId": {
-              "label": "Chat-ID",
-              "placeholder": "1234567890"
-            },
-            "threadId": {
-              "label": "Berichtthread-ID",
-              "placeholder": "1234567890",
-              "description": "Optioneel. Gebruik dit wanneer je meldingen naar een specifiek onderwerp in een groep wilt sturen."
-            },
-            "testNotification": "Test melding",
-            "testing": "Testen...",
-            "delete": "Verwijderen",
-            "deleting": "Verwijderen...",
-            "submit": "Verzenden",
-            "submitting": "Verzenden...",
-            "deleteConfirm": {
-              "title": "Telegram-provider verwijderen",
-              "description": "Weet je zeker dat je deze Telegram-provider wilt verwijderen?",
-              "confirmText": "Verwijderen",
-              "cancelText": "Annuleren"
-            },
-            "success": {
-              "created": "Telegram-provider succesvol aangemaakt",
-              "updated": "Telegram-provider succesvol bijgewerkt",
-              "deleted": "Telegram-provider succesvol verwijderd",
-              "testSent": "Melding succesvol verzonden"
-            },
-            "error": {
-              "create": "Fout bij het aanmaken van de Telegram-provider",
-              "update": "Fout bij het bijwerken van de Telegram-provider",
-              "delete": "Fout bij het verwijderen van de Telegram-provider",
-              "test": "Fout bij het testen van de melding"
-            }
+          "webhookUrl": {
+            "label": "Webhook-URL",
+            "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
+          },
+          "decorations": {
+            "label": "Decoraties",
+            "description": "Verstuurt meldingen als ingesloten Discord-berichten."
+          },
+          "testNotification": "Test melding",
+          "testing": "Testen...",
+          "delete": "Verwijderen",
+          "deleting": "Verwijderen...",
+          "submit": "Verzenden",
+          "submitting": "Verzenden...",
+          "deleteConfirm": {
+            "title": "Discord-provider verwijderen",
+            "description": "Weet je zeker dat je deze Discord-provider wilt verwijderen?",
+            "confirmText": "Verwijderen",
+            "cancelText": "Annuleren"
+          },
+          "success": {
+            "created": "Discord-provider succesvol aangemaakt",
+            "updated": "Discord-provider succesvol bijgewerkt",
+            "deleted": "Discord-provider succesvol verwijderd",
+            "testSent": "Melding succesvol verzonden"
+          },
+          "error": {
+            "create": "Fout bij het aanmaken van de Discord-provider",
+            "update": "Fout bij het bijwerken van de Discord-provider",
+            "delete": "Fout bij het verwijderen van de Discord-provider",
+            "test": "Fout bij het testen van de melding"
           }
         },
-        "columns": {
-          "name": "Naam",
-          "type": "Type"
-        },
-        "providers": {
-          "discord": "Discord",
-          "telegram": "Telegram"
-        },
-        "actions": {
-          "edit": "Meldingsprovider bewerken"
+        "telegram": {
+          "name": {
+            "label": "Naam",
+            "placeholder": "Telegram Bot"
+          },
+          "botToken": {
+            "label": "Bot-token",
+            "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+          },
+          "chatId": {
+            "label": "Chat-ID",
+            "placeholder": "1234567890"
+          },
+          "threadId": {
+            "label": "Berichtthread-ID",
+            "placeholder": "1234567890",
+            "description": "Optioneel. Gebruik dit wanneer je meldingen naar een specifiek onderwerp in een groep wilt sturen."
+          },
+          "testNotification": "Test melding",
+          "testing": "Testen...",
+          "delete": "Verwijderen",
+          "deleting": "Verwijderen...",
+          "submit": "Verzenden",
+          "submitting": "Verzenden...",
+          "deleteConfirm": {
+            "title": "Telegram-provider verwijderen",
+            "description": "Weet je zeker dat je deze Telegram-provider wilt verwijderen?",
+            "confirmText": "Verwijderen",
+            "cancelText": "Annuleren"
+          },
+          "success": {
+            "created": "Telegram-provider succesvol aangemaakt",
+            "updated": "Telegram-provider succesvol bijgewerkt",
+            "deleted": "Telegram-provider succesvol verwijderd",
+            "testSent": "Melding succesvol verzonden"
+          },
+          "error": {
+            "create": "Fout bij het aanmaken van de Telegram-provider",
+            "update": "Fout bij het bijwerken van de Telegram-provider",
+            "delete": "Fout bij het verwijderen van de Telegram-provider",
+            "test": "Fout bij het testen van de melding"
+          }
         }
+      },
+      "columns": {
+        "name": "Naam",
+        "type": "Type"
+      },
+      "providers": {
+        "discord": "Discord",
+        "telegram": "Telegram"
+      },
+      "actions": {
+        "edit": "Meldingsprovider bewerken"
       }
     }
   },
