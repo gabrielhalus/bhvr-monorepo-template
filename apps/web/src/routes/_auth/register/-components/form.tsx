@@ -1,3 +1,5 @@
+import type { FormEvent } from "react";
+
 import { useForm } from "@tanstack/react-form";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Trans, useTranslation } from "react-i18next";
@@ -37,9 +39,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
   const redirectTo = searchParams.get("redirect") || "/";
 
   const form = useForm({
-    validators: {
-      onChange: RegisterSchema,
-    },
+    validators: { onSubmit: RegisterSchema },
     defaultValues: {
       name: "",
       email: "",
@@ -57,6 +57,11 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
     },
   });
 
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    form.handleSubmit();
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -64,11 +69,9 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
           <CardTitle className="text-xl">{t("register.title")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit(e);
-          }}
+          <form
+            onSubmit={handleSubmit}
+            onKeyDown={e => e.key === "Enter" && e.currentTarget.requestSubmit()}
           >
             <div className="grid gap-6">
               <div className="grid gap-6">
@@ -83,9 +86,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={e => field.handleChange(e.target.value)}
-                          type="text"
                           placeholder="John Doe"
-                          required
                         />
                         <FieldError errors={field.state.meta.errors}>
                           {field.state.meta.isTouched && !field.state.meta.isValid && field.state.meta.errors[0]?.message
@@ -146,18 +147,16 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                 <form.Subscribe
                   selector={state => [state.canSubmit, state.isSubmitting]}
                   children={([canSubmit, isSubmitting]) => (
-                    <>
-                      <Button type="submit" disabled={!canSubmit}>
-                        {isSubmitting
-                          ? (
-                              <span className="flex items-center gap-2">
-                                <Spinner />
-                                {t("register.pending")}
-                              </span>
-                            )
-                          : t("register.submit")}
-                      </Button>
-                    </>
+                    <Button type="submit" disabled={!canSubmit}>
+                      {isSubmitting
+                        ? (
+                            <span className="flex items-center gap-2">
+                              <Spinner />
+                              {t("register.pending")}
+                            </span>
+                          )
+                        : t("register.submit")}
+                    </Button>
                   )}
                 />
               </div>

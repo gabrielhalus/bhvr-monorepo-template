@@ -1,3 +1,5 @@
+import type { FormEvent } from "react";
+
 import { useForm } from "@tanstack/react-form";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Trans, useTranslation } from "react-i18next";
@@ -43,6 +45,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
     },
   });
 
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    form.handleSubmit();
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -50,7 +57,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
           <CardTitle className="text-xl">{t("login.title")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={form.handleSubmit}>
+          <form
+            onSubmit={handleSubmit}
+            onKeyDown={e => e.key === "Enter" && e.currentTarget.requestSubmit()}
+          >
             <div className="grid gap-6">
               <div className="grid gap-6">
                 <form.Field
