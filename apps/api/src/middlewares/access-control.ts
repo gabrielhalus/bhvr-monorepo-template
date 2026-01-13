@@ -2,7 +2,7 @@ import type { AppContext } from "@/utils/hono";
 import type { Permission } from "~shared/types/permissions.types";
 
 import { factory } from "@/utils/hono";
-import { isAuthorized } from "@bunstack/shared/auth";
+import { isAuthorized } from "~shared/auth";
 
 /**
  * Core authorization middleware that checks permissions

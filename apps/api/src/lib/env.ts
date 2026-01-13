@@ -1,7 +1,7 @@
 import { z } from "zod";
 import "dotenv/config";
 
-import { validateEnv } from "@bunstack/shared/env";
+import { validateEnv } from "~shared/env";
 
 export const env = validateEnv({
   NODE_ENV: z.enum(["development", "production"]).default("development"),

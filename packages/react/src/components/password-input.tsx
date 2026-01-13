@@ -49,21 +49,21 @@ const RequirementItem = React.memo<{
 
 RequirementItem.displayName = "RequirementItem";
 
-export function PasswordInput({
-  ref,
+export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(({
   className,
   rules,
   checks,
   showRequirements = true,
   onValidationChange,
   onChange,
+  onKeyDown,
   value,
   ...props
-}: PasswordInputProps & { ref?: React.RefObject<HTMLInputElement | null> }) {
+}, ref) => {
   const { t } = useTranslation("ui");
 
   const [showPassword, setShowPassword] = React.useState(false);
-  const [password, setPassword] = React.useState(value?.toString() || "");
+  const password = value?.toString() ?? ""
 
   const requirements = React.useMemo(() => checkRequirements(password, checks), [password, checks]);
 
@@ -87,14 +87,11 @@ export function PasswordInput({
 
   const handleChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.target.value;
-      setPassword(newValue);
       onChange?.(e);
     },
     [onChange],
   );
 
-  // Requirement labels
   const requirementLabels = React.useMemo(
     () => {
       if (!rules)
@@ -115,20 +112,22 @@ export function PasswordInput({
     <div className="space-y-2">
       <InputGroup>
         <InputGroupInput
+          ref={ref}
           {...props}
           type={!showPassword ? "password" : "text"}
           onChange={handleChange}
         />
         <InputGroupAddon align="inline-end">
-          <InputGroupButton
-            variant="ghost"
+          <span
+            role="button"
             aria-label={!showPassword ? t("passwordInput.ariaLabels.showPassword") : t("passwordInput.ariaLabels.hidePassword")}
-            type="button"
             tabIndex={-1}
             onClick={togglePasswordVisibility}
+            onKeyDown={e => e.key === "Enter" && e.preventDefault()}
+            className="inline-flex size-6 cursor-pointer items-center justify-center rounded-[calc(var(--radius)-5px)] text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50"
           >
             {!showPassword ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
-          </InputGroupButton>
+          </span>
         </InputGroupAddon>
       </InputGroup>
 
@@ -149,4 +148,6 @@ export function PasswordInput({
       )}
     </div>
   );
-}
+});
+
+PasswordInput.displayName = "PasswordInput";

@@ -1,4 +1,4 @@
-import type { AppType } from "@bunstack/api";
+import type { AppType } from "~api/app";
 
 import { hc } from "hono/client";
 

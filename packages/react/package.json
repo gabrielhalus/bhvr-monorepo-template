@@ -2,14 +2,6 @@
   "name": "@bunstack/react",
   "type": "module",
   "version": "0.0.0",
-  "exports": {
-    "./styles/globals.css": "./src/styles/globals.css",
-    "./postcss.config": "./postcss.config.mjs",
-    "./lib/*": "./src/lib/*.ts",
-    "./components/*": "./src/components/*.tsx",
-    "./hooks/*": "./src/hooks/*.ts",
-    "./providers/*": "./src/providers/*.ts"
-  },
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc -b",

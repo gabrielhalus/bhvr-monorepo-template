@@ -6,12 +6,12 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { Badge } from "@bunstack/react/components/badge";
-import { Checkbox } from "@bunstack/react/components/checkbox";
-import { Input } from "@bunstack/react/components/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@bunstack/react/components/select";
-import { Switch } from "@bunstack/react/components/switch";
-import { useDebouncedCallback } from "@bunstack/react/hooks/use-debounced-callback";
+import { Badge } from "~react/components/badge";
+import { Checkbox } from "~react/components/checkbox";
+import { Input } from "~react/components/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~react/components/select";
+import { Switch } from "~react/components/switch";
+import { useDebouncedCallback } from "~react/hooks/use-debounced-callback";
 import { api } from "~react/lib/http";
 import { inferConfigValue } from "~shared/helpers/infer-config-value";
 

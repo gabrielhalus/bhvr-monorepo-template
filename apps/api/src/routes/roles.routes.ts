@@ -4,8 +4,8 @@ import { Hono } from "hono";
 
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { deleteRole, getRole, getRoleByName, getRoles, updateRole } from "@bunstack/shared/queries/roles.queries";
-import { createUserRole, deleteUserRole } from "@bunstack/shared/queries/user-roles.queries";
+import { deleteRole, getRole, getRoleByName, getRoles, updateRole } from "~shared/queries/roles.queries";
+import { createUserRole, deleteUserRole } from "~shared/queries/user-roles.queries";
 import { RoleRelationsQuerySchema, UpdateRoleSchema } from "~shared/schemas/api/roles.schemas";
 import { AssignRoleMembersSchema, RemoveRoleMembersSchema } from "~shared/schemas/api/user-roles.schemas";
 

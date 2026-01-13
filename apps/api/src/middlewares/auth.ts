@@ -7,8 +7,8 @@ import { verify } from "hono/jwt";
 import { env } from "@/lib/env";
 import { createAccessToken, getCookieSettings } from "@/lib/jwt";
 import { factory } from "@/utils/hono";
-import { deleteToken, getToken } from "@bunstack/shared/queries/tokens.queries";
-import { getUser } from "@bunstack/shared/queries/users.queries";
+import { deleteToken, getToken } from "~shared/queries/tokens.queries";
+import { getUser } from "~shared/queries/users.queries";
 import { AccessTokenSchema, RefreshTokenSchema } from "~shared/schemas/api/tokens.schemas";
 
 /**

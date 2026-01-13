@@ -3,8 +3,8 @@ import { Hono } from "hono";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { getRuntimeConfig, getRuntimeConfigs, updateRuntimeConfig } from "@bunstack/shared/queries/runtime-configs.queries";
-import { UpdateRuntimeConfigSchema } from "@bunstack/shared/schemas/api/runtime-configs.schemas";
+import { getRuntimeConfig, getRuntimeConfigs, updateRuntimeConfig } from "~shared/queries/runtime-configs.queries";
+import { UpdateRuntimeConfigSchema } from "~shared/schemas/api/runtime-configs.schemas";
 
 export const configRoutes = new Hono()
   /**

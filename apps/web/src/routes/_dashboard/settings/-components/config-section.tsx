@@ -1,4 +1,4 @@
-import type { ConfigNode } from "@bunstack/shared/types/db/runtime-configs.types";
+import type { ConfigNode } from "~shared/types/db/runtime-configs.types";
 
 import { Link, useMatchRoute } from "@tanstack/react-router";
 import { ChevronRightIcon } from "lucide-react";

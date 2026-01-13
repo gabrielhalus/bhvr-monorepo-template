@@ -5,6 +5,7 @@
     "baseUrl": ".",
     "rootDir": "src",
     "paths": {
+      "~api/*": ["../../apps/api/src/*"],
       "~react/*": ["../react/src/*"],
       "~shared/*": ["../shared/src/*"]
     },

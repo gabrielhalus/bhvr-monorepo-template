@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { validateEnv } from "@bunstack/shared/env";
+import { validateEnv } from "~shared/env";
 
 export const env = validateEnv({
   // eslint-disable-next-line node/no-process-env

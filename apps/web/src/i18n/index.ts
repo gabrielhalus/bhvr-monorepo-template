@@ -1,4 +1,4 @@
-import { createClientI18n } from "@bunstack/shared/i18n";
+import { createClientI18n } from "~shared/i18n";
 
 const i18n = createClientI18n();
 

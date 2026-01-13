@@ -4,7 +4,7 @@ import { z } from "zod";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { deleteUser, emailExists, getUser, getUsers, updateUser } from "@bunstack/shared/queries/users.queries";
+import { deleteUser, emailExists, getUser, getUsers, updateUser } from "~shared/queries/users.queries";
 import { UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
 import { UpdateUserSchema } from "~shared/schemas/db/users.schemas";
 
