@@ -1,7 +1,9 @@
+import { config } from "dotenv";
 import { z } from "zod";
-import "dotenv/config";
 
 import { validateEnv } from "~shared/env";
+
+config({ path: "../../.env" });
 
 export const env = validateEnv({
   NODE_ENV: z.enum(["development", "production"]).default("development"),

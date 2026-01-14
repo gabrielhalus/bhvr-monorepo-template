@@ -1,5 +1,5 @@
 const { defineConfig } = require("drizzle-kit");
-require("dotenv").config({ path: ".env.local" });
+require("dotenv").config({ path: "../../.env" });
 
 module.exports = defineConfig({
   schema: "./src/db/models/*.ts",
