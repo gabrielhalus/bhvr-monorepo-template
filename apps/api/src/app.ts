@@ -3,6 +3,7 @@ import { logger } from "hono/logger";
 
 import cors from "@/middlewares/cors";
 import { authRoutes } from "@/routes/auth.routes";
+import { invitationsRoutes } from "@/routes/invitations.routes";
 import { rolesRoutes } from "@/routes/roles.routes";
 import { configRoutes } from "@/routes/runtime-configs.routes";
 import { usersRoutes } from "@/routes/users.routes";
@@ -24,6 +25,7 @@ app.use(cors());
 // -------------------
 const _api = app
   .route("/auth", authRoutes)
+  .route("/invitations", invitationsRoutes)
   .route("/roles", rolesRoutes)
   .route("/config", configRoutes)
   .route("/users", usersRoutes);
