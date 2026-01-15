@@ -1,8 +1,7 @@
-import { randomBytes } from "crypto";
-
 import { password } from "bun";
 import { Hono } from "hono";
 import { setCookie } from "hono/cookie";
+import { randomBytes } from "node:crypto";
 
 import { getClientInfo } from "@/helpers/get-client-info";
 import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN_EXPIRATION_SECONDS } from "@/lib/jwt";
@@ -11,6 +10,7 @@ import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
 import {
   createInvitation,
+  deleteInvitation,
   getInvitationByToken,
   getInvitations,
   getPendingInvitationByEmail,
@@ -205,11 +205,31 @@ export const invitationsRoutes = new Hono()
    * @access protected
    * @permission invitation:revoke
    */
-  .delete("/:id", requirePermissionFactory("invitation:revoke"), async (c) => {
+  .put("/:id", requirePermissionFactory("invitation:revoke"), async (c) => {
     const id = c.req.param("id");
 
     try {
       const invitation = await updateInvitation(id, { status: "revoked" });
+      return c.json({ success: true as const, invitation });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+/**
+ * Delete an invitation
+ *
+ * @param c - The Hono context object with session context
+ * @returns JSON response containing the deleted invitation
+ * @throws {500} If an error occurs while deleting the invitation
+ * @access protected
+ * @permission invitation:delete
+ */
+  .delete("/:id", requirePermissionFactory("invitation:delete"), async (c) => {
+    const id = c.req.param("id");
+
+    try {
+      const invitation = await deleteInvitation(id);
       return c.json({ success: true as const, invitation });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
