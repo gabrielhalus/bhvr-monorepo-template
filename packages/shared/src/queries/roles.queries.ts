@@ -6,16 +6,16 @@ import type { z } from "zod";
 
 import { eq } from "drizzle-orm";
 
-import { attachRelation } from "../helpers";
 import { PoliciesModel } from "../db/models/policies.model";
 import { RolePermissionsModel } from "../db/models/role-permissions.model";
 import { RolesModel } from "../db/models/roles.model";
 import { UserRolesModel } from "../db/models/user-roles.model";
 import { UsersModel } from "../db/models/users.model";
+import { drizzle } from "../drizzle";
+import { attachRelation } from "../helpers";
 import { PolicySchema } from "../schemas/db/policies.schemas";
 import { RoleSchema } from "../schemas/db/roles.schemas";
 import { UserSchema } from "../schemas/db/users.schemas";
-import { drizzle } from "../drizzle";
 
 // ============================================================================
 // Relation Loaders
@@ -228,4 +228,18 @@ export async function getRoleByName<T extends RoleRelationKeys>(name: string, in
   }
 
   return roleWithRelations;
+}
+
+/**
+ * Get the default role (where isDefault is true).
+ * @returns The default role, or null if none is set.
+ */
+export async function getDefaultRole(): Promise<Role | null> {
+  const [role] = await drizzle.select().from(RolesModel).where(eq(RolesModel.isDefault, true)).limit(1);
+
+  if (!role) {
+    return null;
+  }
+
+  return RoleSchema.parse(role);
 }
