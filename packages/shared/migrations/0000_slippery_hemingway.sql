@@ -1,6 +1,6 @@
 CREATE TABLE "notification_channels" (
-	"id" text PRIMARY KEY NOT NULL,
-	"type" text NOT NULL,
+	"id" varchar(21) PRIMARY KEY NOT NULL,
+	"type" varchar(16) NOT NULL,
 	"name" text NOT NULL,
 	"config" jsonb NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE "notification_channels" (
 --> statement-breakpoint
 CREATE TABLE "policies" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"effect" text NOT NULL,
+	"effect" varchar(8) NOT NULL,
 	"permission" text,
 	"role_id" integer,
 	"condition" text,
@@ -41,7 +41,7 @@ CREATE TABLE "roles" (
 CREATE TABLE "runtime_configs" (
 	"config_key" varchar(255) PRIMARY KEY NOT NULL,
 	"value" text,
-	"type" text NOT NULL,
+	"type" varchar(16) NOT NULL,
 	"nullable" boolean NOT NULL,
 	"options" text,
 	"disabled_when" text,
@@ -50,23 +50,23 @@ CREATE TABLE "runtime_configs" (
 );
 --> statement-breakpoint
 CREATE TABLE "tokens" (
-	"id" text PRIMARY KEY NOT NULL,
-	"user_id" text NOT NULL,
+	"id" varchar(21) PRIMARY KEY NOT NULL,
+	"user_id" varchar(21) NOT NULL,
 	"issued_at" timestamp NOT NULL,
 	"expires_at" timestamp NOT NULL,
 	"revoked_at" timestamp,
 	"user_agent" text,
-	"ip" text
+	"ip" varchar(45)
 );
 --> statement-breakpoint
 CREATE TABLE "user_roles" (
-	"user_id" text NOT NULL,
+	"user_id" varchar(21) NOT NULL,
 	"role_id" integer NOT NULL,
 	CONSTRAINT "user_roles_user_id_role_id_pk" PRIMARY KEY("user_id","role_id")
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" varchar(21) PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"email" text NOT NULL,
 	"password" text,

@@ -1,10 +1,10 @@
-import { jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { jsonb, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
 import { nanoid } from "~shared/lib/nanoid";
 
 export const NotificationChannelsModel = pgTable("notification_channels", {
-  id: text("id").primaryKey().$defaultFn(nanoid),
-  type: text("type", { enum: ["DISCORD", "TELEGRAM", "SLACK"] }).notNull(),
+  id: varchar("id", { length: 21 }).primaryKey().$defaultFn(nanoid),
+  type: varchar("type", { length: 16 }).$type<"DISCORD" | "TELEGRAM" | "SLACK">().notNull(),
   name: text("name").notNull(),
   config: jsonb("config").notNull(),
   createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),

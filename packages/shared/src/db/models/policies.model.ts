@@ -1,12 +1,12 @@
 import type { Permission } from "~shared/types/permissions.types";
 
-import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { integer, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
 import { RolesModel } from "./roles.model";
 
 export const PoliciesModel = pgTable("policies", {
   id: serial("id").primaryKey(),
-  effect: text("effect", { enum: ["allow", "deny"] }).notNull(),
+  effect: varchar("effect", { length: 8 }).$type<"allow" | "deny">().notNull(),
   permission: text("permission").$type<Permission>(),
   roleId: integer("role_id").references(() => RolesModel.id, { onDelete: "cascade", onUpdate: "cascade" }),
   condition: text("condition"),

@@ -5,7 +5,7 @@ import { UsersModel } from "~shared/db/models/users.model";
 export const RuntimeConfigModel = pgTable("runtime_configs", {
   configKey: varchar("config_key", { length: 255 }).primaryKey(),
   value: text("value"),
-  type: text("type", { enum: ["string", "number", "boolean", "list"] }).notNull(),
+  type: varchar("type", { length: 16 }).$type<"string" | "number" | "boolean" | "list">().notNull(),
   nullable: boolean("nullable").notNull(),
   options: text("options"),
   disabledWhen: text("disabled_when"),

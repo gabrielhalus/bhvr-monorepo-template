@@ -1,5 +1,5 @@
 {
-  "id": "b6753294-2cc9-43b8-bfad-dbc5d8b24538",
+  "id": "0abb63f2-c694-42a7-adb7-f36fa15a693a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -10,13 +10,13 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "varchar(21)",
           "primaryKey": true,
           "notNull": true
         },
         "type": {
           "name": "type",
-          "type": "text",
+          "type": "varchar(16)",
           "primaryKey": false,
           "notNull": true
         },
@@ -67,7 +67,7 @@
         },
         "effect": {
           "name": "effect",
-          "type": "text",
+          "type": "varchar(8)",
           "primaryKey": false,
           "notNull": true
         },
@@ -283,7 +283,7 @@
         },
         "type": {
           "name": "type",
-          "type": "text",
+          "type": "varchar(16)",
           "primaryKey": false,
           "notNull": true
         },
@@ -363,13 +363,13 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "varchar(21)",
           "primaryKey": true,
           "notNull": true
         },
         "user_id": {
           "name": "user_id",
-          "type": "text",
+          "type": "varchar(21)",
           "primaryKey": false,
           "notNull": true
         },
@@ -399,7 +399,7 @@
         },
         "ip": {
           "name": "ip",
-          "type": "text",
+          "type": "varchar(45)",
           "primaryKey": false,
           "notNull": false
         }
@@ -418,7 +418,7 @@
       "columns": {
         "user_id": {
           "name": "user_id",
-          "type": "text",
+          "type": "varchar(21)",
           "primaryKey": false,
           "notNull": true
         },
@@ -478,7 +478,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "varchar(21)",
           "primaryKey": true,
           "notNull": true
         },
