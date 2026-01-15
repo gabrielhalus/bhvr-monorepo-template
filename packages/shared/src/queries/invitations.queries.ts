@@ -3,12 +3,12 @@ import type { z } from "zod";
 
 import { and, eq, lt } from "drizzle-orm";
 
-import { attachRelation } from "../helpers";
 import { InvitationsModel } from "../db/models/invitations.model";
 import { UsersModel } from "../db/models/users.model";
-import { InvitationSchema, InsertInvitationSchema, UpdateInvitationSchema } from "../schemas/db/invitations.schemas";
-import { UserSchema } from "../schemas/db/users.schemas";
 import { drizzle } from "../drizzle";
+import { attachRelation } from "../helpers";
+import { InsertInvitationSchema, InvitationSchema, UpdateInvitationSchema } from "../schemas/db/invitations.schemas";
+import { UserSchema } from "../schemas/db/users.schemas";
 
 // ============================================================================
 // Relation Loaders
@@ -125,6 +125,24 @@ export async function updateInvitation(id: string, invitation: z.infer<typeof Up
   }
 
   return InvitationSchema.parse(updatedInvitation);
+}
+
+/**
+ * Delete an invitation.
+ * @param id - The invitation id.
+ * @returns The deleted invitation.
+ */
+export async function deleteInvitation(id: string): Promise<Invitation> {
+  const [deletedInvitation] = await drizzle
+    .delete(InvitationsModel)
+    .where(eq(InvitationsModel.id, id))
+    .returning();
+
+  if (!deletedInvitation) {
+    throw new Error("Failed to delete invitation");
+  }
+
+  return InvitationSchema.parse(deletedInvitation);
 }
 
 // ============================================================================
