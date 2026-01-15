@@ -22,4 +22,9 @@ export const PermissionSchema = z.enum([
   // Runtime-config
   "runtimeConfig:list",
   "runtimeConfig:update",
+
+  // Invitations
+  "invitation:create",
+  "invitation:list",
+  "invitation:revoke",
 ]);
