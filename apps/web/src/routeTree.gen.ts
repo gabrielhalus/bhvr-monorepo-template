@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AcceptInvitationRouteImport } from './routes/accept-invitation'
 import { Route as DashboardRouteRouteImport } from './routes/_dashboard/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
@@ -18,6 +19,7 @@ import { Route as DashboardSettingsRouteRouteImport } from './routes/_dashboard/
 import { Route as DashboardRolesRouteRouteImport } from './routes/_dashboard/roles/route'
 import { Route as DashboardUsersIndexRouteImport } from './routes/_dashboard/users/index'
 import { Route as DashboardRolesIndexRouteImport } from './routes/_dashboard/roles/index'
+import { Route as DashboardInvitationsIndexRouteImport } from './routes/_dashboard/invitations/index'
 import { Route as AuthRegisterIndexRouteImport } from './routes/_auth/register/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as DashboardSettingsSplatRouteImport } from './routes/_dashboard/settings/$'
@@ -27,6 +29,11 @@ import { Route as DashboardRolesNamePermissionsIndexRouteImport } from './routes
 import { Route as DashboardRolesNameMembersIndexRouteImport } from './routes/_dashboard/roles/$name/members/index'
 import { Route as DashboardRolesNameDisplayIndexRouteImport } from './routes/_dashboard/roles/$name/_display/index'
 
+const AcceptInvitationRoute = AcceptInvitationRouteImport.update({
+  id: '/accept-invitation',
+  path: '/accept-invitation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
   id: '/_dashboard',
   getParentRoute: () => rootRouteImport,
@@ -70,6 +77,12 @@ const DashboardRolesIndexRoute = DashboardRolesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRolesRouteRoute,
 } as any)
+const DashboardInvitationsIndexRoute =
+  DashboardInvitationsIndexRouteImport.update({
+    id: '/invitations/',
+    path: '/invitations/',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const AuthRegisterIndexRoute = AuthRegisterIndexRouteImport.update({
   id: '/register/',
   path: '/register/',
@@ -116,6 +129,7 @@ const DashboardRolesNameDisplayIndexRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/accept-invitation': typeof AcceptInvitationRoute
   '/roles': typeof DashboardRolesRouteRouteWithChildren
   '/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/users': typeof DashboardUsersRouteRouteWithChildren
@@ -125,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/settings/$': typeof DashboardSettingsSplatRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
+  '/invitations': typeof DashboardInvitationsIndexRoute
   '/roles/': typeof DashboardRolesIndexRoute
   '/users/': typeof DashboardUsersIndexRoute
   '/users/$userId': typeof DashboardUsersUserIdIndexRoute
@@ -133,12 +148,14 @@ export interface FileRoutesByFullPath {
   '/roles/$name/permissions': typeof DashboardRolesNamePermissionsIndexRoute
 }
 export interface FileRoutesByTo {
+  '/accept-invitation': typeof AcceptInvitationRoute
   '/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/profile': typeof DashboardProfileRoute
   '/': typeof DashboardIndexRoute
   '/settings/$': typeof DashboardSettingsSplatRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
+  '/invitations': typeof DashboardInvitationsIndexRoute
   '/roles': typeof DashboardRolesIndexRoute
   '/users': typeof DashboardUsersIndexRoute
   '/users/$userId': typeof DashboardUsersUserIdIndexRoute
@@ -150,6 +167,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteRouteWithChildren
   '/_dashboard': typeof DashboardRouteRouteWithChildren
+  '/accept-invitation': typeof AcceptInvitationRoute
   '/_dashboard/roles': typeof DashboardRolesRouteRouteWithChildren
   '/_dashboard/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/_dashboard/users': typeof DashboardUsersRouteRouteWithChildren
@@ -159,6 +177,7 @@ export interface FileRoutesById {
   '/_dashboard/settings/$': typeof DashboardSettingsSplatRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/register/': typeof AuthRegisterIndexRoute
+  '/_dashboard/invitations/': typeof DashboardInvitationsIndexRoute
   '/_dashboard/roles/': typeof DashboardRolesIndexRoute
   '/_dashboard/users/': typeof DashboardUsersIndexRoute
   '/_dashboard/users/$userId/': typeof DashboardUsersUserIdIndexRoute
@@ -169,6 +188,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/accept-invitation'
     | '/roles'
     | '/settings'
     | '/users'
@@ -178,6 +198,7 @@ export interface FileRouteTypes {
     | '/settings/$'
     | '/login'
     | '/register'
+    | '/invitations'
     | '/roles/'
     | '/users/'
     | '/users/$userId'
@@ -186,12 +207,14 @@ export interface FileRouteTypes {
     | '/roles/$name/permissions'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/accept-invitation'
     | '/settings'
     | '/profile'
     | '/'
     | '/settings/$'
     | '/login'
     | '/register'
+    | '/invitations'
     | '/roles'
     | '/users'
     | '/users/$userId'
@@ -202,6 +225,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_auth'
     | '/_dashboard'
+    | '/accept-invitation'
     | '/_dashboard/roles'
     | '/_dashboard/settings'
     | '/_dashboard/users'
@@ -211,6 +235,7 @@ export interface FileRouteTypes {
     | '/_dashboard/settings/$'
     | '/_auth/login/'
     | '/_auth/register/'
+    | '/_dashboard/invitations/'
     | '/_dashboard/roles/'
     | '/_dashboard/users/'
     | '/_dashboard/users/$userId/'
@@ -222,10 +247,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  AcceptInvitationRoute: typeof AcceptInvitationRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/accept-invitation': {
+      id: '/accept-invitation'
+      path: '/accept-invitation'
+      fullPath: '/accept-invitation'
+      preLoaderRoute: typeof AcceptInvitationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_dashboard': {
       id: '/_dashboard'
       path: ''
@@ -288,6 +321,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/roles/'
       preLoaderRoute: typeof DashboardRolesIndexRouteImport
       parentRoute: typeof DashboardRolesRouteRoute
+    }
+    '/_dashboard/invitations/': {
+      id: '/_dashboard/invitations/'
+      path: '/invitations'
+      fullPath: '/invitations'
+      preLoaderRoute: typeof DashboardInvitationsIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
     }
     '/_auth/register/': {
       id: '/_auth/register/'
@@ -427,6 +467,7 @@ interface DashboardRouteRouteChildren {
   DashboardUsersRouteRoute: typeof DashboardUsersRouteRouteWithChildren
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardInvitationsIndexRoute: typeof DashboardInvitationsIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
@@ -435,6 +476,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardUsersRouteRoute: DashboardUsersRouteRouteWithChildren,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardInvitationsIndexRoute: DashboardInvitationsIndexRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
@@ -444,6 +486,7 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  AcceptInvitationRoute: AcceptInvitationRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
