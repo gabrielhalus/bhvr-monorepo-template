@@ -4,7 +4,7 @@ import type { InvitationWithRelations } from "~shared/types/db/invitations.types
 import { Badge } from "~react/components/badge";
 import { SortableHeader } from "~react/components/sortable-header";
 
-import { ActionDropdown } from "./action-dropdown";
+import { InvitationActionDropdown } from "./invitation-action-dropdown";
 
 const statusVariants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   pending: "default",
@@ -70,24 +70,8 @@ export const invitationColumns: ColumnDef<InvitationWithRelations<["invitedBy"]>
     size: 150,
   },
   {
-    accessorKey: "createdAt",
-    header: ({ column }) => <SortableHeader column={column} title="Created At" />,
-    cell: ({ row }) => {
-      const timestamp = row.original.createdAt;
-      const dateString = timestamp
-        ? new Date(timestamp).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })
-        : "";
-      return <div className="text-muted-foreground">{dateString}</div>;
-    },
-    size: 150,
-  },
-  {
     id: "actions",
-    cell: ({ row }) => <ActionDropdown row={row} />,
+    cell: ({ row }) => <InvitationActionDropdown row={row} />,
     enableSorting: false,
     enableHiding: false,
     size: 50,

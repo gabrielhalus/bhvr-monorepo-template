@@ -15,7 +15,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { t } = useTranslation("web");
 
   const { data: canListUsers } = useQuery(authorizeQueryOptions("user:list"));
-  const { data: canListInvitations } = useQuery(authorizeQueryOptions("invitation:list"));
   const { data: canListRoles } = useQuery(authorizeQueryOptions("role:list"));
   const { data: canListConfigs } = useQuery(authorizeQueryOptions("runtimeConfig:list"));
 
@@ -27,14 +26,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: t("pages.users.title"),
         icon: UsersRound,
         href: { to: "/users" } as const,
-      });
-    }
-
-    if (canListInvitations) {
-      navSettings.push({
-        title: "Invitations",
-        icon: Mail,
-        href: { to: "/invitations" } as const,
       });
     }
 
@@ -64,7 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ],
       navSettings,
     };
-  }, [t, canListUsers, canListInvitations, canListRoles, canListConfigs]);
+  }, [t, canListUsers, canListRoles, canListConfigs]);
 
   return (
     <Sidebar collapsible="icon" {...props}>

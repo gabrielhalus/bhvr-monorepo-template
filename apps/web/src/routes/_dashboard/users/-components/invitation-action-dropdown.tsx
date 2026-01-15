@@ -2,22 +2,21 @@ import type { Row } from "@tanstack/react-table";
 import type { InvitationWithRelations } from "~shared/types/db/invitations.types";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Copy, Link, MoreHorizontal, X } from "lucide-react";
+import { Copy, Link, MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 
 import { getInvitationsQueryOptions } from "@/queries/invitations";
 import { Button } from "~react/components/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "~react/components/dropdown-menu";
-import { Spinner } from "~react/components/spinner";
 import { api } from "~react/lib/http";
 import sayno from "~react/lib/sayno";
 
-export function ActionDropdown({ row: { original: invitation } }: { row: Row<InvitationWithRelations<["invitedBy"]>> }) {
+export function InvitationActionDropdown({ row: { original: invitation } }: { row: Row<InvitationWithRelations<["invitedBy"]>> }) {
   const queryClient = useQueryClient();
 
   const revokeMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await api.invitations[":id"].$delete({ param: { id } });
+      const res = await api.invitations[":id"].$put({ param: { id } });
 
       if (!res.ok) {
         throw new Error("Failed to revoke invitation");
@@ -28,6 +27,22 @@ export function ActionDropdown({ row: { original: invitation } }: { row: Row<Inv
     onError: () => toast.error("Failed to revoke invitation"),
     onSuccess: () => {
       toast.success("Invitation revoked successfully");
+      queryClient.invalidateQueries(getInvitationsQueryOptions(["invitedBy"]));
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await api.invitations[":id"].$delete({ param: { id } });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete invitation");
+      }
+      return res.json();
+    },
+    onError: () => toast.error("Failed to delete invitation"),
+    onSuccess: () => {
+      toast.success("Invitation deleted successfully");
       queryClient.invalidateQueries(getInvitationsQueryOptions(["invitedBy"]));
     },
   });
@@ -47,6 +62,18 @@ export function ActionDropdown({ row: { original: invitation } }: { row: Row<Inv
 
     if (confirmation) {
       revokeMutation.mutate(invitation.id);
+    }
+  };
+
+  const handleDeleteClick = async () => {
+    const confirmation = await sayno({
+      title: "Delete Invitation",
+      description: "Are you sure you want to delete this invitation? The user will no longer be able to use this link.",
+      variant: "destructive",
+    });
+
+    if (confirmation) {
+      deleteMutation.mutate(invitation.id);
     }
   };
 
@@ -73,18 +100,14 @@ export function ActionDropdown({ row: { original: invitation } }: { row: Row<Inv
               Copy Invitation Link
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <Button
-              disabled={revokeMutation.isPending}
-              onClick={handleRevokeClick}
-              variant="destructive"
-              size="sm"
-              className="w-full"
-            >
-              {revokeMutation.isPending ? <Spinner /> : <X className="size-4" />}
-              Revoke
-            </Button>
+            <DropdownMenuItem variant="destructive" onClick={handleRevokeClick}>
+              Revoke Invitation
+            </DropdownMenuItem>
           </>
         )}
+        <DropdownMenuItem variant="destructive" onClick={handleDeleteClick}>
+          Delete Invitation
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
