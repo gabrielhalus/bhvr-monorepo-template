@@ -49,6 +49,13 @@ CREATE TABLE "runtime_configs" (
 	"updated_by" varchar(21)
 );
 --> statement-breakpoint
+CREATE TABLE "seeds" (
+	"id" text PRIMARY KEY NOT NULL,
+	"version" integer NOT NULL,
+	"checksum" text NOT NULL,
+	"applied_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "tokens" (
 	"id" varchar(21) PRIMARY KEY NOT NULL,
 	"user_id" varchar(21) NOT NULL,

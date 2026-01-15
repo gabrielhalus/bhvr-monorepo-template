@@ -3,7 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
-    "rootDir": "src",
+    "rootDir": ".",
     "paths": {
       "~shared/*": ["./src/*"]
     },
@@ -13,6 +13,6 @@
     "noEmit": false,
     "outDir": "dist"
   },
-  "include": ["src", "src/**/*.json"],
+  "include": ["src", "src/**/*.json", "seeds"],
   "exclude": ["node_modules", "dist"]
 }
