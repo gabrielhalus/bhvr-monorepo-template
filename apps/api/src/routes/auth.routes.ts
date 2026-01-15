@@ -7,7 +7,9 @@ import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
 import { isAuthorized } from "~shared/auth";
+import { getDefaultRole } from "~shared/queries/roles.queries";
 import { deleteToken, insertToken } from "~shared/queries/tokens.queries";
+import { createUserRole } from "~shared/queries/user-roles.queries";
 import { createUser, signIn } from "~shared/queries/users.queries";
 import { isAuthorizedSchema, LoginSchema, RegisterSchema } from "~shared/schemas/api/auth.schemas";
 
@@ -27,6 +29,11 @@ export const authRoutes = new Hono()
 
     try {
       const insertedUser = await createUser({ ...user, password: hashedPassword });
+
+      const defaultRole = await getDefaultRole();
+      if (defaultRole) {
+        await createUserRole({ userId: insertedUser.id, roleId: defaultRole.id });
+      }
 
       const insertedToken = await insertToken({
         userId: insertedUser.id,
