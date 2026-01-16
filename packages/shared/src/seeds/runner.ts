@@ -1,11 +1,13 @@
 import type { SeedMeta } from "./types";
 
-import { createHash } from "crypto";
 import { eq } from "drizzle-orm";
+import { createHash } from "node:crypto";
 
 import { RolesModel } from "~shared/db/models/roles.model";
 import { RuntimeConfigModel } from "~shared/db/models/runtime-configs.model";
 import { SeedsModel } from "~shared/db/models/seeds.model";
+import { UserRolesModel } from "~shared/db/models/user-roles.model";
+import { UsersModel } from "~shared/db/models/users.model";
 import { drizzle } from "~shared/drizzle";
 
 // ============================================================================
@@ -40,6 +42,14 @@ type RuntimeConfigSeedData = Array<{
   disabledWhen?: string;
 }>;
 
+type UserSeedData = Array<{
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  roles: string[];
+}>;
+
 async function applyRolesSeed(data: RoleSeedData): Promise<void> {
   for (const role of data) {
     await drizzle
@@ -58,6 +68,46 @@ async function applyRuntimeConfigsSeed(data: RuntimeConfigSeedData): Promise<voi
   }
 }
 
+async function applyUsersSeed(data: UserSeedData): Promise<void> {
+  const usersWithHashedPasswords = await Promise.all(
+    data.map(async ({ roles, ...userData }) => ({
+      userData: { ...userData, password: await Bun.password.hash(userData.password) },
+      roles,
+    })),
+  );
+
+  const allRoles = await drizzle.select().from(RolesModel);
+  const rolesByName = new Map(allRoles.map(r => [r.name, r]));
+
+  const userRoleAssignments: Array<{ roleId: number; userId: string }> = [];
+
+  for (const { userData, roles } of usersWithHashedPasswords) {
+    const [insertedUser] = await drizzle
+      .insert(UsersModel)
+      .values(userData)
+      .onConflictDoNothing()
+      .returning();
+
+    if (!insertedUser) {
+      continue;
+    }
+
+    for (const roleName of roles) {
+      const role = rolesByName.get(roleName);
+      if (role) {
+        userRoleAssignments.push({ roleId: role.id, userId: insertedUser.id });
+      }
+    }
+  }
+
+  if (userRoleAssignments.length > 0) {
+    await drizzle
+      .insert(UserRolesModel)
+      .values(userRoleAssignments)
+      .onConflictDoNothing();
+  }
+}
+
 // ============================================================================
 // Seed Application Router
 // ============================================================================
@@ -69,6 +119,9 @@ async function applySeed(seed: SeedMeta): Promise<void> {
       break;
     case "runtime-configs":
       await applyRuntimeConfigsSeed(seed.data as RuntimeConfigSeedData);
+      break;
+    case "users":
+      await applyUsersSeed(seed.data as UserSeedData);
       break;
     default:
       throw new Error(`Unknown seed id: ${seed.id}`);
