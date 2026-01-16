@@ -26,15 +26,12 @@ function Users() {
   );
 
   return (
-    <div className="w-full py-10 px-10">
+    <div className="w-full p-10">
       <div className="space-y-8">
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">{t("pages.users.list.title")}</h1>
-              <p className="text-muted-foreground">{t("pages.users.list.subtitle")}</p>
-            </div>
-            <InviteUserDialog />
+          <div>
+            <h1 className="text-3xl font-bold">{t("pages.users.list.title")}</h1>
+            <p className="text-muted-foreground">{t("pages.users.list.subtitle")}</p>
           </div>
           <DataTable
             columns={columns}
@@ -55,6 +52,9 @@ function Users() {
             isLoading={invitationsLoading}
             searchPlaceholder="Search invitations..."
           />
+          <div className="flex justify-end">
+            <InviteUserDialog />
+          </div>
         </div>
       </div>
     </div>

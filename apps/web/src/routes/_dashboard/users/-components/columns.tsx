@@ -42,22 +42,6 @@ export const columns: ColumnDef<UserWithRelations<["roles"]>>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "verifiedAt",
-    header: ({ column }) => <SortableHeader column={column} title="Verified At" />,
-    cell: ({ row }) => {
-      const timestamp = row.original.verifiedAt;
-      const dateString = timestamp
-        ? new Date(timestamp).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })
-        : "";
-      return <div className="text-muted-foreground">{dateString}</div>;
-    },
-    size: 150,
-  },
-  {
     accessorKey: "createdAt",
     header: ({ column }) => <SortableHeader column={column} title="Created At" />,
     cell: ({ row }) => {

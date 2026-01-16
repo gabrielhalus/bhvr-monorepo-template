@@ -2,12 +2,13 @@ import type { Row } from "@tanstack/react-table";
 import type { InvitationWithRelations } from "~shared/types/db/invitations.types";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Copy, Link, MoreHorizontal } from "lucide-react";
+import { Ban, Copy, Link, MoreHorizontal, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { getInvitationsQueryOptions } from "@/queries/invitations";
 import { Button } from "~react/components/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "~react/components/dropdown-menu";
+import { Spinner } from "~react/components/spinner";
 import { api } from "~react/lib/http";
 import sayno from "~react/lib/sayno";
 
@@ -96,16 +97,26 @@ export function InvitationActionDropdown({ row: { original: invitation } }: { ro
         {isPending && (
           <>
             <DropdownMenuItem onClick={handleCopyLink}>
-              <Link className="size-4" />
+              <Link />
               Copy Invitation Link
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={handleRevokeClick}>
+            <DropdownMenuItem
+              disabled={revokeMutation.isPending}
+              onClick={handleRevokeClick}
+              variant="destructive"
+            >
+              {revokeMutation.isPending ? <Spinner /> : <Ban /> }
               Revoke Invitation
             </DropdownMenuItem>
           </>
         )}
-        <DropdownMenuItem variant="destructive" onClick={handleDeleteClick}>
+        <DropdownMenuItem
+          disabled={deleteMutation.isPending}
+          onClick={handleDeleteClick}
+          variant="destructive"
+        >
+          {deleteMutation.isPending ? <Spinner /> : <Trash2 /> }
           Delete Invitation
         </DropdownMenuItem>
       </DropdownMenuContent>

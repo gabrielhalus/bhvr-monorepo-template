@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -45,8 +45,10 @@ export function InviteUserDialog() {
     onSuccess: (invitation) => {
       const link = `${window.location.origin}/accept-invitation?token=${invitation.token}`;
       setInvitationLink(link);
-      queryClient.invalidateQueries(getInvitationsQueryOptions());
-      toast.success("Invitation created successfully");
+      queryClient.invalidateQueries(getInvitationsQueryOptions(["invitedBy"]));
+
+      navigator.clipboard.writeText(link);
+      toast.success("Invitation linked copied to clipboard");
     },
   });
 
@@ -81,7 +83,10 @@ export function InviteUserDialog() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button>Invite User</Button>
+        <Button>
+          <Plus />
+          Add invitation
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
