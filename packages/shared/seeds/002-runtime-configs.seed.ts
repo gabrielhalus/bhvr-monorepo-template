@@ -7,7 +7,7 @@ export const seed: SeedMeta = {
   data: [
     {
       configKey: "authentication.00_disableRegister",
-      value: "false",
+      value: "true",
       type: "boolean",
       nullable: false,
     },
