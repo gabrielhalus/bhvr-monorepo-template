@@ -3,8 +3,8 @@ import type { z } from "zod";
 
 import { and, eq, lt } from "drizzle-orm";
 
-import { InvitationsModel } from "../db/models/invitations.model";
-import { UsersModel } from "../db/models/users.model";
+import { InvitationsModel } from "../models/invitations.model";
+import { UsersModel } from "../models/users.model";
 import { drizzle } from "../drizzle";
 import { attachRelation } from "../helpers";
 import { InsertInvitationSchema, InvitationSchema, UpdateInvitationSchema } from "../schemas/db/invitations.schemas";

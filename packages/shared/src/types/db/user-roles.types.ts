@@ -1,3 +1,3 @@
-import type { UserRolesModel } from "~shared/db/models/user-roles.model";
+import type { UserRolesModel } from "~shared/models/user-roles.model";
 
 export type UserRole = typeof UserRolesModel.$inferSelect;

@@ -4,13 +4,13 @@ import type { InsertRoleSchema } from "../schemas/db/roles.schemas";
 import type { Role, RoleRelationKeys, RoleRelations, RoleWithRelations } from "../types/db/roles.types";
 import type { z } from "zod";
 
-import { eq } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 
-import { PoliciesModel } from "../db/models/policies.model";
-import { RolePermissionsModel } from "../db/models/role-permissions.model";
-import { RolesModel } from "../db/models/roles.model";
-import { UserRolesModel } from "../db/models/user-roles.model";
-import { UsersModel } from "../db/models/users.model";
+import { PoliciesModel } from "../models/policies.model";
+import { RolePermissionsModel } from "../models/role-permissions.model";
+import { RolesModel } from "../models/roles.model";
+import { UserRolesModel } from "../models/user-roles.model";
+import { UsersModel } from "../models/users.model";
 import { drizzle } from "../drizzle";
 import { attachRelation } from "../helpers";
 import { PolicySchema } from "../schemas/db/policies.schemas";
@@ -21,39 +21,115 @@ import { UserSchema } from "../schemas/db/users.schemas";
 // Relation Loaders
 // ============================================================================
 
-const relationLoaders: { [K in keyof RoleRelations]: (roleId: number) => Promise<RoleRelations[K]> } = {
-  members: async (roleId) => {
-    const rows = await drizzle
-      .select({ member: UsersModel })
-      .from(UserRolesModel)
-      .leftJoin(UsersModel, eq(UserRolesModel.userId, UsersModel.id))
-      .where(eq(UserRolesModel.roleId, roleId));
+const relationLoaders: { [K in keyof RoleRelations]: (roleIds: number[]) => Promise<Map<number, RoleRelations[K]>> } = {
+  members: async (roleIds) => {
+    const result = new Map<number, RoleRelations["members"]>();
 
-    return rows
-      .map(r => r.member)
-      .filter((r): r is NonNullable<typeof r> => r !== null)
-      .map(r => UserSchema.parse(r));
+    if (roleIds.length === 0) {
+      return result;
+    }
+
+    for (const roleId of roleIds) {
+      result.set(roleId, []);
+    }
+
+    const roles = await drizzle
+      .select({ id: RolesModel.id, isDefault: RolesModel.isDefault })
+      .from(RolesModel)
+      .where(inArray(RolesModel.id, roleIds));
+
+    const defaultRoleIds = roles.filter(r => r.isDefault).map(r => r.id);
+    const nonDefaultRoleIds = roles.filter(r => !r.isDefault).map(r => r.id);
+
+    if (defaultRoleIds.length > 0) {
+      const allUsers = await drizzle.select().from(UsersModel);
+      const parsedUsers = allUsers.map(u => UserSchema.parse(u));
+
+      for (const roleId of defaultRoleIds) {
+        result.set(roleId, parsedUsers);
+      }
+    }
+
+    if (nonDefaultRoleIds.length > 0) {
+      const rows = await drizzle
+        .select({
+          roleId: UserRolesModel.roleId,
+          member: UsersModel,
+        })
+        .from(UserRolesModel)
+        .innerJoin(UsersModel, eq(UserRolesModel.userId, UsersModel.id))
+        .where(inArray(UserRolesModel.roleId, nonDefaultRoleIds));
+
+      for (const row of rows) {
+        const members = result.get(row.roleId) ?? [];
+        members.push(UserSchema.parse(row.member));
+        result.set(row.roleId, members);
+      }
+    }
+
+    return result;
   },
-  permissions: async (roleId) => {
+
+  permissions: async (roleIds) => {
+    const result = new Map<number, RoleRelations["permissions"]>();
+
+    if (roleIds.length === 0) {
+      return result;
+    }
+
+    // Initialize empty arrays for all requested roleIds
+    for (const roleId of roleIds) {
+      result.set(roleId, []);
+    }
+
     const rows = await drizzle
-      .select({ permission: RolePermissionsModel.permission })
+      .select({
+        roleId: RolePermissionsModel.roleId,
+        permission: RolePermissionsModel.permission,
+      })
       .from(RolePermissionsModel)
-      .where(eq(RolePermissionsModel.roleId, roleId));
+      .where(inArray(RolePermissionsModel.roleId, roleIds));
 
-    return rows
-      .map(r => r.permission)
-      .filter((r): r is NonNullable<typeof r> => r !== null);
+    for (const row of rows) {
+      if (row.permission !== null) {
+        const permissions = result.get(row.roleId) ?? [];
+        permissions.push(row.permission);
+        result.set(row.roleId, permissions);
+      }
+    }
+
+    return result;
   },
-  policies: async (roleId) => {
-    const rows = await drizzle
-      .select({ policy: PoliciesModel })
-      .from(PoliciesModel)
-      .where(eq(PoliciesModel.roleId, roleId));
 
-    return rows
-      .map(r => r.policy)
-      .filter((r): r is NonNullable<typeof r> => r !== null)
-      .map(r => PolicySchema.parse(r));
+  policies: async (roleIds) => {
+    const result = new Map<number, RoleRelations["policies"]>();
+
+    if (roleIds.length === 0) {
+      return result;
+    }
+
+    // Initialize empty arrays for all requested roleIds
+    for (const roleId of roleIds) {
+      result.set(roleId, []);
+    }
+
+    const rows = await drizzle
+      .select({
+        roleId: PoliciesModel.roleId,
+        policy: PoliciesModel,
+      })
+      .from(PoliciesModel)
+      .where(inArray(PoliciesModel.roleId, roleIds));
+
+    for (const row of rows) {
+      if (row.roleId !== null && row.policy !== null) {
+        const policies = result.get(row.roleId) ?? [];
+        policies.push(PolicySchema.parse(row.policy));
+        result.set(row.roleId, policies);
+      }
+    }
+
+    return result;
   },
 };
 
@@ -68,23 +144,13 @@ const relationLoaders: { [K in keyof RoleRelations]: (roleId: number) => Promise
  * @throws An error if a loader is not defined for a relation.
  */
 export async function getRoles<T extends RoleRelationKeys>(includes?: T): Promise<RoleWithRelations<T>[]> {
-  const roles = await drizzle.select().from(RolesModel);
+  const roles = await drizzle
+    .select()
+    .from(RolesModel)
+    .orderBy(desc(RolesModel.index));
+
   const parsedRoles = roles.map(r => RoleSchema.parse(r));
-
-  return Promise.all(parsedRoles.map(async (role) => {
-    const roleWithRelations = role as RoleWithRelations<T>;
-
-    if (includes) {
-      await Promise.all(
-        includes.map(async (key) => {
-          const value = await relationLoaders[key](role.id);
-          attachRelation(roleWithRelations, key, value);
-        }),
-      );
-    }
-
-    return roleWithRelations;
-  }));
+  return hydrateRoles(parsedRoles, includes);
 }
 
 /**
@@ -102,18 +168,9 @@ export async function getRole<T extends RoleRelationKeys>(id: number, includes?:
   }
 
   const parsedRole = RoleSchema.parse(role);
-  const roleWithRelations = parsedRole as RoleWithRelations<T>;
+  const [roleWithRelations] = await hydrateRoles([parsedRole], includes);
 
-  if (includes) {
-    await Promise.all(
-      includes.map(async (key) => {
-        const value = await relationLoaders[key](role.id);
-        attachRelation(roleWithRelations, key, value);
-      }),
-    );
-  }
-
-  return roleWithRelations;
+  return roleWithRelations ?? null;
 }
 
 /**
@@ -122,21 +179,35 @@ export async function getRole<T extends RoleRelationKeys>(id: number, includes?:
  * @param includes - The relations to include
  * @returns The roles with added relations
  */
-export async function hydrateRoles<T extends RoleRelationKeys>(roles: Role[], includes: T): Promise<RoleWithRelations<T>[]> {
-  return Promise.all(
-    roles.map(async (role) => {
-      const roleWithRelations = role as RoleWithRelations<T>;
+export async function hydrateRoles<T extends RoleRelationKeys>(roles: Role[], includes?: T): Promise<RoleWithRelations<T>[]> {
+  if (!includes || includes.length === 0) {
+    return roles.map(r => ({ ...r })) as RoleWithRelations<T>[];
+  }
 
-      await Promise.all(
-        includes.map(async (key) => {
-          const value = await relationLoaders[key](role.id);
-          attachRelation(roleWithRelations, key, value);
-        }),
-      );
+  const roleIds = roles.map(r => r.id);
 
-      return roleWithRelations;
+  const relations = await Promise.all(
+    includes.map(async (key) => {
+      const loader = relationLoaders[key];
+
+      if (!loader) {
+        throw new Error(`No relation loader defined for "${key}"`);
+      }
+
+      const data = await loader(roleIds);
+      return [key, data] as const;
     }),
   );
+
+  return roles.map((role) => {
+    const withRelations: RoleWithRelations<T> = { ...role } as RoleWithRelations<T>;
+
+    for (const [key, data] of relations) {
+      attachRelation(withRelations, key, data.get(role.id) ?? null);
+    }
+
+    return withRelations;
+  });
 }
 
 /**
@@ -216,18 +287,10 @@ export async function getRoleByName<T extends RoleRelationKeys>(name: string, in
     return null;
   }
 
-  const roleWithRelations = role as RoleWithRelations<T>;
+  const parsedRole = RoleSchema.parse(role);
+  const [roleWithRelations] = await hydrateRoles([parsedRole], includes);
 
-  if (includes) {
-    await Promise.all(
-      includes.map(async (key) => {
-        const value = await relationLoaders[key](role.id);
-        attachRelation(roleWithRelations, key, value);
-      }),
-    );
-  }
-
-  return roleWithRelations;
+  return roleWithRelations ?? null;
 }
 
 /**

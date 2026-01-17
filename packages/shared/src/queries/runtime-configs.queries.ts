@@ -1,8 +1,8 @@
 import type { ConfigValue, RuntimeConfig } from "../types/db/runtime-configs.types";
 
-import { eq, inArray } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 
-import { RuntimeConfigModel } from "../db/models/runtime-configs.model";
+import { RuntimeConfigModel } from "../models/runtime-configs.model";
 import { drizzle } from "../drizzle";
 import { RuntimeConfigSchema } from "../schemas/db/runtime-configs.schemas";
 
@@ -19,7 +19,8 @@ export async function getRuntimeConfigs(keys?: string[]): Promise<RuntimeConfig[
   const runtimeConfigs = await drizzle
     .select()
     .from(RuntimeConfigModel)
-    .where(keys ? inArray(RuntimeConfigModel.configKey, keys) : undefined);
+    .where(keys ? inArray(RuntimeConfigModel.configKey, keys) : undefined)
+    .orderBy(asc(RuntimeConfigModel.order));
 
   return runtimeConfigs.map(rc => RuntimeConfigSchema.parse(rc));
 }

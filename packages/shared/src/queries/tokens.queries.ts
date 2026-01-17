@@ -4,7 +4,7 @@ import type { z } from "zod";
 
 import { eq } from "drizzle-orm";
 
-import { TokensModel } from "../db/models/tokens.model";
+import { TokensModel } from "../models/tokens.model";
 import { drizzle } from "../drizzle";
 
 // ============================================================================

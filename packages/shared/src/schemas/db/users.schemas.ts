@@ -1,7 +1,7 @@
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { UsersModel } from "~shared/db/models/users.model";
+import { UsersModel } from "~shared/models/users.model";
 
 /**
  * Schema for users

@@ -1,7 +1,7 @@
 import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
 
-import { RolesModel } from "~shared/db/models/roles.model";
-import { UsersModel } from "~shared/db/models/users.model";
+import { RolesModel } from "~shared/models/roles.model";
+import { UsersModel } from "~shared/models/users.model";
 
 export const UserRolesModel = pgTable("user_roles", {
   userId: varchar("user_id", { length: 21 }).notNull().references(() => UsersModel.id, { onDelete: "cascade", onUpdate: "cascade" }),

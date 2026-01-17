@@ -1,7 +1,7 @@
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { InvitationsModel } from "~shared/db/models/invitations.model";
+import { InvitationsModel } from "~shared/models/invitations.model";
 
 export const InvitationStatusSchema = z.enum(["pending", "accepted", "expired", "revoked"]);
 

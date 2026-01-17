@@ -49,7 +49,7 @@
       "config": {
         "authentication": {
           "label": "Authentifizierung",
-          "00_disableRegister": {
+          "disableRegister": {
             "label": "Benutzerregistrierung deaktivieren",
             "description": "Verhindert, dass neue Benutzer sich registrieren. Neue Konten können nur durch Einladungen erstellt werden."
           }

@@ -49,7 +49,7 @@
       "config": {
         "authentication": {
           "label": "Authentication",
-          "00_disableRegister": {
+          "disableRegister": {
             "label": "Disable user registration",
             "description": "Prevents new users from signing up. New accounts can only be created through invitations."
           }

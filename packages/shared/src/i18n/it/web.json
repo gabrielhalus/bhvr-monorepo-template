@@ -49,7 +49,7 @@
       "config": {
         "authentication": {
           "label": "Autenticazione",
-          "00_disableRegister": {
+          "disableRegister": {
             "label": "Disabilita registrazione utenti",
             "description": "Impedisce ai nuovi utenti di registrarsi. I nuovi account possono essere creati solo tramite inviti."
           }

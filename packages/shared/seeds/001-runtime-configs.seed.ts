@@ -6,7 +6,7 @@ export const seed: SeedMeta = {
   description: "Default runtime configuration values",
   data: [
     {
-      configKey: "authentication.00_disableRegister",
+      configKey: "authentication.disableRegister",
       value: "true",
       type: "boolean",
       nullable: false,

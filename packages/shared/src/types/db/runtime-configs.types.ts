@@ -1,4 +1,4 @@
-import type { RuntimeConfigModel } from "~shared/db/models/runtime-configs.model";
+import type { RuntimeConfigModel } from "~shared/models/runtime-configs.model";
 
 export type ConfigValue = | string | number | boolean | null;
 

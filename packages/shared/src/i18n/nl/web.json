@@ -49,7 +49,7 @@
       "config": {
         "authentication": {
           "label": "Authenticatie",
-          "00_disableRegister": {
+          "disableRegister": {
             "label": "Gebruikersregistratie uitschakelen",
             "description": "Voorkomt dat nieuwe gebruikers zich registreren. Nieuwe accounts kunnen alleen via uitnodigingen worden aangemaakt."
           }

@@ -49,7 +49,7 @@
       "config": {
         "authentication": {
           "label": "Authentification",
-          "00_disableRegister": {
+          "disableRegister": {
             "label": "Désactiver l'inscription des utilisateurs",
             "description": "Empêche les nouveaux utilisateurs de s'inscrire. Les nouveaux comptes ne peuvent être créés que par invitation."
           }

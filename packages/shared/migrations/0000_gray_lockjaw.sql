@@ -58,6 +58,7 @@ CREATE TABLE "runtime_configs" (
 	"nullable" boolean NOT NULL,
 	"options" text,
 	"disabled_when" text,
+	"order" integer DEFAULT 0 NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"updated_by" varchar(21)
 );

@@ -3,11 +3,11 @@ import type { SeedMeta } from "./types";
 import { eq } from "drizzle-orm";
 import { createHash } from "node:crypto";
 
-import { RolesModel } from "~shared/db/models/roles.model";
-import { RuntimeConfigModel } from "~shared/db/models/runtime-configs.model";
-import { SeedsModel } from "~shared/db/models/seeds.model";
-import { UserRolesModel } from "~shared/db/models/user-roles.model";
-import { UsersModel } from "~shared/db/models/users.model";
+import { RolesModel } from "~shared/models/roles.model";
+import { RuntimeConfigModel } from "~shared/models/runtime-configs.model";
+import { SeedsModel } from "~shared/models/seeds.model";
+import { UserRolesModel } from "~shared/models/user-roles.model";
+import { UsersModel } from "~shared/models/users.model";
 import { drizzle } from "~shared/drizzle";
 
 // ============================================================================
@@ -79,6 +79,8 @@ async function applyUsersSeed(data: UserSeedData): Promise<void> {
   const allRoles = await drizzle.select().from(RolesModel);
   const rolesByName = new Map(allRoles.map(r => [r.name, r]));
 
+  const defaultRole = allRoles.find(r => r.isDefault);
+
   const userRoleAssignments: Array<{ roleId: number; userId: string }> = [];
 
   for (const { userData, roles } of usersWithHashedPasswords) {
@@ -94,7 +96,7 @@ async function applyUsersSeed(data: UserSeedData): Promise<void> {
 
     for (const roleName of roles) {
       const role = rolesByName.get(roleName);
-      if (role) {
+      if (role && role.id !== defaultRole?.id) {
         userRoleAssignments.push({ roleId: role.id, userId: insertedUser.id });
       }
     }

@@ -1,6 +1,6 @@
-import { boolean, index, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, integer, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
-import { UsersModel } from "~shared/db/models/users.model";
+import { UsersModel } from "~shared/models/users.model";
 
 export const RuntimeConfigModel = pgTable("runtime_configs", {
   configKey: varchar("config_key", { length: 255 }).primaryKey(),
@@ -9,6 +9,7 @@ export const RuntimeConfigModel = pgTable("runtime_configs", {
   nullable: boolean("nullable").notNull(),
   options: text("options"),
   disabledWhen: text("disabled_when"),
+  order: integer("order").notNull().default(0),
   updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow(),
   updatedBy: varchar("updated_by", { length: 21 }).references(() => UsersModel.id),
 }, table => [
