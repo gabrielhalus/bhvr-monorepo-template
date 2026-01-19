@@ -1,9 +1,9 @@
 import type { ConfigValue, RuntimeConfig } from "../types/db/runtime-configs.types";
 
-import { asc, eq, inArray } from "drizzle-orm";
+import { asc, eq, inArray, sql } from "drizzle-orm";
 
-import { RuntimeConfigModel } from "../models/runtime-configs.model";
 import { drizzle } from "../drizzle";
+import { RuntimeConfigModel } from "../models/runtime-configs.model";
 import { RuntimeConfigSchema } from "../schemas/db/runtime-configs.schemas";
 
 // ============================================================================
@@ -20,7 +20,11 @@ export async function getRuntimeConfigs(keys?: string[]): Promise<RuntimeConfig[
     .select()
     .from(RuntimeConfigModel)
     .where(keys ? inArray(RuntimeConfigModel.configKey, keys) : undefined)
-    .orderBy(asc(RuntimeConfigModel.order));
+    .orderBy(
+      asc(sql<unknown>`regexp_replace(${RuntimeConfigModel.configKey}, '\\.[^.]+$', '')`), // parent path (everything except last segment)
+      asc(sql<unknown>`CASE WHEN ${RuntimeConfigModel.configKey} ~ '\\.' THEN 1 ELSE 0 END`), // parent vs leaf: parent fisrt
+      asc(RuntimeConfigModel.order), // leafs order
+    );
 
   return runtimeConfigs.map(rc => RuntimeConfigSchema.parse(rc));
 }

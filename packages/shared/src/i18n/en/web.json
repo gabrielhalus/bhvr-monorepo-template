@@ -54,15 +54,45 @@
             "description": "Prevents new users from signing up. New accounts can only be created through invitations."
           }
         },
-        "appearance": {
-          "label": "Appearance",
-          "00_defaultLightTheme": {
-            "label": "Default light theme",
-            "description": "Theme used in light mode when system appearance is enabled."
+        "notifications": {
+          "label": "Notifications",
+          "discord": {
+            "label": "Discord",
+            "enable": {
+              "label": "Enable Discord",
+              "description": ""
+            },
+            "url": {
+              "label": "Discord Webhook URL",
+              "description": ""
+            }
           },
-          "00_defaultDarkTheme": {
-            "label": "Default dark theme",
-            "description": "Theme used in dark mode when system appearance is enabled."
+          "smtp": {
+            "label": "SMTP",
+            "enable": {
+              "label": "Enable SMTP",
+              "description": ""
+            },
+            "host": {
+              "label": "SMTP Server",
+              "description": ""
+            },
+            "port": {
+              "label": "SMTP Port",
+              "description": ""
+            },
+            "user": {
+              "label": "Username",
+              "description": ""
+            },
+            "password": {
+              "label": "Password",
+              "description": ""
+            },
+            "fromAddress": {
+              "label": "From Address",
+              "description": ""
+            }
           }
         }
       }

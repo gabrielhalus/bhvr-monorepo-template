@@ -3,12 +3,12 @@ import type { SeedMeta } from "./types";
 import { eq } from "drizzle-orm";
 import { createHash } from "node:crypto";
 
+import { drizzle } from "~shared/drizzle";
 import { RolesModel } from "~shared/models/roles.model";
 import { RuntimeConfigModel } from "~shared/models/runtime-configs.model";
 import { SeedsModel } from "~shared/models/seeds.model";
 import { UserRolesModel } from "~shared/models/user-roles.model";
 import { UsersModel } from "~shared/models/users.model";
-import { drizzle } from "~shared/drizzle";
 
 // ============================================================================
 // Checksum
