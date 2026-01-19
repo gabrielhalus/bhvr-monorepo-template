@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { CheckIcon, ShieldIcon, UserPlusIcon, UsersIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -8,11 +9,11 @@ import { AvatarUser } from "@/components/avatar-user";
 import { getRoleByNameQueryOptions, getRolesQueryOptions } from "@/queries/roles";
 import { getUsersQueryOptions } from "@/queries/users";
 import { Button } from "~react/components/button";
-import { Checkbox } from "~react/components/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~react/components/dialog";
-import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
+import { Field, FieldContent, FieldError } from "~react/components/field";
 import { Spinner } from "~react/components/spinner";
 import { api } from "~react/lib/http";
+import { cn } from "~react/lib/utils";
 import { AssignRoleMembersSchema } from "~shared/schemas/api/user-roles.schemas";
 
 import { Route as Layout } from "../../route";
@@ -34,6 +35,8 @@ export function AssignRoleDialog() {
   const { data, isPending } = useQuery(getUsersQueryOptions());
 
   const availableUsers = data?.users?.filter(u => !role.members?.some(m => m.id === u.id)) || [];
+
+  const isDefaultRole = role.isDefault;
 
   const mutation = useMutation({
     mutationFn: async (userIds: string[]) => {
@@ -80,13 +83,18 @@ export function AssignRoleDialog() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button>{t("web:pages.roles.detail.pages.members.addMembers.label")}</Button>
+        <Button>
+          <UserPlusIcon />
+          {t("web:pages.roles.detail.pages.members.addMembers.label")}
+        </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{t("web:pages.roles.detail.pages.members.addMembers.label")}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            {t("web:pages.roles.detail.pages.members.addMembers.label")}
+          </DialogTitle>
           <DialogDescription>
-            Select users to assign to this role
+            Select users to assign to the <span className="font-medium text-foreground">{role.label}</span> role
           </DialogDescription>
         </DialogHeader>
         <form
@@ -96,58 +104,111 @@ export function AssignRoleDialog() {
             form.handleSubmit();
           }}
         >
-          {isPending || !data
-            ? (
-                <div className="flex items-center justify-center py-8">
-                  <Spinner />
-                </div>
-              )
-            : availableUsers.length === 0
-              ? (
-                  <div className="py-8 text-center text-muted-foreground">
-                    All users are already assigned to this role
-                  </div>
-                )
-              : (
-                  <div className="space-y-4 py-4 max-h-100 overflow-y-auto">
-                    <form.Field
-                      name="userIds"
-                      children={field => (
-                        <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
-                          <FieldContent>
-                            <div className="space-y-3">
-                              {availableUsers.map(user => (
-                                <div key={user.id} className="flex items-center space-x-3">
-                                  <Checkbox
-                                    id={user.id}
-                                    checked={field.state.value.includes(user.id)}
-                                    onCheckedChange={(checked) => {
-                                      const currentValue = field.state.value;
-                                      if (checked) {
-                                        field.handleChange([...currentValue, user.id]);
-                                      } else {
-                                        field.handleChange(currentValue.filter((id: string) => id !== user.id));
-                                      }
-                                    }}
-                                  />
-                                  <AvatarUser {...user} size="sm" />
-                                  <FieldLabel
-                                    htmlFor={user.id}
-                                    className="text-sm font-normal cursor-pointer flex-1"
-                                  >
-                                    {user.name}
-                                  </FieldLabel>
+          {isDefaultRole ? (
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-primary/10">
+                <ShieldIcon className="size-6 text-primary" />
+              </div>
+              <p className="text-sm font-medium">Default Role</p>
+              <p className="mt-1 max-w-[260px] text-sm text-muted-foreground">
+                This role is automatically assigned to all users and cannot be manually managed
+              </p>
+            </div>
+          ) : isPending || !data ? (
+            <div className="flex items-center justify-center py-12">
+              <Spinner className="size-6" />
+            </div>
+          ) : availableUsers.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted">
+                <UsersIcon className="size-6 text-muted-foreground" />
+              </div>
+              <p className="text-sm font-medium">All users assigned</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Every user already has this role
+              </p>
+            </div>
+          ) : (
+            <div className="py-2">
+              <form.Field
+                name="userIds"
+                children={field => (
+                  <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                    <FieldContent>
+                      <div className="-mx-2 max-h-72 space-y-1 overflow-y-auto px-2">
+                        {availableUsers.map((user, index) => {
+                          const isSelected = field.state.value.includes(user.id);
+                          return (
+                            <button
+                              key={user.id}
+                              type="button"
+                              onClick={() => {
+                                const currentValue = field.state.value;
+                                if (isSelected) {
+                                  field.handleChange(currentValue.filter((id: string) => id !== user.id));
+                                } else {
+                                  field.handleChange([...currentValue, user.id]);
+                                }
+                              }}
+                              className={cn(
+                                "group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all duration-200",
+                                "hover:bg-accent/50",
+                                isSelected && "bg-primary/5 ring-1 ring-primary/20",
+                              )}
+                              style={{ animationDelay: `${index * 30}ms` }}
+                            >
+                              <div className="relative">
+                                <AvatarUser {...user} size="default" />
+                                <div
+                                  className={cn(
+                                    "absolute -bottom-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full border-2 border-background transition-all duration-200",
+                                    isSelected
+                                      ? "bg-primary text-primary-foreground scale-100"
+                                      : "bg-muted scale-0 group-hover:scale-100",
+                                  )}
+                                >
+                                  <CheckIcon className="size-2.5" />
                                 </div>
-                              ))}
-                            </div>
-                            <FieldError errors={field.state.meta.errors} />
-                          </FieldContent>
-                        </Field>
-                      )}
-                    />
+                              </div>
+                              <div className="flex-1 truncate">
+                                <p className="truncate text-sm font-medium">{user.name}</p>
+                                <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+                              </div>
+                              {isSelected && (
+                                <div className="shrink-0 text-xs font-medium text-primary">
+                                  Selected
+                                </div>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <FieldError errors={field.state.meta.errors} />
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <form.Subscribe
+                selector={state => state.values.userIds}
+                children={(userIds) => userIds.length > 0 && (
+                  <div className="mt-3 flex items-center justify-between border-t pt-3">
+                    <span className="text-sm text-muted-foreground">
+                      {userIds.length} user{userIds.length !== 1 && "s"} selected
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => form.setFieldValue("userIds", [])}
+                    >
+                      Clear selection
+                    </Button>
                   </div>
                 )}
-          <DialogFooter>
+              />
+            </div>
+          )}
+          <DialogFooter className="mt-4">
             <Button
               type="button"
               variant="outline"
@@ -157,22 +218,25 @@ export function AssignRoleDialog() {
               {t("common:actions.cancel")}
             </Button>
             <form.Subscribe
-              selector={state => [state.canSubmit, state.isSubmitting]}
-              children={([canSubmit, isSubmitting]) => (
+              selector={state => [state.canSubmit, state.isSubmitting, state.values.userIds]}
+              children={([canSubmit, isSubmitting, userIds]) => (
                 <Button
                   type="submit"
-                  disabled={!canSubmit || isSubmitting || mutation.isPending || availableUsers.length === 0}
+                  disabled={!canSubmit || isSubmitting || mutation.isPending || (userIds as string[]).length === 0 || isDefaultRole}
                 >
-                  {isSubmitting || mutation.isPending
-                    ? (
-                        <span className="flex items-center space-x-2">
-                          <Spinner />
-                          <span>{t("common:form.saving")}</span>
-                        </span>
-                      )
-                    : (
-                        t("web:pages.roles.detail.pages.members.addMembers.label")
-                      )}
+                  {isSubmitting || mutation.isPending ? (
+                    <>
+                      <Spinner />
+                      <span>{t("common:form.saving")}</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserPlusIcon />
+                      <span>
+                        Assign{(userIds as string[]).length > 0 && ` (${(userIds as string[]).length})`}
+                      </span>
+                    </>
+                  )}
                 </Button>
               )}
             />

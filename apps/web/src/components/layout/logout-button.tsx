@@ -27,7 +27,7 @@ export function LogoutButton({ variant = "button", className }: CommonProps) {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const confirmation = await sayno({ description: t("logout.dialog") });
+      const confirmation = await sayno.confirm({ description: t("logout.dialog") });
       if (!confirmation) {
         return false;
       }

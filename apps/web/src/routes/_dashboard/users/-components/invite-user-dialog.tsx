@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Check, Copy, Plus } from "lucide-react";
+import { CheckCircle2Icon, CopyIcon, MailIcon, SendIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/f
 import { Input } from "~react/components/input";
 import { Spinner } from "~react/components/spinner";
 import { api } from "~react/lib/http";
+import { cn } from "~react/lib/utils";
 import { CreateInvitationSchema } from "~shared/schemas/api/invitations.schemas";
 
 export function InviteUserDialog() {
@@ -48,7 +49,7 @@ export function InviteUserDialog() {
       queryClient.invalidateQueries(getInvitationsQueryOptions(["invitedBy"]));
 
       navigator.clipboard.writeText(link);
-      toast.success("Invitation linked copied to clipboard");
+      toast.success("Invitation link copied to clipboard");
     },
   });
 
@@ -84,11 +85,11 @@ export function InviteUserDialog() {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>
-          <Plus />
-          Add invitation
+          <SendIcon />
+          Invite user
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Invite User</DialogTitle>
           <DialogDescription>
@@ -96,92 +97,125 @@ export function InviteUserDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        {invitationLink
-          ? (
-              <div className="space-y-4 py-4">
-                <p className="text-sm text-muted-foreground">
-                  Invitation created! Copy the link below and share it with the user.
-                </p>
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={invitationLink}
-                    readOnly
-                    className="flex-1 text-sm"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={handleCopyLink}
-                  >
-                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                </div>
-                <DialogFooter>
-                  <Button onClick={() => handleOpenChange(false)}>Done</Button>
-                </DialogFooter>
+        {invitationLink ? (
+          <div className="py-4">
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-emerald-500/10">
+                <CheckCircle2Icon className="size-6 text-emerald-500" />
               </div>
-            )
-          : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  form.handleSubmit();
-                }}
+              <p className="text-sm font-medium">Invitation Created</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                The link has been copied to your clipboard
+              </p>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              <div className="relative">
+                <Input
+                  value={invitationLink}
+                  readOnly
+                  className="pr-20 font-mono text-xs"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCopyLink}
+                  className={cn(
+                    "absolute right-1 top-1/2 -translate-y-1/2 h-7 transition-all",
+                    copied && "text-emerald-500",
+                  )}
+                >
+                  {copied ? (
+                    <>
+                      <CheckCircle2Icon className="size-3.5" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <CopyIcon className="size-3.5" />
+                      Copy
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              <p className="text-center text-xs text-muted-foreground">
+                Share this link with the user to complete their registration
+              </p>
+            </div>
+
+            <DialogFooter className="mt-6">
+              <Button onClick={() => handleOpenChange(false)} className="w-full">
+                Done
+              </Button>
+            </DialogFooter>
+          </div>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit();
+            }}
+          >
+            <div className="py-4">
+              <form.Field
+                name="email"
+                children={field => (
+                  <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                    <FieldLabel className="flex items-center gap-2">
+                      <MailIcon className="size-4 text-muted-foreground" />
+                      Email Address
+                    </FieldLabel>
+                    <FieldContent>
+                      <Input
+                        type="email"
+                        placeholder="user@example.com"
+                        value={field.state.value}
+                        onChange={e => field.handleChange(e.target.value)}
+                        onBlur={field.handleBlur}
+                        className="h-11"
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+            </div>
+            <DialogFooter className="mt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={mutation.isPending}
               >
-                <div className="space-y-4 py-4">
-                  <form.Field
-                    name="email"
-                    children={field => (
-                      <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
-                        <FieldLabel>Email Address</FieldLabel>
-                        <FieldContent>
-                          <Input
-                            type="email"
-                            placeholder="user@example.com"
-                            value={field.state.value}
-                            onChange={e => field.handleChange(e.target.value)}
-                            onBlur={field.handleBlur}
-                          />
-                          <FieldError errors={field.state.meta.errors} />
-                        </FieldContent>
-                      </Field>
-                    )}
-                  />
-                </div>
-                <DialogFooter>
+                {t("common:actions.cancel")}
+              </Button>
+              <form.Subscribe
+                selector={state => [state.canSubmit, state.isSubmitting]}
+                children={([canSubmit, isSubmitting]) => (
                   <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setOpen(false)}
-                    disabled={mutation.isPending}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting || mutation.isPending}
                   >
-                    {t("common:actions.cancel")}
-                  </Button>
-                  <form.Subscribe
-                    selector={state => [state.canSubmit, state.isSubmitting]}
-                    children={([canSubmit, isSubmitting]) => (
-                      <Button
-                        type="submit"
-                        disabled={!canSubmit || isSubmitting || mutation.isPending}
-                      >
-                        {isSubmitting || mutation.isPending
-                          ? (
-                              <span className="flex items-center space-x-2">
-                                <Spinner />
-                                <span>Creating...</span>
-                              </span>
-                            )
-                          : (
-                              "Create Invitation"
-                            )}
-                      </Button>
+                    {isSubmitting || mutation.isPending ? (
+                      <>
+                        <Spinner />
+                        <span>Creating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <SendIcon />
+                        <span>Send Invitation</span>
+                      </>
                     )}
-                  />
-                </DialogFooter>
-              </form>
-            )}
+                  </Button>
+                )}
+              />
+            </DialogFooter>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

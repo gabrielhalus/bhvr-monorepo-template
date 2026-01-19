@@ -42,7 +42,7 @@ export function ActionDropdown({ row: { original: user } }: { row: Row<User> }) 
   });
 
   const handleDeleteClick = async () => {
-    const confirmation = await sayno({
+    const confirmation = await sayno.confirm({
       title: "Delete User",
       description: "Are you sure you want to delete this user? This action cannot be undone.",
       variant: "destructive",

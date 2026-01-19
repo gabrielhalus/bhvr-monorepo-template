@@ -55,7 +55,7 @@ export function InvitationActionDropdown({ row: { original: invitation } }: { ro
   };
 
   const handleRevokeClick = async () => {
-    const confirmation = await sayno({
+    const confirmation = await sayno.confirm({
       title: "Revoke Invitation",
       description: "Are you sure you want to revoke this invitation? The user will no longer be able to use this link.",
       variant: "destructive",
@@ -67,7 +67,7 @@ export function InvitationActionDropdown({ row: { original: invitation } }: { ro
   };
 
   const handleDeleteClick = async () => {
-    const confirmation = await sayno({
+    const confirmation = await sayno.confirm({
       title: "Delete Invitation",
       description: "Are you sure you want to delete this invitation? The user will no longer be able to use this link.",
       variant: "destructive",

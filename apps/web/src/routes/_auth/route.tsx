@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_auth")({
   beforeLoad: async ({ context }) => {
     await auth({ redirectOnAuthenticated: true, redirectOnUnauthenticated: false });
 
-    const { value: config } = await context.queryClient.ensureQueryData(getRuntimeConfigQueryOptions("authentication.00_disableRegister"));
+    const { value: config } = await context.queryClient.ensureQueryData(getRuntimeConfigQueryOptions("authentication.disableRegister"));
     return { disableRegister: inferConfigValue(config.value!) };
   },
 });
