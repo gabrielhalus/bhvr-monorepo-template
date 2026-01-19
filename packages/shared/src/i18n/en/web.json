@@ -8,6 +8,52 @@
       "list": {
         "title": "Users",
         "subtitle": "Manage your users."
+      },
+      "detail": {
+        "title": "User Details",
+        "subtitle": "View and manage user information.",
+        "sections": {
+          "edit": {
+            "title": "Edit User",
+            "description": "Update user information."
+          },
+          "security": {
+            "title": "Security",
+            "description": "Manage user security settings."
+          }
+        },
+        "fields": {
+          "name": "Name",
+          "email": "Email"
+        },
+        "resetPassword": {
+          "button": "Reset Password",
+          "confirmTitle": "Reset Password",
+          "confirmDescription": "Are you sure you want to reset this user's password? A new random password will be generated.",
+          "successTitle": "Password Reset Successful",
+          "successDescription": "The new password has been generated. Make sure to copy it and share it with the user securely. This password will not be shown again.",
+          "copied": "Password copied to clipboard"
+        },
+        "impersonate": {
+          "button": "Impersonate User",
+          "confirmTitle": "Impersonate User",
+          "confirmDescription": "Are you sure you want to impersonate {{name}}? You will be logged in as this user until you stop impersonating.",
+          "success": "Now impersonating {{name}}"
+        }
+      }
+    },
+    "account": {
+      "title": "Account",
+      "subtitle": "Manage your account settings.",
+      "sections": {
+        "profile": {
+          "title": "Profile Information",
+          "description": "Update your profile information."
+        }
+      },
+      "fields": {
+        "name": "Name",
+        "email": "Email"
       }
     },
     "roles": {
@@ -207,6 +253,12 @@
         "edit": "Edit notification provider"
       }
     }
+  },
+  "impersonation": {
+    "banner": "{{impersonator}} is impersonating {{user}}",
+    "stop": "Stop Impersonating",
+    "stopped": "Impersonation stopped",
+    "stopError": "Failed to stop impersonation"
   },
   "errors": {
     "notification": {

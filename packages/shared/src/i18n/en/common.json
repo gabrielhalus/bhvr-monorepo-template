@@ -32,7 +32,8 @@
     "invalid": "Invalid input",
     "noChanges": "No changes",
     "save": "Save",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "close": "Close"
   },
   "dialog": {
     "confirmTitle": "Are you sure?",

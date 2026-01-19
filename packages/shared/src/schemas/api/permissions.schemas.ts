@@ -7,6 +7,7 @@ export const PermissionSchema = z.enum([
   "user:list",
   "user:update",
   "user:delete",
+  "user:impersonate",
 
   // RolesModel
   "role:create",

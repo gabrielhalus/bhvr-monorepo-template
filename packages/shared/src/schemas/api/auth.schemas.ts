@@ -44,3 +44,8 @@ export const isAuthorizedSchema = z.object({
   permission: PermissionSchema,
   resource: z.record(z.string(), z.unknown()).optional(),
 });
+
+export const UpdateAccountSchema = z.object({
+  name: z.string().min(1, "requiredErrorMessage").min(3, "minLengthErrorMessage").max(20, "maxLengthErrorMessage"),
+  email: z.email("invalidErrorMessage").toLowerCase(),
+});

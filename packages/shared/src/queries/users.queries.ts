@@ -308,3 +308,24 @@ export async function emailExists(email: string): Promise<boolean> {
 
   return !!user;
 }
+
+/**
+ * Update a user's password.
+ * @param id - The user id.
+ * @param hashedPassword - The hashed password to set.
+ * @returns The updated user.
+ * @throws An error if the user could not be updated.
+ */
+export async function updateUserPassword(id: string, hashedPassword: string): Promise<User> {
+  const [updatedUser] = await drizzle
+    .update(UsersModel)
+    .set({ password: hashedPassword, updatedAt: new Date().toISOString() })
+    .where(eq(UsersModel.id, id))
+    .returning();
+
+  if (!updatedUser) {
+    throw new Error("Failed to update user password");
+  }
+
+  return UserSchema.parse(updatedUser);
+}

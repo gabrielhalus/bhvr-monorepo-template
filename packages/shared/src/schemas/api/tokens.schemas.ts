@@ -6,6 +6,7 @@ export const AccessTokenSchema = z.object({
   exp: z.number(),
   ttyp: z.literal("access"),
   iss: z.string(),
+  impersonatorId: z.string().optional(),
 });
 
 export const RefreshTokenSchema = z.object({

@@ -16,6 +16,7 @@ export type Condition
 export type Session = {
   user: UserWithRelations<["roles"]>;
   authenticated: true;
+  impersonator?: UserWithRelations<["roles"]>;
 };
 
 export type PasswordRules = {
