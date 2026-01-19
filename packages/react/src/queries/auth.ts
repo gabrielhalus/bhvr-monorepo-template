@@ -15,11 +15,12 @@ export const authQueryOptions = queryOptions({
       return null;
     }
 
-    const { user } = await res.json() as InferResponseType<typeof api.auth.$get>;
+    const data = await res.json() as InferResponseType<typeof api.auth.$get>;
 
     return {
-      user,
+      user: data.user,
       authenticated: true,
+      ...(data.impersonator && { impersonator: data.impersonator }),
     };
   },
   staleTime: Infinity,
