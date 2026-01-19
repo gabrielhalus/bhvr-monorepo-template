@@ -12,15 +12,17 @@ export const VERIFICATION_TOKEN_EXPIRATION_SECONDS = 60 * 60 * 24; // 1 day
 /**
  * Create an access token.
  * @param userId - The user ID to create the token for.
+ * @param impersonatorId - Optional ID of the user who is impersonating.
  * @returns The access token.
  */
-export async function createAccessToken(userId: string): Promise<string> {
+export async function createAccessToken(userId: string, impersonatorId?: string): Promise<string> {
   const payload: JwtPayload = {
     sub: userId,
     ttyp: "access",
     iat: Math.floor(Date.now() / 1000),
     exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRATION_SECONDS,
     iss: "bunstack",
+    ...(impersonatorId && { impersonatorId }),
   };
 
   return await sign(payload, env.JWT_SECRET);

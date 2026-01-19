@@ -43,7 +43,14 @@ export const getSessionContext = factory.createMiddleware(async (c, next) => {
     return c.json({ error: "Unauthorized" }, 401);
   }
 
-  c.set("sessionContext", { user });
+  // Check if this is an impersonation session
+  let impersonator: typeof user | undefined;
+  if (decoded.impersonatorId) {
+    const impersonatorUser = await getUser(decoded.impersonatorId, ["roles"]);
+    impersonator = impersonatorUser ?? undefined;
+  }
+
+  c.set("sessionContext", { user, impersonator });
 
   await next();
 });
@@ -73,6 +80,8 @@ async function attemptTokenRefresh(c: AppContext): Promise<AccessToken | null> {
       return null;
     }
 
+    // Note: When refreshing, we don't preserve impersonation - it only lasts for the access token lifetime
+    // This is a security feature to prevent long-running impersonation sessions
     const newAccessToken = await createAccessToken(decoded.sub);
     setCookie(c, "accessToken", newAccessToken, getCookieSettings("access"));
 

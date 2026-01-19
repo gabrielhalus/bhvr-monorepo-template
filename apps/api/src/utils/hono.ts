@@ -7,6 +7,7 @@ export type AppEnv = {
   Variables: {
     sessionContext: {
       user: UserWithRelations<["roles"]>;
+      impersonator?: UserWithRelations<["roles"]>;
     };
   };
 };

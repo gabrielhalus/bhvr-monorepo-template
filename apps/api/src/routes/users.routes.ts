@@ -1,12 +1,50 @@
+import { password } from "bun";
 import { Hono } from "hono";
 import { z } from "zod";
 
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { deleteUser, emailExists, getUser, getUsers, updateUser } from "~shared/queries/users.queries";
+import { deleteUser, emailExists, getUser, getUsers, updateUser, updateUserPassword } from "~shared/queries/users.queries";
 import { UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
 import { UpdateUserSchema } from "~shared/schemas/db/users.schemas";
+
+/**
+ * Generates a random password that meets the password requirements.
+ * @returns A random password string.
+ */
+function generateRandomPassword(): string {
+  const lowercase = "abcdefghijklmnopqrstuvwxyz";
+  const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const digits = "0123456789";
+  const special = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+
+  const getRandomChar = (chars: string) => chars[Math.floor(Math.random() * chars.length)];
+
+  // Ensure at least one of each required character type
+  const requiredChars = [
+    getRandomChar(lowercase),
+    getRandomChar(uppercase),
+    getRandomChar(digits),
+    getRandomChar(special),
+  ];
+
+  // Fill the rest with random characters from all types
+  const allChars = lowercase + uppercase + digits + special;
+  const remainingLength = 12 - requiredChars.length;
+
+  for (let i = 0; i < remainingLength; i++) {
+    requiredChars.push(getRandomChar(allChars));
+  }
+
+  // Shuffle the array
+  for (let i = requiredChars.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [requiredChars[i], requiredChars[j]] = [requiredChars[j], requiredChars[i]];
+  }
+
+  return requiredChars.join("");
+}
 
 export const usersRoutes = new Hono()
   /**
@@ -95,6 +133,36 @@ export const usersRoutes = new Hono()
     try {
       const user = await updateUser(id, data);
       return c.json({ success: true as const, user });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Reset a user's password and generate a new random one
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response containing the new password (plaintext)
+   * @throws {404} If the user is not found
+   * @throws {500} If an error occurs while resetting the password
+   * @access protected
+   * @permission user:update (resource-specific)
+   */
+  .post("/:id/reset-password", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), async (c) => {
+    const id = c.req.param("id");
+
+    try {
+      const user = await getUser(id);
+      if (!user) {
+        return c.json({ success: false as const, error: "User not found" }, 404);
+      }
+
+      const newPassword = generateRandomPassword();
+      const hashedPassword = await password.hash(newPassword);
+
+      await updateUserPassword(id, hashedPassword);
+
+      return c.json({ success: true as const, password: newPassword });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
