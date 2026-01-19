@@ -12,6 +12,7 @@ import {
   DropdownMenuSubTrigger,
 } from "~react/components/dropdown-menu";
 import { Separator } from "~react/components/separator";
+import { cn } from "~react/lib/utils";
 
 export function ThemeSubmenu() {
   const { t } = useTranslation("common");
@@ -66,7 +67,7 @@ export function ThemeSubmenu() {
               <DropdownMenuItem
                 key={option.value}
                 onClick={event => handleThemeChange(option.value, event)}
-                className={`flex items-center gap-2 ${isActive ? "bg-accent text-accent-foreground" : ""}`}
+                className={cn("flex items-center gap-2 cursor-pointer", isActive ? "bg-accent text-accent-foreground" : "")}
               >
                 <OptionIcon className="size-4 text-muted-foreground" />
                 <span className="text-sm">{option.label}</span>
@@ -84,7 +85,7 @@ export function ThemeSubmenu() {
               <DropdownMenuItem
                 key={option.value}
                 onClick={event => handleThemeChange(option.value, event)}
-                className={`flex items-center gap-2 ${isActive ? "bg-accent text-accent-foreground" : ""}`}
+                className={cn("flex items-center gap-2 cursor-pointer", isActive ? "bg-accent text-accent-foreground" : "")}
               >
                 <OptionIcon className="size-4 text-muted-foreground" />
                 <span className="text-sm">{option.label}</span>
@@ -102,7 +103,7 @@ export function ThemeSubmenu() {
               <DropdownMenuItem
                 key={option.value}
                 onClick={event => handleThemeChange(option.value, event)}
-                className={`flex items-center gap-2 ${isActive ? "bg-accent text-accent-foreground" : ""}`}
+                className={cn("flex items-center gap-2 cursor-pointer", isActive ? "bg-accent text-accent-foreground" : "")}
               >
                 <OptionIcon className="size-4 text-muted-foreground" />
                 <span className="text-sm">{option.label}</span>

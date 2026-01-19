@@ -19,6 +19,7 @@ import { Route as DashboardSettingsRouteRouteImport } from './routes/_dashboard/
 import { Route as DashboardRolesRouteRouteImport } from './routes/_dashboard/roles/route'
 import { Route as DashboardUsersIndexRouteImport } from './routes/_dashboard/users/index'
 import { Route as DashboardRolesIndexRouteImport } from './routes/_dashboard/roles/index'
+import { Route as DashboardAccountIndexRouteImport } from './routes/_dashboard/account/index'
 import { Route as AuthRegisterIndexRouteImport } from './routes/_auth/register/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as DashboardSettingsSplatRouteImport } from './routes/_dashboard/settings/$'
@@ -76,6 +77,11 @@ const DashboardRolesIndexRoute = DashboardRolesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRolesRouteRoute,
 } as any)
+const DashboardAccountIndexRoute = DashboardAccountIndexRouteImport.update({
+  id: '/account/',
+  path: '/account/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const AuthRegisterIndexRoute = AuthRegisterIndexRouteImport.update({
   id: '/register/',
   path: '/register/',
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/settings/$': typeof DashboardSettingsSplatRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
+  '/account': typeof DashboardAccountIndexRoute
   '/roles/': typeof DashboardRolesIndexRoute
   '/users/': typeof DashboardUsersIndexRoute
   '/users/$userId': typeof DashboardUsersUserIdIndexRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/settings/$': typeof DashboardSettingsSplatRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
+  '/account': typeof DashboardAccountIndexRoute
   '/roles': typeof DashboardRolesIndexRoute
   '/users': typeof DashboardUsersIndexRoute
   '/users/$userId': typeof DashboardUsersUserIdIndexRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/_dashboard/settings/$': typeof DashboardSettingsSplatRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/register/': typeof AuthRegisterIndexRoute
+  '/_dashboard/account/': typeof DashboardAccountIndexRoute
   '/_dashboard/roles/': typeof DashboardRolesIndexRoute
   '/_dashboard/users/': typeof DashboardUsersIndexRoute
   '/_dashboard/users/$userId/': typeof DashboardUsersUserIdIndexRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/settings/$'
     | '/login'
     | '/register'
+    | '/account'
     | '/roles/'
     | '/users/'
     | '/users/$userId'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/settings/$'
     | '/login'
     | '/register'
+    | '/account'
     | '/roles'
     | '/users'
     | '/users/$userId'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/_dashboard/settings/$'
     | '/_auth/login/'
     | '/_auth/register/'
+    | '/_dashboard/account/'
     | '/_dashboard/roles/'
     | '/_dashboard/users/'
     | '/_dashboard/users/$userId/'
@@ -308,6 +320,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/roles/'
       preLoaderRoute: typeof DashboardRolesIndexRouteImport
       parentRoute: typeof DashboardRolesRouteRoute
+    }
+    '/_dashboard/account/': {
+      id: '/_dashboard/account/'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof DashboardAccountIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
     }
     '/_auth/register/': {
       id: '/_auth/register/'
@@ -447,6 +466,7 @@ interface DashboardRouteRouteChildren {
   DashboardUsersRouteRoute: typeof DashboardUsersRouteRouteWithChildren
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardAccountIndexRoute: typeof DashboardAccountIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
@@ -455,6 +475,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardUsersRouteRoute: DashboardUsersRouteRouteWithChildren,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardAccountIndexRoute: DashboardAccountIndexRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(

@@ -1,9 +1,13 @@
+import { Link } from "@tanstack/react-router";
+import { User2 } from "lucide-react";
+
 import { LocaleSubmenu } from "@/components/layout/locale-submenu";
 import { LogoutButton } from "@/components/layout/logout-button";
 import { ThemeSubmenu } from "@/components/layout/theme-submenu";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -55,6 +59,13 @@ export function NavUser() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+
+            <DropdownMenuItem className="cursor-pointer" asChild>
+              <Link to="/account">
+                <User2 />
+                My Account
+              </Link>
+            </DropdownMenuItem>
 
             <LocaleSubmenu />
             <ThemeSubmenu />

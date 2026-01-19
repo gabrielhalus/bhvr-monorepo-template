@@ -42,8 +42,8 @@ export function LocaleSubmenu() {
               key={locale.code}
               onClick={event => handleLocaleChange(locale.code, event)}
               className={cn(
-                "flex items-center justify-center px-3 py-2 text-sm",
-                i18n.language === locale.code && "bg-accent text-accent-foreground"
+                "flex items-center justify-center px-3 py-2 text-sm cursor-pointer",
+                i18n.language === locale.code && "bg-accent text-accent-foreground",
               )}
             >
               {locale.name}

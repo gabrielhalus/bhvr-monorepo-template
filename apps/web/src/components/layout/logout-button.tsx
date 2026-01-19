@@ -11,6 +11,7 @@ import { Spinner } from "~react/components/spinner";
 import { useAuth } from "~react/hooks/use-auth";
 import { api } from "~react/lib/http";
 import sayno from "~react/lib/sayno";
+import { cn } from "~react/lib/utils";
 
 type Variant = "button" | "dropdown";
 
@@ -68,14 +69,14 @@ export function LogoutButton({ variant = "button", className }: CommonProps) {
 
   if (variant === "dropdown") {
     return (
-      <DropdownMenuItem onClick={handleLogoutClick} className={className}>
+      <DropdownMenuItem onClick={handleLogoutClick} className={cn("cursor-pointer", className)}>
         {content}
       </DropdownMenuItem>
     );
   }
 
   return (
-    <Button disabled={mutation.isPending} onClick={handleLogoutClick} className={className}>
+    <Button disabled={mutation.isPending} onClick={handleLogoutClick} className={cn("cursor-pointer", className)}>
       {content}
     </Button>
   );
