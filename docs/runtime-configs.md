@@ -21,11 +21,10 @@ Runtime configs allow you to change application behavior without redeploying. Th
 Use dot notation to organize configs hierarchically:
 
 ```
-category.##_configName
+category.configName
 ```
 
 - **category**: Groups related configs (e.g., `authentication`, `features`)
-- **##**: Two-digit number for ordering (e.g., `00`, `01`)
 - **configName**: Descriptive camelCase name
 
 Example: `authentication.disableRegister`
