@@ -16,7 +16,7 @@ import {
   getPendingInvitationByEmail,
   updateInvitation,
 } from "~shared/queries/invitations.queries";
-import { getDefaultRole } from "~shared/queries/roles.queries";
+import { getDefaultRole, getRole } from "~shared/queries/roles.queries";
 import { insertToken } from "~shared/queries/tokens.queries";
 import { createUserRole } from "~shared/queries/user-roles.queries";
 import { createUser, emailExists } from "~shared/queries/users.queries";
@@ -62,11 +62,20 @@ export const invitationsRoutes = new Hono()
         name,
         email: invitation.email,
         password: hashedPassword,
+        verifiedAt: invitation.autoValidateEmail ? new Date().toISOString() : undefined,
       });
 
-      const defaultRole = await getDefaultRole();
-      if (defaultRole) {
-        await createUserRole({ userId: insertedUser.id, roleId: defaultRole.id });
+      // Use invitation's roleId if specified, otherwise use default role
+      if (invitation.roleId) {
+        const role = await getRole(invitation.roleId);
+        if (role) {
+          await createUserRole({ userId: insertedUser.id, roleId: role.id });
+        }
+      } else {
+        const defaultRole = await getDefaultRole();
+        if (defaultRole) {
+          await createUserRole({ userId: insertedUser.id, roleId: defaultRole.id });
+        }
       }
 
       await updateInvitation(invitation.id, {
@@ -167,7 +176,7 @@ export const invitationsRoutes = new Hono()
    * @permission invitation:create
    */
   .post("/", validationMiddleware("json", CreateInvitationSchema), requirePermissionFactory("invitation:create"), async (c) => {
-    const { email } = c.req.valid("json");
+    const { email, roleId, autoValidateEmail } = c.req.valid("json");
     const { user } = c.var.sessionContext;
 
     try {
@@ -188,6 +197,8 @@ export const invitationsRoutes = new Hono()
         token,
         expiresAt,
         invitedById: user.id,
+        roleId: roleId ?? null,
+        autoValidateEmail: autoValidateEmail ?? false,
       });
 
       return c.json({ success: true as const, invitation });
