@@ -1,6 +1,7 @@
-import { pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
 import { nanoid } from "~shared/lib/nanoid";
+import { RolesModel } from "~shared/models/roles.model";
 import { UsersModel } from "~shared/models/users.model";
 
 export const InvitationsModel = pgTable("invitations", {
@@ -10,6 +11,8 @@ export const InvitationsModel = pgTable("invitations", {
   status: varchar("status", { length: 20 }).notNull().default("pending").$type<"pending" | "accepted" | "expired" | "revoked">(),
   expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
   invitedById: varchar("invited_by_id", { length: 21 }).notNull().references(() => UsersModel.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  roleId: integer("role_id").references(() => RolesModel.id, { onDelete: "set null", onUpdate: "cascade" }),
+  autoValidateEmail: boolean("auto_validate_email").notNull().default(false),
   acceptedAt: timestamp("accepted_at", { mode: "string" }),
   createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow(),

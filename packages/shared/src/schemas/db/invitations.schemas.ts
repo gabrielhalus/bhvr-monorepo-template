@@ -17,6 +17,8 @@ export const InsertInvitationSchema = createInsertSchema(InvitationsModel).omit(
   status: true,
 }).extend({
   email: z.email().transform(val => val.toLowerCase()),
+  roleId: z.number().int().positive().nullish(),
+  autoValidateEmail: z.boolean().optional().default(false),
 });
 
 export const UpdateInvitationSchema = createUpdateSchema(InvitationsModel).extend({
