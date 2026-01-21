@@ -21,7 +21,7 @@ import { Spinner } from "~react/components/spinner";
 import { useAuth } from "~react/hooks/use-auth";
 import { api } from "~react/lib/http";
 import sayno from "~react/lib/sayno";
-import { authQueryOptions, authorizeQueryOptions } from "~react/queries/auth";
+import { authorizeQueryOptions } from "~react/queries/auth";
 import { UpdateAccountSchema } from "~shared/schemas/api/auth.schemas";
 
 export const Route = createFileRoute("/_dashboard/users/$userId/")({
@@ -205,7 +205,10 @@ function User() {
             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1.5">
                 <CalendarIcon className="size-4" />
-                <span>Joined {joinedDate}</span>
+                <span>
+                  Joined
+                  {joinedDate}
+                </span>
               </div>
               {user.verifiedAt && (
                 <Badge variant="secondary">Verified</Badge>
