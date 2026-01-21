@@ -7,14 +7,108 @@
       "title": "Usuarios",
       "list": {
         "title": "Usuarios",
-        "subtitle": "Gestiona tus usuarios."
+        "subtitle": "Gestiona tus usuarios.",
+        "searchPlaceholder": "Buscar usuarios..."
+      },
+      "invitations": {
+        "title": "Invitaciones",
+        "subtitle": "Gestiona invitaciones pendientes y pasadas.",
+        "searchPlaceholder": "Buscar invitaciones..."
+      },
+      "columns": {
+        "name": "Nombre",
+        "roles": "Roles",
+        "joined": "Registrado",
+        "email": "Correo",
+        "status": "Estado",
+        "invitedBy": "Invitado por",
+        "expires": "Expira"
+      },
+      "status": {
+        "pending": "Pendiente",
+        "accepted": "Aceptado",
+        "expired": "Expirado",
+        "revoked": "Revocado"
+      },
+      "actions": {
+        "openMenu": "Abrir menú",
+        "actionsLabel": "Acciones",
+        "copyUserId": "Copiar ID de usuario",
+        "deleteUser": "Eliminar usuario",
+        "deleteUserConfirm": "¿Estás seguro de que quieres eliminar este usuario? Esta acción no se puede deshacer.",
+        "deleteUserSuccess": "Usuario eliminado exitosamente",
+        "deleteUserError": "Error al eliminar usuario",
+        "copyId": "Copiar ID",
+        "copyInvitationLink": "Copiar enlace de invitación",
+        "revokeInvitation": "Revocar invitación",
+        "revokeInvitationConfirm": "¿Estás seguro de que quieres revocar esta invitación? El usuario ya no podrá usar este enlace.",
+        "revokeInvitationSuccess": "Invitación revocada exitosamente",
+        "revokeInvitationError": "Error al revocar invitación",
+        "deleteInvitation": "Eliminar invitación",
+        "deleteInvitationConfirm": "¿Estás seguro de que quieres eliminar esta invitación? El usuario ya no podrá usar este enlace.",
+        "deleteInvitationSuccess": "Invitación eliminada exitosamente",
+        "deleteInvitationError": "Error al eliminar invitación",
+        "invitationLinkCopied": "Enlace de invitación copiado al portapapeles"
+      },
+      "invite": {
+        "button": "Invitar usuario",
+        "title": "Invitar usuario",
+        "description": "Envía un enlace de invitación a un nuevo usuario. La invitación expirará en 7 días.",
+        "emailLabel": "Dirección de correo",
+        "emailPlaceholder": "usuario@ejemplo.com",
+        "roleLabel": "Rol",
+        "rolePlaceholder": "Rol predeterminado",
+        "autoValidateEmail": "Validar correo automáticamente",
+        "creating": "Creando...",
+        "sendInvitation": "Enviar invitación",
+        "success": "Invitación creada",
+        "successDescription": "El enlace ha sido copiado a tu portapapeles",
+        "shareDescription": "Comparte este enlace con el usuario para completar su registro",
+        "copied": "Copiado",
+        "copy": "Copiar",
+        "linkCopied": "Enlace copiado al portapapeles",
+        "done": "Listo",
+        "createError": "Error al crear invitación"
       }
+    },
+    "account": {
+      "title": "Cuenta",
+      "subtitle": "Gestiona la configuración de tu cuenta.",
+      "sections": {
+        "profile": {
+          "title": "Información del perfil",
+          "description": "Actualiza la información de tu perfil."
+        }
+      },
+      "fields": {
+        "name": "Nombre",
+        "email": "Correo"
+      }
+    },
+    "nav": {
+      "myAccount": "Mi cuenta",
+      "toggle": "Alternar"
     },
     "roles": {
       "title": "Roles",
       "list": {
         "title": "Roles",
-        "subtitle": "Gestiona tus roles."
+        "subtitle": "Gestiona tus roles.",
+        "searchPlaceholder": "Buscar roles..."
+      },
+      "columns": {
+        "role": "Rol",
+        "members": "Miembros"
+      },
+      "badges": {
+        "default": "Predeterminado",
+        "admin": "Admin"
+      },
+      "allUsers": "Todos los usuarios",
+      "actions": {
+        "openMenu": "Abrir menú",
+        "actionsLabel": "Acciones",
+        "copyRoleId": "Copiar ID de rol"
       },
       "detail": {
         "title": "Editar rol - {{role}}",
@@ -29,9 +123,22 @@
             "title": "Miembros",
             "addMembers": {
               "label": "Añadir miembros",
-              "description": "Añadir miembros al rol <b>{{role}}</b>."
+              "description": "Selecciona usuarios para asignar al rol {{role}}"
             },
-            "searchMembers": "Buscar miembros..."
+            "searchMembers": "Buscar miembros...",
+            "defaultRole": "Rol predeterminado",
+            "defaultRoleDescription": "Este rol se asigna automáticamente a todos los usuarios y no puede gestionarse manualmente",
+            "allUsersAssigned": "Todos los usuarios asignados",
+            "allUsersAssignedDescription": "Todos los usuarios ya tienen este rol",
+            "selected": "Seleccionado",
+            "usersSelected_one": "{{count}} usuario seleccionado",
+            "usersSelected_other": "{{count}} usuarios seleccionados",
+            "clearSelection": "Borrar selección",
+            "assign": "Asignar",
+            "assignWithCount": "Asignar ({{count}})",
+            "assignSuccess": "Usuarios asignados al rol exitosamente",
+            "assignError": "Error al asignar usuarios al rol",
+            "selectAtLeastOne": "Por favor selecciona al menos un usuario"
           },
           "permissions": {
             "title": "Permisos"

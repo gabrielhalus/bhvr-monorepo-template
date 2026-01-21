@@ -19,5 +19,23 @@
         "minSpecialChars_other": "At least {{count}} special characters (e.g., !@#$%)"
       }
     }
+  },
+  "dataTable": {
+    "columns": "Columns",
+    "noResults": "No results.",
+    "rowsSelected": "{{selected}} of {{total}} row(s) selected.",
+    "rowsTotal": "{{count}} row(s) total.",
+    "pageOf": "Page {{current}} of {{total}}",
+    "previous": "Previous",
+    "next": "Next",
+    "searchPlaceholder": "Search..."
+  },
+  "cookieConsent": {
+    "title": "We use cookies",
+    "description": "We use cookies to ensure you get the best experience on our website. For more information on how we use cookies, please see our cookie policy.",
+    "agreement": "By clicking \"Accept\", you agree to our use of cookies.",
+    "learnMore": "Learn more",
+    "decline": "Decline",
+    "accept": "Accept"
   }
 }

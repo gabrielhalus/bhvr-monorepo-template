@@ -19,5 +19,23 @@
         "minSpecialChars_other": "Au moins {{count}} caractères spéciaux (ex : !@#$%)"
       }
     }
+  },
+  "dataTable": {
+    "columns": "Colonnes",
+    "noResults": "Aucun résultat.",
+    "rowsSelected": "{{selected}} sur {{total}} ligne(s) sélectionnée(s).",
+    "rowsTotal": "{{count}} ligne(s) au total.",
+    "pageOf": "Page {{current}} sur {{total}}",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "searchPlaceholder": "Rechercher..."
+  },
+  "cookieConsent": {
+    "title": "Nous utilisons des cookies",
+    "description": "Nous utilisons des cookies pour vous garantir la meilleure expérience sur notre site web. Pour plus d'informations sur notre utilisation des cookies, veuillez consulter notre politique en matière de cookies.",
+    "agreement": "En cliquant sur \"Accepter\", vous acceptez notre utilisation des cookies.",
+    "learnMore": "En savoir plus",
+    "decline": "Refuser",
+    "accept": "Accepter"
   }
 }

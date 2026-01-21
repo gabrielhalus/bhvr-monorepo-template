@@ -7,14 +7,108 @@
       "title": "Gebruikers",
       "list": {
         "title": "Gebruikers",
-        "subtitle": "Beheer je gebruikers."
+        "subtitle": "Beheer je gebruikers.",
+        "searchPlaceholder": "Zoek gebruikers..."
+      },
+      "invitations": {
+        "title": "Uitnodigingen",
+        "subtitle": "Beheer lopende en eerdere uitnodigingen.",
+        "searchPlaceholder": "Zoek uitnodigingen..."
+      },
+      "columns": {
+        "name": "Naam",
+        "roles": "Rollen",
+        "joined": "Lid sinds",
+        "email": "E-mail",
+        "status": "Status",
+        "invitedBy": "Uitgenodigd door",
+        "expires": "Verloopt"
+      },
+      "status": {
+        "pending": "In behandeling",
+        "accepted": "Geaccepteerd",
+        "expired": "Verlopen",
+        "revoked": "Ingetrokken"
+      },
+      "actions": {
+        "openMenu": "Menu openen",
+        "actionsLabel": "Acties",
+        "copyUserId": "Kopieer gebruikers-ID",
+        "deleteUser": "Gebruiker verwijderen",
+        "deleteUserConfirm": "Weet je zeker dat je deze gebruiker wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+        "deleteUserSuccess": "Gebruiker succesvol verwijderd",
+        "deleteUserError": "Fout bij verwijderen gebruiker",
+        "copyId": "Kopieer ID",
+        "copyInvitationLink": "Kopieer uitnodigingslink",
+        "revokeInvitation": "Uitnodiging intrekken",
+        "revokeInvitationConfirm": "Weet je zeker dat je deze uitnodiging wilt intrekken? De gebruiker kan deze link niet meer gebruiken.",
+        "revokeInvitationSuccess": "Uitnodiging succesvol ingetrokken",
+        "revokeInvitationError": "Fout bij intrekken uitnodiging",
+        "deleteInvitation": "Uitnodiging verwijderen",
+        "deleteInvitationConfirm": "Weet je zeker dat je deze uitnodiging wilt verwijderen? De gebruiker kan deze link niet meer gebruiken.",
+        "deleteInvitationSuccess": "Uitnodiging succesvol verwijderd",
+        "deleteInvitationError": "Fout bij verwijderen uitnodiging",
+        "invitationLinkCopied": "Uitnodigingslink gekopieerd naar klembord"
+      },
+      "invite": {
+        "button": "Gebruiker uitnodigen",
+        "title": "Gebruiker uitnodigen",
+        "description": "Stuur een uitnodigingslink naar een nieuwe gebruiker. De uitnodiging verloopt over 7 dagen.",
+        "emailLabel": "E-mailadres",
+        "emailPlaceholder": "gebruiker@voorbeeld.nl",
+        "roleLabel": "Rol",
+        "rolePlaceholder": "Standaard rol",
+        "autoValidateEmail": "E-mail automatisch valideren",
+        "creating": "Aanmaken...",
+        "sendInvitation": "Uitnodiging versturen",
+        "success": "Uitnodiging aangemaakt",
+        "successDescription": "De link is naar je klembord gekopieerd",
+        "shareDescription": "Deel deze link met de gebruiker om de registratie te voltooien",
+        "copied": "Gekopieerd",
+        "copy": "Kopiëren",
+        "linkCopied": "Link gekopieerd naar klembord",
+        "done": "Klaar",
+        "createError": "Fout bij aanmaken uitnodiging"
       }
+    },
+    "account": {
+      "title": "Account",
+      "subtitle": "Beheer je accountinstellingen.",
+      "sections": {
+        "profile": {
+          "title": "Profielinformatie",
+          "description": "Werk je profielinformatie bij."
+        }
+      },
+      "fields": {
+        "name": "Naam",
+        "email": "E-mail"
+      }
+    },
+    "nav": {
+      "myAccount": "Mijn account",
+      "toggle": "Schakelen"
     },
     "roles": {
       "title": "Rollen",
       "list": {
         "title": "Rollen",
-        "subtitle": "Beheer je rollen."
+        "subtitle": "Beheer je rollen.",
+        "searchPlaceholder": "Zoek rollen..."
+      },
+      "columns": {
+        "role": "Rol",
+        "members": "Leden"
+      },
+      "badges": {
+        "default": "Standaard",
+        "admin": "Admin"
+      },
+      "allUsers": "Alle gebruikers",
+      "actions": {
+        "openMenu": "Menu openen",
+        "actionsLabel": "Acties",
+        "copyRoleId": "Kopieer rol-ID"
       },
       "detail": {
         "title": "Rol bewerken - {{role}}",
@@ -29,9 +123,22 @@
             "title": "Leden",
             "addMembers": {
               "label": "Leden toevoegen",
-              "description": "Voeg leden toe aan de rol <b>{{role}}</b>."
+              "description": "Selecteer gebruikers om toe te wijzen aan de rol {{role}}"
             },
-            "searchMembers": "Zoek leden..."
+            "searchMembers": "Zoek leden...",
+            "defaultRole": "Standaard rol",
+            "defaultRoleDescription": "Deze rol wordt automatisch aan alle gebruikers toegewezen en kan niet handmatig worden beheerd",
+            "allUsersAssigned": "Alle gebruikers toegewezen",
+            "allUsersAssignedDescription": "Elke gebruiker heeft deze rol al",
+            "selected": "Geselecteerd",
+            "usersSelected_one": "{{count}} gebruiker geselecteerd",
+            "usersSelected_other": "{{count}} gebruikers geselecteerd",
+            "clearSelection": "Selectie wissen",
+            "assign": "Toewijzen",
+            "assignWithCount": "Toewijzen ({{count}})",
+            "assignSuccess": "Gebruikers succesvol aan rol toegewezen",
+            "assignError": "Fout bij toewijzen van gebruikers aan rol",
+            "selectAtLeastOne": "Selecteer ten minste één gebruiker"
           },
           "permissions": {
             "title": "Machtigingen"

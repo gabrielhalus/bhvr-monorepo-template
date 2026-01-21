@@ -59,6 +59,7 @@
     "total": "au total.",
     "page": "Page",
     "previous": "Précédent",
-    "next": "Suivant"
+    "next": "Suivant",
+    "searchPlaceholder": "Rechercher..."
   }
 }

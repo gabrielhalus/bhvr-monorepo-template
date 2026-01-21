@@ -60,6 +60,7 @@
     "total": "total.",
     "page": "Page",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "searchPlaceholder": "Search..."
   }
 }

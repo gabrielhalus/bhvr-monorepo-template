@@ -59,6 +59,7 @@
     "total": "totaal.",
     "page": "Pagina",
     "previous": "Vorige",
-    "next": "Volgende"
+    "next": "Volgende",
+    "searchPlaceholder": "Zoeken..."
   }
 }

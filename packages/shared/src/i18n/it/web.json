@@ -7,14 +7,108 @@
       "title": "Utenti",
       "list": {
         "title": "Utenti",
-        "subtitle": "Gestisci i tuoi utenti."
+        "subtitle": "Gestisci i tuoi utenti.",
+        "searchPlaceholder": "Cerca utenti..."
+      },
+      "invitations": {
+        "title": "Inviti",
+        "subtitle": "Gestisci inviti in sospeso e passati.",
+        "searchPlaceholder": "Cerca inviti..."
+      },
+      "columns": {
+        "name": "Nome",
+        "roles": "Ruoli",
+        "joined": "Iscritto",
+        "email": "Email",
+        "status": "Stato",
+        "invitedBy": "Invitato da",
+        "expires": "Scade"
+      },
+      "status": {
+        "pending": "In attesa",
+        "accepted": "Accettato",
+        "expired": "Scaduto",
+        "revoked": "Revocato"
+      },
+      "actions": {
+        "openMenu": "Apri menu",
+        "actionsLabel": "Azioni",
+        "copyUserId": "Copia ID utente",
+        "deleteUser": "Elimina utente",
+        "deleteUserConfirm": "Sei sicuro di voler eliminare questo utente? Questa azione non può essere annullata.",
+        "deleteUserSuccess": "Utente eliminato con successo",
+        "deleteUserError": "Errore nell'eliminazione dell'utente",
+        "copyId": "Copia ID",
+        "copyInvitationLink": "Copia link invito",
+        "revokeInvitation": "Revoca invito",
+        "revokeInvitationConfirm": "Sei sicuro di voler revocare questo invito? L'utente non potrà più usare questo link.",
+        "revokeInvitationSuccess": "Invito revocato con successo",
+        "revokeInvitationError": "Errore nella revoca dell'invito",
+        "deleteInvitation": "Elimina invito",
+        "deleteInvitationConfirm": "Sei sicuro di voler eliminare questo invito? L'utente non potrà più usare questo link.",
+        "deleteInvitationSuccess": "Invito eliminato con successo",
+        "deleteInvitationError": "Errore nell'eliminazione dell'invito",
+        "invitationLinkCopied": "Link invito copiato negli appunti"
+      },
+      "invite": {
+        "button": "Invita utente",
+        "title": "Invita utente",
+        "description": "Invia un link di invito a un nuovo utente. L'invito scadrà tra 7 giorni.",
+        "emailLabel": "Indirizzo email",
+        "emailPlaceholder": "utente@esempio.com",
+        "roleLabel": "Ruolo",
+        "rolePlaceholder": "Ruolo predefinito",
+        "autoValidateEmail": "Valida email automaticamente",
+        "creating": "Creazione...",
+        "sendInvitation": "Invia invito",
+        "success": "Invito creato",
+        "successDescription": "Il link è stato copiato negli appunti",
+        "shareDescription": "Condividi questo link con l'utente per completare la registrazione",
+        "copied": "Copiato",
+        "copy": "Copia",
+        "linkCopied": "Link copiato negli appunti",
+        "done": "Fatto",
+        "createError": "Errore nella creazione dell'invito"
       }
+    },
+    "account": {
+      "title": "Account",
+      "subtitle": "Gestisci le impostazioni del tuo account.",
+      "sections": {
+        "profile": {
+          "title": "Informazioni profilo",
+          "description": "Aggiorna le informazioni del tuo profilo."
+        }
+      },
+      "fields": {
+        "name": "Nome",
+        "email": "Email"
+      }
+    },
+    "nav": {
+      "myAccount": "Il mio account",
+      "toggle": "Attiva/disattiva"
     },
     "roles": {
       "title": "Ruoli",
       "list": {
         "title": "Ruoli",
-        "subtitle": "Gestisci i tuoi ruoli."
+        "subtitle": "Gestisci i tuoi ruoli.",
+        "searchPlaceholder": "Cerca ruoli..."
+      },
+      "columns": {
+        "role": "Ruolo",
+        "members": "Membri"
+      },
+      "badges": {
+        "default": "Predefinito",
+        "admin": "Admin"
+      },
+      "allUsers": "Tutti gli utenti",
+      "actions": {
+        "openMenu": "Apri menu",
+        "actionsLabel": "Azioni",
+        "copyRoleId": "Copia ID ruolo"
       },
       "detail": {
         "title": "Modifica ruolo - {{role}}",
@@ -29,9 +123,22 @@
             "title": "Membri",
             "addMembers": {
               "label": "Aggiungi membri",
-              "description": "Aggiungi membri al ruolo <b>{{role}}</b>."
+              "description": "Seleziona gli utenti da assegnare al ruolo {{role}}"
             },
-            "searchMembers": "Cerca membri..."
+            "searchMembers": "Cerca membri...",
+            "defaultRole": "Ruolo predefinito",
+            "defaultRoleDescription": "Questo ruolo viene assegnato automaticamente a tutti gli utenti e non può essere gestito manualmente",
+            "allUsersAssigned": "Tutti gli utenti assegnati",
+            "allUsersAssignedDescription": "Ogni utente ha già questo ruolo",
+            "selected": "Selezionato",
+            "usersSelected_one": "{{count}} utente selezionato",
+            "usersSelected_other": "{{count}} utenti selezionati",
+            "clearSelection": "Cancella selezione",
+            "assign": "Assegna",
+            "assignWithCount": "Assegna ({{count}})",
+            "assignSuccess": "Utenti assegnati al ruolo con successo",
+            "assignError": "Errore nell'assegnazione degli utenti al ruolo",
+            "selectAtLeastOne": "Seleziona almeno un utente"
           },
           "permissions": {
             "title": "Permessi"

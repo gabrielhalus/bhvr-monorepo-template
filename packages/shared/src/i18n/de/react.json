@@ -19,5 +19,23 @@
         "minSpecialChars_other": "Mindestens {{count}} Sonderzeichen (z.B. !@#$%)"
       }
     }
+  },
+  "dataTable": {
+    "columns": "Spalten",
+    "noResults": "Keine Ergebnisse.",
+    "rowsSelected": "{{selected}} von {{total}} Zeile(n) ausgewählt.",
+    "rowsTotal": "{{count}} Zeile(n) insgesamt.",
+    "pageOf": "Seite {{current}} von {{total}}",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "searchPlaceholder": "Suchen..."
+  },
+  "cookieConsent": {
+    "title": "Wir verwenden Cookies",
+    "description": "Wir verwenden Cookies, um sicherzustellen, dass Sie die beste Erfahrung auf unserer Website erhalten. Weitere Informationen zur Verwendung von Cookies finden Sie in unserer Cookie-Richtlinie.",
+    "agreement": "Durch Klicken auf \"Akzeptieren\" stimmen Sie unserer Verwendung von Cookies zu.",
+    "learnMore": "Mehr erfahren",
+    "decline": "Ablehnen",
+    "accept": "Akzeptieren"
   }
 }

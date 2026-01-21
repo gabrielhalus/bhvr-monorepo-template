@@ -7,7 +7,68 @@
       "title": "Users",
       "list": {
         "title": "Users",
-        "subtitle": "Manage your users."
+        "subtitle": "Manage your users.",
+        "searchPlaceholder": "Search users..."
+      },
+      "invitations": {
+        "title": "Invitations",
+        "subtitle": "Manage pending and past invitations.",
+        "searchPlaceholder": "Search invitations..."
+      },
+      "columns": {
+        "name": "Name",
+        "roles": "Roles",
+        "joined": "Joined",
+        "email": "Email",
+        "status": "Status",
+        "invitedBy": "Invited By",
+        "expires": "Expires"
+      },
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "expired": "Expired",
+        "revoked": "Revoked"
+      },
+      "actions": {
+        "openMenu": "Open menu",
+        "actionsLabel": "Actions",
+        "copyUserId": "Copy User ID",
+        "deleteUser": "Delete User",
+        "deleteUserConfirm": "Are you sure you want to delete this user? This action cannot be undone.",
+        "deleteUserSuccess": "User deleted successfully",
+        "deleteUserError": "Failed to delete user",
+        "copyId": "Copy ID",
+        "copyInvitationLink": "Copy Invitation Link",
+        "revokeInvitation": "Revoke Invitation",
+        "revokeInvitationConfirm": "Are you sure you want to revoke this invitation? The user will no longer be able to use this link.",
+        "revokeInvitationSuccess": "Invitation revoked successfully",
+        "revokeInvitationError": "Failed to revoke invitation",
+        "deleteInvitation": "Delete Invitation",
+        "deleteInvitationConfirm": "Are you sure you want to delete this invitation? The user will no longer be able to use this link.",
+        "deleteInvitationSuccess": "Invitation deleted successfully",
+        "deleteInvitationError": "Failed to delete invitation",
+        "invitationLinkCopied": "Invitation link copied to clipboard"
+      },
+      "invite": {
+        "button": "Invite user",
+        "title": "Invite User",
+        "description": "Send an invitation link to a new user. The invitation will expire in 7 days.",
+        "emailLabel": "Email Address",
+        "emailPlaceholder": "user@example.com",
+        "roleLabel": "Role",
+        "rolePlaceholder": "Default role",
+        "autoValidateEmail": "Auto validate email",
+        "creating": "Creating...",
+        "sendInvitation": "Send Invitation",
+        "success": "Invitation Created",
+        "successDescription": "The link has been copied to your clipboard",
+        "shareDescription": "Share this link with the user to complete their registration",
+        "copied": "Copied",
+        "copy": "Copy",
+        "linkCopied": "Link copied to clipboard",
+        "done": "Done",
+        "createError": "Failed to create invitation"
       },
       "detail": {
         "title": "User Details",
@@ -56,11 +117,30 @@
         "email": "Email"
       }
     },
+    "nav": {
+      "myAccount": "My Account",
+      "toggle": "Toggle"
+    },
     "roles": {
       "title": "Roles",
       "list": {
         "title": "Roles",
-        "subtitle": "Manage your roles."
+        "subtitle": "Manage your roles.",
+        "searchPlaceholder": "Search roles..."
+      },
+      "columns": {
+        "role": "Role",
+        "members": "Members"
+      },
+      "badges": {
+        "default": "Default",
+        "admin": "Admin"
+      },
+      "allUsers": "All users",
+      "actions": {
+        "openMenu": "Open menu",
+        "actionsLabel": "Actions",
+        "copyRoleId": "Copy Role ID"
       },
       "detail": {
         "title": "Edit role - {{role}}",
@@ -75,9 +155,22 @@
             "title": "Members",
             "addMembers": {
               "label": "Add members",
-              "description": "Add members to the <b>{{role}}</b> role."
+              "description": "Select users to assign to the {{role}} role"
             },
-            "searchMembers": "Search members..."
+            "searchMembers": "Search members...",
+            "defaultRole": "Default Role",
+            "defaultRoleDescription": "This role is automatically assigned to all users and cannot be manually managed",
+            "allUsersAssigned": "All users assigned",
+            "allUsersAssignedDescription": "Every user already has this role",
+            "selected": "Selected",
+            "usersSelected_one": "{{count}} user selected",
+            "usersSelected_other": "{{count}} users selected",
+            "clearSelection": "Clear selection",
+            "assign": "Assign",
+            "assignWithCount": "Assign ({{count}})",
+            "assignSuccess": "Users assigned to role successfully",
+            "assignError": "Failed to assign users to role",
+            "selectAtLeastOne": "Please select at least one user"
           },
           "permissions": {
             "title": "Permissions"

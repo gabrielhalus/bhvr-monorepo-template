@@ -19,5 +19,23 @@
         "minSpecialChars_other": "Minstens {{count}} speciale tekens (bijv. !@#$%)"
       }
     }
+  },
+  "dataTable": {
+    "columns": "Kolommen",
+    "noResults": "Geen resultaten.",
+    "rowsSelected": "{{selected}} van {{total}} rij(en) geselecteerd.",
+    "rowsTotal": "{{count}} rij(en) totaal.",
+    "pageOf": "Pagina {{current}} van {{total}}",
+    "previous": "Vorige",
+    "next": "Volgende",
+    "searchPlaceholder": "Zoeken..."
+  },
+  "cookieConsent": {
+    "title": "Wij gebruiken cookies",
+    "description": "Wij gebruiken cookies om ervoor te zorgen dat je de beste ervaring op onze website krijgt. Voor meer informatie over hoe wij cookies gebruiken, raadpleeg ons cookiebeleid.",
+    "agreement": "Door op \"Accepteren\" te klikken, ga je akkoord met ons gebruik van cookies.",
+    "learnMore": "Meer informatie",
+    "decline": "Weigeren",
+    "accept": "Accepteren"
   }
 }

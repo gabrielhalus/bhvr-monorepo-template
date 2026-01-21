@@ -7,14 +7,90 @@
       "title": "Benutzer",
       "list": {
         "title": "Benutzer",
-        "subtitle": "Verwalte deine Benutzer."
+        "subtitle": "Verwalte deine Benutzer.",
+        "searchPlaceholder": "Benutzer suchen..."
+      },
+      "invitations": {
+        "title": "Einladungen",
+        "subtitle": "Verwalte ausstehende und vergangene Einladungen.",
+        "searchPlaceholder": "Einladungen suchen..."
+      },
+      "columns": {
+        "name": "Name",
+        "roles": "Rollen",
+        "joined": "Beigetreten",
+        "email": "E-Mail",
+        "status": "Status",
+        "invitedBy": "Eingeladen von",
+        "expires": "Läuft ab"
+      },
+      "status": {
+        "pending": "Ausstehend",
+        "accepted": "Angenommen",
+        "expired": "Abgelaufen",
+        "revoked": "Widerrufen"
+      },
+      "actions": {
+        "openMenu": "Menü öffnen",
+        "actionsLabel": "Aktionen",
+        "copyUserId": "Benutzer-ID kopieren",
+        "deleteUser": "Benutzer löschen",
+        "deleteUserConfirm": "Möchtest du diesen Benutzer wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "deleteUserSuccess": "Benutzer erfolgreich gelöscht",
+        "deleteUserError": "Fehler beim Löschen des Benutzers",
+        "copyId": "ID kopieren",
+        "copyInvitationLink": "Einladungslink kopieren",
+        "revokeInvitation": "Einladung widerrufen",
+        "revokeInvitationConfirm": "Möchtest du diese Einladung wirklich widerrufen? Der Benutzer kann diesen Link nicht mehr verwenden.",
+        "revokeInvitationSuccess": "Einladung erfolgreich widerrufen",
+        "revokeInvitationError": "Fehler beim Widerrufen der Einladung",
+        "deleteInvitation": "Einladung löschen",
+        "deleteInvitationConfirm": "Möchtest du diese Einladung wirklich löschen? Der Benutzer kann diesen Link nicht mehr verwenden.",
+        "deleteInvitationSuccess": "Einladung erfolgreich gelöscht",
+        "deleteInvitationError": "Fehler beim Löschen der Einladung",
+        "invitationLinkCopied": "Einladungslink in Zwischenablage kopiert"
+      },
+      "invite": {
+        "button": "Benutzer einladen",
+        "title": "Benutzer einladen",
+        "description": "Sende einen Einladungslink an einen neuen Benutzer. Die Einladung läuft in 7 Tagen ab.",
+        "emailLabel": "E-Mail-Adresse",
+        "emailPlaceholder": "benutzer@beispiel.de",
+        "roleLabel": "Rolle",
+        "rolePlaceholder": "Standardrolle",
+        "autoValidateEmail": "E-Mail automatisch validieren",
+        "creating": "Wird erstellt...",
+        "sendInvitation": "Einladung senden",
+        "success": "Einladung erstellt",
+        "successDescription": "Der Link wurde in deine Zwischenablage kopiert",
+        "shareDescription": "Teile diesen Link mit dem Benutzer, um die Registrierung abzuschließen",
+        "copied": "Kopiert",
+        "copy": "Kopieren",
+        "linkCopied": "Link in Zwischenablage kopiert",
+        "done": "Fertig",
+        "createError": "Fehler beim Erstellen der Einladung"
       }
     },
     "roles": {
       "title": "Rollen",
       "list": {
         "title": "Rollen",
-        "subtitle": "Verwalte deine Rollen."
+        "subtitle": "Verwalte deine Rollen.",
+        "searchPlaceholder": "Rollen suchen..."
+      },
+      "columns": {
+        "role": "Rolle",
+        "members": "Mitglieder"
+      },
+      "badges": {
+        "default": "Standard",
+        "admin": "Admin"
+      },
+      "allUsers": "Alle Benutzer",
+      "actions": {
+        "openMenu": "Menü öffnen",
+        "actionsLabel": "Aktionen",
+        "copyRoleId": "Rollen-ID kopieren"
       },
       "detail": {
         "title": "Rolle bearbeiten - {{role}}",
@@ -29,9 +105,22 @@
             "title": "Mitglieder",
             "addMembers": {
               "label": "Mitglieder hinzufügen",
-              "description": "Mitglieder zur Rolle <b>{{role}}</b> hinzufügen."
+              "description": "Wähle Benutzer aus, die der Rolle {{role}} zugewiesen werden sollen"
             },
-            "searchMembers": "Mitglieder suchen..."
+            "searchMembers": "Mitglieder suchen...",
+            "defaultRole": "Standardrolle",
+            "defaultRoleDescription": "Diese Rolle wird automatisch allen Benutzern zugewiesen und kann nicht manuell verwaltet werden",
+            "allUsersAssigned": "Alle Benutzer zugewiesen",
+            "allUsersAssignedDescription": "Jeder Benutzer hat bereits diese Rolle",
+            "selected": "Ausgewählt",
+            "usersSelected_one": "{{count}} Benutzer ausgewählt",
+            "usersSelected_other": "{{count}} Benutzer ausgewählt",
+            "clearSelection": "Auswahl löschen",
+            "assign": "Zuweisen",
+            "assignWithCount": "Zuweisen ({{count}})",
+            "assignSuccess": "Benutzer erfolgreich der Rolle zugewiesen",
+            "assignError": "Fehler beim Zuweisen der Benutzer zur Rolle",
+            "selectAtLeastOne": "Bitte wähle mindestens einen Benutzer aus"
           },
           "permissions": {
             "title": "Berechtigungen"
@@ -43,6 +132,24 @@
           "permissions": "Berechtigungen"
         }
       }
+    },
+    "account": {
+      "title": "Konto",
+      "subtitle": "Verwalte deine Kontoeinstellungen.",
+      "sections": {
+        "profile": {
+          "title": "Profilinformationen",
+          "description": "Aktualisiere deine Profilinformationen."
+        }
+      },
+      "fields": {
+        "name": "Name",
+        "email": "E-Mail"
+      }
+    },
+    "nav": {
+      "myAccount": "Mein Konto",
+      "toggle": "Umschalten"
     },
     "settings": {
       "title": "Einstellungen",

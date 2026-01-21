@@ -7,14 +7,108 @@
       "title": "Utilisateurs",
       "list": {
         "title": "Utilisateurs",
-        "subtitle": "Gérez vos utilisateurs."
+        "subtitle": "Gérez vos utilisateurs.",
+        "searchPlaceholder": "Rechercher des utilisateurs..."
+      },
+      "invitations": {
+        "title": "Invitations",
+        "subtitle": "Gérez les invitations en attente et passées.",
+        "searchPlaceholder": "Rechercher des invitations..."
+      },
+      "columns": {
+        "name": "Nom",
+        "roles": "Rôles",
+        "joined": "Inscrit",
+        "email": "E-mail",
+        "status": "Statut",
+        "invitedBy": "Invité par",
+        "expires": "Expire"
+      },
+      "status": {
+        "pending": "En attente",
+        "accepted": "Accepté",
+        "expired": "Expiré",
+        "revoked": "Révoqué"
+      },
+      "actions": {
+        "openMenu": "Ouvrir le menu",
+        "actionsLabel": "Actions",
+        "copyUserId": "Copier l'ID utilisateur",
+        "deleteUser": "Supprimer l'utilisateur",
+        "deleteUserConfirm": "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.",
+        "deleteUserSuccess": "Utilisateur supprimé avec succès",
+        "deleteUserError": "Échec de la suppression de l'utilisateur",
+        "copyId": "Copier l'ID",
+        "copyInvitationLink": "Copier le lien d'invitation",
+        "revokeInvitation": "Révoquer l'invitation",
+        "revokeInvitationConfirm": "Êtes-vous sûr de vouloir révoquer cette invitation ? L'utilisateur ne pourra plus utiliser ce lien.",
+        "revokeInvitationSuccess": "Invitation révoquée avec succès",
+        "revokeInvitationError": "Échec de la révocation de l'invitation",
+        "deleteInvitation": "Supprimer l'invitation",
+        "deleteInvitationConfirm": "Êtes-vous sûr de vouloir supprimer cette invitation ? L'utilisateur ne pourra plus utiliser ce lien.",
+        "deleteInvitationSuccess": "Invitation supprimée avec succès",
+        "deleteInvitationError": "Échec de la suppression de l'invitation",
+        "invitationLinkCopied": "Lien d'invitation copié dans le presse-papiers"
+      },
+      "invite": {
+        "button": "Inviter un utilisateur",
+        "title": "Inviter un utilisateur",
+        "description": "Envoyez un lien d'invitation à un nouvel utilisateur. L'invitation expirera dans 7 jours.",
+        "emailLabel": "Adresse e-mail",
+        "emailPlaceholder": "utilisateur@exemple.com",
+        "roleLabel": "Rôle",
+        "rolePlaceholder": "Rôle par défaut",
+        "autoValidateEmail": "Valider l'e-mail automatiquement",
+        "creating": "Création...",
+        "sendInvitation": "Envoyer l'invitation",
+        "success": "Invitation créée",
+        "successDescription": "Le lien a été copié dans votre presse-papiers",
+        "shareDescription": "Partagez ce lien avec l'utilisateur pour compléter son inscription",
+        "copied": "Copié",
+        "copy": "Copier",
+        "linkCopied": "Lien copié dans le presse-papiers",
+        "done": "Terminé",
+        "createError": "Échec de la création de l'invitation"
       }
+    },
+    "account": {
+      "title": "Compte",
+      "subtitle": "Gérez les paramètres de votre compte.",
+      "sections": {
+        "profile": {
+          "title": "Informations du profil",
+          "description": "Mettez à jour vos informations de profil."
+        }
+      },
+      "fields": {
+        "name": "Nom",
+        "email": "E-mail"
+      }
+    },
+    "nav": {
+      "myAccount": "Mon compte",
+      "toggle": "Basculer"
     },
     "roles": {
       "title": "Rôles",
       "list": {
         "title": "Rôles",
-        "subtitle": "Gérez vos rôles."
+        "subtitle": "Gérez vos rôles.",
+        "searchPlaceholder": "Rechercher des rôles..."
+      },
+      "columns": {
+        "role": "Rôle",
+        "members": "Membres"
+      },
+      "badges": {
+        "default": "Par défaut",
+        "admin": "Admin"
+      },
+      "allUsers": "Tous les utilisateurs",
+      "actions": {
+        "openMenu": "Ouvrir le menu",
+        "actionsLabel": "Actions",
+        "copyRoleId": "Copier l'ID du rôle"
       },
       "detail": {
         "title": "Modifier le rôle - {{role}}",
@@ -29,9 +123,22 @@
             "title": "Membres",
             "addMembers": {
               "label": "Ajouter des membres",
-              "description": "Ajouter des membres au rôle <b>{{role}}</b>."
+              "description": "Sélectionnez les utilisateurs à assigner au rôle {{role}}"
             },
-            "searchMembers": "Chercher des membres..."
+            "searchMembers": "Chercher des membres...",
+            "defaultRole": "Rôle par défaut",
+            "defaultRoleDescription": "Ce rôle est automatiquement assigné à tous les utilisateurs et ne peut pas être géré manuellement",
+            "allUsersAssigned": "Tous les utilisateurs assignés",
+            "allUsersAssignedDescription": "Chaque utilisateur a déjà ce rôle",
+            "selected": "Sélectionné",
+            "usersSelected_one": "{{count}} utilisateur sélectionné",
+            "usersSelected_other": "{{count}} utilisateurs sélectionnés",
+            "clearSelection": "Effacer la sélection",
+            "assign": "Assigner",
+            "assignWithCount": "Assigner ({{count}})",
+            "assignSuccess": "Utilisateurs assignés au rôle avec succès",
+            "assignError": "Échec de l'assignation des utilisateurs au rôle",
+            "selectAtLeastOne": "Veuillez sélectionner au moins un utilisateur"
           },
           "permissions": {
             "title": "Permissions"
