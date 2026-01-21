@@ -4,6 +4,7 @@ import type { User } from "~shared/types/db/users.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, MoreHorizontal, Trash2 } from "lucide-react";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { Button } from "~react/components/button";
@@ -15,6 +16,7 @@ import sayno from "~react/lib/sayno";
 import { authorizeQueryOptions } from "~react/queries/auth";
 
 export function ActionDropdown({ row: { original: user } }: { row: Row<User> }) {
+  const { t } = useTranslation("web");
   const queryClient = useQueryClient();
 
   const { user: loggedUser } = useAuth();
@@ -29,22 +31,22 @@ export function ActionDropdown({ row: { original: user } }: { row: Row<User> }) 
       const res = await api.users[":id"].$delete({ param: { id } });
 
       if (!res.ok) {
-        throw new Error("Failed to delete user");
+        throw new Error(t("pages.users.actions.deleteUserError"));
       }
 
       return res.json();
     },
-    onError: () => toast.error("Failed to delete user"),
+    onError: () => toast.error(t("pages.users.actions.deleteUserError")),
     onSuccess: () => {
-      toast.success("User deleted successfully");
+      toast.success(t("pages.users.actions.deleteUserSuccess"));
       queryClient.refetchQueries({ queryKey: ["get-users"] });
     },
   });
 
   const handleDeleteClick = async () => {
     const confirmation = await sayno.confirm({
-      title: "Delete User",
-      description: "Are you sure you want to delete this user? This action cannot be undone.",
+      title: t("pages.users.actions.deleteUser"),
+      description: t("pages.users.actions.deleteUserConfirm"),
       variant: "destructive",
     });
 
@@ -57,15 +59,15 @@ export function ActionDropdown({ row: { original: user } }: { row: Row<User> }) 
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
+          <span className="sr-only">{t("pages.users.actions.openMenu")}</span>
           <MoreHorizontal className="size-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuLabel>{t("pages.users.actions.actionsLabel")}</DropdownMenuLabel>
         <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id)}>
           <Copy className="size-4" />
-          Copy User ID
+          {t("pages.users.actions.copyUserId")}
         </DropdownMenuItem>
         {canDelete && (
           <DropdownMenuItem
@@ -74,7 +76,7 @@ export function ActionDropdown({ row: { original: user } }: { row: Row<User> }) 
             variant="destructive"
           >
             {mutation.isPending ? <Spinner /> : <Trash2 className="size-4" />}
-            Delete User
+            {t("pages.users.actions.deleteUser")}
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>

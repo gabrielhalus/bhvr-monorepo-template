@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { getRolesQueryOptions } from "@/queries/roles";
 import { DataTable } from "~react/components/data-table";
 
-import { columns } from "./-components/columns";
+import { getColumns } from "./-components/columns";
 
 export const Route = createFileRoute("/_dashboard/roles/")({
   component: Roles,
@@ -13,6 +14,8 @@ export const Route = createFileRoute("/_dashboard/roles/")({
 
 function Roles() {
   const { t } = useTranslation("web");
+
+  const columns = useMemo(() => getColumns(t), [t]);
 
   const { isPending, data } = useQuery(getRolesQueryOptions(["members"]));
 
@@ -27,7 +30,7 @@ function Roles() {
           columns={columns}
           data={data?.roles}
           isLoading={isPending}
-          searchPlaceholder="Search roles..."
+          searchPlaceholder={t("pages.roles.list.searchPlaceholder")}
         />
       </div>
     </div>

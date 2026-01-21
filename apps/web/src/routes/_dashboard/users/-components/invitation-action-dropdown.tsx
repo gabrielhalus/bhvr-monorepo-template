@@ -3,6 +3,7 @@ import type { InvitationWithRelations } from "~shared/types/db/invitations.types
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Ban, Copy, Link, MoreHorizontal, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { getInvitationsQueryOptions } from "@/queries/invitations";
@@ -13,6 +14,7 @@ import { api } from "~react/lib/http";
 import sayno from "~react/lib/sayno";
 
 export function InvitationActionDropdown({ row: { original: invitation } }: { row: Row<InvitationWithRelations<["invitedBy"]>> }) {
+  const { t } = useTranslation("web");
   const queryClient = useQueryClient();
 
   const revokeMutation = useMutation({
@@ -20,14 +22,14 @@ export function InvitationActionDropdown({ row: { original: invitation } }: { ro
       const res = await api.invitations[":id"].$put({ param: { id } });
 
       if (!res.ok) {
-        throw new Error("Failed to revoke invitation");
+        throw new Error(t("pages.users.actions.revokeInvitationError"));
       }
 
       return res.json();
     },
-    onError: () => toast.error("Failed to revoke invitation"),
+    onError: () => toast.error(t("pages.users.actions.revokeInvitationError")),
     onSuccess: () => {
-      toast.success("Invitation revoked successfully");
+      toast.success(t("pages.users.actions.revokeInvitationSuccess"));
       queryClient.invalidateQueries(getInvitationsQueryOptions(["invitedBy"]));
     },
   });
@@ -37,13 +39,13 @@ export function InvitationActionDropdown({ row: { original: invitation } }: { ro
       const res = await api.invitations[":id"].$delete({ param: { id } });
 
       if (!res.ok) {
-        throw new Error("Failed to delete invitation");
+        throw new Error(t("pages.users.actions.deleteInvitationError"));
       }
       return res.json();
     },
-    onError: () => toast.error("Failed to delete invitation"),
+    onError: () => toast.error(t("pages.users.actions.deleteInvitationError")),
     onSuccess: () => {
-      toast.success("Invitation deleted successfully");
+      toast.success(t("pages.users.actions.deleteInvitationSuccess"));
       queryClient.invalidateQueries(getInvitationsQueryOptions(["invitedBy"]));
     },
   });
@@ -51,13 +53,13 @@ export function InvitationActionDropdown({ row: { original: invitation } }: { ro
   const handleCopyLink = () => {
     const link = `${window.location.origin}/accept-invitation?token=${invitation.token}`;
     navigator.clipboard.writeText(link);
-    toast.success("Invitation link copied to clipboard");
+    toast.success(t("pages.users.actions.invitationLinkCopied"));
   };
 
   const handleRevokeClick = async () => {
     const confirmation = await sayno.confirm({
-      title: "Revoke Invitation",
-      description: "Are you sure you want to revoke this invitation? The user will no longer be able to use this link.",
+      title: t("pages.users.actions.revokeInvitation"),
+      description: t("pages.users.actions.revokeInvitationConfirm"),
       variant: "destructive",
     });
 
@@ -68,8 +70,8 @@ export function InvitationActionDropdown({ row: { original: invitation } }: { ro
 
   const handleDeleteClick = async () => {
     const confirmation = await sayno.confirm({
-      title: "Delete Invitation",
-      description: "Are you sure you want to delete this invitation? The user will no longer be able to use this link.",
+      title: t("pages.users.actions.deleteInvitation"),
+      description: t("pages.users.actions.deleteInvitationConfirm"),
       variant: "destructive",
     });
 
@@ -84,21 +86,21 @@ export function InvitationActionDropdown({ row: { original: invitation } }: { ro
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
+          <span className="sr-only">{t("pages.users.actions.openMenu")}</span>
           <MoreHorizontal className="size-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuLabel>{t("pages.users.actions.actionsLabel")}</DropdownMenuLabel>
         <DropdownMenuItem onClick={() => navigator.clipboard.writeText(invitation.id)}>
           <Copy className="size-4" />
-          Copy ID
+          {t("pages.users.actions.copyId")}
         </DropdownMenuItem>
         {isPending && (
           <>
             <DropdownMenuItem onClick={handleCopyLink}>
               <Link />
-              Copy Invitation Link
+              {t("pages.users.actions.copyInvitationLink")}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -107,7 +109,7 @@ export function InvitationActionDropdown({ row: { original: invitation } }: { ro
               variant="destructive"
             >
               {revokeMutation.isPending ? <Spinner /> : <Ban /> }
-              Revoke Invitation
+              {t("pages.users.actions.revokeInvitation")}
             </DropdownMenuItem>
           </>
         )}
@@ -117,7 +119,7 @@ export function InvitationActionDropdown({ row: { original: invitation } }: { ro
           variant="destructive"
         >
           {deleteMutation.isPending ? <Spinner /> : <Trash2 /> }
-          Delete Invitation
+          {t("pages.users.actions.deleteInvitation")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

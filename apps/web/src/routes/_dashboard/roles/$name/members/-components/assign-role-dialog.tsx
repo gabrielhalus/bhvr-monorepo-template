@@ -50,10 +50,10 @@ export function AssignRoleDialog() {
       }
     },
     onError: () => {
-      toast.error("Failed to assign users to role");
+      toast.error(t("web:pages.roles.detail.pages.members.assignError"));
     },
     onSuccess: () => {
-      toast.success("Users assigned to role successfully");
+      toast.success(t("web:pages.roles.detail.pages.members.assignSuccess"));
       queryClient.invalidateQueries(getRolesQueryOptions(["members"]));
       queryClient.invalidateQueries(getRoleByNameQueryOptions(role.name, ["members"]));
       queryClient.invalidateQueries(getUsersQueryOptions(["roles"]));
@@ -68,7 +68,7 @@ export function AssignRoleDialog() {
     },
     onSubmit: async ({ value }) => {
       if (value.userIds.length === 0) {
-        toast.error("Please select at least one user");
+        toast.error(t("web:pages.roles.detail.pages.members.selectAtLeastOne"));
         return;
       }
       mutation.mutate(value.userIds);
@@ -94,11 +94,7 @@ export function AssignRoleDialog() {
             {t("web:pages.roles.detail.pages.members.addMembers.label")}
           </DialogTitle>
           <DialogDescription>
-            Select users to assign to the
-            {" "}
-            <span className="font-medium text-foreground">{role.label}</span>
-            {" "}
-            role
+            {t("web:pages.roles.detail.pages.members.addMembers.description", { role: role.label })}
           </DialogDescription>
         </DialogHeader>
         <form
@@ -114,9 +110,9 @@ export function AssignRoleDialog() {
                   <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-primary/10">
                     <ShieldIcon className="size-6 text-primary" />
                   </div>
-                  <p className="text-sm font-medium">Default Role</p>
+                  <p className="text-sm font-medium">{t("web:pages.roles.detail.pages.members.defaultRole")}</p>
                   <p className="mt-1 max-w-65 text-sm text-muted-foreground">
-                    This role is automatically assigned to all users and cannot be manually managed
+                    {t("web:pages.roles.detail.pages.members.defaultRoleDescription")}
                   </p>
                 </div>
               )
@@ -132,9 +128,9 @@ export function AssignRoleDialog() {
                       <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted">
                         <UsersIcon className="size-6 text-muted-foreground" />
                       </div>
-                      <p className="text-sm font-medium">All users assigned</p>
+                      <p className="text-sm font-medium">{t("web:pages.roles.detail.pages.members.allUsersAssigned")}</p>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        Every user already has this role
+                        {t("web:pages.roles.detail.pages.members.allUsersAssignedDescription")}
                       </p>
                     </div>
                   )
@@ -186,7 +182,7 @@ export function AssignRoleDialog() {
                                       </div>
                                       {isSelected && (
                                         <div className="shrink-0 text-xs font-medium text-primary">
-                                          Selected
+                                          {t("web:pages.roles.detail.pages.members.selected")}
                                         </div>
                                       )}
                                     </button>
@@ -203,12 +199,7 @@ export function AssignRoleDialog() {
                         children={userIds => userIds.length > 0 && (
                           <div className="mt-3 flex items-center justify-between border-t pt-3">
                             <span className="text-sm text-muted-foreground">
-                              {userIds.length}
-                              {" "}
-                              user
-                              {userIds.length !== 1 && "s"}
-                              {" "}
-                              selected
+                              {t("web:pages.roles.detail.pages.members.usersSelected", { count: userIds.length })}
                             </span>
                             <Button
                               type="button"
@@ -216,7 +207,7 @@ export function AssignRoleDialog() {
                               size="sm"
                               onClick={() => form.setFieldValue("userIds", [])}
                             >
-                              Clear selection
+                              {t("web:pages.roles.detail.pages.members.clearSelection")}
                             </Button>
                           </div>
                         )}
@@ -250,8 +241,9 @@ export function AssignRoleDialog() {
                         <>
                           <UserPlusIcon />
                           <span>
-                            Assign
-                            {(userIds as string[]).length > 0 && ` (${(userIds as string[]).length})`}
+                            {(userIds as string[]).length > 0
+                              ? t("web:pages.roles.detail.pages.members.assignWithCount", { count: (userIds as string[]).length })
+                              : t("web:pages.roles.detail.pages.members.assign")}
                           </span>
                         </>
                       )}

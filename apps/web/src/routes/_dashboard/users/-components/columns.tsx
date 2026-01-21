@@ -1,5 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import type { UserWithRelations } from "~shared/types/db/users.types";
+import type { TFunction } from "i18next";
 
 import { Link } from "@tanstack/react-router";
 import { CalendarIcon, MailIcon } from "lucide-react";
@@ -10,10 +11,10 @@ import { SortableHeader } from "~react/components/sortable-header";
 
 import { ActionDropdown } from "./action-dropdown";
 
-export const columns: ColumnDef<UserWithRelations<["roles"]>>[] = [
+export const getColumns = (t: TFunction): ColumnDef<UserWithRelations<["roles"]>>[] => [
   {
     accessorKey: "name",
-    header: ({ column }) => <SortableHeader column={column} title="Name" />,
+    header: ({ column }) => <SortableHeader column={column} title={t("pages.users.columns.name")} />,
     cell: ({ row }) => (
       <Link
         to="/users/$userId"
@@ -36,7 +37,7 @@ export const columns: ColumnDef<UserWithRelations<["roles"]>>[] = [
   },
   {
     accessorKey: "roles",
-    header: "Roles",
+    header: t("pages.users.columns.roles"),
     cell: ({ row }) => {
       const roles = row.original.roles;
       if (!roles || roles.length === 0) {
@@ -66,7 +67,7 @@ export const columns: ColumnDef<UserWithRelations<["roles"]>>[] = [
   },
   {
     accessorKey: "createdAt",
-    header: ({ column }) => <SortableHeader column={column} title="Joined" />,
+    header: ({ column }) => <SortableHeader column={column} title={t("pages.users.columns.joined")} />,
     cell: ({ row }) => {
       const timestamp = row.original.createdAt;
       const dateString = timestamp

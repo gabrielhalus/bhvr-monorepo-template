@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { getInvitationsQueryOptions } from "@/queries/invitations";
 import { getUsersQueryOptions } from "@/queries/users";
 import { DataTable } from "~react/components/data-table";
 
-import { columns } from "./-components/columns";
-import { invitationColumns } from "./-components/invitation-columns";
+import { getColumns } from "./-components/columns";
+import { getInvitationColumns } from "./-components/invitation-columns";
 import { InviteUserDialog } from "./-components/invite-user-dialog";
 
 export const Route = createFileRoute("/_dashboard/users/")({
@@ -16,6 +17,9 @@ export const Route = createFileRoute("/_dashboard/users/")({
 
 function Users() {
   const { t } = useTranslation("web");
+
+  const columns = useMemo(() => getColumns(t), [t]);
+  const invitationColumns = useMemo(() => getInvitationColumns(t), [t]);
 
   const { isPending: usersLoading, data: usersData } = useQuery(
     getUsersQueryOptions(["roles"]),
@@ -37,20 +41,20 @@ function Users() {
             columns={columns}
             data={usersData?.users}
             isLoading={usersLoading}
-            searchPlaceholder="Search users..."
+            searchPlaceholder={t("pages.users.list.searchPlaceholder")}
           />
         </div>
 
         <div className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold">Invitations</h2>
-            <p className="text-muted-foreground">Manage pending and past invitations</p>
+            <h2 className="text-2xl font-bold">{t("pages.users.invitations.title")}</h2>
+            <p className="text-muted-foreground">{t("pages.users.invitations.subtitle")}</p>
           </div>
           <DataTable
             columns={invitationColumns}
             data={invitationsData?.invitations}
             isLoading={invitationsLoading}
-            searchPlaceholder="Search invitations..."
+            searchPlaceholder={t("pages.users.invitations.searchPlaceholder")}
           />
           <div className="flex justify-end">
             <InviteUserDialog />

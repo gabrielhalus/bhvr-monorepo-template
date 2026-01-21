@@ -1,5 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import type { RoleWithRelations } from "~shared/types/db/roles.types";
+import type { TFunction } from "i18next";
 
 import { Link } from "@tanstack/react-router";
 import { ShieldIcon, UsersIcon } from "lucide-react";
@@ -10,10 +11,10 @@ import { cn } from "~react/lib/utils";
 
 import { ActionDropdown } from "./action-dropdown";
 
-export const columns: ColumnDef<RoleWithRelations<["members"]>>[] = [
+export const getColumns = (t: TFunction): ColumnDef<RoleWithRelations<["members"]>>[] => [
   {
     accessorKey: "label",
-    header: ({ column }) => <SortableHeader column={column} title="Role" />,
+    header: ({ column }) => <SortableHeader column={column} title={t("pages.roles.columns.role")} />,
     cell: ({ row }) => (
       <Link
         to="/roles/$name"
@@ -39,12 +40,12 @@ export const columns: ColumnDef<RoleWithRelations<["members"]>>[] = [
             </span>
             {row.original.isDefault && (
               <Badge variant="outline" className="text-xs font-normal">
-                Default
+                {t("pages.roles.badges.default")}
               </Badge>
             )}
             {row.original.isSuperAdmin && (
               <Badge variant="secondary" className="text-xs font-normal">
-                Admin
+                {t("pages.roles.badges.admin")}
               </Badge>
             )}
           </div>
@@ -60,7 +61,7 @@ export const columns: ColumnDef<RoleWithRelations<["members"]>>[] = [
   },
   {
     accessorKey: "members",
-    header: ({ column }) => <SortableHeader column={column} title="Members" />,
+    header: ({ column }) => <SortableHeader column={column} title={t("pages.roles.columns.members")} />,
     cell: ({ row }) => {
       const memberCount = row.original.members.length;
       const isDefault = row.original.isDefault;
@@ -73,7 +74,7 @@ export const columns: ColumnDef<RoleWithRelations<["members"]>>[] = [
         >
           <UsersIcon className="size-4 text-muted-foreground" />
           <span className="tabular-nums">
-            {isDefault ? "All users" : memberCount}
+            {isDefault ? t("pages.roles.allUsers") : memberCount}
           </span>
         </Link>
       );

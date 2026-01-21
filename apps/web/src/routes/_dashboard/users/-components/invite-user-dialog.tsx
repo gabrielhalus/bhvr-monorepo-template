@@ -43,12 +43,12 @@ export function InviteUserDialog() {
       if (!res.ok) {
         const errorMessage = "error" in responseData
           ? (typeof responseData.error === "string" ? responseData.error : responseData.error?.message)
-          : "Failed to create invitation";
-        throw new Error(errorMessage || "Failed to create invitation");
+          : t("web:pages.users.invite.createError");
+        throw new Error(errorMessage || t("web:pages.users.invite.createError"));
       }
 
       if (!("success" in responseData) || !responseData.success || !("invitation" in responseData)) {
-        throw new Error("Failed to create invitation");
+        throw new Error(t("web:pages.users.invite.createError"));
       }
 
       return responseData.invitation;
@@ -62,7 +62,7 @@ export function InviteUserDialog() {
       queryClient.invalidateQueries(getInvitationsQueryOptions(["invitedBy"]));
 
       navigator.clipboard.writeText(link);
-      toast.success("Invitation link copied to clipboard");
+      toast.success(t("web:pages.users.actions.invitationLinkCopied"));
     },
   });
 
@@ -95,7 +95,7 @@ export function InviteUserDialog() {
     if (invitationLink) {
       await navigator.clipboard.writeText(invitationLink);
       setCopied(true);
-      toast.success("Link copied to clipboard");
+      toast.success(t("web:pages.users.invite.linkCopied"));
       setTimeout(() => setCopied(false), 2000);
     }
   };
@@ -105,14 +105,14 @@ export function InviteUserDialog() {
       <DialogTrigger asChild>
         <Button>
           <SendIcon />
-          Invite user
+          {t("web:pages.users.invite.button")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Invite User</DialogTitle>
+          <DialogTitle>{t("web:pages.users.invite.title")}</DialogTitle>
           <DialogDescription>
-            Send an invitation link to a new user. The invitation will expire in 7 days.
+            {t("web:pages.users.invite.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -122,9 +122,9 @@ export function InviteUserDialog() {
               <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-emerald-500/10">
                 <CheckCircle2Icon className="size-6 text-emerald-500" />
               </div>
-              <p className="text-sm font-medium">Invitation Created</p>
+              <p className="text-sm font-medium">{t("web:pages.users.invite.success")}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                The link has been copied to your clipboard
+                {t("web:pages.users.invite.successDescription")}
               </p>
             </div>
 
@@ -148,25 +148,25 @@ export function InviteUserDialog() {
                   {copied ? (
                     <>
                       <CheckCircle2Icon className="size-3.5" />
-                      Copied
+                      {t("web:pages.users.invite.copied")}
                     </>
                   ) : (
                     <>
                       <CopyIcon className="size-3.5" />
-                      Copy
+                      {t("web:pages.users.invite.copy")}
                     </>
                   )}
                 </Button>
               </div>
 
               <p className="text-center text-xs text-muted-foreground">
-                Share this link with the user to complete their registration
+                {t("web:pages.users.invite.shareDescription")}
               </p>
             </div>
 
             <DialogFooter className="mt-6">
               <Button onClick={() => handleOpenChange(false)} className="w-full">
-                Done
+                {t("web:pages.users.invite.done")}
               </Button>
             </DialogFooter>
           </div>
@@ -185,12 +185,12 @@ export function InviteUserDialog() {
                   <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
                     <FieldLabel className="flex items-center gap-2">
                       <MailIcon className="size-4 text-muted-foreground" />
-                      Email Address
+                      {t("web:pages.users.invite.emailLabel")}
                     </FieldLabel>
                     <FieldContent>
                       <Input
                         type="email"
-                        placeholder="user@example.com"
+                        placeholder={t("web:pages.users.invite.emailPlaceholder")}
                         value={field.state.value}
                         onChange={e => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
@@ -208,7 +208,7 @@ export function InviteUserDialog() {
                   <Field>
                     <FieldLabel className="flex items-center gap-2">
                       <ShieldIcon className="size-4 text-muted-foreground" />
-                      Role
+                      {t("web:pages.users.invite.roleLabel")}
                     </FieldLabel>
                     <FieldContent>
                       <Select
@@ -218,7 +218,7 @@ export function InviteUserDialog() {
                         }}
                       >
                         <SelectTrigger className="h-11 w-full">
-                          <SelectValue placeholder="Default role" />
+                          <SelectValue placeholder={t("web:pages.users.invite.rolePlaceholder")} />
                         </SelectTrigger>
                         <SelectContent>
                           {roles.map(role => (
@@ -243,7 +243,7 @@ export function InviteUserDialog() {
                       onCheckedChange={checked => field.handleChange(checked === true)}
                     />
                     <Label htmlFor="autoValidateEmail" className="cursor-pointer text-sm font-normal">
-                      Auto validate email
+                      {t("web:pages.users.invite.autoValidateEmail")}
                     </Label>
                   </div>
                 )}
@@ -268,12 +268,12 @@ export function InviteUserDialog() {
                     {isSubmitting || mutation.isPending ? (
                       <>
                         <Spinner />
-                        <span>Creating...</span>
+                        <span>{t("web:pages.users.invite.creating")}</span>
                       </>
                     ) : (
                       <>
                         <SendIcon />
-                        <span>Send Invitation</span>
+                        <span>{t("web:pages.users.invite.sendInvitation")}</span>
                       </>
                     )}
                   </Button>
