@@ -11,6 +11,7 @@ import {
 } from "@tanstack/react-table";
 import { ChevronDown, Search, Settings2 } from "lucide-react";
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "~react/components/button";
 import {
@@ -63,7 +64,7 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   isLoading = false,
-  searchPlaceholder = "Search...",
+  searchPlaceholder,
   onSearchChange,
   searchValue = "",
   searchInputRef: externalSearchInputRef,
@@ -78,6 +79,7 @@ export function DataTable<TData, TValue>({
   // Add search props
   manualFiltering = false,
 }: DataTableProps<TData, TValue>) {
+  const { t } = useTranslation("ui");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -173,7 +175,7 @@ export function DataTable<TData, TValue>({
             <Search className="absolute left-2 top-2.5 size-4 text-muted-foreground" />
             <Input
               ref={searchInputRef}
-              placeholder={searchPlaceholder}
+              placeholder={searchPlaceholder ?? t("dataTable.searchPlaceholder")}
               value={searchValue}
               onChange={event => onSearchChange?.(event.target.value)}
               className="pl-8 max-w-sm"
@@ -185,8 +187,7 @@ export function DataTable<TData, TValue>({
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto bg-transparent" disabled={isLoading}>
               <Settings2 className="mr-2 size-4" />
-              Columns
-              {" "}
+              {t("dataTable.columns")}
               <ChevronDown className="ml-2 size-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -263,7 +264,7 @@ export function DataTable<TData, TValue>({
                 : (
                     <TableRow>
                       <TableCell colSpan={columns.length} className="h-24 text-center">
-                        No results.
+                        {t("dataTable.noResults")}
                       </TableCell>
                     </TableRow>
                   )}
@@ -278,26 +279,13 @@ export function DataTable<TData, TValue>({
               )
             : (
                 columns.some(col => col.id === "select")
-                  ? (
-                      <>
-                        {table.getFilteredSelectedRowModel().rows.length}
-                        {" "}
-                        of
-                        {" "}
-                        {table.getFilteredRowModel().rows.length}
-                        {" "}
-                        row(s)
-                        selected.
-                      </>
-                    )
-                  : (
-                      <>
-                        {table.getFilteredRowModel().rows.length}
-                        {" "}
-                        row(s)
-                        total.
-                      </>
-                    )
+                  ? t("dataTable.rowsSelected", {
+                      selected: table.getFilteredSelectedRowModel().rows.length,
+                      total: table.getFilteredRowModel().rows.length,
+                    })
+                  : t("dataTable.rowsTotal", {
+                      count: table.getFilteredRowModel().rows.length,
+                    })
               )}
         </div>
         <div className="flex items-center space-x-2">
@@ -307,13 +295,10 @@ export function DataTable<TData, TValue>({
               )
             : (
                 <p className="text-sm font-medium">
-                  Page
-                  {" "}
-                  {currentPagination.pageIndex + 1}
-                  {" "}
-                  of
-                  {" "}
-                  {table.getPageCount()}
+                  {t("dataTable.pageOf", {
+                    current: currentPagination.pageIndex + 1,
+                    total: table.getPageCount(),
+                  })}
                 </p>
               )}
           <div className="flex items-center space-x-2">
@@ -323,7 +308,7 @@ export function DataTable<TData, TValue>({
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage() || isLoading}
             >
-              Previous
+              {t("dataTable.previous")}
             </Button>
             <Button
               variant="outline"
@@ -331,7 +316,7 @@ export function DataTable<TData, TValue>({
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage() || isLoading}
             >
-              Next
+              {t("dataTable.next")}
             </Button>
           </div>
         </div>
