@@ -62,7 +62,7 @@ export const invitationsRoutes = new Hono()
         name,
         email: invitation.email,
         password: hashedPassword,
-        verifiedAt: invitation.autoValidateEmail ? new Date().toISOString() : undefined,
+        verifiedAt: invitation.autoValidateEmail ? new Date().toISOString() : null,
       });
 
       // Use invitation's roleId if specified, otherwise use default role
