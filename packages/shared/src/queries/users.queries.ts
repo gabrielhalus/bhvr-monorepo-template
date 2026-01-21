@@ -3,12 +3,12 @@ import type { z } from "zod";
 
 import { eq, inArray } from "drizzle-orm";
 
+import { drizzle } from "../drizzle";
+import { attachRelation } from "../helpers";
 import { RolesModel } from "../models/roles.model";
 import { TokensModel } from "../models/tokens.model";
 import { UserRolesModel } from "../models/user-roles.model";
 import { UsersModel } from "../models/users.model";
-import { drizzle } from "../drizzle";
-import { attachRelation } from "../helpers";
 import { RoleSchema } from "../schemas/db/roles.schemas";
 import { TokenSchema } from "../schemas/db/tokens.schemas";
 import { InsertUserSchema, UpdateUserSchema, UserSchema } from "../schemas/db/users.schemas";

@@ -354,27 +354,8 @@
     "stopError": "Failed to stop impersonation"
   },
   "errors": {
-    "notification": {
-      "name": {
-        "required": "Name is required"
-      },
-      "type": {
-        "required": "Provider type is required"
-      },
-      "discord": {
-        "webhookUrl": {
-          "required": "Webhook URL is required",
-          "invalid": "Webhook URL must be a valid URL"
-        }
-      },
-      "telegram": {
-        "botToken": {
-          "required": "Bot token is required"
-        },
-        "chatId": {
-          "required": "Chat ID is required"
-        }
-      }
+    "email": {
+      "invalidErrorMessage": "Please enter a valid email address."
     }
   }
 }

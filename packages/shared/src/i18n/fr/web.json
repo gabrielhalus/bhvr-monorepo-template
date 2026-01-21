@@ -286,27 +286,8 @@
     }
   },
   "errors": {
-    "notification": {
-      "name": {
-        "required": "Le nom est obligatoire"
-      },
-      "type": {
-        "required": "Le type de fournisseur est obligatoire"
-      },
-      "discord": {
-        "webhookUrl": {
-          "required": "L'URL du webhook est obligatoire",
-          "invalid": "L'URL du webhook doit être une URL valide"
-        }
-      },
-      "telegram": {
-        "botToken": {
-          "required": "Le jeton du bot est obligatoire"
-        },
-        "chatId": {
-          "required": "L'ID du chat est obligatoire"
-        }
-      }
+    "email": {
+      "invalidErrorMessage": "Veuillez entrer une adresse e-mail valide."
     }
   }
 }

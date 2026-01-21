@@ -284,29 +284,5 @@
         "edit": "Meldingsprovider bewerken"
       }
     }
-  },
-  "errors": {
-    "notification": {
-      "name": {
-        "required": "Naam is verplicht"
-      },
-      "type": {
-        "required": "Providertype is verplicht"
-      },
-      "discord": {
-        "webhookUrl": {
-          "required": "Webhook-URL is verplicht",
-          "invalid": "Webhook-URL moet een geldige URL zijn"
-        }
-      },
-      "telegram": {
-        "botToken": {
-          "required": "Bot-token is verplicht"
-        },
-        "chatId": {
-          "required": "Chat-ID is verplicht"
-        }
-      }
-    }
   }
 }

@@ -284,29 +284,5 @@
         "edit": "Modifica provider di notifiche"
       }
     }
-  },
-  "errors": {
-    "notification": {
-      "name": {
-        "required": "Il nome è obbligatorio"
-      },
-      "type": {
-        "required": "Il tipo di provider è obbligatorio"
-      },
-      "discord": {
-        "webhookUrl": {
-          "required": "L'URL del webhook è obbligatoria",
-          "invalid": "L'URL del webhook deve essere un URL valido"
-        }
-      },
-      "telegram": {
-        "botToken": {
-          "required": "Il token del bot è obbligatorio"
-        },
-        "chatId": {
-          "required": "L'ID della chat è obbligatorio"
-        }
-      }
-    }
   }
 }

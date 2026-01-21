@@ -284,29 +284,5 @@
         "edit": "Benachrichtigungsanbieter bearbeiten"
       }
     }
-  },
-  "errors": {
-    "notification": {
-      "name": {
-        "required": "Name ist erforderlich"
-      },
-      "type": {
-        "required": "Anbietertyp ist erforderlich"
-      },
-      "discord": {
-        "webhookUrl": {
-          "required": "Webhook-URL ist erforderlich",
-          "invalid": "Webhook-URL muss eine gültige URL sein"
-        }
-      },
-      "telegram": {
-        "botToken": {
-          "required": "Bot-Token ist erforderlich"
-        },
-        "chatId": {
-          "required": "Chat-ID ist erforderlich"
-        }
-      }
-    }
   }
 }

@@ -284,29 +284,5 @@
         "edit": "Editar proveedor de notificaciones"
       }
     }
-  },
-  "errors": {
-    "notification": {
-      "name": {
-        "required": "El nombre es obligatorio"
-      },
-      "type": {
-        "required": "El tipo de proveedor es obligatorio"
-      },
-      "discord": {
-        "webhookUrl": {
-          "required": "La URL del webhook es obligatoria",
-          "invalid": "La URL del webhook debe ser una URL válida"
-        }
-      },
-      "telegram": {
-        "botToken": {
-          "required": "El token del bot es obligatorio"
-        },
-        "chatId": {
-          "required": "El ID del chat es obligatorio"
-        }
-      }
-    }
   }
 }

@@ -23,6 +23,10 @@ export const InsertUserSchema = createInsertSchema(UsersModel).omit({ id: true, 
     .string()
     .min(8)
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).+$/),
+  verifiedAt: z
+    .string()
+    .optional()
+    .nullable(),
 });
 
 /**
