@@ -12,7 +12,7 @@ import {
   createInvitation,
   deleteInvitation,
   getInvitationByToken,
-  getInvitations,
+  getInvitationsPaginated,
   getPendingInvitationByEmail,
   updateInvitation,
 } from "~shared/queries/invitations.queries";
@@ -21,6 +21,12 @@ import { insertToken } from "~shared/queries/tokens.queries";
 import { createUserRole } from "~shared/queries/user-roles.queries";
 import { createUser, emailExists } from "~shared/queries/users.queries";
 import { AcceptInvitationSchema, CreateInvitationSchema, InvitationRelationsQuerySchema } from "~shared/schemas/api/invitations.schemas";
+import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
+
+/**
+ * Combined schema for paginated invitations query
+ */
+const PaginatedInvitationsQuerySchema = PaginationQuerySchema.extend(InvitationRelationsQuerySchema.shape);
 
 const INVITATION_EXPIRATION_DAYS = 7;
 
@@ -65,7 +71,6 @@ export const invitationsRoutes = new Hono()
         verifiedAt: invitation.autoValidateEmail ? new Date().toISOString() : null,
       });
 
-      // Use invitation's roleId if specified, otherwise use default role
       if (invitation.roleId) {
         const role = await getRole(invitation.roleId);
         if (role) {
@@ -146,20 +151,20 @@ export const invitationsRoutes = new Hono()
   .use(getSessionContext)
 
   /**
-   * Get all invitations with optional relation includes
+   * Get paginated invitations with optional relation includes
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing all invitations
+   * @returns JSON response containing paginated invitations with metadata
    * @throws {500} If an error occurs while retrieving invitations
    * @access protected
    * @permission invitation:list
    */
-  .get("/", validationMiddleware("query", InvitationRelationsQuerySchema), requirePermissionFactory("invitation:list"), async (c) => {
-    const { includes } = c.req.valid("query");
+  .get("/", validationMiddleware("query", PaginatedInvitationsQuerySchema), requirePermissionFactory("invitation:list"), async (c) => {
+    const { includes, page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
     try {
-      const invitations = await getInvitations(includes);
-      return c.json({ success: true as const, invitations });
+      const result = await getInvitationsPaginated({ page, limit, sortBy, sortOrder, search }, includes);
+      return c.json({ success: true as const, ...result });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }

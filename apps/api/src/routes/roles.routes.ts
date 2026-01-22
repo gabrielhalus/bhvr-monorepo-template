@@ -1,36 +1,40 @@
-import type { RoleRelationKeys } from "~shared/types/db/roles.types";
-
 import { Hono } from "hono";
 
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { deleteRole, getRole, getRoleByName, getRoles, updateRole } from "~shared/queries/roles.queries";
+import { deleteRole, getRole, getRoleByName, getRolesPaginated, updateRole } from "~shared/queries/roles.queries";
 import { createUserRole, deleteUserRole } from "~shared/queries/user-roles.queries";
+import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
 import { RoleRelationsQuerySchema, UpdateRoleSchema } from "~shared/schemas/api/roles.schemas";
 import { AssignRoleMembersSchema, RemoveRoleMembersSchema } from "~shared/schemas/api/user-roles.schemas";
 
 import { requirePermissionFactory } from "../middlewares/access-control";
+
+/**
+ * Combined schema for paginated roles query
+ */
+const PaginatedRolesQuerySchema = PaginationQuerySchema.extend(RoleRelationsQuerySchema.shape);
 
 export const rolesRoutes = new Hono()
   // --- All routes below this point require authentication
   .use(getSessionContext)
 
   /**
-   * Get all roles with optional relation includes
+   * Get paginated roles with optional relation includes
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing all roles
+   * @returns JSON response containing paginated roles with metadata
    * @throws {500} If an error occurs while retrieving roles
    * @access protected
    * @permission role:list
    */
-  .get("/", requirePermissionFactory("role:list"), async (c) => {
-    const { includes } = c.req.queries();
+  .get("/", validationMiddleware("query", PaginatedRolesQuerySchema), requirePermissionFactory("role:list"), async (c) => {
+    const { includes, page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
     try {
-      const roles = await getRoles(includes as RoleRelationKeys);
+      const result = await getRolesPaginated({ page, limit, sortBy, sortOrder, search }, includes);
 
-      return c.json({ success: true as const, roles });
+      return c.json({ success: true as const, ...result });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }

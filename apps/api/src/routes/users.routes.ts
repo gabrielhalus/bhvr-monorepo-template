@@ -5,9 +5,12 @@ import { z } from "zod";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { deleteUser, emailExists, getUser, getUsers, updateUser, updateUserPassword } from "~shared/queries/users.queries";
+import { deleteUser, emailExists, getUser, getUsersPaginated, updateUser, updateUserPassword } from "~shared/queries/users.queries";
+import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
 import { UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
 import { UpdateUserSchema } from "~shared/schemas/db/users.schemas";
+
+const PaginatedUsersQuerySchema = PaginationQuerySchema.extend(UserRelationsQuerySchema.shape);
 
 /**
  * Generates a random password that meets the password requirements.
@@ -70,21 +73,21 @@ export const usersRoutes = new Hono()
   .use(getSessionContext)
 
   /**
-   * Get all users with optional relation includes
+   * Get paginated users with optional relation includes
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing all users
+   * @returns JSON response containing paginated users with metadata
    * @throws {500} If an error occurs while retrieving users
    * @access protected
    * @permission user:list
    */
-  .get("/", validationMiddleware("query", UserRelationsQuerySchema), requirePermissionFactory("user:list"), async (c) => {
-    const { includes } = c.req.valid("query");
+  .get("/", validationMiddleware("query", PaginatedUsersQuerySchema), requirePermissionFactory("user:list"), async (c) => {
+    const { includes, page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
     try {
-      const users = await getUsers(includes);
+      const result = await getUsersPaginated({ page, limit, sortBy, sortOrder, search }, includes);
 
-      return c.json({ success: true as const, users });
+      return c.json({ success: true as const, ...result });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
