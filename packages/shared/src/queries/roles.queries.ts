@@ -1,18 +1,20 @@
 import type { WithRelations } from "../lib/type-utils";
+import type { PaginatedResponse, PaginationQuery } from "../schemas/api/pagination.schemas";
 import type { UpdateRoleSchema } from "../schemas/api/roles.schemas";
 import type { InsertRoleSchema } from "../schemas/db/roles.schemas";
 import type { Role, RoleRelationKeys, RoleRelations, RoleWithRelations } from "../types/db/roles.types";
 import type { z } from "zod";
 
-import { desc, eq, inArray } from "drizzle-orm";
+import { asc, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
 
+import { drizzle } from "../drizzle";
+import { attachRelation } from "../helpers";
 import { PoliciesModel } from "../models/policies.model";
 import { RolePermissionsModel } from "../models/role-permissions.model";
 import { RolesModel } from "../models/roles.model";
 import { UserRolesModel } from "../models/user-roles.model";
 import { UsersModel } from "../models/users.model";
-import { drizzle } from "../drizzle";
-import { attachRelation } from "../helpers";
+import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
 import { PolicySchema } from "../schemas/db/policies.schemas";
 import { RoleSchema } from "../schemas/db/roles.schemas";
 import { UserSchema } from "../schemas/db/users.schemas";
@@ -151,6 +153,67 @@ export async function getRoles<T extends RoleRelationKeys>(includes?: T): Promis
 
   const parsedRoles = roles.map(r => RoleSchema.parse(r));
   return hydrateRoles(parsedRoles, includes);
+}
+
+/**
+ * Get paginated roles with optional relations.
+ * @param pagination - Pagination parameters (page, limit, sortBy, sortOrder, search).
+ * @param includes - The relations to include.
+ * @returns Paginated roles with relations.
+ */
+export async function getRolesPaginated<T extends RoleRelationKeys>(
+  pagination: PaginationQuery,
+  includes?: T,
+): Promise<PaginatedResponse<RoleWithRelations<T>>> {
+  const { page, limit, sortBy, sortOrder, search } = pagination;
+  const offset = (page - 1) * limit;
+
+  const searchCondition = search
+    ? or(
+        ilike(RolesModel.name, `%${search}%`),
+        ilike(RolesModel.description, `%${search}%`),
+      )
+    : undefined;
+
+  const sortableColumns: Record<string, typeof RolesModel.id | typeof RolesModel.name | typeof RolesModel.index> = {
+    id: RolesModel.id,
+    name: RolesModel.name,
+    index: RolesModel.index,
+  };
+
+  const countQuery = drizzle
+    .select({ count: count() })
+    .from(RolesModel);
+
+  if (searchCondition) {
+    countQuery.where(searchCondition);
+  }
+
+  const [countResult] = await countQuery;
+  const total = countResult?.count ?? 0;
+
+  const dataQuery = drizzle
+    .select()
+    .from(RolesModel);
+
+  if (searchCondition) {
+    dataQuery.where(searchCondition);
+  }
+
+  const sortColumn = sortBy && sortableColumns[sortBy] ? sortableColumns[sortBy] : RolesModel.index;
+  if (sortOrder === "asc") {
+    dataQuery.orderBy(asc(sortColumn));
+  } else {
+    dataQuery.orderBy(desc(sortColumn));
+  }
+
+  dataQuery.limit(limit).offset(offset);
+
+  const roles = await dataQuery;
+  const parsedRoles = roles.map(r => RoleSchema.parse(r));
+  const hydratedRoles = await hydrateRoles(parsedRoles, includes);
+
+  return createPaginatedResponse(hydratedRoles, total, page, limit);
 }
 
 /**

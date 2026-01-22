@@ -1,7 +1,8 @@
+import type { PaginatedResponse, PaginationQuery } from "../schemas/api/pagination.schemas";
 import type { User, UserRelationKeys, UserRelations, UserWithRelations } from "../types/db/users.types";
 import type { z } from "zod";
 
-import { eq, inArray } from "drizzle-orm";
+import { asc, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
 
 import { drizzle } from "../drizzle";
 import { attachRelation } from "../helpers";
@@ -9,6 +10,7 @@ import { RolesModel } from "../models/roles.model";
 import { TokensModel } from "../models/tokens.model";
 import { UserRolesModel } from "../models/user-roles.model";
 import { UsersModel } from "../models/users.model";
+import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
 import { RoleSchema } from "../schemas/db/roles.schemas";
 import { TokenSchema } from "../schemas/db/tokens.schemas";
 import { InsertUserSchema, UpdateUserSchema, UserSchema } from "../schemas/db/users.schemas";
@@ -117,6 +119,68 @@ export async function getUsers<T extends UserRelationKeys>(includes?: T): Promis
 
   const parsedUsers = users.map(u => UserSchema.parse(u));
   return hydrateUsers(parsedUsers, includes);
+}
+
+/**
+ * Get paginated users with optional relations.
+ * @param pagination - Pagination parameters (page, limit, sortBy, sortOrder, search).
+ * @param includes - The relations to include.
+ * @returns Paginated users with relations.
+ */
+export async function getUsersPaginated<T extends UserRelationKeys>(
+  pagination: PaginationQuery,
+  includes?: T,
+): Promise<PaginatedResponse<UserWithRelations<T>>> {
+  const { page, limit, sortBy, sortOrder, search } = pagination;
+  const offset = (page - 1) * limit;
+
+  const searchCondition = search
+    ? or(
+        ilike(UsersModel.name, `%${search}%`),
+        ilike(UsersModel.email, `%${search}%`),
+      )
+    : undefined;
+
+  const sortableColumns: Record<string, typeof UsersModel.id | typeof UsersModel.name | typeof UsersModel.email | typeof UsersModel.createdAt> = {
+    id: UsersModel.id,
+    name: UsersModel.name,
+    email: UsersModel.email,
+    createdAt: UsersModel.createdAt,
+  };
+
+  const countQuery = drizzle
+    .select({ count: count() })
+    .from(UsersModel);
+
+  if (searchCondition) {
+    countQuery.where(searchCondition);
+  }
+
+  const [countResult] = await countQuery;
+  const total = countResult?.count ?? 0;
+
+  const dataQuery = drizzle
+    .select()
+    .from(UsersModel);
+
+  if (searchCondition) {
+    dataQuery.where(searchCondition);
+  }
+
+  const sortColumn = sortBy && sortableColumns[sortBy] ? sortableColumns[sortBy] : UsersModel.createdAt;
+  if (sortOrder === "asc") {
+    dataQuery.orderBy(asc(sortColumn));
+  } else {
+    dataQuery.orderBy(desc(sortColumn));
+  }
+
+  dataQuery.limit(limit).offset(offset);
+
+  const users = await dataQuery;
+  const parsedUsers = users.map(u => UserSchema.parse(u));
+  const hydratedUsers = await hydrateUsers(parsedUsers, includes);
+
+  return createPaginatedResponse(hydratedUsers, total, page, limit);
 }
 
 /**

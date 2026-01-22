@@ -1,12 +1,14 @@
+import type { PaginatedResponse, PaginationQuery } from "../schemas/api/pagination.schemas";
 import type { Invitation, InvitationRelationKeys, InvitationRelations, InvitationWithRelations } from "../types/db/invitations.types";
 import type { z } from "zod";
 
-import { and, eq, lt } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, lt, or } from "drizzle-orm";
 
-import { InvitationsModel } from "../models/invitations.model";
-import { UsersModel } from "../models/users.model";
 import { drizzle } from "../drizzle";
 import { attachRelation } from "../helpers";
+import { InvitationsModel } from "../models/invitations.model";
+import { UsersModel } from "../models/users.model";
+import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
 import { InsertInvitationSchema, InvitationSchema, UpdateInvitationSchema } from "../schemas/db/invitations.schemas";
 import { UserSchema } from "../schemas/db/users.schemas";
 
@@ -56,6 +58,82 @@ export async function getInvitations<T extends InvitationRelationKeys>(includes?
 
     return invitationWithRelations;
   }));
+}
+
+/**
+ * Get paginated invitations with optional relations.
+ * @param pagination - Pagination parameters (page, limit, sortBy, sortOrder, search).
+ * @param includes - The relations to include.
+ * @returns Paginated invitations with relations.
+ */
+export async function getInvitationsPaginated<T extends InvitationRelationKeys>(
+  pagination: PaginationQuery,
+  includes?: T,
+): Promise<PaginatedResponse<InvitationWithRelations<T>>> {
+  const { page, limit, sortBy, sortOrder, search } = pagination;
+  const offset = (page - 1) * limit;
+
+  const searchCondition = search
+    ? or(
+        ilike(InvitationsModel.email, `%${search}%`),
+      )
+    : undefined;
+
+  const sortableColumns: Record<string, typeof InvitationsModel.id | typeof InvitationsModel.email | typeof InvitationsModel.status | typeof InvitationsModel.createdAt | typeof InvitationsModel.expiresAt> = {
+    id: InvitationsModel.id,
+    email: InvitationsModel.email,
+    status: InvitationsModel.status,
+    createdAt: InvitationsModel.createdAt,
+    expiresAt: InvitationsModel.expiresAt,
+  };
+
+  const countQuery = drizzle
+    .select({ count: count() })
+    .from(InvitationsModel);
+
+  if (searchCondition) {
+    countQuery.where(searchCondition);
+  }
+
+  const [countResult] = await countQuery;
+  const total = countResult?.count ?? 0;
+
+  const dataQuery = drizzle
+    .select()
+    .from(InvitationsModel);
+
+  if (searchCondition) {
+    dataQuery.where(searchCondition);
+  }
+
+  const sortColumn = sortBy && sortableColumns[sortBy] ? sortableColumns[sortBy] : InvitationsModel.createdAt;
+  if (sortOrder === "asc") {
+    dataQuery.orderBy(asc(sortColumn));
+  } else {
+    dataQuery.orderBy(desc(sortColumn));
+  }
+
+  dataQuery.limit(limit).offset(offset);
+
+  const invitations = await dataQuery;
+  const parsedInvitations = invitations.map(i => InvitationSchema.parse(i));
+
+  const hydratedInvitations = await Promise.all(parsedInvitations.map(async (invitation) => {
+    const invitationWithRelations = invitation as InvitationWithRelations<T>;
+
+    if (includes) {
+      await Promise.all(
+        includes.map(async (key) => {
+          const value = await relationLoaders[key](invitation.invitedById);
+          attachRelation(invitationWithRelations, key, value);
+        }),
+      );
+    }
+
+    return invitationWithRelations;
+  }));
+
+  return createPaginatedResponse(hydratedInvitations, total, page, limit);
 }
 
 /**
