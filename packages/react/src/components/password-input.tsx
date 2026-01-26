@@ -68,7 +68,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
   const requirements = React.useMemo(() => checkRequirements(password, checks), [password, checks]);
 
   const isValid = React.useMemo(() => {
-    if (!checks || Object.keys(checks).length === 0) {
+    if (!checks || !Object.keys(checks).length) {
       // If no checks are provided, consider the password valid
       return true;
     }
