@@ -4,8 +4,8 @@ services:
     container_name: postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: "${POSTGRES_USER:?Environment variable POSTGRES_USER is required}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Environment variable POSTGRES_PASSWORD is required}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-admin}"
       POSTGRES_DB: bunstack
     ports:
       - "5432:5432"
