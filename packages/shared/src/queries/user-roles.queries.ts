@@ -3,9 +3,9 @@ import type { z } from "zod";
 
 import { and, eq } from "drizzle-orm";
 
+import { drizzle } from "../drizzle";
 import { RolesModel } from "../models/roles.model";
 import { UserRolesModel } from "../models/user-roles.model";
-import { drizzle } from "../drizzle";
 import { UserRoleSchema } from "../schemas/db/user-roles.schemas";
 
 // ============================================================================

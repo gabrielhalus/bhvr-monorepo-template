@@ -1,8 +1,10 @@
 import type { PaginatedResponse, PaginationQuery } from "../schemas/api/pagination.schemas";
-import type { Invitation, InvitationRelationKeys, InvitationRelations, InvitationWithRelations } from "../types/db/invitations.types";
+import type { Invitation, InvitationRelationKey, InvitationRelations, InvitationWithRelations } from "../types/db/invitations.types";
 import type { z } from "zod";
 
-import { and, asc, count, desc, eq, ilike, lt, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, lt, or } from "drizzle-orm";
+
+import { UserSchema } from "~shared/schemas/db/users.schemas";
 
 import { drizzle } from "../drizzle";
 import { attachRelation } from "../helpers";
@@ -10,24 +12,35 @@ import { InvitationsModel } from "../models/invitations.model";
 import { UsersModel } from "../models/users.model";
 import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
 import { InsertInvitationSchema, InvitationSchema, UpdateInvitationSchema } from "../schemas/db/invitations.schemas";
-import { UserSchema } from "../schemas/db/users.schemas";
 
 // ============================================================================
 // Relation Loaders
 // ============================================================================
 
-const relationLoaders: { [K in keyof InvitationRelations]: (invitedById: string) => Promise<InvitationRelations[K]> } = {
-  invitedBy: async (invitedById) => {
-    const [user] = await drizzle
-      .select()
-      .from(UsersModel)
-      .where(eq(UsersModel.id, invitedById));
+export const invitationRelationLoaders: { [K in keyof InvitationRelations]: (invitationIds: string[]) => Promise<Record<string, InvitationRelations[K]>> } = {
+  invitedBy: async (invitationIds) => {
+    const result: Record<string, InvitationRelations["invitedBy"]> = {};
 
-    if (!user) {
-      throw new Error("Invited by user not found");
+    if (!invitationIds.length) {
+      return result;
     }
 
-    return UserSchema.parse(user);
+    const invitationsRows = await drizzle
+      .select({
+        invitationId: InvitationsModel.id,
+        user: UsersModel,
+      })
+      .from(InvitationsModel)
+      .leftJoin(UsersModel, eq(InvitationsModel.invitedById, UsersModel.id))
+      .where(inArray(InvitationsModel.id, invitationIds));
+
+    for (const row of invitationsRows) {
+      if (row.user) {
+        result[row.invitationId]! = UserSchema.parse(row.user);
+      }
+    }
+
+    return result;
   },
 };
 
@@ -40,24 +53,13 @@ const relationLoaders: { [K in keyof InvitationRelations]: (invitedById: string)
  * @param includes - The relations to include.
  * @returns The invitations with relations.
  */
-export async function getInvitations<T extends InvitationRelationKeys>(includes?: T): Promise<InvitationWithRelations<T>[]> {
-  const invitations = await drizzle.select().from(InvitationsModel);
+export async function getInvitations<T extends InvitationRelationKey[]>(includes?: T): Promise<InvitationWithRelations<T>[]> {
+  const invitations = await drizzle
+    .select()
+    .from(InvitationsModel);
+
   const parsedInvitations = invitations.map(i => InvitationSchema.parse(i));
-
-  return Promise.all(parsedInvitations.map(async (invitation) => {
-    const invitationWithRelations = invitation as InvitationWithRelations<T>;
-
-    if (includes) {
-      await Promise.all(
-        includes.map(async (key) => {
-          const value = await relationLoaders[key](invitation.invitedById);
-          attachRelation(invitationWithRelations, key, value);
-        }),
-      );
-    }
-
-    return invitationWithRelations;
-  }));
+  return hydrateInvitations(parsedInvitations, includes);
 }
 
 /**
@@ -66,7 +68,7 @@ export async function getInvitations<T extends InvitationRelationKeys>(includes?
  * @param includes - The relations to include.
  * @returns Paginated invitations with relations.
  */
-export async function getInvitationsPaginated<T extends InvitationRelationKeys>(
+export async function getInvitationsPaginated<T extends InvitationRelationKey[]>(
   pagination: PaginationQuery,
   includes?: T,
 ): Promise<PaginatedResponse<InvitationWithRelations<T>>> {
@@ -117,21 +119,7 @@ export async function getInvitationsPaginated<T extends InvitationRelationKeys>(
 
   const invitations = await dataQuery;
   const parsedInvitations = invitations.map(i => InvitationSchema.parse(i));
-
-  const hydratedInvitations = await Promise.all(parsedInvitations.map(async (invitation) => {
-    const invitationWithRelations = invitation as InvitationWithRelations<T>;
-
-    if (includes) {
-      await Promise.all(
-        includes.map(async (key) => {
-          const value = await relationLoaders[key](invitation.invitedById);
-          attachRelation(invitationWithRelations, key, value);
-        }),
-      );
-    }
-
-    return invitationWithRelations;
-  }));
+  const hydratedInvitations = await hydrateInvitations(parsedInvitations, includes);
 
   return createPaginatedResponse(hydratedInvitations, total, page, limit);
 }
@@ -142,7 +130,7 @@ export async function getInvitationsPaginated<T extends InvitationRelationKeys>(
  * @param includes - The relations to include.
  * @returns The invitation with relations.
  */
-export async function getInvitation<T extends InvitationRelationKeys>(id: string, includes?: T): Promise<InvitationWithRelations<T> | null> {
+export async function getInvitation<T extends InvitationRelationKey[]>(id: string, includes?: T): Promise<InvitationWithRelations<T> | null> {
   const [invitation] = await drizzle
     .select()
     .from(InvitationsModel)
@@ -153,18 +141,46 @@ export async function getInvitation<T extends InvitationRelationKeys>(id: string
   }
 
   const parsedInvitation = InvitationSchema.parse(invitation);
-  const invitationWithRelations = parsedInvitation as InvitationWithRelations<T>;
+  const [invitationWithRelations] = await hydrateInvitations([parsedInvitation], includes);
 
-  if (includes) {
-    await Promise.all(
-      includes.map(async (key) => {
-        const value = await relationLoaders[key](invitation.invitedById);
-        attachRelation(invitationWithRelations, key, value);
-      }),
-    );
+  return invitationWithRelations ?? null;
+}
+
+/**
+ * Hydrate invitations with additional relations
+ * @param invitations - The invitations to hydrate
+ * @param includes - The relations to include
+ * @returns The invitations with added relations
+ */
+export async function hydrateInvitations<T extends InvitationRelationKey[]>(invitations: Invitation[], includes?: T): Promise<InvitationWithRelations<T>[]> {
+  if (!includes || !includes.length) {
+    return invitations.map(u => ({ ...u })) as InvitationWithRelations<T>[];
   }
 
-  return invitationWithRelations;
+  const invitationIds = invitations.map(u => u.id);
+
+  const relations = await Promise.all(
+    includes.map(async (key) => {
+      const loader = invitationRelationLoaders[key];
+
+      if (!loader) {
+        throw new Error(`No relation loader defined for "${key}"`);
+      }
+
+      const data = await loader(invitationIds);
+      return [key, data] as const;
+    }),
+  );
+
+  return invitations.map((invitation) => {
+    const withRelations: InvitationWithRelations<T> = { ...invitation } as InvitationWithRelations<T>;
+
+    for (const [key, data] of relations) {
+      attachRelation(withRelations, key, data[invitation.id] ?? null);
+    }
+
+    return withRelations;
+  });
 }
 
 /**

@@ -1,9 +1,12 @@
 import type { SeedMeta } from "./types";
+import type { Policy } from "~shared/types/db/policies.types";
+import type { Permission } from "~shared/types/permissions.types";
 
 import { eq } from "drizzle-orm";
 import { createHash } from "node:crypto";
 
 import { drizzle } from "~shared/drizzle";
+import { PoliciesModel } from "~shared/models/policies.model";
 import { RolesModel } from "~shared/models/roles.model";
 import { RuntimeConfigModel } from "~shared/models/runtime-configs.model";
 import { SeedsModel } from "~shared/models/seeds.model";
@@ -42,6 +45,13 @@ type RuntimeConfigSeedData = Array<{
   disabledWhen?: string;
 }>;
 
+type PolicySeedData = Array<{
+  effect: Policy["effect"];
+  permission: Permission;
+  roleId: number;
+  condition: Policy["condition"];
+}>;
+
 type UserSeedData = Array<{
   id: string;
   name: string;
@@ -64,6 +74,15 @@ async function applyRuntimeConfigsSeed(data: RuntimeConfigSeedData): Promise<voi
     await drizzle
       .insert(RuntimeConfigModel)
       .values(config)
+      .onConflictDoNothing();
+  }
+}
+
+async function applyPoliciesSeed(data: PolicySeedData): Promise<void> {
+  for (const policy of data) {
+    await drizzle
+      .insert(PoliciesModel)
+      .values(policy)
       .onConflictDoNothing();
   }
 }
@@ -121,6 +140,9 @@ async function applySeed(seed: SeedMeta): Promise<void> {
       break;
     case "runtime-configs":
       await applyRuntimeConfigsSeed(seed.data as RuntimeConfigSeedData);
+      break;
+    case "policies":
+      await applyPoliciesSeed(seed.data as PolicySeedData);
       break;
     case "users":
       await applyUsersSeed(seed.data as UserSeedData);

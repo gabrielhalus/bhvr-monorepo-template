@@ -7,18 +7,19 @@ import { arrayParam } from "~shared/helpers";
 /**
  * User relation keys
  */
-const userRelationKeys = ["roles", "tokens"] as const satisfies (keyof UserRelations)[];
+const UserRelationKey = ["roles", "tokens"] as const satisfies (keyof UserRelations)[];
 
 /**
  * Schema for user relations
  */
-export const UserRelationsSchema = z.array(z.enum(userRelationKeys));
+export const UserRelationsSchema = z.array(z.enum(UserRelationKey));
 
 /**
  * Schema for user relations query
  */
 export const UserRelationsQuerySchema = z.object({
-  includes: arrayParam(z.enum(userRelationKeys)).optional(),
+  userIds: arrayParam(z.string().length(21)).optional(),
+  include: arrayParam(z.enum(UserRelationKey)),
 });
 
 /**

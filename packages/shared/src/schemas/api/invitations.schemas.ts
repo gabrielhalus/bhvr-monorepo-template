@@ -8,18 +8,19 @@ import { PasswordSchema } from "~shared/schemas/api/auth.schemas";
 /**
  * Invitation relation keys
  */
-const invitationRelationKeys = ["invitedBy"] as const satisfies (keyof InvitationRelations)[];
+const InvitationRelationKey = ["invitedBy"] as const satisfies (keyof InvitationRelations)[];
 
 /**
  * Schema for invitation relations
  */
-export const InvitationRelationsSchema = z.array(z.enum(invitationRelationKeys));
+export const InvitationRelationsSchema = z.array(z.enum(InvitationRelationKey));
 
 /**
  * Schema for invitation relations query
  */
 export const InvitationRelationsQuerySchema = z.object({
-  includes: arrayParam(z.enum(invitationRelationKeys)).optional(),
+  invitationIds: arrayParam(z.string().length(21)).optional(),
+  include: arrayParam(z.enum(InvitationRelationKey)),
 });
 
 /**

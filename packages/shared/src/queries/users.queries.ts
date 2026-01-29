@@ -1,5 +1,5 @@
 import type { PaginatedResponse, PaginationQuery } from "../schemas/api/pagination.schemas";
-import type { User, UserRelationKeys, UserRelations, UserWithRelations } from "../types/db/users.types";
+import type { User, UserRelationKey, UserRelations, UserWithRelations } from "../types/db/users.types";
 import type { z } from "zod";
 
 import { asc, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
@@ -19,19 +19,17 @@ import { InsertUserSchema, UpdateUserSchema, UserSchema } from "../schemas/db/us
 // Relation Loaders
 // ============================================================================
 
-const relationLoaders: { [K in keyof UserRelations]: (userIds: string[]) => Promise<Map<string, UserRelations[K]>> } = {
+export const userRelationLoaders: { [K in keyof UserRelations]: (userIds: string[]) => Promise<Record<string, UserRelations[K]>> } = {
   roles: async (userIds) => {
-    const result = new Map<string, UserRelations["roles"]>();
+    const result: Record<string, UserRelations["roles"]> = {};
 
-    if (userIds.length === 0) {
+    if (!userIds.length) {
       return result;
     }
 
-    for (const userId of userIds) {
-      result.set(userId, []);
-    }
+    userIds.forEach(id => (result[id] = []));
 
-    const [assignedRoles, defaultRole] = await Promise.all([
+    const [userRolesRows, defaultRolesRows] = await Promise.all([
       drizzle
         .select({
           userId: UserRolesModel.userId,
@@ -43,28 +41,20 @@ const relationLoaders: { [K in keyof UserRelations]: (userIds: string[]) => Prom
       drizzle
         .select()
         .from(RolesModel)
-        .where(eq(RolesModel.isDefault, true))
-        .limit(1),
+        .where(eq(RolesModel.isDefault, true)),
     ]);
 
-    for (const row of assignedRoles) {
+    for (const row of userRolesRows) {
       if (row.role !== null) {
-        const roles = result.get(row.userId) ?? [];
-        roles.push(RoleSchema.parse(row.role));
-        result.set(row.userId, roles);
+        result[row.userId]!.push(RoleSchema.parse(row.role));
       }
     }
 
-    // Add default role to all users if it exists and not already assigned
-    if (defaultRole[0]) {
-      const parsedDefaultRole = RoleSchema.parse(defaultRole[0]);
-
-      for (const userId of userIds) {
-        const roles = result.get(userId) ?? [];
-        if (!roles.some(r => r.id === parsedDefaultRole.id)) {
-          roles.push(parsedDefaultRole);
-          result.set(userId, roles);
-        }
+    if (defaultRolesRows.length) {
+      for (const row of defaultRolesRows) {
+        userIds.forEach((userId) => {
+          result[userId]!.push(RoleSchema.parse(row));
+        });
       }
     }
 
@@ -72,17 +62,15 @@ const relationLoaders: { [K in keyof UserRelations]: (userIds: string[]) => Prom
   },
 
   tokens: async (userIds) => {
-    const result = new Map<string, UserRelations["tokens"]>();
+    const result: Record<string, UserRelations["tokens"]> = {};
 
-    if (userIds.length === 0) {
+    if (!userIds.length) {
       return result;
     }
 
-    for (const userId of userIds) {
-      result.set(userId, []);
-    }
+    userIds.forEach(id => (result[id] = []));
 
-    const rows = await drizzle
+    const userTokensRows = await drizzle
       .select({
         userId: TokensModel.userId,
         token: TokensModel,
@@ -90,13 +78,79 @@ const relationLoaders: { [K in keyof UserRelations]: (userIds: string[]) => Prom
       .from(TokensModel)
       .where(inArray(TokensModel.userId, userIds));
 
-    for (const row of rows) {
+    for (const row of userTokensRows) {
       if (row.token !== null) {
-        const tokens = result.get(row.userId) ?? [];
-        tokens.push(TokenSchema.parse(row.token));
-        result.set(row.userId, tokens);
+        result[row.userId]!.push(TokenSchema.parse(row.token));
       }
     }
+
+    return result;
+  },
+};
+
+export const userRelationCountLoaders: { [K in keyof UserRelations]: (userIds: string[]) => Promise<Record<string, number>>; } = {
+  roles: async (userIds) => {
+    const result: Record<string, number> = {};
+
+    if (!userIds.length) {
+      return result;
+    }
+
+    userIds.forEach(id => (result[id] = 0));
+
+    const [userRolesRows, defaultRolesRows] = await Promise.all([
+      drizzle
+        .select({
+          userId: UserRolesModel.userId,
+          count: count(RolesModel.id),
+        })
+        .from(UserRolesModel)
+        .leftJoin(RolesModel, eq(UserRolesModel.roleId, RolesModel.id))
+        .where(inArray(UserRolesModel.userId, userIds))
+        .groupBy(UserRolesModel.userId),
+      drizzle
+        .select({
+          count: count(RolesModel.id),
+        })
+        .from(RolesModel)
+        .where(eq(RolesModel.isDefault, true)),
+    ]);
+
+    for (const row of userRolesRows) {
+      result[row.userId] = Number(row.count);
+    };
+
+    const defaultCount = defaultRolesRows[0]?.count ?? 0;
+    if (defaultCount) {
+      userIds.forEach((userId) => {
+        result[userId]! += Number(defaultCount);
+      });
+    }
+
+    return result;
+  },
+
+  tokens: async (userIds) => {
+    const result: Record<string, number> = {};
+
+    if (!userIds.length) {
+      return result;
+    }
+
+    userIds.forEach(id => (result[id] = 0));
+
+    const userTokensRows = await drizzle
+      .select({
+        userId: TokensModel.userId,
+        count: count(TokensModel.id),
+      })
+      .from(TokensModel)
+      .where(inArray(TokensModel.userId, userIds))
+      .groupBy(TokensModel.userId);
+
+    for (const row of userTokensRows) {
+      result[row.userId] = Number(row.count);
+    };
 
     return result;
   },
@@ -112,7 +166,7 @@ const relationLoaders: { [K in keyof UserRelations]: (userIds: string[]) => Prom
  * @returns The users with relations.
  * @throws An error if a loader is not defined for a relation.
  */
-export async function getUsers<T extends UserRelationKeys>(includes?: T): Promise<UserWithRelations<T>[]> {
+export async function getUsers<T extends UserRelationKey[]>(includes?: T): Promise<UserWithRelations<T>[]> {
   const users = await drizzle
     .select()
     .from(UsersModel);
@@ -127,7 +181,7 @@ export async function getUsers<T extends UserRelationKeys>(includes?: T): Promis
  * @param includes - The relations to include.
  * @returns Paginated users with relations.
  */
-export async function getUsersPaginated<T extends UserRelationKeys>(
+export async function getUsersPaginated<T extends UserRelationKey[]>(
   pagination: PaginationQuery,
   includes?: T,
 ): Promise<PaginatedResponse<UserWithRelations<T>>> {
@@ -190,7 +244,7 @@ export async function getUsersPaginated<T extends UserRelationKeys>(
  * @returns The user with relations.
  * @throws An error if a loader is not defined for a relation.
  */
-export async function getUser<T extends UserRelationKeys>(id: string, includes?: T): Promise<UserWithRelations<T> | null> {
+export async function getUser<T extends UserRelationKey[]>(id: string, includes?: T): Promise<UserWithRelations<T> | null> {
   const [user] = await drizzle
     .select()
     .from(UsersModel)
@@ -212,8 +266,8 @@ export async function getUser<T extends UserRelationKeys>(id: string, includes?:
  * @param includes - The relations to include
  * @returns The users with added relations
  */
-export async function hydrateUsers<T extends UserRelationKeys>(users: User[], includes?: T): Promise<UserWithRelations<T>[]> {
-  if (!includes || includes.length === 0) {
+export async function hydrateUsers<T extends UserRelationKey[]>(users: User[], includes?: T): Promise<UserWithRelations<T>[]> {
+  if (!includes || !includes.length) {
     return users.map(u => ({ ...u })) as UserWithRelations<T>[];
   }
 
@@ -221,7 +275,7 @@ export async function hydrateUsers<T extends UserRelationKeys>(users: User[], in
 
   const relations = await Promise.all(
     includes.map(async (key) => {
-      const loader = relationLoaders[key];
+      const loader = userRelationLoaders[key];
 
       if (!loader) {
         throw new Error(`No relation loader defined for "${key}"`);
@@ -236,7 +290,7 @@ export async function hydrateUsers<T extends UserRelationKeys>(users: User[], in
     const withRelations: UserWithRelations<T> = { ...user } as UserWithRelations<T>;
 
     for (const [key, data] of relations) {
-      attachRelation(withRelations, key, data.get(user.id) ?? null);
+      attachRelation(withRelations, key, data[user.id] ?? null);
     }
 
     return withRelations;
@@ -313,7 +367,7 @@ export async function deleteUser(id: string): Promise<User> {
  * @returns The user with relations.
  * @throws An error if a loader is not defined for a relation.
  */
-export async function getUserByEmail<T extends UserRelationKeys>(email: string, includes?: T): Promise<UserWithRelations<T> | null> {
+export async function getUserByEmail<T extends UserRelationKey[]>(email: string, includes?: T): Promise<UserWithRelations<T> | null> {
   const [user] = await drizzle
     .select()
     .from(UsersModel)

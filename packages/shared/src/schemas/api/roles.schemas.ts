@@ -7,18 +7,19 @@ import { arrayParam } from "~shared/helpers";
 /**
  * Role relation keys
  */
-const roleRelationKeys = ["members", "permissions", "policies"] as const satisfies (keyof RoleRelations)[];
+const RoleRelationKey = ["members", "permissions", "policies"] as const satisfies (keyof RoleRelations)[];
 
 /**
  * Schema for role relations
  */
-export const RoleRelationsSchema = z.array(z.enum(roleRelationKeys));
+export const RoleRelationsSchema = z.array(z.enum(RoleRelationKey));
 
 /**
  * Schema for role relations query
  */
 export const RoleRelationsQuerySchema = z.object({
-  includes: arrayParam(z.enum(roleRelationKeys)).optional(),
+  roleIds: arrayParam(z.number()).optional(),
+  include: arrayParam(z.enum(RoleRelationKey)),
 });
 
 /**

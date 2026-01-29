@@ -12,7 +12,7 @@ import { evaluateCondition } from "./evaluate-condition";
  * @returns True if the user has the permission, false otherwise
  */
 export async function isAuthorized(permission: Permission, user: UserWithRelations<["roles"]>, resource?: Record<string, unknown>): Promise<boolean> {
-  if (!user.roles || user.roles.length === 0) {
+  if (!user.roles || !user.roles.length) {
     return false;
   }
 
@@ -25,7 +25,7 @@ export async function isAuthorized(permission: Permission, user: UserWithRelatio
   for (const role of hydratedRoles) {
     const { policies, permissions } = role;
 
-    if (!policies || policies.length === 0) {
+    if (!policies || !policies.length) {
       if (permissions?.includes(permission)) {
         return true;
       }

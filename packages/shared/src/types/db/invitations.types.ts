@@ -12,6 +12,6 @@ export type InvitationRelations = {
   invitedBy: User;
 };
 
-export type InvitationRelationKeys = z.infer<typeof InvitationRelationsSchema>;
+export type InvitationRelationKey = z.infer<typeof InvitationRelationsSchema>[number];
 
-export type InvitationWithRelations<T extends InvitationRelationKeys> = WithRelations<Invitation, InvitationRelations, T>;
+export type InvitationWithRelations<T extends InvitationRelationKey[]> = WithRelations<Invitation, InvitationRelations, T>;
