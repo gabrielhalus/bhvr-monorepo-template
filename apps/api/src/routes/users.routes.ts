@@ -1,53 +1,17 @@
+import type { UserRelations } from "~shared/types/db/users.types";
+
 import { password } from "bun";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { generateRandomPassword } from "@/helpers/generate-random-password";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { deleteUser, emailExists, getUser, getUsersPaginated, updateUser, updateUserPassword } from "~shared/queries/users.queries";
+import { deleteUser, emailExists, getUser, getUsersPaginated, updateUser, updateUserPassword, userRelationCountLoaders, userRelationLoaders } from "~shared/queries/users.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
 import { UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
 import { UpdateUserSchema } from "~shared/schemas/db/users.schemas";
-
-const PaginatedUsersQuerySchema = PaginationQuerySchema.extend(UserRelationsQuerySchema.shape);
-
-/**
- * Generates a random password that meets the password requirements.
- * @returns A random password string.
- */
-function generateRandomPassword(): string {
-  const lowercase = "abcdefghijklmnopqrstuvwxyz";
-  const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const digits = "0123456789";
-  const special = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-
-  const getRandomChar = (chars: string) => chars[Math.floor(Math.random() * chars.length)];
-
-  // Ensure at least one of each required character type
-  const requiredChars = [
-    getRandomChar(lowercase),
-    getRandomChar(uppercase),
-    getRandomChar(digits),
-    getRandomChar(special),
-  ];
-
-  // Fill the rest with random characters from all types
-  const allChars = lowercase + uppercase + digits + special;
-  const remainingLength = 12 - requiredChars.length;
-
-  for (let i = 0; i < remainingLength; i++) {
-    requiredChars.push(getRandomChar(allChars));
-  }
-
-  // Shuffle the array
-  for (let i = requiredChars.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [requiredChars[i], requiredChars[j]] = [requiredChars[j], requiredChars[i]];
-  }
-
-  return requiredChars.join("");
-}
 
 export const usersRoutes = new Hono()
   /**
@@ -73,19 +37,19 @@ export const usersRoutes = new Hono()
   .use(getSessionContext)
 
   /**
-   * Get paginated users with optional relation includes
+   * Get paginated users with optional relation include
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing paginated users with metadata
+   * @returns JSON response with paginated users with metadata
    * @throws {500} If an error occurs while retrieving users
    * @access protected
    * @permission user:list
    */
-  .get("/", validationMiddleware("query", PaginatedUsersQuerySchema), requirePermissionFactory("user:list"), async (c) => {
-    const { includes, page, limit, sortBy, sortOrder, search } = c.req.valid("query");
+  .get("/", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("user:list"), async (c) => {
+    const { page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
     try {
-      const result = await getUsersPaginated({ page, limit, sortBy, sortOrder, search }, includes);
+      const result = await getUsersPaginated({ page, limit, sortBy, sortOrder, search });
 
       return c.json({ success: true as const, ...result });
     } catch (error) {
@@ -94,21 +58,92 @@ export const usersRoutes = new Hono()
   })
 
   /**
-   * Get a specific user by ID with optional relation includes
+   * Get the relations for specified users.
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing the user data
+   * @returns JSON response with users-relations mapping
+   * @throws {500} If an error occurs while retrieving relations
+   * @access protected
+   * @permission user:list
+   */
+  .get("/relations", validationMiddleware("query", UserRelationsQuerySchema), requirePermissionFactory("user:list"), async (c) => {
+    const { userIds = [], include } = c.req.valid("query");
+
+    try {
+      const relations: Record<string, Partial<UserRelations>> = {};
+      userIds.forEach(id => (relations[id] = {}));
+
+      await Promise.all(
+        include.map(async (key) => {
+          const loader = userRelationLoaders[key];
+          if (!loader)
+            throw new Error(`No relation loader defined for "${key}"`);
+
+          const data = await loader(userIds);
+
+          for (const [userId, items] of Object.entries(data)) {
+            relations[userId]![key] = items;
+          }
+        }),
+      );
+
+      return c.json({ success: true as const, relations });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Get the count of relations for specified users.
+   *
+   * @param ctx - Hono context, including session info
+   * @returns JSON response with the count of user relations
+   * @throws {500} If an error occurs while retrieving relations count
+   * @access protected
+   * @permission user:list
+   */
+  .get("/relations/count", validationMiddleware("query", UserRelationsQuerySchema), requirePermissionFactory("user:list"), async (c) => {
+    const { userIds = [], include } = c.req.valid("query");
+
+    try {
+      const relations: Record<string, Record<string, number>> = {};
+      userIds.forEach(id => (relations[id] = {}));
+
+      await Promise.all(
+        include.map(async (key) => {
+          const loader = userRelationCountLoaders[key];
+          if (!loader)
+            throw new Error(`No relation loader defined for "${key}"`);
+
+          const data = await loader(userIds);
+
+          for (const [userId, items] of Object.entries(data)) {
+            relations[userId]![key] = items;
+          }
+        }),
+      );
+
+      return c.json({ success: true as const, ...relations });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Get a specific user by ID with optional relation include
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response with the user data
    * @throws {404} If the user is not found
    * @throws {500} If an error occurs while retrieving the user
    * @access protected
    * @permission user:read (resource-specific)
    */
-  .get("/:id", validationMiddleware("query", UserRelationsQuerySchema), requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), async (c) => {
+  .get("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), async (c) => {
     const id = c.req.param("id");
-    const { includes } = c.req.valid("query");
 
     try {
-      const user = await getUser(id, includes);
+      const user = await getUser(id);
 
       if (!user) {
         return c.json({ success: false, error: "Not Found" }, 404);
@@ -121,15 +156,89 @@ export const usersRoutes = new Hono()
   })
 
   /**
+   * Get relations for a specific user.
+   *
+   * @param ctx - Hono context, including session info
+   * @param id - User ID
+   * @returns JSON response with the specified user's relations
+   * @throws {500} If an error occurs while retrieving relations
+   * @access protected
+   * @permission user:read
+   */
+  .get("/:id{^[a-zA-Z0-9-]{21}$}/relations", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", UserRelationsQuerySchema), async (c) => {
+    const id = c.req.param("id");
+    const { include } = c.req.valid("query");
+
+    try {
+      const relations: Record<string, Partial<UserRelations>> = {};
+
+      await Promise.all(
+        include.map(async (key) => {
+          const loader = userRelationLoaders[key];
+          if (!loader)
+            throw new Error(`No relation loader defined for "${key}"`);
+
+          const data = await loader([id]);
+
+          for (const [_, items] of Object.entries(data)) {
+            relations[key] = items as Partial<UserRelations>;
+          }
+        }),
+      );
+
+      return c.json({ success: true as const, relations });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Get the count of relations for a specific user.
+   *
+   * @param ctx - Hono context, including session info
+   * @param id - User ID
+   * @returns JSON response with the count of relations for the user
+   * @throws {500} If an error occurs while retrieving relations count
+   * @access protected
+   * @permission user:read
+   */
+  .get("/:id{^[a-zA-Z0-9-]{21}$}/relations/count", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", UserRelationsQuerySchema), async (c) => {
+    const id = c.req.param("id");
+    const { include } = c.req.valid("query");
+
+    try {
+      const relations: Record<string, number> = {};
+
+      await Promise.all(
+        include.map(async (key) => {
+          const loader = userRelationCountLoaders[key];
+          if (!loader)
+            throw new Error(`No relation loader defined for "${key}"`);
+
+          const data = await loader([id]);
+
+          for (const [_, items] of Object.entries(data)) {
+            relations[key] = items;
+          }
+        }),
+      );
+
+      return c.json({ success: true as const, relations });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
    * Update a specific user by ID
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing the updated user data
+   * @returns JSON response with the updated user data
    * @throws {500} If an error occurs while updating the user
    * @access protected
    * @permission user:update (resource-specific)
    */
-  .put("/:id", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateUserSchema), async (c) => {
+  .put("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateUserSchema), async (c) => {
     const id = c.req.param("id");
     const data = c.req.valid("json");
 
@@ -145,13 +254,13 @@ export const usersRoutes = new Hono()
    * Reset a user's password and generate a new random one
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing the new password (plaintext)
+   * @returns JSON response with the new password (plaintext)
    * @throws {404} If the user is not found
    * @throws {500} If an error occurs while resetting the password
    * @access protected
    * @permission user:update (resource-specific)
    */
-  .post("/:id/reset-password", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), async (c) => {
+  .post("/:id{^[a-zA-Z0-9-]{21}$}/reset-password", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), async (c) => {
     const id = c.req.param("id");
 
     try {
@@ -175,12 +284,12 @@ export const usersRoutes = new Hono()
    * Delete a specific user by ID
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing the deleted user data
+   * @returns JSON response with the deleted user data
    * @throws {500} If an error occurs while deleting the user
    * @access protected
    * @permission user:delete (resource-specific)
    */
-  .delete("/:id", requirePermissionFactory("user:delete", c => ({ id: c.req.param("id") })), async (c) => {
+  .delete("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("user:delete", c => ({ id: c.req.param("id") })), async (c) => {
     const id = c.req.param("id");
 
     try {

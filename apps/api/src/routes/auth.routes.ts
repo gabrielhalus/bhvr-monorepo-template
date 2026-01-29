@@ -130,7 +130,7 @@ export const authRoutes = new Hono()
    * Get the authenticated user's session information
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing the authenticated user's session data (including impersonator if impersonating)
+   * @returns JSON response with the authenticated user's session data (including impersonator if impersonating)
    * @access protected
    */
   .get("/", async (c) => {
@@ -146,7 +146,7 @@ export const authRoutes = new Hono()
    * Update the authenticated user's account information
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing the updated user data
+   * @returns JSON response with the updated user data
    * @throws {500} If an error occurs while updating the account
    * @access protected
    */
@@ -194,7 +194,7 @@ export const authRoutes = new Hono()
    * @access protected
    * @permission user:impersonate
    */
-  .post("/impersonate/:id", async (c) => {
+  .post("/impersonate/:id{^[a-zA-Z0-9-]{21}$}", async (c) => {
     const sessionContext = c.var.sessionContext;
     const targetUserId = c.req.param("id");
 
