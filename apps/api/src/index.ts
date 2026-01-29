@@ -1,6 +1,6 @@
 import app from "@/app";
-import { runSeeds } from "~shared/seeds";
 import { seeds } from "~seeds";
+import { runSeeds } from "~shared/seeds";
 
 // Run seeds before starting the server
 await runSeeds(seeds);

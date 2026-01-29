@@ -1,3 +1,5 @@
+import type { InvitationRelations } from "~shared/types/db/invitations.types";
+
 import { password } from "bun";
 import { Hono } from "hono";
 import { setCookie } from "hono/cookie";
@@ -11,9 +13,11 @@ import { validationMiddleware } from "@/middlewares/validation";
 import {
   createInvitation,
   deleteInvitation,
+  getInvitation,
   getInvitationByToken,
   getInvitationsPaginated,
   getPendingInvitationByEmail,
+  invitationRelationLoaders,
   updateInvitation,
 } from "~shared/queries/invitations.queries";
 import { getDefaultRole, getRole } from "~shared/queries/roles.queries";
@@ -154,17 +158,116 @@ export const invitationsRoutes = new Hono()
    * Get paginated invitations with optional relation includes
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing paginated invitations with metadata
+   * @returns JSON response with paginated invitations with metadata
    * @throws {500} If an error occurs while retrieving invitations
    * @access protected
    * @permission invitation:list
    */
   .get("/", validationMiddleware("query", PaginatedInvitationsQuerySchema), requirePermissionFactory("invitation:list"), async (c) => {
-    const { includes, page, limit, sortBy, sortOrder, search } = c.req.valid("query");
+    const { page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
     try {
-      const result = await getInvitationsPaginated({ page, limit, sortBy, sortOrder, search }, includes);
+      const result = await getInvitationsPaginated({ page, limit, sortBy, sortOrder, search });
       return c.json({ success: true as const, ...result });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Get the relations for specified invitations.
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response with invitations-relations mapping
+   * @throws {500} If an error occurs while retrieving relations
+   * @access protected
+   * @permission invitation:list
+   */
+  .get("/relations", validationMiddleware("query", InvitationRelationsQuerySchema), requirePermissionFactory("invitation:list"), async (c) => {
+    const { invitationIds = [], include } = c.req.valid("query");
+
+    try {
+      const relations: Record<string, Partial<InvitationRelations>> = {};
+      invitationIds.forEach(id => (relations[id] = {}));
+
+      await Promise.all(
+        include.map(async (key) => {
+          const loader = invitationRelationLoaders[key];
+          if (!loader)
+            throw new Error(`No relation loader defined for "${key}"`);
+
+          const data = await loader(invitationIds);
+
+          for (const [invitationId, items] of Object.entries(data)) {
+            relations[invitationId]![key] = items;
+          }
+        }),
+      );
+
+      return c.json({ success: true as const, relations });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Get a specific invitation by ID with optional relation include
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response with the invitation data
+   * @throws {404} If the invitation is not found
+   * @throws {500} If an error occurs while retrieving the invitation
+   * @access protected
+   * @permission invitation:read (resource-specific)
+   */
+  .get("/:id", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), async (c) => {
+    const id = c.req.param("id");
+
+    try {
+      const invitation = await getInvitation(id);
+
+      if (!invitation) {
+        return c.json({ success: false, error: "Not Found" }, 404);
+      }
+
+      return c.json({ success: true as const, invitation });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+/**
+ * Get relations for a specific invitation.
+ *
+ * @param ctx - Hono context, including session info
+ * @param id - Invitation ID
+ * @returns JSON response with the specified invitation's relations
+ * @throws {500} If an error occurs while retrieving relations
+ * @access protected
+ * @permission invitation:read
+ */
+  .get("/:id/relations", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", InvitationRelationsQuerySchema), async (c) => {
+    const id = c.req.param("id");
+    const { include } = c.req.valid("query");
+
+    try {
+      const relations: Record<string, Partial<InvitationRelations>> = {};
+
+      await Promise.all(
+        include.map(async (key) => {
+          const loader = invitationRelationLoaders[key];
+          if (!loader)
+            throw new Error(`No relation loader defined for "${key}"`);
+
+          const data = await loader([id]);
+
+          for (const [_, items] of Object.entries(data)) {
+            relations[key] = items as Partial<InvitationRelations>;
+          }
+        }),
+      );
+
+      return c.json({ success: true as const, relations });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
@@ -174,7 +277,7 @@ export const invitationsRoutes = new Hono()
    * Create a new invitation
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing the created invitation
+   * @returns JSON response with the created invitation
    * @throws {400} If the email is already registered or has a pending invitation
    * @throws {500} If an error occurs during invitation creation
    * @access protected
@@ -216,7 +319,7 @@ export const invitationsRoutes = new Hono()
    * Revoke an invitation
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing the revoked invitation
+   * @returns JSON response with the revoked invitation
    * @throws {500} If an error occurs while revoking the invitation
    * @access protected
    * @permission invitation:revoke
@@ -236,7 +339,7 @@ export const invitationsRoutes = new Hono()
  * Delete an invitation
  *
  * @param c - The Hono context object with session context
- * @returns JSON response containing the deleted invitation
+ * @returns JSON response with the deleted invitation
  * @throws {500} If an error occurs while deleting the invitation
  * @access protected
  * @permission invitation:delete

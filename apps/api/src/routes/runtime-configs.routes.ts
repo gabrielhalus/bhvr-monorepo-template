@@ -8,7 +8,7 @@ import { UpdateRuntimeConfigSchema } from "~shared/schemas/api/runtime-configs.s
 
 export const configRoutes = new Hono()
   /**
-   * @returns JSON response containing all runtime configurations
+   * @returns JSON response with all runtime configurations
    * @throws 500 if an error occurs while retrieving the configurations
    * @access public
    */
@@ -29,7 +29,7 @@ export const configRoutes = new Hono()
    * Get a specific runtime-configuration value by key
    *
    * @param c - The Hono context object
-   * @returns JSON response containing the configuration for the specified key
+   * @returns JSON response with the configuration for the specified key
    * @throws 404 if the configuration key is not found
    * @throws 500 if an error occurs while retrieving the configuration
    * @access public
@@ -57,7 +57,7 @@ export const configRoutes = new Hono()
    * Update a runtime-configuration value by key
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response containing the updated configuration data
+   * @returns JSON response with the updated configuration data
    * @throws {500} If an error occurs while updating the configuration
    * @access protected
    * @permission runtimeConfig:update (resource-specific)
