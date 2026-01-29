@@ -7,6 +7,8 @@ import type { z } from "zod";
 
 import { asc, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
 
+import { PermissionSchema } from "~shared/schemas/api/permissions.schemas";
+
 import { drizzle } from "../drizzle";
 import { attachRelation } from "../helpers";
 import { PoliciesModel } from "../models/policies.model";
@@ -23,49 +25,44 @@ import { UserSchema } from "../schemas/db/users.schemas";
 // Relation Loaders
 // ============================================================================
 
-const relationLoaders: { [K in keyof RoleRelations]: (roleIds: number[]) => Promise<Map<number, RoleRelations[K]>> } = {
+export const roleRelationLoaders: { [K in keyof RoleRelations]: (roleIds: number[]) => Promise<Record<number, RoleRelations[K]>> } = {
   members: async (roleIds) => {
-    const result = new Map<number, RoleRelations["members"]>();
+    const result: Record<number, RoleRelations["members"]> = {};
 
-    if (roleIds.length === 0) {
+    if (!roleIds.length) {
       return result;
     }
 
-    for (const roleId of roleIds) {
-      result.set(roleId, []);
-    }
+    roleIds.forEach(id => (result[id] = []));
 
-    const roles = await drizzle
-      .select({ id: RolesModel.id, isDefault: RolesModel.isDefault })
-      .from(RolesModel)
-      .where(inArray(RolesModel.id, roleIds));
+    const [userRolesRows, defaultRolesRows] = await Promise.all([
+      drizzle
+        .select({
+          roleId: UserRolesModel.roleId,
+          user: UsersModel,
+        })
+        .from(UserRolesModel)
+        .leftJoin(UsersModel, eq(UserRolesModel.userId, UsersModel.id))
+        .where(inArray(UserRolesModel.roleId, roleIds)),
+      drizzle
+        .select()
+        .from(RolesModel)
+        .where(eq(RolesModel.isDefault, true)),
+    ]);
 
-    const defaultRoleIds = roles.filter(r => r.isDefault).map(r => r.id);
-    const nonDefaultRoleIds = roles.filter(r => !r.isDefault).map(r => r.id);
-
-    if (defaultRoleIds.length > 0) {
-      const allUsers = await drizzle.select().from(UsersModel);
-      const parsedUsers = allUsers.map(u => UserSchema.parse(u));
-
-      for (const roleId of defaultRoleIds) {
-        result.set(roleId, parsedUsers);
+    for (const row of userRolesRows) {
+      if (row.user !== null) {
+        result[row.roleId]!.push(UserSchema.parse(row.user));
       }
     }
 
-    if (nonDefaultRoleIds.length > 0) {
-      const rows = await drizzle
-        .select({
-          roleId: UserRolesModel.roleId,
-          member: UsersModel,
-        })
-        .from(UserRolesModel)
-        .innerJoin(UsersModel, eq(UserRolesModel.userId, UsersModel.id))
-        .where(inArray(UserRolesModel.roleId, nonDefaultRoleIds));
+    if (defaultRolesRows.length) {
+      const allUsers = await drizzle
+        .select()
+        .from(UsersModel);
 
-      for (const row of rows) {
-        const members = result.get(row.roleId) ?? [];
-        members.push(UserSchema.parse(row.member));
-        result.set(row.roleId, members);
+      for (const row of defaultRolesRows) {
+        result[row.id] = allUsers;
       }
     }
 
@@ -73,18 +70,15 @@ const relationLoaders: { [K in keyof RoleRelations]: (roleIds: number[]) => Prom
   },
 
   permissions: async (roleIds) => {
-    const result = new Map<number, RoleRelations["permissions"]>();
+    const result: Record<number, RoleRelations["permissions"]> = {};
 
-    if (roleIds.length === 0) {
+    if (!roleIds.length) {
       return result;
     }
 
-    // Initialize empty arrays for all requested roleIds
-    for (const roleId of roleIds) {
-      result.set(roleId, []);
-    }
+    roleIds.forEach(id => (result[id] = []));
 
-    const rows = await drizzle
+    const rolePermissionsRows = await drizzle
       .select({
         roleId: RolePermissionsModel.roleId,
         permission: RolePermissionsModel.permission,
@@ -92,11 +86,9 @@ const relationLoaders: { [K in keyof RoleRelations]: (roleIds: number[]) => Prom
       .from(RolePermissionsModel)
       .where(inArray(RolePermissionsModel.roleId, roleIds));
 
-    for (const row of rows) {
+    for (const row of rolePermissionsRows) {
       if (row.permission !== null) {
-        const permissions = result.get(row.roleId) ?? [];
-        permissions.push(row.permission);
-        result.set(row.roleId, permissions);
+        result[row.roleId]!.push(PermissionSchema.parse(row.permission));
       }
     }
 
@@ -104,18 +96,15 @@ const relationLoaders: { [K in keyof RoleRelations]: (roleIds: number[]) => Prom
   },
 
   policies: async (roleIds) => {
-    const result = new Map<number, RoleRelations["policies"]>();
+    const result: Record<number, RoleRelations["policies"]> = {};
 
-    if (roleIds.length === 0) {
+    if (!roleIds.length) {
       return result;
     }
 
-    // Initialize empty arrays for all requested roleIds
-    for (const roleId of roleIds) {
-      result.set(roleId, []);
-    }
+    roleIds.forEach(id => (result[id] = []));
 
-    const rows = await drizzle
+    const rolePoliciesRows = await drizzle
       .select({
         roleId: PoliciesModel.roleId,
         policy: PoliciesModel,
@@ -123,11 +112,100 @@ const relationLoaders: { [K in keyof RoleRelations]: (roleIds: number[]) => Prom
       .from(PoliciesModel)
       .where(inArray(PoliciesModel.roleId, roleIds));
 
-    for (const row of rows) {
+    for (const row of rolePoliciesRows) {
       if (row.roleId !== null && row.policy !== null) {
-        const policies = result.get(row.roleId) ?? [];
-        policies.push(PolicySchema.parse(row.policy));
-        result.set(row.roleId, policies);
+        result[row.roleId]!.push(PolicySchema.parse(row.policy));
+      }
+    }
+
+    return result;
+  },
+};
+
+export const roleRelationCountLoaders: { [K in keyof RoleRelations]: (roleIds: number[]) => Promise<Record<number, number>>; } = {
+  members: async (roleIds) => {
+    const result: Record<number, number> = {};
+
+    if (!roleIds.length) {
+      return result;
+    }
+
+    roleIds.forEach(id => (result[id] = 0));
+
+    const [userRolesRows, defaultRolesRows] = await Promise.all([
+      drizzle
+        .select({
+          roleId: UserRolesModel.roleId,
+          count: count(UserRolesModel.userId),
+        })
+        .from(UserRolesModel)
+        .where(inArray(UserRolesModel.roleId, roleIds)),
+      drizzle
+        .select({
+          count: count(RolesModel.id),
+        })
+        .from(RolesModel)
+        .where(eq(RolesModel.isDefault, true)),
+    ]);
+
+    for (const row of userRolesRows) {
+      result[row.roleId]! = Number(row.count);
+    }
+
+    const defaultCount = defaultRolesRows[0]?.count ?? 0;
+    if (defaultCount) {
+      roleIds.forEach((roleId) => {
+        result[roleId]! += Number(defaultCount);
+      });
+    }
+
+    return result;
+  },
+
+  permissions: async (roleIds) => {
+    const result: Record<number, number> = {};
+
+    if (!roleIds.length) {
+      return result;
+    }
+
+    roleIds.forEach(id => (result[id] = 0));
+
+    const rolePermissionsRows = await drizzle
+      .select({
+        roleId: RolePermissionsModel.roleId,
+        count: count(RolePermissionsModel.roleId),
+      })
+      .from(RolePermissionsModel)
+      .where(inArray(RolePermissionsModel.roleId, roleIds));
+
+    for (const row of rolePermissionsRows) {
+      result[row.roleId]! = Number(row.count);
+    }
+
+    return result;
+  },
+
+  policies: async (roleIds) => {
+    const result: Record<number, number> = {};
+
+    if (!roleIds.length) {
+      return result;
+    }
+
+    roleIds.forEach(id => (result[id] = 0));
+
+    const rolePoliciesRows = await drizzle
+      .select({
+        roleId: PoliciesModel.roleId,
+        count: count(PoliciesModel.roleId),
+      })
+      .from(PoliciesModel)
+      .where(inArray(PoliciesModel.roleId, roleIds));
+
+    for (const row of rolePoliciesRows) {
+      if (row.roleId) {
+        result[row.roleId]! = Number(row.count);
       }
     }
 
@@ -243,7 +321,7 @@ export async function getRole<T extends RoleRelationKeys>(id: number, includes?:
  * @returns The roles with added relations
  */
 export async function hydrateRoles<T extends RoleRelationKeys>(roles: Role[], includes?: T): Promise<RoleWithRelations<T>[]> {
-  if (!includes || includes.length === 0) {
+  if (!includes || !includes.length) {
     return roles.map(r => ({ ...r })) as RoleWithRelations<T>[];
   }
 
@@ -251,7 +329,7 @@ export async function hydrateRoles<T extends RoleRelationKeys>(roles: Role[], in
 
   const relations = await Promise.all(
     includes.map(async (key) => {
-      const loader = relationLoaders[key];
+      const loader = roleRelationLoaders[key];
 
       if (!loader) {
         throw new Error(`No relation loader defined for "${key}"`);
@@ -266,7 +344,7 @@ export async function hydrateRoles<T extends RoleRelationKeys>(roles: Role[], in
     const withRelations: RoleWithRelations<T> = { ...role } as RoleWithRelations<T>;
 
     for (const [key, data] of relations) {
-      attachRelation(withRelations, key, data.get(role.id) ?? null);
+      attachRelation(withRelations, key, data[role.id] ?? null);
     }
 
     return withRelations;

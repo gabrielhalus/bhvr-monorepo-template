@@ -73,6 +73,8 @@
       "detail": {
         "title": "User Details",
         "subtitle": "View and manage user information.",
+        "joinedAt": "Joined at {{date, date}}",
+        "verifiedAt": "{{date, YYYY/DD/YYYY}}",
         "sections": {
           "edit": {
             "title": "Edit User",
@@ -106,6 +108,7 @@
     "account": {
       "title": "Account",
       "subtitle": "Manage your account settings.",
+      "joinedAt": "Joined at {{date, date}}",
       "sections": {
         "profile": {
           "title": "Profile Information",

@@ -12,6 +12,6 @@ export type UserRelations = {
   tokens: Token[];
 };
 
-export type UserRelationKeys = z.infer<typeof UserRelationsSchema>;
+export type UserRelationKey = z.infer<typeof UserRelationsSchema>[number];
 
-export type UserWithRelations<T extends UserRelationKeys> = WithRelations<User, UserRelations, T>;
+export type UserWithRelations<T extends UserRelationKey[]> = WithRelations<User, UserRelations, T>;

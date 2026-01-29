@@ -7,6 +7,7 @@ import { initReactI18next } from "react-i18next";
 import de from "./de";
 import en from "./en";
 import es from "./es";
+import { formatValue } from "./format";
 import fr from "./fr";
 import it from "./it";
 import nl from "./nl";
@@ -37,7 +38,10 @@ export function createClientI18n(extra: Partial<InitOptions> = {}): i18n {
     ns: Object.keys(en) as string[],
     supportedLngs: ["de", "en", "es", "fr", "it", "nl"],
     resources: bundledResources,
-    interpolation: { escapeValue: false },
+    interpolation: {
+      escapeValue: false,
+      format: (value, format, locale) => formatValue(value, { locale, format }),
+    },
     react: { useSuspense: false },
     ...extra,
   } as I18NextInitOptions);

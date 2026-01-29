@@ -1,5 +1,5 @@
-import type { RolesModel } from "~shared/models/roles.model";
 import type { WithRelations } from "~shared/lib/type-utils";
+import type { RolesModel } from "~shared/models/roles.model";
 import type { RoleRelationsSchema } from "~shared/schemas/api/roles.schemas";
 import type { Policy } from "~shared/types/db/policies.types";
 import type { User } from "~shared/types/db/users.types";

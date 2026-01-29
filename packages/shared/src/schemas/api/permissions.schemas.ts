@@ -26,6 +26,7 @@ export const PermissionSchema = z.enum([
 
   // Invitations
   "invitation:create",
+  "invitation:read",
   "invitation:list",
   "invitation:revoke",
   "invitation:delete",

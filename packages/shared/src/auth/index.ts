@@ -2,7 +2,7 @@ import type { UserWithRelations } from "../types/db/users.types";
 import type { Permission } from "../types/permissions.types";
 
 import { hydrateRoles } from "../queries/roles.queries";
-import { evaluateCondition } from "./evaluate-condition";
+import { evaluatePolicies } from "./evaluate-policy";
 
 /**
  * Check if a user has a specific permission
@@ -12,10 +12,6 @@ import { evaluateCondition } from "./evaluate-condition";
  * @returns True if the user has the permission, false otherwise
  */
 export async function isAuthorized(permission: Permission, user: UserWithRelations<["roles"]>, resource?: Record<string, unknown>): Promise<boolean> {
-  if (!user.roles || user.roles.length === 0) {
-    return false;
-  }
-
   if (user.roles.some(role => role.isSuperAdmin)) {
     return true;
   }
@@ -25,24 +21,15 @@ export async function isAuthorized(permission: Permission, user: UserWithRelatio
   for (const role of hydratedRoles) {
     const { policies, permissions } = role;
 
-    if (!policies || policies.length === 0) {
-      if (permissions?.includes(permission)) {
-        return true;
-      }
-      continue;
-    }
+    if (policies?.length) {
+      const policyDecision = evaluatePolicies(policies, permission, user, resource);
 
-    for (const policy of policies) {
-      const satisfiesCondition = policy.condition
-        ? evaluateCondition(policy.condition, user, resource)
-        : true;
-
-      if (satisfiesCondition && policy.effect === "allow") {
+      if (policyDecision === "allow") {
         return true;
       }
 
-      if (satisfiesCondition && policy.effect === "deny") {
-        return false;
+      if (policyDecision === "deny") {
+        continue;
       }
     }
 
@@ -53,5 +40,3 @@ export async function isAuthorized(permission: Permission, user: UserWithRelatio
 
   return false;
 }
-
-export { evaluateCondition, resolveOperand } from "./evaluate-condition";

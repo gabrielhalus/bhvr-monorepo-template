@@ -29,7 +29,7 @@ export const authQueryOptions = queryOptions({
 
 export function authorizeQueryOptions(permission: Permission, resource?: Record<string, unknown>) {
   return queryOptions({
-    queryKey: ["authorize", permission, resource],
+    queryKey: ["authorize", { permission, resource }],
     queryFn: async (): Promise<boolean> => {
       const res = await api.auth.authorize.$post({ json: { permission, resource } });
 

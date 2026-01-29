@@ -3,9 +3,9 @@ import type { z } from "zod";
 
 import { and, eq } from "drizzle-orm";
 
+import { drizzle } from "../drizzle";
 import { RolesModel } from "../models/roles.model";
 import { UserRolesModel } from "../models/user-roles.model";
-import { drizzle } from "../drizzle";
 import { UserRoleSchema } from "../schemas/db/user-roles.schemas";
 
 // ============================================================================
@@ -18,14 +18,24 @@ import { UserRoleSchema } from "../schemas/db/user-roles.schemas";
  * @returns The created relation.
  * @throws An error if the relation could not be created.
  */
-export async function createUserRole(userRole: z.infer<typeof UserRoleSchema>): Promise<UserRole> {
+export async function createUserRole(userRole: z.infer<typeof UserRoleSchema>): Promise<UserRole | null> {
+  const [roleRow] = await drizzle
+    .select()
+    .from(RolesModel)
+    .where(eq(RolesModel.id, userRole.roleId))
+    .limit(1);
+
+  if (!roleRow || roleRow.isDefault) {
+    return null;
+  }
+
   const [createdUserRole] = await drizzle
     .insert(UserRolesModel)
     .values(userRole)
     .returning();
 
   if (!createdUserRole) {
-    throw new Error("Failed to create user");
+    throw new Error("Failed to create user role");
   }
 
   return UserRoleSchema.parse(createdUserRole);

@@ -14,6 +14,6 @@ export function arrayParam<T extends z.ZodTypeAny>(schema: T) {
         return [val];
       return undefined;
     },
-    z.array(schema).optional(),
+    z.array(schema),
   );
 }
