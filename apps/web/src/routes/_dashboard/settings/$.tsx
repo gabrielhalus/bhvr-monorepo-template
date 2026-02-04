@@ -1,11 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, getRouteApi, Navigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 
-import { runtimeConfigsQueryOptions } from "@/api/runtime-configs/runtime-configs.queries";
 import { buildConfigTree, findFirstLeafSection, findNodeBySegments } from "~shared/helpers/config-tree";
 
 import { NodeForm } from "./-components/node-form";
+
+const settingsRoute = getRouteApi("/_dashboard/settings");
 
 export const Route = createFileRoute("/_dashboard/settings/$")(
   {
@@ -22,16 +22,16 @@ export const Route = createFileRoute("/_dashboard/settings/$")(
 
 function RouteComponent() {
   const { _splat: splat } = Route.useParams();
-  const { data } = useQuery(runtimeConfigsQueryOptions);
+  const { configs } = settingsRoute.useLoaderData();
 
   const segments = splat?.split("/").filter(Boolean) ?? [];
 
   const configTree = useMemo(() => {
-    if (!data?.configs) {
+    if (!configs) {
       return null;
     }
-    return buildConfigTree(data.configs);
-  }, [data?.configs]);
+    return buildConfigTree(configs);
+  }, [configs]);
 
   if (!splat && configTree) {
     const firstLeafSection = findFirstLeafSection(configTree);
@@ -54,7 +54,7 @@ function RouteComponent() {
   return (
     <div>
       {Array.from(node.children.values()).map(child => (
-        <NodeForm node={child} allConfigs={data?.configs ?? []} key={child.fullKey} />
+        <NodeForm node={child} allConfigs={configs ?? []} key={child.fullKey} />
       ))}
     </div>
   );

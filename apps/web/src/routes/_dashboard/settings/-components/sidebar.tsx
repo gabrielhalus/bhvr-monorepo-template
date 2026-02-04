@@ -1,20 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
+import { getRouteApi } from "@tanstack/react-router";
 import { useMemo } from "react";
 
-import { runtimeConfigsQueryOptions } from "@/api/runtime-configs/runtime-configs.queries";
 import { buildConfigTree } from "~shared/helpers/config-tree";
 
 import { ConfigSection } from "./config-section";
 
+const settingsRoute = getRouteApi("/_dashboard/settings");
+
 export function Sidebar() {
-  const { data } = useQuery(runtimeConfigsQueryOptions);
+  const { configs } = settingsRoute.useLoaderData();
 
   const configTree = useMemo(() => {
-    if (!data?.configs) {
+    if (!configs) {
       return new Map();
     }
-    return buildConfigTree(data.configs);
-  }, [data?.configs]);
+    return buildConfigTree(configs);
+  }, [configs]);
 
   return (
     <aside className="h-full w-75 p-2 border-r">

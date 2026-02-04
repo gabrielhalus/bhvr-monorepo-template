@@ -1,10 +1,12 @@
 import type { FormEvent } from "react";
 
 import { useForm } from "@tanstack/react-form";
+import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Trans, useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
+import { runtimeConfigQueryOptions } from "@/api/runtime-configs/runtime-configs.queries";
 import { Button } from "~react/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~react/components/card";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
@@ -13,14 +15,14 @@ import { PasswordInput } from "~react/components/password-input";
 import { Spinner } from "~react/components/spinner";
 import { api } from "~react/lib/http";
 import { cn } from "~react/lib/utils";
+import { inferConfigValue } from "~shared/helpers/infer-config-value";
 import { LoginSchema } from "~shared/schemas/api/auth.schemas";
-
-import { Route } from "../../route";
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const { t } = useTranslation("auth");
 
-  const { disableRegister } = Route.useRouteContext();
+  const { data: config } = useQuery(runtimeConfigQueryOptions("authentication.disableRegister"));
+  const disableRegister = config ? inferConfigValue(config.value.value!) : false;
 
   const navigate = useNavigate();
   const location = useRouterState({ select: s => s.location });

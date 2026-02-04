@@ -15,7 +15,7 @@ import { UserSecurityActions } from "./-components/user-security-actions";
 
 export const Route = createFileRoute("/_dashboard/users/$userId/")({
   component: User,
-  loader: ({ params, context }) => context.queryClient.fetchQuery(userQueryOptions(params.userId)),
+  loader: ({ params, context }) => context.queryClient.ensureQueryData(userQueryOptions(params.userId)),
   staticData: { crumb: (data: { user?: _User }) => data.user?.name },
 });
 

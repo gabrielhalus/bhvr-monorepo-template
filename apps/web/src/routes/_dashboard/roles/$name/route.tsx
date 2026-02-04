@@ -10,7 +10,7 @@ import { Sidebar } from "./-components/sidebar";
 
 export const Route = createFileRoute("/_dashboard/roles/$name")({
   component: RoleLayout,
-  loader: ({ params, context }) => context.queryClient.fetchQuery(roleQueryOptions(params.name)),
+  loader: ({ params, context }) => context.queryClient.ensureQueryData(roleQueryOptions(params.name)),
   staticData: { crumb: (data: { role?: _Role }) => data.role?.label },
 });
 
