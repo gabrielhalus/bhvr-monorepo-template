@@ -13,12 +13,8 @@ export function LocaleSubmenu() {
   const { t, i18n } = useTranslation("common");
 
   const locales = [
-    { code: "de", name: "Deutsch" },
     { code: "en", name: "English" },
-    { code: "es", name: "Español" },
     { code: "fr", name: "Français" },
-    { code: "it", name: "Italiano" },
-    { code: "nl", name: "Nederlands" },
   ];
 
   const currentLocale = locales.find(locale => locale.code === i18n.language) || locales[0];
