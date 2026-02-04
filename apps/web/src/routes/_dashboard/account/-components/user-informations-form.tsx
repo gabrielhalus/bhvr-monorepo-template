@@ -1,10 +1,11 @@
+import type { User } from "~shared/types/db/users.types";
 import type { z } from "zod";
 
 import { useForm } from "@tanstack/react-form";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useUpdateUser } from "@/hooks/users/use-update-user";
+import { useUpdateAccount } from "@/hooks/users/use-update-account";
 import { useUser } from "@/hooks/users/use-user";
 import { Button } from "~react/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
@@ -21,7 +22,7 @@ export function UserInformationsForm({ userId }: { userId: string }) {
 
   const formRef = useRef<{ reset: (values: z.infer<typeof UpdateAccountSchema>) => void } | null>(null);
 
-  const mutation = useUpdateUser();
+  const mutation = useUpdateAccount();
 
   const handleSuccess = (response: { user: { name: string; email: string } }) => {
     formRef.current?.reset({ name: response.user.name, email: response.user.email });
@@ -30,11 +31,11 @@ export function UserInformationsForm({ userId }: { userId: string }) {
   const form = useForm({
     validators: { onChange: UpdateAccountSchema },
     defaultValues: {
-      name: userQuery.data?.user.name ?? "",
-      email: userQuery.data?.user.email ?? "",
+      name: userQuery.data?.user?.name ?? "",
+      email: userQuery.data?.user?.email ?? "",
     },
     onSubmit: async ({ value }) => {
-      const response = await mutation.mutateAsync({ id: userId, data: value });
+      const response = await mutation.mutateAsync(value);
       handleSuccess(response);
     },
   });

@@ -1,5 +1,3 @@
-import type { User } from "~shared/types/db/users.types";
-
 import { useQuery } from "@tanstack/react-query";
 import { CheckIcon, CopyIcon, KeyIcon, UserIcon } from "lucide-react";
 import { useState } from "react";
@@ -8,6 +6,7 @@ import { toast } from "sonner";
 
 import { useImpersonateUser } from "@/hooks/users/use-impersonate-user";
 import { useResetUserPassword } from "@/hooks/users/use-reset-user-password";
+import { useUser } from "@/hooks/users/use-user";
 import { Button } from "~react/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~react/components/dialog";
@@ -17,20 +16,21 @@ import { useAuth } from "~react/hooks/use-auth";
 import sayno from "~react/lib/sayno";
 import { authorizeQueryOptions } from "~react/queries/auth";
 
-export function UserSecurityActions({ user }: { user: User }) {
+export function UserSecurityActions({ userId }: { userId: string }) {
   const { t } = useTranslation();
 
   const { user: currentUser } = useAuth();
+  const userQuery = useUser(userId);
 
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const { data: canImpersonate } = useQuery(authorizeQueryOptions("user:impersonate", { id: user.id }));
-  const isSelf = currentUser.id === user.id;
+  const { data: canImpersonate } = useQuery(authorizeQueryOptions("user:impersonate", { id: userId }));
+  const isSelf = currentUser.id === userId;
 
   const resetPasswordMutation = useResetUserPassword();
-  const impersonateMutation = useImpersonateUser(user.name);
+  const impersonateMutation = useImpersonateUser(userQuery.data?.user?.name);
 
   const handleResetPassword = async () => {
     const confirmation = await sayno.confirm({
@@ -40,7 +40,7 @@ export function UserSecurityActions({ user }: { user: User }) {
     });
 
     if (confirmation) {
-      const response = await resetPasswordMutation.mutateAsync(user.id);
+      const response = await resetPasswordMutation.mutateAsync(userId);
       setGeneratedPassword(response.password);
       setPasswordDialogOpen(true);
       setCopied(false);
@@ -59,11 +59,11 @@ export function UserSecurityActions({ user }: { user: User }) {
   const handleImpersonate = async () => {
     const confirmation = await sayno.confirm({
       title: t("web:pages.users.detail.impersonate.confirmTitle"),
-      description: t("web:pages.users.detail.impersonate.confirmDescription", { name: user.name }),
+      description: t("web:pages.users.detail.impersonate.confirmDescription", { name: userQuery.data?.user?.name }),
     });
 
     if (confirmation) {
-      impersonateMutation.mutate(user.id);
+      impersonateMutation.mutate(userId);
     }
   };
 

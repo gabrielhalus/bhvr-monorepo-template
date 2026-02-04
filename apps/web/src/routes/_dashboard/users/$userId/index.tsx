@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { userQueryOptions } from "@/api/users/users.queries";
 import { AvatarUser } from "@/components/avatar-user";
+import { useUser } from "@/hooks/users/use-user";
 import { Badge } from "~react/components/badge";
 import { Button } from "~react/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
@@ -21,7 +22,9 @@ export const Route = createFileRoute("/_dashboard/users/$userId/")({
 
 function User() {
   const { t } = useTranslation(["common", "web"]);
-  const { user } = Route.useLoaderData();
+
+  const { userId } = Route.useParams();
+  const userQuery = useUser(userId);
 
   return (
     <div className="w-full p-10">
@@ -40,12 +43,12 @@ function User() {
 
         <Card>
           <CardHeader className="flex-row items-center gap-4">
-            <AvatarUser avatar={user.avatar ?? ""} name={user.name ?? ""} size="lg" />
+            <AvatarUser avatar={userQuery.data?.user?.avatar ?? ""} name={userQuery.data?.user?.name ?? ""} size="lg" />
             <div className="flex-1">
-              <CardTitle>{user.name}</CardTitle>
+              <CardTitle>{userQuery.data?.user?.name}</CardTitle>
               <CardDescription className="flex items-center gap-1">
                 <MailIcon className="size-3" />
-                {user.email}
+                {userQuery.data?.user?.email}
               </CardDescription>
             </div>
           </CardHeader>
@@ -54,17 +57,17 @@ function User() {
               <div className="flex items-center gap-1.5">
                 <CalendarIcon className="size-4" />
                 <span>
-                  {t("web:pages.users.detail.joinedAt", { date: new Date(user?.createdAt ?? "") })}
+                  {t("web:pages.users.detail.joinedAt", { date: new Date(userQuery.data?.user?.createdAt ?? "") })}
                 </span>
               </div>
-              {user.verifiedAt && <Badge variant="secondary">Verified</Badge>}
+              {userQuery.data?.user?.verifiedAt && <Badge variant="secondary">Verified</Badge>}
             </div>
 
-            {user.roles && user.roles.length > 0 && (
+            {userQuery.data?.user?.roles && userQuery.data?.user?.roles.length > 0 && (
               <div className="flex items-center gap-2">
                 <ShieldIcon className="size-4 text-muted-foreground" />
                 <div className="flex flex-wrap gap-1">
-                  {user.roles.map(role => (
+                  {userQuery.data?.user?.roles.map(role => (
                     <Badge key={role.id} variant={role.isDefault ? "outline" : "secondary"}>
                       {role.label}
                     </Badge>
@@ -75,8 +78,8 @@ function User() {
           </CardContent>
         </Card>
 
-        <UserInformationsForm user={user} />
-        <UserSecurityActions user={user} />
+        <UserInformationsForm userId={userId} />
+        <UserSecurityActions userId={userId} />
       </div>
     </div>
   );
