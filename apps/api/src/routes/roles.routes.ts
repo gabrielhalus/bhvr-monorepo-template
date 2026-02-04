@@ -2,8 +2,10 @@ import type { RoleRelations } from "~shared/types/db/roles.types";
 
 import { Hono } from "hono";
 
+import { getClientInfo } from "@/helpers/get-client-info";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
+import { logRoleDelete, logRoleMembersAdd, logRoleMembersRemove, logRoleUpdate } from "~shared/queries/audit-logs.queries";
 import { deleteRole, getRole, getRoleByName, getRolesPaginated, roleRelationCountLoaders, roleRelationLoaders, updateRole } from "~shared/queries/roles.queries";
 import { createUserRole, deleteUserRole } from "~shared/queries/user-roles.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
@@ -245,11 +247,22 @@ export const rolesRoutes = new Hono()
    * @permission role:update (resource-specific)
    */
   .put("/:id{[0-9]+}", requirePermissionFactory("role:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateRoleSchema), async (c) => {
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
+
     try {
       const id = Number(c.req.param("id"));
       const data = c.req.valid("json");
 
       const role = await updateRole(id, data);
+
+      // Audit log: role update (tracks impersonation if active)
+      await logRoleUpdate(String(id), {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      }, data);
+
       return c.json({ success: true as const, role });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
@@ -267,9 +280,19 @@ export const rolesRoutes = new Hono()
    */
   .delete("/:id{[0-9]+}", requirePermissionFactory("role:delete", c => ({ id: c.req.param("id") })), async (c) => {
     const id = Number(c.req.param("id"));
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
 
     try {
       const role = await deleteRole(id);
+
+      // Audit log: role deletion (tracks impersonation if active)
+      await logRoleDelete(String(id), {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
       return c.json({ success: true as const, role });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
@@ -288,11 +311,21 @@ export const rolesRoutes = new Hono()
   .post("/:id{[0-9]+}/members", requirePermissionFactory("userRole:create"), validationMiddleware("json", AssignRoleMembersSchema), async (c) => {
     const id = Number(c.req.param("id"));
     const { userIds } = c.req.valid("json");
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
 
     try {
       for (const userId of userIds) {
         await createUserRole({ userId, roleId: id });
       }
+
+      // Audit log: members added to role (tracks impersonation if active)
+      await logRoleMembersAdd(String(id), userIds, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
       return c.json({ success: true as const });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
@@ -311,11 +344,21 @@ export const rolesRoutes = new Hono()
   .delete("/:id{[0-9]+}/members", requirePermissionFactory("userRole:create"), validationMiddleware("json", RemoveRoleMembersSchema), async (c) => {
     const id = Number(c.req.param("id"));
     const { userIds } = c.req.valid("json");
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
 
     try {
       for (const userId of userIds) {
         await deleteUserRole({ userId, roleId: id });
       }
+
+      // Audit log: members removed from role (tracks impersonation if active)
+      await logRoleMembersRemove(String(id), userIds, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
       return c.json({ success: true as const });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);

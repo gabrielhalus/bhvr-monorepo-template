@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { logger } from "hono/logger";
 
 import cors from "@/middlewares/cors";
+import { auditLogsRoutes } from "@/routes/audit-logs.routes";
 import { authRoutes } from "@/routes/auth.routes";
 import { invitationsRoutes } from "@/routes/invitations.routes";
 import { rolesRoutes } from "@/routes/roles.routes";
@@ -24,6 +25,7 @@ app.use(cors());
 // API (Hono @ port 3030)
 // -------------------
 const _api = app
+  .route("/audit-logs", auditLogsRoutes)
   .route("/auth", authRoutes)
   .route("/invitations", invitationsRoutes)
   .route("/roles", rolesRoutes)

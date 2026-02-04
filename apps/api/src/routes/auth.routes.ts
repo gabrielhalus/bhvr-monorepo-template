@@ -5,8 +5,18 @@ import { getCookie, setCookie } from "hono/cookie";
 import { getClientInfo } from "@/helpers/get-client-info";
 import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN_EXPIRATION_SECONDS, verifyToken } from "@/lib/jwt";
 import { getSessionContext } from "@/middlewares/auth";
+import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { validationMiddleware } from "@/middlewares/validation";
 import { isAuthorized } from "~shared/auth";
+import {
+  logAccountUpdate,
+  logImpersonationStart,
+  logImpersonationStop,
+  logLogin,
+  logLoginFailed,
+  logLogout,
+  logRegister,
+} from "~shared/queries/audit-logs.queries";
 import { getDefaultRole } from "~shared/queries/roles.queries";
 import { deleteToken, insertToken } from "~shared/queries/tokens.queries";
 import { createUserRole } from "~shared/queries/user-roles.queries";
@@ -23,9 +33,10 @@ export const authRoutes = new Hono()
    * @throws {500} If an error occurs during user creation or token generation
    * @access public
    */
-  .post("/register", validationMiddleware("json", RegisterSchema), async (c) => {
+  .post("/register", rateLimiter(rateLimitPresets.register), validationMiddleware("json", RegisterSchema), async (c) => {
     const user = c.req.valid("json");
     const hashedPassword = await password.hash(user.password);
+    const clientInfo = getClientInfo(c);
 
     try {
       const insertedUser = await createUser({ ...user, password: hashedPassword });
@@ -39,7 +50,7 @@ export const authRoutes = new Hono()
         userId: insertedUser.id,
         issuedAt: new Date().toISOString(),
         expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_SECONDS * 1000).toISOString(),
-        ...getClientInfo(c),
+        ...clientInfo,
       });
 
       const accessToken = await createAccessToken(insertedUser.id);
@@ -47,6 +58,9 @@ export const authRoutes = new Hono()
 
       const refreshToken = await createRefreshToken(insertedUser.id, insertedToken.id);
       setCookie(c, "refreshToken", refreshToken, getCookieSettings("refresh"));
+
+      // Audit log: user registration
+      await logRegister(insertedUser.id, clientInfo);
 
       return c.json({ success: true as const });
     } catch (error) {
@@ -67,12 +81,15 @@ export const authRoutes = new Hono()
    * @throws {500} If an error occurs during authentication or token generation
    * @access public
    */
-  .post("/login", validationMiddleware("json", LoginSchema), async (c) => {
+  .post("/login", rateLimiter(rateLimitPresets.login), validationMiddleware("json", LoginSchema), async (c) => {
     const { email, password } = c.req.valid("json");
+    const clientInfo = getClientInfo(c);
 
     try {
       const userId = await signIn(email, password);
       if (!userId) {
+        // Audit log: failed login attempt
+        await logLoginFailed(email, clientInfo);
         return c.json({ success: false as const, error: "Invalid credentials" }, 200);
       }
 
@@ -80,7 +97,7 @@ export const authRoutes = new Hono()
         userId,
         issuedAt: new Date().toISOString(),
         expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_SECONDS * 1000).toISOString(),
-        ...getClientInfo(c),
+        ...clientInfo,
       });
 
       const accessToken = await createAccessToken(userId);
@@ -88,6 +105,9 @@ export const authRoutes = new Hono()
 
       const refreshToken = await createRefreshToken(userId, insertedToken.id);
       setCookie(c, "refreshToken", refreshToken, getCookieSettings("refresh"));
+
+      // Audit log: successful login
+      await logLogin(userId, clientInfo);
 
       return c.json({ success: true as const });
     } catch (error) {
@@ -105,12 +125,29 @@ export const authRoutes = new Hono()
    */
   .post("/logout", async (c) => {
     const refreshToken = getCookie(c, "refreshToken");
+    const accessToken = getCookie(c, "accessToken");
+    const clientInfo = getClientInfo(c);
+    let userId: string | undefined;
+
+    // Try to get user ID from access token for audit logging
+    if (accessToken) {
+      try {
+        const payload = await verifyToken(accessToken, "access");
+        userId = payload?.sub;
+      } catch {
+        // Token invalid or expired, continue with logout
+      }
+    }
 
     if (refreshToken) {
       try {
         const payload = await verifyToken(refreshToken, "refresh");
         if (payload?.jti) {
           await deleteToken(payload.jti);
+        }
+        // Get user ID from refresh token if not already set
+        if (!userId) {
+          userId = payload?.sub;
         }
       } catch {
         return c.json({ success: false as const, error: "Failed to delete refresh token" }, 401);
@@ -119,6 +156,11 @@ export const authRoutes = new Hono()
 
     setCookie(c, "accessToken", "", getCookieSettings("clear"));
     setCookie(c, "refreshToken", "", getCookieSettings("clear"));
+
+    // Audit log: logout (if we could identify the user)
+    if (userId) {
+      await logLogout({ actorId: userId, ...clientInfo });
+    }
 
     return c.json({ success: true as const });
   })
@@ -153,9 +195,18 @@ export const authRoutes = new Hono()
   .put("/account", validationMiddleware("json", UpdateAccountSchema), async (c) => {
     const sessionContext = c.var.sessionContext;
     const data = c.req.valid("json");
+    const clientInfo = getClientInfo(c);
 
     try {
       const user = await updateUser(sessionContext.user.id, data);
+
+      // Audit log: account update (tracks impersonation if active)
+      await logAccountUpdate({
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      }, data);
+
       return c.json({ success: true as const, user });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
@@ -225,6 +276,10 @@ export const authRoutes = new Hono()
       const accessToken = await createAccessToken(targetUserId, sessionContext.user.id);
       setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
 
+      // Audit log: impersonation started
+      const clientInfo = getClientInfo(c);
+      await logImpersonationStart(sessionContext.user.id, targetUserId, clientInfo);
+
       return c.json({ success: true as const, user: targetUser });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
@@ -251,6 +306,10 @@ export const authRoutes = new Hono()
       // Create new access token for the original user (the impersonator)
       const accessToken = await createAccessToken(sessionContext.impersonator.id);
       setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
+
+      // Audit log: impersonation stopped
+      const clientInfo = getClientInfo(c);
+      await logImpersonationStop(sessionContext.impersonator.id, sessionContext.user.id, clientInfo);
 
       return c.json({ success: true as const, user: sessionContext.impersonator });
     } catch (error) {

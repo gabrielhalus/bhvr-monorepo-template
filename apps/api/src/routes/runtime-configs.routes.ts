@@ -1,8 +1,10 @@
 import { Hono } from "hono";
 
+import { getClientInfo } from "@/helpers/get-client-info";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
+import { logConfigUpdate } from "~shared/queries/audit-logs.queries";
 import { getRuntimeConfig, getRuntimeConfigs, updateRuntimeConfig } from "~shared/queries/runtime-configs.queries";
 import { UpdateRuntimeConfigSchema } from "~shared/schemas/api/runtime-configs.schemas";
 
@@ -65,10 +67,22 @@ export const configRoutes = new Hono()
   .put("/:key", requirePermissionFactory("runtimeConfig:update", c => ({ key: c.req.param("key") })), validationMiddleware("json", UpdateRuntimeConfigSchema), async (c) => {
     const key = c.req.param("key");
     const { value } = c.req.valid("json");
-    const { user } = c.get("sessionContext");
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
 
     try {
-      const config = await updateRuntimeConfig(key, value, user.id);
+      // Get old value for audit log
+      const oldConfig = await getRuntimeConfig(key);
+      const oldValue = oldConfig?.value;
+
+      const config = await updateRuntimeConfig(key, value, sessionContext.user.id);
+
+      // Audit log: config update (tracks impersonation if active)
+      await logConfigUpdate(key, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      }, oldValue, value);
 
       return c.json({ success: true as const, config });
     } catch (error) {

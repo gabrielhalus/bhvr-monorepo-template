@@ -4,10 +4,12 @@ import { password } from "bun";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { getClientInfo } from "@/helpers/get-client-info";
 import { generateRandomPassword } from "@/helpers/generate-random-password";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
+import { logPasswordReset, logUserDelete, logUserUpdate } from "~shared/queries/audit-logs.queries";
 import { deleteUser, emailExists, getUser, getUsersPaginated, updateUser, updateUserPassword, userRelationCountLoaders, userRelationLoaders } from "~shared/queries/users.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
 import { UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
@@ -241,9 +243,19 @@ export const usersRoutes = new Hono()
   .put("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateUserSchema), async (c) => {
     const id = c.req.param("id");
     const data = c.req.valid("json");
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
 
     try {
       const user = await updateUser(id, data);
+
+      // Audit log: user update (tracks impersonation if active)
+      await logUserUpdate(id, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      }, data);
+
       return c.json({ success: true as const, user });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
@@ -262,6 +274,8 @@ export const usersRoutes = new Hono()
    */
   .post("/:id{^[a-zA-Z0-9-]{21}$}/reset-password", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), async (c) => {
     const id = c.req.param("id");
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
 
     try {
       const user = await getUser(id);
@@ -273,6 +287,13 @@ export const usersRoutes = new Hono()
       const hashedPassword = await password.hash(newPassword);
 
       await updateUserPassword(id, hashedPassword);
+
+      // Audit log: password reset (tracks impersonation if active)
+      await logPasswordReset(id, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
 
       return c.json({ success: true as const, password: newPassword });
     } catch (error) {
@@ -291,9 +312,19 @@ export const usersRoutes = new Hono()
    */
   .delete("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("user:delete", c => ({ id: c.req.param("id") })), async (c) => {
     const id = c.req.param("id");
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
 
     try {
       const user = await deleteUser(id);
+
+      // Audit log: user deletion (tracks impersonation if active)
+      await logUserDelete(id, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
       return c.json({ success: true as const, user });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);

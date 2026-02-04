@@ -10,6 +10,7 @@ import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
+import { logInvitationAccept, logInvitationCreate, logInvitationDelete, logInvitationRevoke } from "~shared/queries/audit-logs.queries";
 import {
   createInvitation,
   deleteInvitation,
@@ -99,6 +100,10 @@ export const invitationsRoutes = new Hono()
 
       const refreshToken = await createRefreshToken(insertedUser.id, insertedToken.id);
       setCookie(c, "refreshToken", refreshToken, getCookieSettings("refresh"));
+
+      // Audit log: invitation accepted
+      const clientInfo = getClientInfo(c);
+      await logInvitationAccept(invitation.id, insertedUser.id, clientInfo);
 
       return c.json({ success: true as const });
     } catch (error) {
@@ -280,7 +285,8 @@ export const invitationsRoutes = new Hono()
    */
   .post("/", validationMiddleware("json", CreateInvitationSchema), requirePermissionFactory("invitation:create"), async (c) => {
     const { email, roleId, autoValidateEmail } = c.req.valid("json");
-    const { user } = c.var.sessionContext;
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
 
     try {
       if (await emailExists(email)) {
@@ -299,9 +305,16 @@ export const invitationsRoutes = new Hono()
         email,
         token,
         expiresAt,
-        invitedById: user.id,
+        invitedById: sessionContext.user.id,
         roleId: roleId ?? null,
         autoValidateEmail: autoValidateEmail ?? false,
+      });
+
+      // Audit log: invitation created (tracks impersonation if active)
+      await logInvitationCreate(invitation.id, email, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
       });
 
       return c.json({ success: true as const, invitation });
@@ -321,9 +334,19 @@ export const invitationsRoutes = new Hono()
    */
   .put("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("invitation:revoke"), async (c) => {
     const id = c.req.param("id");
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
 
     try {
       const invitation = await updateInvitation(id, { status: "revoked" });
+
+      // Audit log: invitation revoked (tracks impersonation if active)
+      await logInvitationRevoke(id, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
       return c.json({ success: true as const, invitation });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
@@ -341,9 +364,19 @@ export const invitationsRoutes = new Hono()
  */
   .delete("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("invitation:delete"), async (c) => {
     const id = c.req.param("id");
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
 
     try {
       const invitation = await deleteInvitation(id);
+
+      // Audit log: invitation deleted (tracks impersonation if active)
+      await logInvitationDelete(id, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
       return c.json({ success: true as const, invitation });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
