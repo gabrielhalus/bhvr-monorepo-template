@@ -31,12 +31,12 @@ export const PasswordSchema = z
 
 export const RegisterSchema = z.object({
   name: z.string().min(1, "requiredErrorMessage").min(3, "minLengthErrorMessage").max(20, "maxLengthErrorMessage"),
-  email: z.email("invalidErrorMessage").toLowerCase(),
+  email: z.string().toLowerCase().trim().pipe(z.email("invalidErrorMessage")),
   password: PasswordSchema,
 });
 
 export const LoginSchema = z.object({
-  email: z.email("invalidErrorMessage").toLowerCase(),
+  email: z.string().toLowerCase().trim().pipe(z.email("invalidErrorMessage")),
   password: z.string().min(1, "requiredErrorMessage"),
 });
 
@@ -47,5 +47,5 @@ export const isAuthorizedSchema = z.object({
 
 export const UpdateAccountSchema = z.object({
   name: z.string().min(1, "requiredErrorMessage").min(3, "minLengthErrorMessage").max(20, "maxLengthErrorMessage"),
-  email: z.email("invalidErrorMessage").toLowerCase(),
+  email: z.string().toLowerCase().trim().pipe(z.email("invalidErrorMessage")),
 });

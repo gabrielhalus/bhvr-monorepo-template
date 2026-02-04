@@ -27,7 +27,7 @@ export const InvitationRelationsQuerySchema = z.object({
  * Schema for creating an invitation
  */
 export const CreateInvitationSchema = z.object({
-  email: z.email("invalidErrorMessage").toLowerCase(),
+  email: z.string().toLowerCase().trim().pipe(z.email("invalidErrorMessage")),
   roleId: z.number().or(z.undefined()),
   autoValidateEmail: z.boolean(),
 });
