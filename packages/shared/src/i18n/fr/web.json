@@ -18,17 +18,17 @@
       "columns": {
         "name": "Nom",
         "roles": "Rôles",
-        "joined": "Inscrit",
+        "joined": "Inscrit le",
         "email": "E-mail",
         "status": "Statut",
         "invitedBy": "Invité par",
-        "expires": "Expire"
+        "expires": "Expire le"
       },
       "status": {
         "pending": "En attente",
-        "accepted": "Accepté",
-        "expired": "Expiré",
-        "revoked": "Révoqué"
+        "accepted": "Acceptée",
+        "expired": "Expirée",
+        "revoked": "Révoquée"
       },
       "actions": {
         "openMenu": "Ouvrir le menu",
@@ -63,17 +63,52 @@
         "sendInvitation": "Envoyer l'invitation",
         "success": "Invitation créée",
         "successDescription": "Le lien a été copié dans votre presse-papiers",
-        "shareDescription": "Partagez ce lien avec l'utilisateur pour compléter son inscription",
+        "shareDescription": "Partagez ce lien avec l'utilisateur pour qu'il puisse finaliser son inscription",
         "copied": "Copié",
         "copy": "Copier",
         "linkCopied": "Lien copié dans le presse-papiers",
         "done": "Terminé",
         "createError": "Échec de la création de l'invitation"
+      },
+      "detail": {
+        "title": "Détails de l'utilisateur",
+        "subtitle": "Afficher et gérer les informations de l'utilisateur.",
+        "joinedAt": "Inscrit le {{date, date}}",
+        "verifiedAt": "{{date, DD/MM/YYYY}}",
+        "sections": {
+          "edit": {
+            "title": "Modifier l'utilisateur",
+            "description": "Mettre à jour les informations de l'utilisateur."
+          },
+          "security": {
+            "title": "Sécurité",
+            "description": "Gérer les paramètres de sécurité de l'utilisateur."
+          }
+        },
+        "fields": {
+          "name": "Nom",
+          "email": "E-mail"
+        },
+        "resetPassword": {
+          "button": "Réinitialiser le mot de passe",
+          "confirmTitle": "Réinitialiser le mot de passe",
+          "confirmDescription": "Êtes-vous sûr de vouloir réinitialiser le mot de passe de cet utilisateur ? Un nouveau mot de passe aléatoire sera généré.",
+          "successTitle": "Réinitialisation réussie",
+          "successDescription": "Le nouveau mot de passe a été généré. Assurez-vous de le copier et de le transmettre à l'utilisateur de manière sécurisée. Ce mot de passe ne sera plus affiché par la suite.",
+          "copied": "Mot de passe copié dans le presse-papiers"
+        },
+        "impersonate": {
+          "button": "Emprunter l'identité",
+          "confirmTitle": "Emprunter l'identité",
+          "confirmDescription": "Êtes-vous sûr de vouloir emprunter l'identité de {{name}} ? Vous serez connecté en tant que cet utilisateur jusqu'à ce que vous arrêtiez la session.",
+          "success": "Session en cours sous l'identité de {{name}}"
+        }
       }
     },
     "account": {
       "title": "Compte",
       "subtitle": "Gérez les paramètres de votre compte.",
+      "joinedAt": "Membre depuis le {{date, date}}",
       "sections": {
         "profile": {
           "title": "Informations du profil",
@@ -125,12 +160,12 @@
               "label": "Ajouter des membres",
               "description": "Sélectionnez les utilisateurs à assigner au rôle {{role}}"
             },
-            "searchMembers": "Chercher des membres...",
+            "searchMembers": "Rechercher des membres...",
             "defaultRole": "Rôle par défaut",
             "defaultRoleDescription": "Ce rôle est automatiquement assigné à tous les utilisateurs et ne peut pas être géré manuellement",
             "allUsersAssigned": "Tous les utilisateurs assignés",
-            "allUsersAssignedDescription": "Chaque utilisateur a déjà ce rôle",
-            "selected": "Sélectionné",
+            "allUsersAssignedDescription": "Chaque utilisateur possède déjà ce rôle",
+            "selected": "Sélectionné(s)",
             "usersSelected_one": "{{count}} utilisateur sélectionné",
             "usersSelected_other": "{{count}} utilisateurs sélectionnés",
             "clearSelection": "Effacer la sélection",
@@ -158,18 +193,48 @@
           "label": "Authentification",
           "disableRegister": {
             "label": "Désactiver l'inscription des utilisateurs",
-            "description": "Empêche les nouveaux utilisateurs de s'inscrire. Les nouveaux comptes ne peuvent être créés que par invitation."
+            "description": "Empêche les nouveaux utilisateurs de s'inscrire. Les nouveaux comptes ne pourront être créés que via invitation."
           }
         },
-        "appearance": {
-          "label": "Apparence",
-          "00_defaultLightTheme": {
-            "label": "Thème clair par défaut",
-            "description": "Thème utilisé en mode clair lorsque l'apparence système est activée."
+        "notifications": {
+          "label": "Notifications",
+          "discord": {
+            "label": "Discord",
+            "enable": {
+              "label": "Activer Discord",
+              "description": ""
+            },
+            "url": {
+              "label": "URL du Webhook Discord",
+              "description": ""
+            }
           },
-          "00_defaultDarkTheme": {
-            "label": "Thème sombre par défaut",
-            "description": "Thème utilisé en mode sombre lorsque l'apparence système est activée."
+          "smtp": {
+            "label": "SMTP",
+            "enable": {
+              "label": "Activer SMTP",
+              "description": ""
+            },
+            "host": {
+              "label": "Serveur SMTP",
+              "description": ""
+            },
+            "port": {
+              "label": "Port SMTP",
+              "description": ""
+            },
+            "user": {
+              "label": "Nom d'utilisateur",
+              "description": ""
+            },
+            "password": {
+              "label": "Mot de passe",
+              "description": ""
+            },
+            "fromAddress": {
+              "label": "Adresse d'expédition",
+              "description": ""
+            }
           }
         }
       }
@@ -196,19 +261,19 @@
             "placeholder": "Bot Discord"
           },
           "webhookUrl": {
-            "label": "URL du webhook",
+            "label": "URL du Webhook",
             "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
           },
           "decorations": {
             "label": "Décorations",
-            "description": "Envoie les notifications sous forme de messages Discord intégrés."
+            "description": "Envoie les notifications sous forme de messages 'Embed' Discord."
           },
           "testNotification": "Tester la notification",
           "testing": "Test en cours...",
           "delete": "Supprimer",
           "deleting": "Suppression...",
-          "submit": "Soumettre",
-          "submitting": "Soumission...",
+          "submit": "Enregistrer",
+          "submitting": "Envoi...",
           "deleteConfirm": {
             "title": "Supprimer le fournisseur Discord",
             "description": "Êtes-vous sûr de vouloir supprimer ce fournisseur Discord ?",
@@ -219,7 +284,7 @@
             "created": "Fournisseur Discord créé avec succès",
             "updated": "Fournisseur Discord mis à jour avec succès",
             "deleted": "Fournisseur Discord supprimé avec succès",
-            "testSent": "Notification envoyée avec succès"
+            "testSent": "Notification de test envoyée avec succès"
           },
           "error": {
             "create": "Échec de la création du fournisseur Discord",
@@ -234,24 +299,24 @@
             "placeholder": "Bot Telegram"
           },
           "botToken": {
-            "label": "Jeton du bot",
+            "label": "Token du Bot",
             "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
           },
           "chatId": {
-            "label": "ID du chat",
+            "label": "ID du Chat",
             "placeholder": "1234567890"
           },
           "threadId": {
-            "label": "ID du fil de discussion",
+            "label": "ID du fil (Thread ID)",
             "placeholder": "1234567890",
-            "description": "Optionnel. Utilisez-le lorsque vous souhaitez envoyer des notifications à un sujet spécifique dans un groupe."
+            "description": "Optionnel. À utiliser pour envoyer des notifications vers un sujet (topic) spécifique dans un groupe."
           },
           "testNotification": "Tester la notification",
           "testing": "Test en cours...",
           "delete": "Supprimer",
           "deleting": "Suppression...",
-          "submit": "Soumettre",
-          "submitting": "Soumission...",
+          "submit": "Enregistrer",
+          "submitting": "Envoi...",
           "deleteConfirm": {
             "title": "Supprimer le fournisseur Telegram",
             "description": "Êtes-vous sûr de vouloir supprimer ce fournisseur Telegram ?",
@@ -262,7 +327,7 @@
             "created": "Fournisseur Telegram créé avec succès",
             "updated": "Fournisseur Telegram mis à jour avec succès",
             "deleted": "Fournisseur Telegram supprimé avec succès",
-            "testSent": "Notification envoyée avec succès"
+            "testSent": "Notification de test envoyée avec succès"
           },
           "error": {
             "create": "Échec de la création du fournisseur Telegram",
@@ -284,6 +349,12 @@
         "edit": "Modifier le fournisseur de notifications"
       }
     }
+  },
+  "impersonation": {
+    "banner": "{{impersonator}} emprunte actuellement l'identité de {{user}}",
+    "stop": "Arrêter l'impersonnalisation",
+    "stopped": "Impersonnalisation arrêtée",
+    "stopError": "Échec de l'arrêt de l'impersonnalisation"
   },
   "errors": {
     "email": {
