@@ -30,4 +30,7 @@ export const PermissionSchema = z.enum([
   "invitation:list",
   "invitation:revoke",
   "invitation:delete",
+
+  // Audit logs
+  "auditLog:list",
 ]);

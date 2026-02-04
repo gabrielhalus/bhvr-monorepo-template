@@ -124,6 +124,20 @@
       "myAccount": "My Account",
       "toggle": "Toggle"
     },
+    "logs": {
+      "title": "Audit Logs",
+      "subtitle": "View system activity and user actions.",
+      "searchPlaceholder": "Search logs...",
+      "impersonated": "Impersonated",
+      "impersonatedBy": "Action performed by impersonator: {{id}}",
+      "columns": {
+        "action": "Action",
+        "actor": "Actor",
+        "target": "Target",
+        "ip": "IP Address",
+        "timestamp": "Timestamp"
+      }
+    },
     "roles": {
       "title": "Roles",
       "list": {
