@@ -43,7 +43,7 @@ export function getUserColumns(t: TFunction): ColumnDef<UserWithRelations<["role
       header: t("pages.users.columns.roles"),
       cell: ({ row }) => {
         const roles = row.original.roles;
-        if (!roles || !roles.length) {
+        if (!roles?.length) {
           return <span className="text-muted-foreground">—</span>;
         }
         return (

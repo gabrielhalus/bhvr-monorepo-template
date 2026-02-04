@@ -41,7 +41,7 @@ function RouteComponent() {
     }
   }
 
-  if (!configTree || !segments.length) {
+  if (!configTree || !segments?.length) {
     return null;
   }
 

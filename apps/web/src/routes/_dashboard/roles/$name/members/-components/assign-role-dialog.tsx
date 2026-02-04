@@ -121,7 +121,7 @@ export function AssignRoleDialog() {
                     <Spinner className="size-6" />
                   </div>
                 )
-              : !availableUsers.length
+              : !availableUsers?.length
                   ? (
                       <div className="flex flex-col items-center justify-center py-10 text-center">
                         <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted">
@@ -227,7 +227,7 @@ export function AssignRoleDialog() {
               children={([canSubmit, isSubmitting, userIds]) => (
                 <Button
                   type="submit"
-                  disabled={!canSubmit || isSubmitting || mutation.isPending || !userIds.length || isDefaultRole}
+                  disabled={!canSubmit || isSubmitting || mutation.isPending || !userIds?.length || isDefaultRole}
                 >
                   {isSubmitting || mutation.isPending
                     ? (

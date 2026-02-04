@@ -21,7 +21,7 @@ export const invitationRelationLoaders: { [K in keyof InvitationRelations]: (inv
   invitedBy: async (invitationIds) => {
     const result: Record<string, InvitationRelations["invitedBy"]> = {};
 
-    if (!invitationIds.length) {
+    if (!invitationIds?.length) {
       return result;
     }
 
@@ -153,7 +153,7 @@ export async function getInvitation<T extends InvitationRelationKey[]>(id: strin
  * @returns The invitations with added relations
  */
 export async function hydrateInvitations<T extends InvitationRelationKey[]>(invitations: Invitation[], includes?: T): Promise<InvitationWithRelations<T>[]> {
-  if (!includes || !includes.length) {
+  if (!includes?.length) {
     return invitations.map(u => ({ ...u })) as InvitationWithRelations<T>[];
   }
 

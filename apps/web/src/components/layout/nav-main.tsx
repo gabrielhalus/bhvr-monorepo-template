@@ -12,7 +12,7 @@ export function NavMain({ items }: { items: { title: string; icon: LucideIcon; h
   const { t } = useTranslation("web");
   const matchRoute = useMatchRoute();
 
-  if (!items.length) {
+  if (!items?.length) {
     return;
   }
 

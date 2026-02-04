@@ -29,7 +29,7 @@ export const roleRelationLoaders: { [K in keyof RoleRelations]: (roleIds: number
   members: async (roleIds) => {
     const result: Record<number, RoleRelations["members"]> = {};
 
-    if (!roleIds.length) {
+    if (!roleIds?.length) {
       return result;
     }
 
@@ -72,7 +72,7 @@ export const roleRelationLoaders: { [K in keyof RoleRelations]: (roleIds: number
   permissions: async (roleIds) => {
     const result: Record<number, RoleRelations["permissions"]> = {};
 
-    if (!roleIds.length) {
+    if (!roleIds?.length) {
       return result;
     }
 
@@ -98,7 +98,7 @@ export const roleRelationLoaders: { [K in keyof RoleRelations]: (roleIds: number
   policies: async (roleIds) => {
     const result: Record<number, RoleRelations["policies"]> = {};
 
-    if (!roleIds.length) {
+    if (!roleIds?.length) {
       return result;
     }
 
@@ -126,7 +126,7 @@ export const roleRelationCountLoaders: { [K in keyof RoleRelations]: (roleIds: n
   members: async (roleIds) => {
     const result: Record<number, number> = {};
 
-    if (!roleIds.length) {
+    if (!roleIds?.length) {
       return result;
     }
 
@@ -165,7 +165,7 @@ export const roleRelationCountLoaders: { [K in keyof RoleRelations]: (roleIds: n
   permissions: async (roleIds) => {
     const result: Record<number, number> = {};
 
-    if (!roleIds.length) {
+    if (!roleIds?.length) {
       return result;
     }
 
@@ -189,7 +189,7 @@ export const roleRelationCountLoaders: { [K in keyof RoleRelations]: (roleIds: n
   policies: async (roleIds) => {
     const result: Record<number, number> = {};
 
-    if (!roleIds.length) {
+    if (!roleIds?.length) {
       return result;
     }
 
@@ -321,7 +321,7 @@ export async function getRole<T extends RoleRelationKeys>(id: number, includes?:
  * @returns The roles with added relations
  */
 export async function hydrateRoles<T extends RoleRelationKeys>(roles: Role[], includes?: T): Promise<RoleWithRelations<T>[]> {
-  if (!includes || !includes.length) {
+  if (!includes?.length) {
     return roles.map(r => ({ ...r })) as RoleWithRelations<T>[];
   }
 

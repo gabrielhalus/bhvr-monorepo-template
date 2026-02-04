@@ -23,7 +23,7 @@ export const userRelationLoaders: { [K in keyof UserRelations]: (userIds: string
   roles: async (userIds) => {
     const result: Record<string, UserRelations["roles"]> = {};
 
-    if (!userIds.length) {
+    if (!userIds?.length) {
       return result;
     }
 
@@ -64,7 +64,7 @@ export const userRelationLoaders: { [K in keyof UserRelations]: (userIds: string
   tokens: async (userIds) => {
     const result: Record<string, UserRelations["tokens"]> = {};
 
-    if (!userIds.length) {
+    if (!userIds?.length) {
       return result;
     }
 
@@ -92,7 +92,7 @@ export const userRelationCountLoaders: { [K in keyof UserRelations]: (userIds: s
   roles: async (userIds) => {
     const result: Record<string, number> = {};
 
-    if (!userIds.length) {
+    if (!userIds?.length) {
       return result;
     }
 
@@ -133,7 +133,7 @@ export const userRelationCountLoaders: { [K in keyof UserRelations]: (userIds: s
   tokens: async (userIds) => {
     const result: Record<string, number> = {};
 
-    if (!userIds.length) {
+    if (!userIds?.length) {
       return result;
     }
 
@@ -267,7 +267,7 @@ export async function getUser<T extends UserRelationKey[]>(id: string, includes?
  * @returns The users with added relations
  */
 export async function hydrateUsers<T extends UserRelationKey[]>(users: User[], includes?: T): Promise<UserWithRelations<T>[]> {
-  if (!includes || !includes.length) {
+  if (!includes?.length) {
     return users.map(u => ({ ...u })) as UserWithRelations<T>[];
   }
 

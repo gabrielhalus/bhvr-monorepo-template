@@ -13,7 +13,7 @@ export function NavSettings({ items }: { items: { title: string; icon: LucideIco
 
   const matchRoute = useMatchRoute();
 
-  if (!items.length) {
+  if (!items?.length) {
     return;
   }
 
