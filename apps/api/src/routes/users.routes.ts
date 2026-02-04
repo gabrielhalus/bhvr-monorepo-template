@@ -123,7 +123,7 @@ export const usersRoutes = new Hono()
         }),
       );
 
-      return c.json({ success: true as const, ...relations });
+      return c.json({ success: true as const, relations });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
