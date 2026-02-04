@@ -110,7 +110,7 @@ export function UserSecurityActions({ userId }: { userId: string }) {
           <div className="flex items-center gap-2">
             <Input
               readOnly
-              value={generatedPassword || ""}
+              value={generatedPassword ?? ""}
               className="font-mono"
             />
             <Button

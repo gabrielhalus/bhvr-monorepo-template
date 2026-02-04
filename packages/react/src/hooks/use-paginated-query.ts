@@ -40,7 +40,7 @@ export function usePaginatedQuery<TData, TError = Error>({
       limit,
       sortBy,
       sortOrder,
-      search: debouncedSearch || undefined,
+      search: debouncedSearch ?? undefined,
     }),
     [page, limit, sortBy, sortOrder, debouncedSearch],
   );

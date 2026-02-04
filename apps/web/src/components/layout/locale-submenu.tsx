@@ -17,7 +17,7 @@ export function LocaleSubmenu() {
     { code: "fr", name: "Français", flag: "🇫🇷" },
   ];
 
-  const currentLocale = locales.find(locale => locale.code === i18n.language) || locales[0];
+  const currentLocale = locales.find(locale => locale.code === i18n.language) ?? locales[0];
 
   const handleLocaleChange = (localeCode: string, event: React.MouseEvent) => {
     event.preventDefault();

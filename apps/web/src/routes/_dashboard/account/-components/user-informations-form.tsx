@@ -1,4 +1,3 @@
-import type { User } from "~shared/types/db/users.types";
 import type { z } from "zod";
 
 import { useForm } from "@tanstack/react-form";

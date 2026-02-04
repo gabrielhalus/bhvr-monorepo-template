@@ -6,10 +6,10 @@ import { Link } from "@tanstack/react-router";
 import { MailIcon, ShieldIcon, UsersIcon, UserXIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import { usersKeys } from "@/api/users/users.keys";
-import { AvatarUser } from "@/components/avatar-user";
 import { rolesKeys } from "@/api/roles/roles.keys";
 import { roleQueryOptions } from "@/api/roles/roles.queries";
+import { usersKeys } from "@/api/users/users.keys";
+import { AvatarUser } from "@/components/avatar-user";
 import { Button } from "~react/components/button";
 import { Spinner } from "~react/components/spinner";
 import { api } from "~react/lib/http";
@@ -32,7 +32,7 @@ export function RoleMembersList({ search }: { search: string }) {
   const role = data?.role;
   const filteredMembers = role?.members?.filter(member =>
     member.name.toLowerCase().includes(search.toLowerCase())
-    || member.email.toLowerCase().includes(search.toLowerCase()),
+    ?? member.email.toLowerCase().includes(search.toLowerCase()),
   );
 
   if (!role) {

@@ -15,7 +15,7 @@ export function useCreateInvitation() {
       queryClient.invalidateQueries({ queryKey: invitationsKeys.paginated });
     },
     onError: (error) => {
-      toast.error(error.message || t("pages.users.invite.createError"));
+      toast.error(error.message ?? t("pages.users.invite.createError"));
     },
   });
 }

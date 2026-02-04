@@ -15,7 +15,7 @@ export function useAcceptInvitation() {
       navigate({ to: "/", replace: true });
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to create account");
+      toast.error(error.message ?? "Failed to create account");
     },
   });
 }

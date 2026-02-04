@@ -14,11 +14,11 @@ export const passwordRules: PasswordRules = {
 
 export const passwordChecks = {
   minLength: (val: string) => val.length >= passwordRules.minLength,
-  minUppercase: (val: string) => (val.match(/[A-Z]/g) || []).length >= passwordRules.minUppercase,
-  minLowercase: (val: string) => (val.match(/[a-z]/g) || []).length >= passwordRules.minLowercase,
-  minDigits: (val: string) => (val.match(/\d/g) || []).length >= passwordRules.minDigits,
+  minUppercase: (val: string) => (val.match(/[A-Z]/g) ?? []).length >= passwordRules.minUppercase,
+  minLowercase: (val: string) => (val.match(/[a-z]/g) ?? []).length >= passwordRules.minLowercase,
+  minDigits: (val: string) => (val.match(/\d/g) ?? []).length >= passwordRules.minDigits,
   minSpecialChars: (val: string) =>
-    (val.match(/[!@#$%^&*()\-=+[\]{};:'",.<>/?\\|`]/g) || []).length >= passwordRules.minSpecialChars,
+    (val.match(/[!@#$%^&*()\-=+[\]{};:'",.<>/?\\|`]/g) ?? []).length >= passwordRules.minSpecialChars,
 };
 
 export const PasswordSchema = z

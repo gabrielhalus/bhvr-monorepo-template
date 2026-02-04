@@ -138,8 +138,8 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
             {(Object.keys(rules) as (keyof PasswordRules)[]).map(ruleKey => (
               <RequirementItem
                 key={ruleKey}
-                label={requirementLabels[ruleKey] || ""}
-                satisfied={requirements[ruleKey] || false}
+                label={requirementLabels[ruleKey] ?? ""}
+                satisfied={requirements[ruleKey] ?? false}
                 show={!!rules[ruleKey]}
               />
             ))}

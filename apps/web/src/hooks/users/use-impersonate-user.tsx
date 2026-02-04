@@ -18,7 +18,7 @@ export function useImpersonateUser(userName?: string) {
       navigate({ to: "/" });
     },
     onError: (error) => {
-      toast.error(error.message || t("pages.users.detail.impersonate.error"));
+      toast.error(error.message ?? t("pages.users.detail.impersonate.error"));
     },
   });
 }

@@ -32,7 +32,7 @@ function AcceptInvitation() {
   const { token } = Route.useSearch();
 
   const { data, isPending, error } = useQuery({
-    ...validateInvitationQueryOptions(token || ""),
+    ...validateInvitationQueryOptions(token ?? ""),
     enabled: !!token,
   });
 
@@ -128,7 +128,7 @@ function AcceptInvitation() {
               </div>
               <CardTitle>Invitation Expired</CardTitle>
               <CardDescription className="mt-2">
-                {error?.message || "This invitation has expired or has already been used. Please request a new invitation from your administrator."}
+                {error?.message ?? "This invitation has expired or has already been used. Please request a new invitation from your administrator."}
               </CardDescription>
             </CardHeader>
             <CardContent>

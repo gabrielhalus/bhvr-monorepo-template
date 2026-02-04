@@ -51,7 +51,7 @@ export function Form() {
   const form = useForm({
     validators: { onChange: UpdateRoleSchema },
     defaultValues: {
-      label: role.label || "",
+      label: role.label ?? "",
       description: role.description ?? null,
     },
     onSubmit: async ({ value }) => {

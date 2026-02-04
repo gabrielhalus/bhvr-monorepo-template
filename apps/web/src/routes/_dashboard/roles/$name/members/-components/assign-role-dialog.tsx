@@ -5,9 +5,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
+import { roleQueryOptions } from "@/api/roles/roles.queries";
 import { AvatarUser } from "@/components/avatar-user";
 import { usePaginatedUsers } from "@/hooks/users/use-paginated-users";
-import { roleQueryOptions } from "@/api/roles/roles.queries";
 import { Button } from "~react/components/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~react/components/dialog";
 import { Field, FieldContent, FieldError } from "~react/components/field";
@@ -34,7 +34,7 @@ export function AssignRoleDialog() {
 
   const { data, isLoading } = usePaginatedUsers();
 
-  const availableUsers = data?.filter(u => !role.members?.some(m => m.id === u.id)) || [];
+  const availableUsers = data?.filter(u => !role.members?.some(m => m.id === u.id)) ?? [];
 
   const isDefaultRole = role.isDefault;
 
