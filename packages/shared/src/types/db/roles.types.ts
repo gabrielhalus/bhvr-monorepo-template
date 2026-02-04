@@ -1,4 +1,4 @@
-import type { WithRelations } from "~shared/lib/type-utils";
+import type { WithRelations, WithRelationsCount } from "~shared/lib/type-utils";
 import type { RolesModel } from "~shared/models/roles.model";
 import type { RoleRelationsSchema } from "~shared/schemas/api/roles.schemas";
 import type { Policy } from "~shared/types/db/policies.types";
@@ -17,3 +17,5 @@ export type RoleRelations = {
 export type RoleRelationKeys = z.infer<typeof RoleRelationsSchema>;
 
 export type RoleWithRelations<T extends RoleRelationKeys> = WithRelations<Role, RoleRelations, T>;
+
+export type RoleWithRelationsCount<T extends RoleRelationKeys> = WithRelationsCount<Role, RoleRelations, T>;

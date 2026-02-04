@@ -9,3 +9,11 @@ export type WithRelations<
 > = TBase & {
   [K in TKeys[number]]: TRelations[K];
 };
+
+export type WithRelationsCount<
+  TBase,
+  TRelations extends Record<PropertyKey, unknown>,
+  TKeys extends (keyof TRelations)[],
+> = TBase & {
+  [K in TKeys[number]]: number;
+};
