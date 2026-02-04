@@ -35,34 +35,20 @@ export const roleRelationLoaders: { [K in keyof RoleRelations]: (roleIds: number
 
     roleIds.forEach(id => (result[id] = []));
 
-    const [userRolesRows, defaultRolesRows] = await Promise.all([
+    const [userRolesRows] = await Promise.all([
       drizzle
         .select({
           roleId: UserRolesModel.roleId,
           user: UsersModel,
         })
         .from(UserRolesModel)
-        .leftJoin(UsersModel, eq(UserRolesModel.userId, UsersModel.id))
+        .innerJoin(UsersModel, eq(UserRolesModel.userId, UsersModel.id))
         .where(inArray(UserRolesModel.roleId, roleIds)),
-      drizzle
-        .select()
-        .from(RolesModel)
-        .where(eq(RolesModel.isDefault, true)),
     ]);
 
     for (const row of userRolesRows) {
       if (row.user !== null) {
         result[row.roleId]!.push(UserSchema.parse(row.user));
-      }
-    }
-
-    if (defaultRolesRows.length) {
-      const allUsers = await drizzle
-        .select()
-        .from(UsersModel);
-
-      for (const row of defaultRolesRows) {
-        result[row.id] = allUsers;
       }
     }
 
@@ -132,31 +118,19 @@ export const roleRelationCountLoaders: { [K in keyof RoleRelations]: (roleIds: n
 
     roleIds.forEach(id => (result[id] = 0));
 
-    const [userRolesRows, defaultRolesRows] = await Promise.all([
+    const [userRolesRows] = await Promise.all([
       drizzle
         .select({
           roleId: UserRolesModel.roleId,
           count: count(UserRolesModel.userId),
         })
         .from(UserRolesModel)
-        .where(inArray(UserRolesModel.roleId, roleIds)),
-      drizzle
-        .select({
-          count: count(RolesModel.id),
-        })
-        .from(RolesModel)
-        .where(eq(RolesModel.isDefault, true)),
+        .where(inArray(UserRolesModel.roleId, roleIds))
+        .groupBy(UserRolesModel.roleId),
     ]);
 
     for (const row of userRolesRows) {
       result[row.roleId]! = Number(row.count);
-    }
-
-    const defaultCount = defaultRolesRows[0]?.count ?? 0;
-    if (defaultCount) {
-      roleIds.forEach((roleId) => {
-        result[roleId]! += Number(defaultCount);
-      });
     }
 
     return result;

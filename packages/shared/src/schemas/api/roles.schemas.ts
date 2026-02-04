@@ -18,7 +18,7 @@ export const RoleRelationsSchema = z.array(z.enum(RoleRelationKey));
  * Schema for role relations query
  */
 export const RoleRelationsQuerySchema = z.object({
-  roleIds: arrayParam(z.number()).optional(),
+  roleIds: arrayParam(z.coerce.number()).optional(),
   include: arrayParam(z.enum(RoleRelationKey)),
 });
 

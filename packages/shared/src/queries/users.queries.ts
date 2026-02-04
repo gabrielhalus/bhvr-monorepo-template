@@ -36,7 +36,7 @@ export const userRelationLoaders: { [K in keyof UserRelations]: (userIds: string
           role: RolesModel,
         })
         .from(UserRolesModel)
-        .leftJoin(RolesModel, eq(UserRolesModel.roleId, RolesModel.id))
+        .innerJoin(RolesModel, eq(UserRolesModel.roleId, RolesModel.id))
         .where(inArray(UserRolesModel.userId, userIds)),
       drizzle
         .select()
@@ -105,7 +105,7 @@ export const userRelationCountLoaders: { [K in keyof UserRelations]: (userIds: s
           count: count(RolesModel.id),
         })
         .from(UserRolesModel)
-        .leftJoin(RolesModel, eq(UserRolesModel.roleId, RolesModel.id))
+        .innerJoin(RolesModel, eq(UserRolesModel.roleId, RolesModel.id))
         .where(inArray(UserRolesModel.userId, userIds))
         .groupBy(UserRolesModel.userId),
       drizzle

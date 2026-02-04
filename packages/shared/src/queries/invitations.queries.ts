@@ -31,7 +31,7 @@ export const invitationRelationLoaders: { [K in keyof InvitationRelations]: (inv
         user: UsersModel,
       })
       .from(InvitationsModel)
-      .leftJoin(UsersModel, eq(InvitationsModel.invitedById, UsersModel.id))
+      .innerJoin(UsersModel, eq(InvitationsModel.invitedById, UsersModel.id))
       .where(inArray(InvitationsModel.id, invitationIds));
 
     for (const row of invitationsRows) {
