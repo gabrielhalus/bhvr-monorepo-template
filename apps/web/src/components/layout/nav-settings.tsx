@@ -1,7 +1,7 @@
 import type { LinkOptions } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useMatchRoute } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -10,8 +10,8 @@ import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuAction, Sideba
 
 export function NavSettings({ items }: { items: { title: string; icon: LucideIcon; href: LinkOptions; items?: { title: string; href: LinkOptions }[] }[] }) {
   const { t } = useTranslation("web");
-  const location = useLocation();
-  const isActive = (href: LinkOptions["to"]) => location.pathname === href;
+
+  const matchRoute = useMatchRoute();
 
   if (!items.length) {
     return;
@@ -21,43 +21,50 @@ export function NavSettings({ items }: { items: { title: string; icon: LucideIco
     <SidebarGroup>
       <SidebarGroupLabel>{t("pages.settings.title")}</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map(item => (
-          <Collapsible key={item.title} asChild defaultOpen={isActive(item.href.to)}>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={item.title} isActive={isActive(item.href.to)}>
-                <Link {...item.href}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-              {item.items?.length
-                ? (
-                    <>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuAction className="data-[state=open]:rotate-90">
-                          <ChevronRight />
-                          <span className="sr-only">{t("pages.nav.toggle")}</span>
-                        </SidebarMenuAction>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {item.items?.map(subItem => (
-                            <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton asChild>
-                                <Link {...subItem.href}>
-                                  <span>{subItem.title}</span>
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </>
-                  )
-                : null}
-            </SidebarMenuItem>
-          </Collapsible>
-        ))}
+        {items.map((item) => {
+          const isActive = !!matchRoute({
+            ...item.href,
+            fuzzy: true,
+          });
+
+          return (
+            <Collapsible key={item.title} asChild defaultOpen={isActive}>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip={item.title} isActive={isActive}>
+                  <Link {...item.href}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+                {item.items?.length
+                  ? (
+                      <>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuAction className="data-[state=open]:rotate-90">
+                            <ChevronRight />
+                            <span className="sr-only">{t("pages.nav.toggle")}</span>
+                          </SidebarMenuAction>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {item.items?.map(subItem => (
+                              <SidebarMenuSubItem key={subItem.title}>
+                                <SidebarMenuSubButton asChild>
+                                  <Link {...subItem.href}>
+                                    <span>{subItem.title}</span>
+                                  </Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </>
+                    )
+                  : null}
+              </SidebarMenuItem>
+            </Collapsible>
+          );
+        })}
       </SidebarMenu>
     </SidebarGroup>
   );

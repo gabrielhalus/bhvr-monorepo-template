@@ -12,7 +12,7 @@ export const Route = createFileRoute(
   "/_dashboard/roles/$name/members/",
 )({
   component: RoleMembers,
-  loader: () => ({ crumb: "pages.roles.detail.pages.members.title" }),
+  staticData: { crumb: "pages.roles.detail.pages.members.title" },
 });
 
 function RoleMembers() {

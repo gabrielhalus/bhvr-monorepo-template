@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 import { auth } from "@/lib/auth";
-import { getRuntimeConfigQueryOptions } from "@/queries/runtime-configs";
+import { runtimeConfigQueryOptions } from "@/api/runtime-configs/runtime-configs.queries";
 import { inferConfigValue } from "~shared/helpers/infer-config-value";
 
 export const Route = createFileRoute("/_auth")({
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_auth")({
   beforeLoad: async ({ context }) => {
     await auth({ redirectOnAuthenticated: true, redirectOnUnauthenticated: false });
 
-    const { value: config } = await context.queryClient.ensureQueryData(getRuntimeConfigQueryOptions("authentication.disableRegister"));
+    const { value: config } = await context.queryClient.ensureQueryData(runtimeConfigQueryOptions("authentication.disableRegister"));
     return { disableRegister: inferConfigValue(config.value!) };
   },
 });

@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import { getRuntimeConfigsQueryOptions } from "@/queries/runtime-configs";
+import { runtimeConfigsQueryOptions } from "@/api/runtime-configs/runtime-configs.queries";
 import { buildConfigTree } from "~shared/helpers/config-tree";
 
 import { ConfigSection } from "./config-section";
 
 export function Sidebar() {
-  const { data } = useQuery(getRuntimeConfigsQueryOptions);
+  const { data } = useQuery(runtimeConfigsQueryOptions);
 
   const configTree = useMemo(() => {
     if (!data?.configs) {

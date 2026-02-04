@@ -1,12 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-import { getRolesQueryOptions } from "@/queries/roles";
+import { usePaginatedRoles } from "@/hooks/roles/use-paginated-roles";
 import { DataTable } from "~react/components/data-table";
 
-import { getColumns } from "./-components/columns";
+import { getRoleColumns } from "./-components/role.columns";
 
 export const Route = createFileRoute("/_dashboard/roles/")({
   component: Roles,
@@ -15,9 +14,9 @@ export const Route = createFileRoute("/_dashboard/roles/")({
 function Roles() {
   const { t } = useTranslation("web");
 
-  const columns = useMemo(() => getColumns(t), [t]);
+  const columns = useMemo(() => getRoleColumns(t), [t]);
 
-  const { isPending, data } = useQuery(getRolesQueryOptions(["members"]));
+  const rolesQuery = usePaginatedRoles();
 
   return (
     <div className="w-full p-10">
@@ -28,9 +27,19 @@ function Roles() {
         </div>
         <DataTable
           columns={columns}
-          data={data?.roles}
-          isLoading={isPending}
+          data={rolesQuery.data}
+          isLoading={rolesQuery.isLoading}
           searchPlaceholder={t("pages.roles.list.searchPlaceholder")}
+          manualPagination
+          manualSorting
+          manualFiltering
+          pagination={rolesQuery.paginationState}
+          onPaginationChange={rolesQuery.onPaginationChange}
+          pageCount={rolesQuery.pageCount}
+          sorting={rolesQuery.sortingState}
+          onSortingChange={rolesQuery.onSortingChange}
+          searchValue={rolesQuery.searchValue}
+          onSearchChange={rolesQuery.onSearchChange}
         />
       </div>
     </div>

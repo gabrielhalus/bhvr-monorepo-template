@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
-import { getRoleByNameQueryOptions } from "@/queries/roles";
+import { roleQueryOptions } from "@/api/roles/roles.queries";
 import { Button } from "~react/components/button";
 
 import { Route } from "../route";
@@ -16,7 +16,7 @@ export function Nav() {
   const { role } = Route.useLoaderData();
 
   const query = useQuery({
-    ...getRoleByNameQueryOptions(role.name, ["members"]),
+    ...roleQueryOptions(role.name),
     initialData: { success: true, role },
   });
 

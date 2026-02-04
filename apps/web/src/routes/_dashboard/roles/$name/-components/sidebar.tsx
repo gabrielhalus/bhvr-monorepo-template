@@ -3,12 +3,12 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { getRolesQueryOptions } from "@/queries/roles";
+import { allRolesQueryOptions } from "@/api/roles/roles.queries";
 import { Button } from "~react/components/button";
 
 export function Sidebar() {
   const { t } = useTranslation("common");
-  const { data } = useQuery(getRolesQueryOptions());
+  const { data } = useQuery(allRolesQueryOptions);
 
   return (
     <aside className="h-full w-75 p-2 border-r">

@@ -4,7 +4,7 @@ export const Route = createFileRoute(
   "/_dashboard/roles/$name/permissions/",
 )({
   component: RolePermissions,
-  loader: () => ({ crumb: "pages.roles.detail.pages.permissions.title" }),
+  staticData: { crumb: "pages.roles.detail.pages.permissions.title" },
 });
 
 function RolePermissions() {

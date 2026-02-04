@@ -11,9 +11,7 @@ export const Route = createFileRoute("/_dashboard/users")({
       throw redirect({ to: "/" });
     }
   },
-  loader: () => ({
-    crumb: "pages.users.title",
-  }),
+  staticData: { crumb: "pages.users.title" },
 });
 
 function UsersLayout() {

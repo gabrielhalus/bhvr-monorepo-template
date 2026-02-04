@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Box, CogIcon, Home, Mail, ShieldUser, UsersRound } from "lucide-react";
+import { Box, CogIcon, Home, ShieldUser, UsersRound } from "lucide-react";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 

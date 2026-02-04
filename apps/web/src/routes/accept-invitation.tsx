@@ -2,20 +2,19 @@ import type { FormEvent } from "react";
 
 import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { AlertCircleIcon, BoxIcon, LinkIcon, MailIcon, UserIcon, UserPlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import { z } from "zod";
 
-import { validateInvitationQueryOptions } from "@/queries/invitations";
+import { validateInvitationQueryOptions } from "@/api/invitations/invitations.queries";
+import { useAcceptInvitation } from "@/hooks/invitations/use-accept-invitation";
 import { Button } from "~react/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
 import { Input } from "~react/components/input";
 import { PasswordInput } from "~react/components/password-input";
 import { Spinner } from "~react/components/spinner";
-import { api } from "~react/lib/http";
 import { passwordChecks, passwordRules } from "~shared/schemas/api/auth.schemas";
 import { AcceptInvitationSchema } from "~shared/schemas/api/invitations.schemas";
 
@@ -30,13 +29,14 @@ export const Route = createFileRoute("/accept-invitation")({
 
 function AcceptInvitation() {
   const { t } = useTranslation("common");
-  const navigate = useNavigate();
   const { token } = Route.useSearch();
 
   const { data, isPending, error } = useQuery({
     ...validateInvitationQueryOptions(token || ""),
     enabled: !!token,
   });
+
+  const acceptMutation = useAcceptInvitation();
 
   const form = useForm({
     validators: {
@@ -47,18 +47,7 @@ function AcceptInvitation() {
       password: "",
     },
     onSubmit: async ({ value }) => {
-      const res = await api.invitations.accept.$post({
-        json: { token: token!, ...value },
-      });
-
-      const json = await res.json();
-
-      if (json.success) {
-        toast.success("Account created successfully!");
-        return navigate({ to: "/", replace: true });
-      }
-
-      throw toast.error(typeof json.error === "string" ? json.error : "Failed to create account");
+      await acceptMutation.mutateAsync({ token: token!, ...value });
     },
   });
 
@@ -241,17 +230,19 @@ function AcceptInvitation() {
                   selector={state => [state.canSubmit, state.isSubmitting]}
                   children={([canSubmit, isSubmitting]) => (
                     <Button type="submit" disabled={!canSubmit} className="mt-2 h-11">
-                      {isSubmitting ? (
-                        <>
-                          <Spinner />
-                          <span>Creating Account...</span>
-                        </>
-                      ) : (
-                        <>
-                          <UserPlusIcon />
-                          <span>Create Account</span>
-                        </>
-                      )}
+                      {isSubmitting
+                        ? (
+                            <>
+                              <Spinner />
+                              <span>Creating Account...</span>
+                            </>
+                          )
+                        : (
+                            <>
+                              <UserPlusIcon />
+                              <span>Create Account</span>
+                            </>
+                          )}
                     </Button>
                   )}
                 />

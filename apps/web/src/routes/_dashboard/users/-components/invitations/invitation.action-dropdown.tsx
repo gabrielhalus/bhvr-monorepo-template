@@ -1,54 +1,23 @@
 import type { Row } from "@tanstack/react-table";
-import type { InvitationWithRelations } from "~shared/types/db/invitations.types";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Ban, Copy, Link, MoreHorizontal, Trash2 } from "lucide-react";
+
+import type { InvitationRow } from "./invitations.data-table";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { getInvitationsQueryOptions } from "@/queries/invitations";
+import { useDeleteInvitation } from "@/hooks/invitations/use-delete-invitation";
+import { useRevokeInvitation } from "@/hooks/invitations/use-revoke-invitation";
 import { Button } from "~react/components/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "~react/components/dropdown-menu";
 import { Spinner } from "~react/components/spinner";
-import { api } from "~react/lib/http";
 import sayno from "~react/lib/sayno";
 
-export function InvitationActionDropdown({ row: { original: invitation } }: { row: Row<InvitationWithRelations<["invitedBy"]>> }) {
+export function InvitationActionDropdown({ row: { original: invitation } }: { row: Row<InvitationRow> }) {
   const { t } = useTranslation("web");
-  const queryClient = useQueryClient();
 
-  const revokeMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const res = await api.invitations[":id"].$put({ param: { id } });
-
-      if (!res.ok) {
-        throw new Error(t("pages.users.actions.revokeInvitationError"));
-      }
-
-      return res.json();
-    },
-    onError: () => toast.error(t("pages.users.actions.revokeInvitationError")),
-    onSuccess: () => {
-      toast.success(t("pages.users.actions.revokeInvitationSuccess"));
-      queryClient.invalidateQueries(getInvitationsQueryOptions(["invitedBy"]));
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const res = await api.invitations[":id"].$delete({ param: { id } });
-
-      if (!res.ok) {
-        throw new Error(t("pages.users.actions.deleteInvitationError"));
-      }
-      return res.json();
-    },
-    onError: () => toast.error(t("pages.users.actions.deleteInvitationError")),
-    onSuccess: () => {
-      toast.success(t("pages.users.actions.deleteInvitationSuccess"));
-      queryClient.invalidateQueries(getInvitationsQueryOptions(["invitedBy"]));
-    },
-  });
+  const revokeMutation = useRevokeInvitation();
+  const deleteMutation = useDeleteInvitation();
 
   const handleCopyLink = () => {
     const link = `${window.location.origin}/accept-invitation?token=${invitation.token}`;

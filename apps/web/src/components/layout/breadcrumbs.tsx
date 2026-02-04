@@ -15,11 +15,23 @@ export function Breadcrumbs() {
   const matches = useMatches();
 
   const items = matches
-    .filter(match => match.loaderData?.crumb)
-    .map(({ loaderData, ...match }) => ({
-      ...match,
-      label: loaderData?.crumb,
-    }));
+    .filter(match => (match.staticData as any)?.crumb)
+    .map((match) => {
+      const staticData = match.staticData as {
+        crumb: string | ((data: any) => string);
+      };
+
+      const label = typeof staticData.crumb === "function"
+        ? staticData.crumb(match.loaderData)
+        : staticData.crumb;
+
+      return {
+        id: match.id,
+        pathname: match.pathname,
+        params: match.params,
+        label,
+      };
+    });
 
   return (
     <Breadcrumb>

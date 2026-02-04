@@ -4,9 +4,7 @@ import { Sidebar } from "./-components/sidebar";
 
 export const Route = createFileRoute("/_dashboard/settings")({
   component: RouteComponent,
-  loader: () => ({
-    crumb: "pages.settings.title",
-  }),
+  staticData: { crumb: "pages.settings.title" },
 });
 
 function RouteComponent() {

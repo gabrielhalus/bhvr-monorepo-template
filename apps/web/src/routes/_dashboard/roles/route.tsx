@@ -11,9 +11,7 @@ export const Route = createFileRoute("/_dashboard/roles")({
     }
   },
   component: RolesLayout,
-  loader: () => ({
-    crumb: "pages.roles.title",
-  }),
+  staticData: { crumb: "pages.roles.title" },
 });
 
 function RolesLayout() {

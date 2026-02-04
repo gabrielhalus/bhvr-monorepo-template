@@ -9,16 +9,8 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "~react/components
 
 export const Route = createFileRoute("/_dashboard")({
   component: DashboardLayout,
-  beforeLoad: async () => {
-    const session = await auth();
-
-    return { session };
-  },
-  loader: () => {
-    return {
-      crumb: "pages.home.title",
-    };
-  },
+  beforeLoad: async () => await auth(),
+  staticData: { crumb: "pages.home.title" },
 });
 
 function DashboardLayout() {

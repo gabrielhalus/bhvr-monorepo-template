@@ -1,12 +1,12 @@
 import { useForm } from "@tanstack/react-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2Icon, CopyIcon, MailIcon, SendIcon, ShieldIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { getInvitationsQueryOptions } from "@/queries/invitations";
-import { getAllRolesQueryOptions } from "@/queries/roles";
+import { useCreateInvitation } from "@/hooks/invitations/use-create-invitation";
+import { allRolesQueryOptions } from "@/api/roles/roles.queries";
 import { Button } from "~react/components/button";
 import { Checkbox } from "~react/components/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~react/components/dialog";
@@ -15,56 +15,19 @@ import { Input } from "~react/components/input";
 import { Label } from "~react/components/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~react/components/select";
 import { Spinner } from "~react/components/spinner";
-import { api } from "~react/lib/http";
 import { cn } from "~react/lib/utils";
 import { CreateInvitationSchema } from "~shared/schemas/api/invitations.schemas";
 
 export function InviteUserDialog() {
   const { t } = useTranslation(["common", "web"]);
-  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [invitationLink, setInvitationLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const { data: rolesData } = useQuery(getAllRolesQueryOptions);
+  const { data: rolesData } = useQuery(allRolesQueryOptions);
   const roles = rolesData?.roles ?? [];
 
-  const mutation = useMutation({
-    mutationFn: async (data: { email: string; roleId?: number; autoValidateEmail: boolean }) => {
-      const res = await api.invitations.$post({
-        json: {
-          email: data.email,
-          roleId: data.roleId,
-          autoValidateEmail: data.autoValidateEmail,
-        },
-      });
-      const responseData = await res.json();
-
-      if (!res.ok) {
-        const errorMessage = "error" in responseData
-          ? (typeof responseData.error === "string" ? responseData.error : responseData.error?.message)
-          : t("web:pages.users.invite.createError");
-        throw new Error(errorMessage || t("web:pages.users.invite.createError"));
-      }
-
-      if (!("success" in responseData) || !responseData.success || !("invitation" in responseData)) {
-        throw new Error(t("web:pages.users.invite.createError"));
-      }
-
-      return responseData.invitation;
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-    onSuccess: (invitation) => {
-      const link = `${window.location.origin}/accept-invitation?token=${invitation.token}`;
-      setInvitationLink(link);
-      queryClient.invalidateQueries(getInvitationsQueryOptions(["invitedBy"]));
-
-      navigator.clipboard.writeText(link);
-      toast.success(t("web:pages.users.actions.invitationLinkCopied"));
-    },
-  });
+  const mutation = useCreateInvitation();
 
   const form = useForm({
     validators: { onChange: CreateInvitationSchema },
@@ -74,11 +37,16 @@ export function InviteUserDialog() {
       autoValidateEmail: false,
     },
     onSubmit: async ({ value }) => {
-      mutation.mutate({
+      const response = await mutation.mutateAsync({
         email: value.email,
         roleId: value.roleId,
         autoValidateEmail: value.autoValidateEmail,
       });
+
+      const link = `${window.location.origin}/accept-invitation?token=${response.invitation.token}`;
+      setInvitationLink(link);
+      navigator.clipboard.writeText(link);
+      toast.success(t("web:pages.users.actions.invitationLinkCopied"));
     },
   });
 
@@ -193,7 +161,7 @@ export function InviteUserDialog() {
                         </FieldLabel>
                         <FieldContent>
                           <Input
-                            placeholder={t("pages.users.invite.emailPlaceholder")}
+                            placeholder={t("web:pages.users.invite.emailPlaceholder")}
                             value={field.state.value}
                             onChange={e => field.handleChange(e.target.value)}
                             onBlur={field.handleBlur}
@@ -228,7 +196,10 @@ export function InviteUserDialog() {
                               <SelectValue placeholder={t("web:pages.users.invite.rolePlaceholder")} />
                             </SelectTrigger>
                             <SelectContent>
-                              {roles.map(role => (
+                              <SelectItem value="none" className="text-muted-foreground">
+                                {t("web:pages.users.invite.rolePlaceholder")}
+                              </SelectItem>
+                              {roles.filter(role => !role.isDefault).map(role => (
                                 <SelectItem key={role.id} value={role.id.toString()}>
                                   {role.label}
                                 </SelectItem>

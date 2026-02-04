@@ -1,32 +1,17 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import type { Role as _Role } from "~shared/types/db/roles.types";
+
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
-import { getRoleByNameQueryOptions } from "@/queries/roles";
-import { getUsersQueryOptions } from "@/queries/users";
-import { authorizeQueryOptions } from "~react/queries/auth";
+import { roleQueryOptions } from "@/api/roles/roles.queries";
 
 import { Nav } from "./-components/nav";
 import { Sidebar } from "./-components/sidebar";
 
 export const Route = createFileRoute("/_dashboard/roles/$name")({
   component: RoleLayout,
-  beforeLoad: async ({ params, context }) => {
-    const { role } = await context.queryClient.ensureQueryData(getRoleByNameQueryOptions(params.name, ["members"]));
-
-    const canRead = await context.queryClient.ensureQueryData(authorizeQueryOptions("role:read", role));
-
-    if (!canRead) {
-      throw redirect({ to: "/" });
-    }
-
-    return { role };
-  },
-  loader: async ({ params, context: { queryClient } }) => {
-    const { role } = await queryClient.ensureQueryData(getRoleByNameQueryOptions(params.name, ["members"]));
-    await queryClient.ensureQueryData(getUsersQueryOptions());
-
-    return { role, crumb: role.label };
-  },
+  loader: ({ params, context }) => context.queryClient.fetchQuery(roleQueryOptions(params.name)),
+  staticData: { crumb: (data: { role?: _Role }) => data.role?.label },
 });
 
 function RoleLayout() {

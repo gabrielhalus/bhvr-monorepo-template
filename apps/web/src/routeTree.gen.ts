@@ -13,7 +13,6 @@ import { Route as AcceptInvitationRouteImport } from './routes/accept-invitation
 import { Route as DashboardRouteRouteImport } from './routes/_dashboard/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
-import { Route as DashboardProfileRouteImport } from './routes/_dashboard/profile'
 import { Route as DashboardUsersRouteRouteImport } from './routes/_dashboard/users/route'
 import { Route as DashboardSettingsRouteRouteImport } from './routes/_dashboard/settings/route'
 import { Route as DashboardRolesRouteRouteImport } from './routes/_dashboard/roles/route'
@@ -45,11 +44,6 @@ const AuthRouteRoute = AuthRouteRouteImport.update({
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
-const DashboardProfileRoute = DashboardProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardUsersRouteRoute = DashboardUsersRouteRouteImport.update({
@@ -132,7 +126,6 @@ export interface FileRoutesByFullPath {
   '/roles': typeof DashboardRolesRouteRouteWithChildren
   '/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/users': typeof DashboardUsersRouteRouteWithChildren
-  '/profile': typeof DashboardProfileRoute
   '/': typeof DashboardIndexRoute
   '/roles/$name': typeof DashboardRolesNameRouteRouteWithChildren
   '/settings/$': typeof DashboardSettingsSplatRoute
@@ -149,7 +142,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/accept-invitation': typeof AcceptInvitationRoute
   '/settings': typeof DashboardSettingsRouteRouteWithChildren
-  '/profile': typeof DashboardProfileRoute
   '/': typeof DashboardIndexRoute
   '/settings/$': typeof DashboardSettingsSplatRoute
   '/login': typeof AuthLoginIndexRoute
@@ -170,7 +162,6 @@ export interface FileRoutesById {
   '/_dashboard/roles': typeof DashboardRolesRouteRouteWithChildren
   '/_dashboard/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/_dashboard/users': typeof DashboardUsersRouteRouteWithChildren
-  '/_dashboard/profile': typeof DashboardProfileRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/roles/$name': typeof DashboardRolesNameRouteRouteWithChildren
   '/_dashboard/settings/$': typeof DashboardSettingsSplatRoute
@@ -191,7 +182,6 @@ export interface FileRouteTypes {
     | '/roles'
     | '/settings'
     | '/users'
-    | '/profile'
     | '/'
     | '/roles/$name'
     | '/settings/$'
@@ -208,7 +198,6 @@ export interface FileRouteTypes {
   to:
     | '/accept-invitation'
     | '/settings'
-    | '/profile'
     | '/'
     | '/settings/$'
     | '/login'
@@ -228,7 +217,6 @@ export interface FileRouteTypes {
     | '/_dashboard/roles'
     | '/_dashboard/settings'
     | '/_dashboard/users'
-    | '/_dashboard/profile'
     | '/_dashboard/'
     | '/_dashboard/roles/$name'
     | '/_dashboard/settings/$'
@@ -277,13 +265,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/_dashboard/profile': {
-      id: '/_dashboard/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof DashboardProfileRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/_dashboard/users': {
@@ -464,7 +445,6 @@ interface DashboardRouteRouteChildren {
   DashboardRolesRouteRoute: typeof DashboardRolesRouteRouteWithChildren
   DashboardSettingsRouteRoute: typeof DashboardSettingsRouteRouteWithChildren
   DashboardUsersRouteRoute: typeof DashboardUsersRouteRouteWithChildren
-  DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardAccountIndexRoute: typeof DashboardAccountIndexRoute
 }
@@ -473,7 +453,6 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardRolesRouteRoute: DashboardRolesRouteRouteWithChildren,
   DashboardSettingsRouteRoute: DashboardSettingsRouteRouteWithChildren,
   DashboardUsersRouteRoute: DashboardUsersRouteRouteWithChildren,
-  DashboardProfileRoute: DashboardProfileRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardAccountIndexRoute: DashboardAccountIndexRoute,
 }

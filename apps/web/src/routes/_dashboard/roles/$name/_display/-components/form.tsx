@@ -6,7 +6,6 @@ import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { getAllRolesQueryOptions } from "@/queries/roles";
 import { Button } from "~react/components/button";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
 import { Input } from "~react/components/input";
@@ -21,7 +20,6 @@ type UpdateRoleData = z.infer<typeof UpdateRoleSchema>;
 export function Form() {
   const { t } = useTranslation(["common", "web"]);
   const queryClient = useQueryClient();
-  const params = Layout.useParams();
 
   const { role } = Layout.useLoaderData();
 
@@ -42,9 +40,7 @@ export function Form() {
     },
     onSuccess: (response) => {
       toast.success(`Role successfully updated`);
-      queryClient.refetchQueries(getAllRolesQueryOptions);
-      queryClient.invalidateQueries({ queryKey: ["get-role-by-name", params.name] });
-      queryClient.invalidateQueries({ queryKey: ["get-roles-paginated"] });
+      queryClient.refetchQueries({ queryKey: ["roles"] });
       formRef.current?.reset(response.role);
     },
     onError: () => {

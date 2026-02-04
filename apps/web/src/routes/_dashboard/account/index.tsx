@@ -1,14 +1,13 @@
 import type { z } from "zod";
 
 import { useForm } from "@tanstack/react-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { CalendarIcon, MailIcon, ShieldIcon } from "lucide-react";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import { AvatarUser } from "@/components/avatar-user";
+import { useUpdateAccount } from "@/hooks/users/use-update-account";
 import { Badge } from "~react/components/badge";
 import { Button } from "~react/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
@@ -17,45 +16,26 @@ import { Input } from "~react/components/input";
 import { Separator } from "~react/components/separator";
 import { Spinner } from "~react/components/spinner";
 import { useAuth } from "~react/hooks/use-auth";
-import { api } from "~react/lib/http";
-import { authQueryOptions } from "~react/queries/auth";
 import { UpdateAccountSchema } from "~shared/schemas/api/auth.schemas";
 
 export const Route = createFileRoute("/_dashboard/account/")({
   component: Account,
-  loader: () => ({
-    crumb: "pages.account.title",
-  }),
+  staticData: { crumb: "pages.account.title" },
 });
 
 type UpdateAccountData = z.infer<typeof UpdateAccountSchema>;
 
 function Account() {
   const { t } = useTranslation(["common", "web"]);
-  const queryClient = useQueryClient();
   const { user } = useAuth();
 
   const formRef = useRef<{ reset: (values: UpdateAccountData) => void } | null>(null);
 
-  const mutation = useMutation({
-    mutationFn: async (data: UpdateAccountData) => {
-      const res = await api.auth.account.$put({ json: data });
+  const mutation = useUpdateAccount();
 
-      if (!res.ok) {
-        throw new Error("Failed to update account");
-      }
-
-      return res.json();
-    },
-    onSuccess: (response) => {
-      toast.success("Account updated successfully");
-      queryClient.invalidateQueries({ queryKey: authQueryOptions.queryKey });
-      formRef.current?.reset({ name: response.user.name, email: response.user.email });
-    },
-    onError: () => {
-      toast.error("Failed to update account");
-    },
-  });
+  const handleSuccess = (response: { user: { name: string; email: string } }) => {
+    formRef.current?.reset({ name: response.user.name, email: response.user.email });
+  };
 
   const form = useForm({
     validators: { onChange: UpdateAccountSchema },
@@ -64,19 +44,12 @@ function Account() {
       email: user.email || "",
     },
     onSubmit: async ({ value }) => {
-      mutation.mutate(value);
+      const response = await mutation.mutateAsync(value);
+      handleSuccess(response);
     },
   });
 
   formRef.current = form;
-
-  const joinedDate = user.createdAt
-    ? new Date(user.createdAt).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "";
 
   return (
     <div className="w-full p-10">
@@ -102,8 +75,7 @@ function Account() {
               <div className="flex items-center gap-1.5">
                 <CalendarIcon className="size-4" />
                 <span>
-                  Joined
-                  {joinedDate}
+                  {t("web:pages.account.joinedAt", { date: new Date(user.createdAt) })}
                 </span>
               </div>
               {user.verifiedAt && (

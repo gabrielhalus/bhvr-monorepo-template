@@ -3,17 +3,18 @@ import type { User } from "~shared/types/db/users.types";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { MailIcon, ShieldIcon, UserXIcon, UsersIcon, XIcon } from "lucide-react";
+import { MailIcon, ShieldIcon, UsersIcon, UserXIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 
+import { usersKeys } from "@/api/users/users.keys";
 import { AvatarUser } from "@/components/avatar-user";
-import { getRoleByNameQueryOptions, getRolesQueryOptions } from "@/queries/roles";
-import { getUsersQueryOptions } from "@/queries/users";
+import { rolesKeys } from "@/api/roles/roles.keys";
+import { roleQueryOptions } from "@/api/roles/roles.queries";
 import { Button } from "~react/components/button";
 import { Spinner } from "~react/components/spinner";
 import { api } from "~react/lib/http";
-import { cn } from "~react/lib/utils";
 import sayno from "~react/lib/sayno";
+import { cn } from "~react/lib/utils";
 import { authorizeQueryOptions } from "~react/queries/auth";
 
 import { Route as Layout } from "../../route";
@@ -21,7 +22,7 @@ import { Route as Layout } from "../../route";
 export function RoleMembersList({ search }: { search: string }) {
   const { role: initialRole } = Layout.useLoaderData();
   const { data, isPending } = useQuery({
-    ...getRoleByNameQueryOptions(initialRole.name, ["members"]),
+    ...roleQueryOptions(initialRole.name),
     initialData: {
       success: true,
       role: initialRole,
@@ -46,17 +47,21 @@ export function RoleMembersList({ search }: { search: string }) {
     );
   }
 
-  if (!filteredMembers || filteredMembers.length === 0) {
+  if (!filteredMembers || !filteredMembers.length) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted">
-          {search ? (
-            <UserXIcon className="size-6 text-muted-foreground" />
-          ) : role.isDefault ? (
-            <ShieldIcon className="size-6 text-muted-foreground" />
-          ) : (
-            <UsersIcon className="size-6 text-muted-foreground" />
-          )}
+          {search
+            ? (
+                <UserXIcon className="size-6 text-muted-foreground" />
+              )
+            : role.isDefault
+              ? (
+                  <ShieldIcon className="size-6 text-muted-foreground" />
+                )
+              : (
+                  <UsersIcon className="size-6 text-muted-foreground" />
+                )}
         </div>
         <p className="text-sm font-medium">
           {search ? "No members found" : "No members yet"}
@@ -99,7 +104,6 @@ function RoleMemberItem({
 
   const { data: canDelete } = useQuery(authorizeQueryOptions("role:delete", role));
 
-  // Default role is soft-assigned to all users and cannot be removed
   const isDefaultRole = role.isDefault;
 
   const mutation = useMutation({
@@ -109,13 +113,15 @@ function RoleMemberItem({
       if (!res.ok) {
         throw new Error("Failed to remove user role");
       }
+
+      return userId;
     },
     onError: () => toast.error("Failed to remove user role"),
-    onSuccess: () => {
+    onSuccess: (userId: string) => {
       toast.success("User role removed successfully");
-      queryClient.invalidateQueries(getRolesQueryOptions(["members"]));
-      queryClient.invalidateQueries(getRoleByNameQueryOptions(role.name, ["members"]));
-      queryClient.invalidateQueries(getUsersQueryOptions(["roles"]));
+      queryClient.invalidateQueries({ queryKey: rolesKeys.all });
+      queryClient.invalidateQueries({ queryKey: rolesKeys.byName(role.name) });
+      queryClient.invalidateQueries({ queryKey: usersKeys.relations([userId], ["roles"]) });
     },
   });
 
