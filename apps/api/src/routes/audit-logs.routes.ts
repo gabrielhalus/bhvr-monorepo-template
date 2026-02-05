@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { requirePermissionFactory } from "@/middlewares/access-control";
+import { auditList } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
 import { getAuditLogsPaginated } from "~shared/queries/audit-logs.queries";
@@ -28,7 +29,7 @@ export const auditLogsRoutes = new Hono()
    * @access protected
    * @permission auditLog:list
    */
-  .get("/", validationMiddleware("query", AuditLogsQuerySchema), requirePermissionFactory("auditLog:list"), async (c) => {
+  .get("/", validationMiddleware("query", AuditLogsQuerySchema), requirePermissionFactory("auditLog:list"), auditList("auditLog:list", "auditLog"), async (c) => {
     const { page, limit, sortBy, sortOrder, search, action, actorId, targetId, targetType, includeImpersonated } = c.req.valid("query");
 
     try {

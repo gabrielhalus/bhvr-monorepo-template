@@ -3,13 +3,14 @@ import type { RoleRelations } from "~shared/types/db/roles.types";
 import { Hono } from "hono";
 
 import { getClientInfo } from "@/helpers/get-client-info";
+import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { logRoleDelete, logRoleMembersAdd, logRoleMembersRemove, logRoleUpdate } from "~shared/queries/audit-logs.queries";
-import { deleteRole, getRole, getRoleByName, getRolesPaginated, roleRelationCountLoaders, roleRelationLoaders, updateRole } from "~shared/queries/roles.queries";
+import { logRoleCreate, logRoleDelete, logRoleMembersAdd, logRoleMembersRemove, logRoleUpdate } from "~shared/queries/audit-logs.queries";
+import { createRole, deleteRole, getRole, getRoleByName, getRolesPaginated, roleRelationCountLoaders, roleRelationLoaders, updateRole } from "~shared/queries/roles.queries";
 import { createUserRole, deleteUserRole } from "~shared/queries/user-roles.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
-import { RoleRelationsQuerySchema, UpdateRoleSchema } from "~shared/schemas/api/roles.schemas";
+import { CreateRoleSchema, RoleRelationsQuerySchema, UpdateRoleSchema } from "~shared/schemas/api/roles.schemas";
 import { AssignRoleMembersSchema, RemoveRoleMembersSchema } from "~shared/schemas/api/user-roles.schemas";
 
 import { requirePermissionFactory } from "../middlewares/access-control";
@@ -27,7 +28,7 @@ export const rolesRoutes = new Hono()
    * @access protected
    * @permission role:list
    */
-  .get("/", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("role:list"), async (c) => {
+  .get("/", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("role:list"), auditList("role:list", "role"), async (c) => {
     const { page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
     try {
@@ -112,6 +113,40 @@ export const rolesRoutes = new Hono()
   })
 
   /**
+   * Create a new role
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response with the created role data
+   * @throws {400} If role name already exists
+   * @throws {500} If an error occurs while creating the role
+   * @access protected
+   * @permission role:create
+   */
+  .post("/", requirePermissionFactory("role:create"), validationMiddleware("json", CreateRoleSchema), async (c) => {
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
+    const data = c.req.valid("json");
+
+    try {
+      const role = await createRole(data);
+
+      // Audit log: role creation
+      await logRoleCreate(String(role.id), {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      }, role.name);
+
+      return c.json({ success: true as const, role });
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("UNIQUE constraint failed")) {
+        return c.json({ success: false as const, error: "Role name already exists" }, 400);
+      }
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
    * Get a specific role by ID with optional relation includes
    *
    * @param c - The Hono context object with session context
@@ -121,7 +156,7 @@ export const rolesRoutes = new Hono()
    * @access protected
    * @permission role:read
    */
-  .get("/:id{[0-9]+}", requirePermissionFactory("role:read"), async (c) => {
+  .get("/:id{[0-9]+}", requirePermissionFactory("role:read"), auditRead("role:read", "role"), async (c) => {
     const id = Number(c.req.param("id"));
 
     try {

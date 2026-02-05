@@ -7,6 +7,7 @@ import { z } from "zod";
 import { getClientInfo } from "@/helpers/get-client-info";
 import { generateRandomPassword } from "@/helpers/generate-random-password";
 import { requirePermissionFactory } from "@/middlewares/access-control";
+import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
 import { logPasswordReset, logUserDelete, logUserUpdate } from "~shared/queries/audit-logs.queries";
@@ -47,7 +48,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:list
    */
-  .get("/", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("user:list"), async (c) => {
+  .get("/", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("user:list"), auditList("user:list", "user"), async (c) => {
     const { page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
     try {
@@ -141,7 +142,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:read (resource-specific)
    */
-  .get("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), async (c) => {
+  .get("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), auditRead("user:read", "user"), async (c) => {
     const id = c.req.param("id");
 
     try {

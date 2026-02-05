@@ -9,6 +9,7 @@ import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { validationMiddleware } from "@/middlewares/validation";
 import { isAuthorized } from "~shared/auth";
 import {
+  logAccountPasswordChange,
   logAccountUpdate,
   logImpersonationStart,
   logImpersonationStop,
@@ -20,8 +21,8 @@ import {
 import { getDefaultRole } from "~shared/queries/roles.queries";
 import { deleteToken, insertToken } from "~shared/queries/tokens.queries";
 import { createUserRole } from "~shared/queries/user-roles.queries";
-import { createUser, getUser, signIn, updateUser } from "~shared/queries/users.queries";
-import { isAuthorizedSchema, LoginSchema, RegisterSchema, UpdateAccountSchema } from "~shared/schemas/api/auth.schemas";
+import { createUser, getUser, signIn, updateUser, updateUserPassword } from "~shared/queries/users.queries";
+import { ChangePasswordSchema, isAuthorizedSchema, LoginSchema, RegisterSchema, UpdateAccountSchema } from "~shared/schemas/api/auth.schemas";
 
 export const authRoutes = new Hono()
   /**
@@ -208,6 +209,49 @@ export const authRoutes = new Hono()
       }, data);
 
       return c.json({ success: true as const, user });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Change the authenticated user's password
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response indicating success or failure of password change
+   * @throws {400} If the current password is incorrect
+   * @throws {500} If an error occurs while changing the password
+   * @access protected
+   */
+  .put("/account/password", validationMiddleware("json", ChangePasswordSchema), async (c) => {
+    const sessionContext = c.var.sessionContext;
+    const { currentPassword, newPassword } = c.req.valid("json");
+    const clientInfo = getClientInfo(c);
+
+    try {
+      // Verify current password
+      const user = await getUser(sessionContext.user.id);
+      if (!user || !user.password) {
+        return c.json({ success: false as const, error: "User not found" }, 404);
+      }
+
+      const isValidPassword = await password.verify(currentPassword, user.password);
+      if (!isValidPassword) {
+        return c.json({ success: false as const, error: "Current password is incorrect" }, 400);
+      }
+
+      // Hash and update new password
+      const hashedPassword = await password.hash(newPassword);
+      await updateUserPassword(sessionContext.user.id, hashedPassword);
+
+      // Audit log: password change (tracks impersonation if active)
+      await logAccountPasswordChange({
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
+      return c.json({ success: true as const });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }

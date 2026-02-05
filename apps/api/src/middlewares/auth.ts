@@ -4,9 +4,11 @@ import type { AccessToken } from "~shared/types/db/tokens.types";
 import { getCookie, setCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
 
+import { getClientInfo } from "@/helpers/get-client-info";
 import { env } from "@/lib/env";
 import { createAccessToken, getCookieSettings } from "@/lib/jwt";
 import { factory } from "@/utils/hono";
+import { logTokenRefresh } from "~shared/queries/audit-logs.queries";
 import { deleteToken, getToken } from "~shared/queries/tokens.queries";
 import { getUser } from "~shared/queries/users.queries";
 import { AccessTokenSchema, RefreshTokenSchema } from "~shared/schemas/api/tokens.schemas";
@@ -87,6 +89,12 @@ async function attemptTokenRefresh(c: AppContext): Promise<AccessToken | null> {
 
     const newVerified = await verify(newAccessToken, env.JWT_SECRET);
     const newDecoded = AccessTokenSchema.parse(newVerified);
+
+    // Audit log: token refresh
+    const clientInfo = getClientInfo(c);
+    logTokenRefresh(decoded.sub, clientInfo).catch(() => {
+      // Silently fail audit logging to not break auth flow
+    });
 
     return newDecoded;
   } catch {

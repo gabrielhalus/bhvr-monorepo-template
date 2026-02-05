@@ -8,6 +8,7 @@ import { randomBytes } from "node:crypto";
 import { getClientInfo } from "@/helpers/get-client-info";
 import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN_EXPIRATION_SECONDS } from "@/lib/jwt";
 import { requirePermissionFactory } from "@/middlewares/access-control";
+import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
 import { logInvitationAccept, logInvitationCreate, logInvitationDelete, logInvitationRevoke } from "~shared/queries/audit-logs.queries";
@@ -163,7 +164,7 @@ export const invitationsRoutes = new Hono()
    * @access protected
    * @permission invitation:list
    */
-  .get("/", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("invitation:list"), async (c) => {
+  .get("/", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("invitation:list"), auditList("invitation:list", "invitation"), async (c) => {
     const { page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
     try {
@@ -220,7 +221,7 @@ export const invitationsRoutes = new Hono()
    * @access protected
    * @permission invitation:read (resource-specific)
    */
-  .get("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), async (c) => {
+  .get("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), auditRead("invitation:read", "invitation"), async (c) => {
     const id = c.req.param("id");
 
     try {
