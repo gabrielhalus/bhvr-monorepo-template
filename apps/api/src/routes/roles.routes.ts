@@ -6,11 +6,11 @@ import { getClientInfo } from "@/helpers/get-client-info";
 import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { logRoleCreate, logRoleDelete, logRoleMembersAdd, logRoleMembersRemove, logRoleUpdate } from "~shared/queries/audit-logs.queries";
-import { createRole, deleteRole, getRole, getRoleByName, getRolesPaginated, roleRelationCountLoaders, roleRelationLoaders, updateRole } from "~shared/queries/roles.queries";
+import { logRoleCreate, logRoleDelete, logRoleMembersAdd, logRoleMembersRemove } from "~shared/queries/audit-logs.queries";
+import { createRole, deleteRole, getRole, getRoleByName, getRolesPaginated, roleRelationCountLoaders, roleRelationLoaders } from "~shared/queries/roles.queries";
 import { createUserRole, deleteUserRole } from "~shared/queries/user-roles.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
-import { CreateRoleSchema, RoleRelationsQuerySchema, UpdateRoleSchema } from "~shared/schemas/api/roles.schemas";
+import { CreateRoleSchema, RoleRelationsQuerySchema } from "~shared/schemas/api/roles.schemas";
 import { AssignRoleMembersSchema, RemoveRoleMembersSchema } from "~shared/schemas/api/user-roles.schemas";
 
 import { requirePermissionFactory } from "../middlewares/access-control";
@@ -265,38 +265,6 @@ export const rolesRoutes = new Hono()
       if (!role) {
         return c.json({ success: false as const, error: "Role not found" }, 404);
       }
-
-      return c.json({ success: true as const, role });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
-  })
-
-  /**
-   * Update a specific role by ID
-   *
-   * @param c - The Hono context object with session context
-   * @returns JSON response with the updated role data
-   * @throws {500} If an error occurs while updating the role
-   * @access protected
-   * @permission role:update (resource-specific)
-   */
-  .put("/:id{[0-9]+}", requirePermissionFactory("role:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateRoleSchema), async (c) => {
-    const sessionContext = c.var.sessionContext;
-    const clientInfo = getClientInfo(c);
-
-    try {
-      const id = Number(c.req.param("id"));
-      const data = c.req.valid("json");
-
-      const role = await updateRole(id, data);
-
-      // Audit log: role update (tracks impersonation if active)
-      await logRoleUpdate(String(id), {
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      }, data);
 
       return c.json({ success: true as const, role });
     } catch (error) {

@@ -14,15 +14,17 @@ import { validationMiddleware } from "@/middlewares/validation";
 import { logInvitationAccept, logInvitationCreate, logInvitationDelete, logInvitationRevoke } from "~shared/queries/audit-logs.queries";
 import {
   createInvitation,
+  createInvitationRoles,
   deleteInvitation,
   getInvitation,
   getInvitationByToken,
+  getInvitationRoleIds,
   getInvitationsPaginated,
   getPendingInvitationByEmail,
   invitationRelationLoaders,
   updateInvitation,
 } from "~shared/queries/invitations.queries";
-import { getDefaultRole, getRole } from "~shared/queries/roles.queries";
+import { getDefaultRole } from "~shared/queries/roles.queries";
 import { insertToken } from "~shared/queries/tokens.queries";
 import { createUserRole } from "~shared/queries/user-roles.queries";
 import { createUser, emailExists } from "~shared/queries/users.queries";
@@ -72,10 +74,11 @@ export const invitationsRoutes = new Hono()
         verifiedAt: invitation.autoValidateEmail ? new Date().toISOString() : null,
       });
 
-      if (invitation.roleId) {
-        const role = await getRole(invitation.roleId);
-        if (role) {
-          await createUserRole({ userId: insertedUser.id, roleId: role.id });
+      const invitationRoleIds = await getInvitationRoleIds(invitation.id);
+
+      if (invitationRoleIds.length > 0) {
+        for (const roleId of invitationRoleIds) {
+          await createUserRole({ userId: insertedUser.id, roleId });
         }
       } else {
         const defaultRole = await getDefaultRole();
@@ -285,7 +288,7 @@ export const invitationsRoutes = new Hono()
    * @permission invitation:create
    */
   .post("/", validationMiddleware("json", CreateInvitationSchema), requirePermissionFactory("invitation:create"), async (c) => {
-    const { email, roleId, autoValidateEmail } = c.req.valid("json");
+    const { email, roleIds, autoValidateEmail } = c.req.valid("json");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
@@ -307,9 +310,12 @@ export const invitationsRoutes = new Hono()
         token,
         expiresAt,
         invitedById: sessionContext.user.id,
-        roleId: roleId ?? null,
         autoValidateEmail: autoValidateEmail ?? false,
       });
+
+      if (roleIds && roleIds.length > 0) {
+        await createInvitationRoles(invitation.id, roleIds);
+      }
 
       // Audit log: invitation created (tracks impersonation if active)
       await logInvitationCreate(invitation.id, email, {

@@ -4,16 +4,17 @@ import { password } from "bun";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { getClientInfo } from "@/helpers/get-client-info";
 import { generateRandomPassword } from "@/helpers/generate-random-password";
+import { getClientInfo } from "@/helpers/get-client-info";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { logPasswordReset, logUserDelete, logUserUpdate } from "~shared/queries/audit-logs.queries";
+import { logPasswordReset, logUserDelete, logUserRolesUpdate, logUserUpdate } from "~shared/queries/audit-logs.queries";
+import { getUserRoleIds, updateUserRoles } from "~shared/queries/user-roles.queries";
 import { deleteUser, emailExists, getUser, getUsersPaginated, updateUser, updateUserPassword, userRelationCountLoaders, userRelationLoaders } from "~shared/queries/users.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
-import { UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
+import { UpdateUserRolesSchema, UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
 import { UpdateUserSchema } from "~shared/schemas/db/users.schemas";
 
 export const usersRoutes = new Hono()
@@ -297,6 +298,43 @@ export const usersRoutes = new Hono()
       });
 
       return c.json({ success: true as const, password: newPassword });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Update a user's roles
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response with the updated roles
+   * @throws {404} If the user is not found
+   * @throws {500} If an error occurs while updating the roles
+   * @access protected
+   * @permission userRole:create
+   */
+  .put("/:id{^[a-zA-Z0-9-]{21}$}/roles", requirePermissionFactory("userRole:create"), validationMiddleware("json", UpdateUserRolesSchema), async (c) => {
+    const id = c.req.param("id");
+    const { roleIds } = c.req.valid("json");
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
+
+    try {
+      const user = await getUser(id);
+      if (!user) {
+        return c.json({ success: false as const, error: "User not found" }, 404);
+      }
+
+      const previousRoleIds = await getUserRoleIds(id);
+      await updateUserRoles(id, roleIds);
+
+      await logUserRolesUpdate(id, roleIds, previousRoleIds, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
+      return c.json({ success: true as const, roleIds });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
