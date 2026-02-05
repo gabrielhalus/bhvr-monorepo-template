@@ -1,19 +1,18 @@
 import { useForm } from "@tanstack/react-form";
-import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2Icon, CopyIcon, MailIcon, SendIcon, ShieldIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { useCreateInvitation } from "@/hooks/invitations/use-create-invitation";
-import { allRolesQueryOptions } from "@/api/roles/roles.queries";
+import { useRoles } from "@/hooks/roles/use-roles";
 import { Button } from "~react/components/button";
 import { Checkbox } from "~react/components/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~react/components/dialog";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
 import { Input } from "~react/components/input";
 import { Label } from "~react/components/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~react/components/select";
+import { MultiSelect } from "~react/components/multi-select";
 import { Spinner } from "~react/components/spinner";
 import { cn } from "~react/lib/utils";
 import { CreateInvitationSchema } from "~shared/schemas/api/invitations.schemas";
@@ -24,8 +23,9 @@ export function InviteUserDialog() {
   const [invitationLink, setInvitationLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const { data: rolesData } = useQuery(allRolesQueryOptions);
+  const { data: rolesData } = useRoles();
   const roles = rolesData?.roles ?? [];
+  const nonDefaultRoles = roles.filter(role => !role.isDefault);
 
   const mutation = useCreateInvitation();
 
@@ -33,13 +33,13 @@ export function InviteUserDialog() {
     validators: { onChange: CreateInvitationSchema },
     defaultValues: {
       email: "",
-      roleId: undefined as number | undefined,
+      roleIds: [] as number[],
       autoValidateEmail: false,
     },
     onSubmit: async ({ value }) => {
       const response = await mutation.mutateAsync({
         email: value.email,
-        roleId: value.roleId,
+        roleIds: value.roleIds.length > 0 ? value.roleIds : undefined,
         autoValidateEmail: value.autoValidateEmail,
       });
 
@@ -67,6 +67,11 @@ export function InviteUserDialog() {
       setTimeout(() => setCopied(false), 2000);
     }
   };
+
+  const roleOptions = nonDefaultRoles.map(role => ({
+    value: role.id,
+    label: t(`web:pages.roles.names.${role.name}`, { defaultValue: role.name }),
+  }));
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -178,34 +183,28 @@ export function InviteUserDialog() {
                   />
 
                   <form.Field
-                    name="roleId"
+                    name="roleIds"
                     children={field => (
                       <Field>
                         <FieldLabel className="flex items-center gap-2">
                           <ShieldIcon className="size-4 text-muted-foreground" />
-                          {t("web:pages.users.invite.roleLabel")}
+                          {t("web:pages.users.invite.rolesLabel")}
                         </FieldLabel>
                         <FieldContent>
-                          <Select
-                            value={field.state.value?.toString() ?? ""}
-                            onValueChange={(value) => {
-                              field.handleChange(value ? Number(value) : undefined);
-                            }}
-                          >
-                            <SelectTrigger className="h-11 w-full">
-                              <SelectValue placeholder={t("web:pages.users.invite.rolePlaceholder")} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none" className="text-muted-foreground">
-                                {t("web:pages.users.invite.rolePlaceholder")}
-                              </SelectItem>
-                              {roles.filter(role => !role.isDefault).map(role => (
-                                <SelectItem key={role.id} value={role.id.toString()}>
-                                  {role.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          {nonDefaultRoles.length > 0
+                            ? (
+                                <MultiSelect
+                                  options={roleOptions}
+                                  value={field.state.value}
+                                  onChange={field.handleChange}
+                                  placeholder={t("web:pages.users.invite.rolesPlaceholder")}
+                                />
+                              )
+                            : (
+                                <p className="text-sm text-muted-foreground">
+                                  {t("web:pages.users.invite.noRolesSelected")}
+                                </p>
+                              )}
                         </FieldContent>
                       </Field>
                     )}

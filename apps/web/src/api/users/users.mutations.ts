@@ -84,6 +84,19 @@ async function stopImpersonation() {
   return res.json();
 }
 
+async function updateUserRoles(id: string, roleIds: number[]) {
+  const res = await api.users[":id{^[a-zA-Z0-9-]{21}$}"].roles.$put({
+    param: { id },
+    json: { roleIds },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to update user roles");
+  }
+
+  return res.json();
+}
+
 // ============================================================================
 // Mutation Options
 // ============================================================================
@@ -137,6 +150,16 @@ export function stopImpersonationMutationOptions(queryClient: QueryClient) {
     mutationFn: () => stopImpersonation(),
     onSuccess: () => {
       queryClient.refetchQueries();
+    },
+  };
+}
+
+export function updateUserRolesMutationOptions(queryClient: QueryClient) {
+  return {
+    mutationFn: ({ id, roleIds }: { id: string; roleIds: number[] }) => updateUserRoles(id, roleIds),
+    onSuccess: (_data: { success: true }, variables: { id: string; roleIds: number[] }) => {
+      queryClient.invalidateQueries({ queryKey: usersKeys.byId(variables.id) });
+      queryClient.invalidateQueries({ queryKey: usersKeys.paginated });
     },
   };
 }

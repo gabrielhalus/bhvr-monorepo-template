@@ -12,6 +12,7 @@ import { Button } from "~react/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
 
 import { UserInformationsForm } from "./-components/user-informations-form";
+import { UserRolesForm } from "./-components/user-roles-form";
 import { UserSecurityActions } from "./-components/user-security-actions";
 
 export const Route = createFileRoute("/_dashboard/users/$userId/")({
@@ -69,7 +70,7 @@ function User() {
                 <div className="flex flex-wrap gap-1">
                   {userQuery.data?.user?.roles.map(role => (
                     <Badge key={role.id} variant={role.isDefault ? "outline" : "secondary"}>
-                      {role.label}
+                      {t(`web:pages.roles.names.${role.name}`, { defaultValue: role.name })}
                     </Badge>
                   ))}
                 </div>
@@ -79,6 +80,7 @@ function User() {
         </Card>
 
         <UserInformationsForm userId={userId} />
+        <UserRolesForm userId={userId} />
         <UserSecurityActions userId={userId} />
       </div>
     </div>

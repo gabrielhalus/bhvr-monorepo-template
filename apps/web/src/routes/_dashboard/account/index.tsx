@@ -56,7 +56,7 @@ function Account() {
                 <div className="flex flex-wrap gap-1">
                   {user.roles.map(role => (
                     <Badge key={role.id} variant={role.isDefault ? "outline" : "secondary"}>
-                      {role.label}
+                      {t(`web:pages.roles.names.${role.name}`, { defaultValue: role.name })}
                     </Badge>
                   ))}
                 </div>

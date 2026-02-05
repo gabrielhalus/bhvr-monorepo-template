@@ -50,7 +50,7 @@ export function getUserColumns(t: TFunction): ColumnDef<UserWithRelations<["role
           <div className="flex flex-wrap gap-1">
             {roles.slice(0, 3).map(role => (
               <Badge key={role.id} variant={role.isDefault ? "outline" : "secondary"} className="font-normal">
-                {role.label}
+                {i18n.t(`web:pages.roles.names.${role.name}`, { defaultValue: role.name })}
               </Badge>
             ))}
             {roles.length > 3 && (

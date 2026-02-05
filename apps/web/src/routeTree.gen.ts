@@ -15,19 +15,13 @@ import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
 import { Route as DashboardUsersRouteRouteImport } from './routes/_dashboard/users/route'
 import { Route as DashboardSettingsRouteRouteImport } from './routes/_dashboard/settings/route'
-import { Route as DashboardRolesRouteRouteImport } from './routes/_dashboard/roles/route'
 import { Route as DashboardLogsRouteRouteImport } from './routes/_dashboard/logs/route'
 import { Route as DashboardUsersIndexRouteImport } from './routes/_dashboard/users/index'
-import { Route as DashboardRolesIndexRouteImport } from './routes/_dashboard/roles/index'
 import { Route as DashboardAccountIndexRouteImport } from './routes/_dashboard/account/index'
 import { Route as AuthRegisterIndexRouteImport } from './routes/_auth/register/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as DashboardSettingsSplatRouteImport } from './routes/_dashboard/settings/$'
-import { Route as DashboardRolesNameRouteRouteImport } from './routes/_dashboard/roles/$name/route'
 import { Route as DashboardUsersUserIdIndexRouteImport } from './routes/_dashboard/users/$userId/index'
-import { Route as DashboardRolesNamePermissionsIndexRouteImport } from './routes/_dashboard/roles/$name/permissions/index'
-import { Route as DashboardRolesNameMembersIndexRouteImport } from './routes/_dashboard/roles/$name/members/index'
-import { Route as DashboardRolesNameDisplayIndexRouteImport } from './routes/_dashboard/roles/$name/_display/index'
 
 const AcceptInvitationRoute = AcceptInvitationRouteImport.update({
   id: '/accept-invitation',
@@ -57,11 +51,6 @@ const DashboardSettingsRouteRoute = DashboardSettingsRouteRouteImport.update({
   path: '/settings',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardRolesRouteRoute = DashboardRolesRouteRouteImport.update({
-  id: '/roles',
-  path: '/roles',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
 const DashboardLogsRouteRoute = DashboardLogsRouteRouteImport.update({
   id: '/logs',
   path: '/logs',
@@ -71,11 +60,6 @@ const DashboardUsersIndexRoute = DashboardUsersIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardUsersRouteRoute,
-} as any)
-const DashboardRolesIndexRoute = DashboardRolesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardRolesRouteRoute,
 } as any)
 const DashboardAccountIndexRoute = DashboardAccountIndexRouteImport.update({
   id: '/account/',
@@ -97,54 +81,25 @@ const DashboardSettingsSplatRoute = DashboardSettingsSplatRouteImport.update({
   path: '/$',
   getParentRoute: () => DashboardSettingsRouteRoute,
 } as any)
-const DashboardRolesNameRouteRoute = DashboardRolesNameRouteRouteImport.update({
-  id: '/$name',
-  path: '/$name',
-  getParentRoute: () => DashboardRolesRouteRoute,
-} as any)
 const DashboardUsersUserIdIndexRoute =
   DashboardUsersUserIdIndexRouteImport.update({
     id: '/$userId/',
     path: '/$userId/',
     getParentRoute: () => DashboardUsersRouteRoute,
   } as any)
-const DashboardRolesNamePermissionsIndexRoute =
-  DashboardRolesNamePermissionsIndexRouteImport.update({
-    id: '/permissions/',
-    path: '/permissions/',
-    getParentRoute: () => DashboardRolesNameRouteRoute,
-  } as any)
-const DashboardRolesNameMembersIndexRoute =
-  DashboardRolesNameMembersIndexRouteImport.update({
-    id: '/members/',
-    path: '/members/',
-    getParentRoute: () => DashboardRolesNameRouteRoute,
-  } as any)
-const DashboardRolesNameDisplayIndexRoute =
-  DashboardRolesNameDisplayIndexRouteImport.update({
-    id: '/_display/',
-    path: '/',
-    getParentRoute: () => DashboardRolesNameRouteRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/accept-invitation': typeof AcceptInvitationRoute
   '/logs': typeof DashboardLogsRouteRoute
-  '/roles': typeof DashboardRolesRouteRouteWithChildren
   '/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/users': typeof DashboardUsersRouteRouteWithChildren
   '/': typeof DashboardIndexRoute
-  '/roles/$name': typeof DashboardRolesNameRouteRouteWithChildren
   '/settings/$': typeof DashboardSettingsSplatRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
   '/account': typeof DashboardAccountIndexRoute
-  '/roles/': typeof DashboardRolesIndexRoute
   '/users/': typeof DashboardUsersIndexRoute
   '/users/$userId': typeof DashboardUsersUserIdIndexRoute
-  '/roles/$name/': typeof DashboardRolesNameDisplayIndexRoute
-  '/roles/$name/members': typeof DashboardRolesNameMembersIndexRoute
-  '/roles/$name/permissions': typeof DashboardRolesNamePermissionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/accept-invitation': typeof AcceptInvitationRoute
@@ -155,12 +110,8 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
   '/account': typeof DashboardAccountIndexRoute
-  '/roles': typeof DashboardRolesIndexRoute
   '/users': typeof DashboardUsersIndexRoute
   '/users/$userId': typeof DashboardUsersUserIdIndexRoute
-  '/roles/$name': typeof DashboardRolesNameDisplayIndexRoute
-  '/roles/$name/members': typeof DashboardRolesNameMembersIndexRoute
-  '/roles/$name/permissions': typeof DashboardRolesNamePermissionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -168,42 +119,30 @@ export interface FileRoutesById {
   '/_dashboard': typeof DashboardRouteRouteWithChildren
   '/accept-invitation': typeof AcceptInvitationRoute
   '/_dashboard/logs': typeof DashboardLogsRouteRoute
-  '/_dashboard/roles': typeof DashboardRolesRouteRouteWithChildren
   '/_dashboard/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/_dashboard/users': typeof DashboardUsersRouteRouteWithChildren
   '/_dashboard/': typeof DashboardIndexRoute
-  '/_dashboard/roles/$name': typeof DashboardRolesNameRouteRouteWithChildren
   '/_dashboard/settings/$': typeof DashboardSettingsSplatRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/register/': typeof AuthRegisterIndexRoute
   '/_dashboard/account/': typeof DashboardAccountIndexRoute
-  '/_dashboard/roles/': typeof DashboardRolesIndexRoute
   '/_dashboard/users/': typeof DashboardUsersIndexRoute
   '/_dashboard/users/$userId/': typeof DashboardUsersUserIdIndexRoute
-  '/_dashboard/roles/$name/_display/': typeof DashboardRolesNameDisplayIndexRoute
-  '/_dashboard/roles/$name/members/': typeof DashboardRolesNameMembersIndexRoute
-  '/_dashboard/roles/$name/permissions/': typeof DashboardRolesNamePermissionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/accept-invitation'
     | '/logs'
-    | '/roles'
     | '/settings'
     | '/users'
     | '/'
-    | '/roles/$name'
     | '/settings/$'
     | '/login'
     | '/register'
     | '/account'
-    | '/roles/'
     | '/users/'
     | '/users/$userId'
-    | '/roles/$name/'
-    | '/roles/$name/members'
-    | '/roles/$name/permissions'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/accept-invitation'
@@ -214,33 +153,23 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/account'
-    | '/roles'
     | '/users'
     | '/users/$userId'
-    | '/roles/$name'
-    | '/roles/$name/members'
-    | '/roles/$name/permissions'
   id:
     | '__root__'
     | '/_auth'
     | '/_dashboard'
     | '/accept-invitation'
     | '/_dashboard/logs'
-    | '/_dashboard/roles'
     | '/_dashboard/settings'
     | '/_dashboard/users'
     | '/_dashboard/'
-    | '/_dashboard/roles/$name'
     | '/_dashboard/settings/$'
     | '/_auth/login/'
     | '/_auth/register/'
     | '/_dashboard/account/'
-    | '/_dashboard/roles/'
     | '/_dashboard/users/'
     | '/_dashboard/users/$userId/'
-    | '/_dashboard/roles/$name/_display/'
-    | '/_dashboard/roles/$name/members/'
-    | '/_dashboard/roles/$name/permissions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -293,13 +222,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/_dashboard/roles': {
-      id: '/_dashboard/roles'
-      path: '/roles'
-      fullPath: '/roles'
-      preLoaderRoute: typeof DashboardRolesRouteRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
     '/_dashboard/logs': {
       id: '/_dashboard/logs'
       path: '/logs'
@@ -313,13 +235,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/users/'
       preLoaderRoute: typeof DashboardUsersIndexRouteImport
       parentRoute: typeof DashboardUsersRouteRoute
-    }
-    '/_dashboard/roles/': {
-      id: '/_dashboard/roles/'
-      path: '/'
-      fullPath: '/roles/'
-      preLoaderRoute: typeof DashboardRolesIndexRouteImport
-      parentRoute: typeof DashboardRolesRouteRoute
     }
     '/_dashboard/account/': {
       id: '/_dashboard/account/'
@@ -349,40 +264,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsSplatRouteImport
       parentRoute: typeof DashboardSettingsRouteRoute
     }
-    '/_dashboard/roles/$name': {
-      id: '/_dashboard/roles/$name'
-      path: '/$name'
-      fullPath: '/roles/$name'
-      preLoaderRoute: typeof DashboardRolesNameRouteRouteImport
-      parentRoute: typeof DashboardRolesRouteRoute
-    }
     '/_dashboard/users/$userId/': {
       id: '/_dashboard/users/$userId/'
       path: '/$userId'
       fullPath: '/users/$userId'
       preLoaderRoute: typeof DashboardUsersUserIdIndexRouteImport
       parentRoute: typeof DashboardUsersRouteRoute
-    }
-    '/_dashboard/roles/$name/permissions/': {
-      id: '/_dashboard/roles/$name/permissions/'
-      path: '/permissions'
-      fullPath: '/roles/$name/permissions'
-      preLoaderRoute: typeof DashboardRolesNamePermissionsIndexRouteImport
-      parentRoute: typeof DashboardRolesNameRouteRoute
-    }
-    '/_dashboard/roles/$name/members/': {
-      id: '/_dashboard/roles/$name/members/'
-      path: '/members'
-      fullPath: '/roles/$name/members'
-      preLoaderRoute: typeof DashboardRolesNameMembersIndexRouteImport
-      parentRoute: typeof DashboardRolesNameRouteRoute
-    }
-    '/_dashboard/roles/$name/_display/': {
-      id: '/_dashboard/roles/$name/_display/'
-      path: '/'
-      fullPath: '/roles/$name/'
-      preLoaderRoute: typeof DashboardRolesNameDisplayIndexRouteImport
-      parentRoute: typeof DashboardRolesNameRouteRoute
     }
   }
 }
@@ -400,38 +287,6 @@ const AuthRouteRouteChildren: AuthRouteRouteChildren = {
 const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
-
-interface DashboardRolesNameRouteRouteChildren {
-  DashboardRolesNameDisplayIndexRoute: typeof DashboardRolesNameDisplayIndexRoute
-  DashboardRolesNameMembersIndexRoute: typeof DashboardRolesNameMembersIndexRoute
-  DashboardRolesNamePermissionsIndexRoute: typeof DashboardRolesNamePermissionsIndexRoute
-}
-
-const DashboardRolesNameRouteRouteChildren: DashboardRolesNameRouteRouteChildren =
-  {
-    DashboardRolesNameDisplayIndexRoute: DashboardRolesNameDisplayIndexRoute,
-    DashboardRolesNameMembersIndexRoute: DashboardRolesNameMembersIndexRoute,
-    DashboardRolesNamePermissionsIndexRoute:
-      DashboardRolesNamePermissionsIndexRoute,
-  }
-
-const DashboardRolesNameRouteRouteWithChildren =
-  DashboardRolesNameRouteRoute._addFileChildren(
-    DashboardRolesNameRouteRouteChildren,
-  )
-
-interface DashboardRolesRouteRouteChildren {
-  DashboardRolesNameRouteRoute: typeof DashboardRolesNameRouteRouteWithChildren
-  DashboardRolesIndexRoute: typeof DashboardRolesIndexRoute
-}
-
-const DashboardRolesRouteRouteChildren: DashboardRolesRouteRouteChildren = {
-  DashboardRolesNameRouteRoute: DashboardRolesNameRouteRouteWithChildren,
-  DashboardRolesIndexRoute: DashboardRolesIndexRoute,
-}
-
-const DashboardRolesRouteRouteWithChildren =
-  DashboardRolesRouteRoute._addFileChildren(DashboardRolesRouteRouteChildren)
 
 interface DashboardSettingsRouteRouteChildren {
   DashboardSettingsSplatRoute: typeof DashboardSettingsSplatRoute
@@ -462,7 +317,6 @@ const DashboardUsersRouteRouteWithChildren =
 
 interface DashboardRouteRouteChildren {
   DashboardLogsRouteRoute: typeof DashboardLogsRouteRoute
-  DashboardRolesRouteRoute: typeof DashboardRolesRouteRouteWithChildren
   DashboardSettingsRouteRoute: typeof DashboardSettingsRouteRouteWithChildren
   DashboardUsersRouteRoute: typeof DashboardUsersRouteRouteWithChildren
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -471,7 +325,6 @@ interface DashboardRouteRouteChildren {
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardLogsRouteRoute: DashboardLogsRouteRoute,
-  DashboardRolesRouteRoute: DashboardRolesRouteRouteWithChildren,
   DashboardSettingsRouteRoute: DashboardSettingsRouteRouteWithChildren,
   DashboardUsersRouteRoute: DashboardUsersRouteRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,

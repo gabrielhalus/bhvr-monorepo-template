@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Box, CogIcon, Home, ScrollTextIcon, ShieldUser, UsersRound } from "lucide-react";
+import { Box, CogIcon, Home, ScrollTextIcon, UsersRound } from "lucide-react";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -15,7 +15,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { t } = useTranslation("web");
 
   const { data: canListUsers } = useQuery(authorizeQueryOptions("user:list"));
-  const { data: canListRoles } = useQuery(authorizeQueryOptions("role:list"));
   const { data: canListConfigs } = useQuery(authorizeQueryOptions("runtimeConfig:list"));
   const { data: canListAuditLogs } = useQuery(authorizeQueryOptions("auditLog:list"));
 
@@ -27,14 +26,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: t("pages.users.title"),
         icon: UsersRound,
         href: { to: "/users" } as const,
-      });
-    }
-
-    if (canListRoles) {
-      navSettings.push({
-        title: t("pages.roles.title"),
-        icon: ShieldUser,
-        href: { to: "/roles" } as const,
       });
     }
 
@@ -64,7 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ],
       navSettings,
     };
-  }, [t, canListUsers, canListRoles, canListConfigs, canListAuditLogs]);
+  }, [t, canListUsers, canListConfigs, canListAuditLogs]);
 
   return (
     <Sidebar collapsible="icon" {...props}>
