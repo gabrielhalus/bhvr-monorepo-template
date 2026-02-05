@@ -15,6 +15,13 @@
       "when": 1770237169595,
       "tag": "0001_flippant_omega_red",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770280384471,
+      "tag": "0002_nosy_deathstrike",
+      "breakpoints": true
     }
   ]
 }

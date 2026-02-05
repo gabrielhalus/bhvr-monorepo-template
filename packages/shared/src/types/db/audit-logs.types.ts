@@ -22,6 +22,7 @@ export type AuditLogAction =
   | "user:update"
   | "user:delete"
   | "user:password_reset"
+  | "user:roles_update"
   | "user:export"
   // Account actions (self-service)
   | "account:update"

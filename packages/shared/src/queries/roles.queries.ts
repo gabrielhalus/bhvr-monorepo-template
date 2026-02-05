@@ -1,11 +1,10 @@
 import type { WithRelations } from "../lib/type-utils";
 import type { PaginatedResponse, PaginationQuery } from "../schemas/api/pagination.schemas";
-import type { UpdateRoleSchema } from "../schemas/api/roles.schemas";
 import type { InsertRoleSchema } from "../schemas/db/roles.schemas";
 import type { Role, RoleRelationKeys, RoleRelations, RoleWithRelations } from "../types/db/roles.types";
 import type { z } from "zod";
 
-import { asc, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
+import { asc, count, desc, eq, ilike, inArray } from "drizzle-orm";
 
 import { PermissionSchema } from "~shared/schemas/api/permissions.schemas";
 
@@ -221,10 +220,7 @@ export async function getRolesPaginated<T extends RoleRelationKeys>(
   const offset = (page - 1) * limit;
 
   const searchCondition = search
-    ? or(
-        ilike(RolesModel.name, `%${search}%`),
-        ilike(RolesModel.description, `%${search}%`),
-      )
+    ? ilike(RolesModel.name, `%${search}%`)
     : undefined;
 
   const sortableColumns: Record<string, typeof RolesModel.id | typeof RolesModel.name | typeof RolesModel.index> = {
@@ -342,27 +338,6 @@ export async function createRole(role: z.infer<typeof InsertRoleSchema>): Promis
   }
 
   return RoleSchema.parse(createdRole);
-}
-
-/**
- * Update a role.
- * @param id - The role id.
- * @param role - The role to update.
- * @returns The updated role.
- * @throws An error if the role could not be updated.
- */
-export async function updateRole(id: number, role: z.infer<typeof UpdateRoleSchema>): Promise<Role> {
-  const [updatedRole] = await drizzle
-    .update(RolesModel)
-    .set(role)
-    .where(eq(RolesModel.id, id))
-    .returning();
-
-  if (!updatedRole) {
-    throw new Error("Failed to update role");
-  }
-
-  return RoleSchema.parse(updatedRole);
 }
 
 /**

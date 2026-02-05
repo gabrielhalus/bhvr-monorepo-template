@@ -56,8 +56,9 @@
         "description": "Send an invitation link to a new user. The invitation will expire in 7 days.",
         "emailLabel": "Email Address",
         "emailPlaceholder": "user@example.com",
-        "roleLabel": "Role",
-        "rolePlaceholder": "Default role",
+        "rolesLabel": "Roles",
+        "rolesPlaceholder": "Select roles...",
+        "noRolesSelected": "Default role only",
         "autoValidateEmail": "Auto validate email",
         "creating": "Creating...",
         "sendInvitation": "Send Invitation",
@@ -79,6 +80,12 @@
           "edit": {
             "title": "Edit User",
             "description": "Update user information."
+          },
+          "roles": {
+            "title": "Roles",
+            "description": "Manage user roles.",
+            "updateSuccess": "Roles updated successfully",
+            "updateError": "Failed to update roles"
           },
           "security": {
             "title": "Security",
@@ -139,65 +146,13 @@
       }
     },
     "roles": {
-      "title": "Roles",
-      "list": {
-        "title": "Roles",
-        "subtitle": "Manage your roles.",
-        "searchPlaceholder": "Search roles..."
-      },
-      "columns": {
-        "role": "Role",
-        "members": "Members"
+      "names": {
+        "admin": "Admin",
+        "user": "User"
       },
       "badges": {
         "default": "Default",
         "admin": "Admin"
-      },
-      "allUsers": "All users",
-      "actions": {
-        "openMenu": "Open menu",
-        "actionsLabel": "Actions",
-        "copyRoleId": "Copy Role ID"
-      },
-      "detail": {
-        "title": "Edit role - {{role}}",
-        "pages": {
-          "display": {
-            "fields": {
-              "label": "Label",
-              "description": "Description"
-            }
-          },
-          "members": {
-            "title": "Members",
-            "addMembers": {
-              "label": "Add members",
-              "description": "Select users to assign to the {{role}} role"
-            },
-            "searchMembers": "Search members...",
-            "defaultRole": "Default Role",
-            "defaultRoleDescription": "This role is automatically assigned to all users and cannot be manually managed",
-            "allUsersAssigned": "All users assigned",
-            "allUsersAssignedDescription": "Every user already has this role",
-            "selected": "Selected",
-            "usersSelected_one": "{{count}} user selected",
-            "usersSelected_other": "{{count}} users selected",
-            "clearSelection": "Clear selection",
-            "assign": "Assign",
-            "assignWithCount": "Assign ({{count}})",
-            "assignSuccess": "Users assigned to role successfully",
-            "assignError": "Failed to assign users to role",
-            "selectAtLeastOne": "Please select at least one user"
-          },
-          "permissions": {
-            "title": "Permissions"
-          }
-        },
-        "nav": {
-          "display": "Display",
-          "members": "Manage Members ({{count}})",
-          "permissions": "Permissions"
-        }
       }
     },
     "settings": {

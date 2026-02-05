@@ -285,6 +285,27 @@ export async function logUserDelete(
 }
 
 /**
+ * Log user roles update.
+ */
+export async function logUserRolesUpdate(
+  targetUserId: string,
+  newRoleIds: number[],
+  previousRoleIds: number[],
+  ctx: AuditContext,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "user:roles_update",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId: targetUserId,
+    targetType: "user",
+    metadata: JSON.stringify({ newRoleIds, previousRoleIds }),
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
  * Log password reset (admin action on another user).
  */
 export async function logPasswordReset(

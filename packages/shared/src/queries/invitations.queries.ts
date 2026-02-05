@@ -4,11 +4,14 @@ import type { z } from "zod";
 
 import { and, asc, count, desc, eq, ilike, inArray, lt, or } from "drizzle-orm";
 
+import { RoleSchema } from "~shared/schemas/db/roles.schemas";
 import { UserSchema } from "~shared/schemas/db/users.schemas";
 
 import { drizzle } from "../drizzle";
 import { attachRelation } from "../helpers";
+import { InvitationRolesModel } from "../models/invitation-roles.model";
 import { InvitationsModel } from "../models/invitations.model";
+import { RolesModel } from "../models/roles.model";
 import { UsersModel } from "../models/users.model";
 import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
 import { InsertInvitationSchema, InvitationSchema, UpdateInvitationSchema } from "../schemas/db/invitations.schemas";
@@ -37,6 +40,33 @@ export const invitationRelationLoaders: { [K in keyof InvitationRelations]: (inv
     for (const row of invitationsRows) {
       if (row.user) {
         result[row.invitationId]! = UserSchema.parse(row.user);
+      }
+    }
+
+    return result;
+  },
+
+  roles: async (invitationIds) => {
+    const result: Record<string, InvitationRelations["roles"]> = {};
+
+    if (!invitationIds?.length) {
+      return result;
+    }
+
+    invitationIds.forEach(id => (result[id] = []));
+
+    const rolesRows = await drizzle
+      .select({
+        invitationId: InvitationRolesModel.invitationId,
+        role: RolesModel,
+      })
+      .from(InvitationRolesModel)
+      .innerJoin(RolesModel, eq(InvitationRolesModel.roleId, RolesModel.id))
+      .where(inArray(InvitationRolesModel.invitationId, invitationIds));
+
+    for (const row of rolesRows) {
+      if (row.role) {
+        result[row.invitationId]!.push(RoleSchema.parse(row.role));
       }
     }
 
@@ -289,4 +319,48 @@ export async function expireInvitations(): Promise<number> {
     .returning();
 
   return result.length;
+}
+
+// ============================================================================
+// Invitation Roles
+// ============================================================================
+
+/**
+ * Create an invitation role.
+ * @param invitationId - The invitation id.
+ * @param roleId - The role id.
+ */
+export async function createInvitationRole(invitationId: string, roleId: number): Promise<void> {
+  await drizzle
+    .insert(InvitationRolesModel)
+    .values({ invitationId, roleId })
+    .onConflictDoNothing();
+}
+
+/**
+ * Create multiple invitation roles.
+ * @param invitationId - The invitation id.
+ * @param roleIds - The role ids.
+ */
+export async function createInvitationRoles(invitationId: string, roleIds: number[]): Promise<void> {
+  if (!roleIds.length) return;
+
+  await drizzle
+    .insert(InvitationRolesModel)
+    .values(roleIds.map(roleId => ({ invitationId, roleId })))
+    .onConflictDoNothing();
+}
+
+/**
+ * Get role IDs for an invitation.
+ * @param invitationId - The invitation id.
+ * @returns The role IDs.
+ */
+export async function getInvitationRoleIds(invitationId: string): Promise<number[]> {
+  const rows = await drizzle
+    .select({ roleId: InvitationRolesModel.roleId })
+    .from(InvitationRolesModel)
+    .where(eq(InvitationRolesModel.invitationId, invitationId));
+
+  return rows.map(r => r.roleId);
 }

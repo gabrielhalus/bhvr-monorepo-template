@@ -8,7 +8,7 @@ import { PasswordSchema } from "~shared/schemas/api/auth.schemas";
 /**
  * Invitation relation keys
  */
-const InvitationRelationKey = ["invitedBy"] as const satisfies (keyof InvitationRelations)[];
+const InvitationRelationKey = ["invitedBy", "roles"] as const satisfies (keyof InvitationRelations)[];
 
 /**
  * Schema for invitation relations
@@ -28,7 +28,7 @@ export const InvitationRelationsQuerySchema = z.object({
  */
 export const CreateInvitationSchema = z.object({
   email: z.string().toLowerCase().trim().pipe(z.email("invalidErrorMessage")),
-  roleId: z.number().or(z.undefined()),
+  roleIds: z.array(z.number()).optional(),
   autoValidateEmail: z.boolean(),
 });
 

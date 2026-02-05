@@ -31,3 +31,10 @@ export const UpdateUserPasswordSchema = z.object({
     .min(8)
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).+$/),
 });
+
+/**
+ * Schema for updating a user's roles
+ */
+export const UpdateUserRolesSchema = z.object({
+  roleIds: z.array(z.number()),
+});

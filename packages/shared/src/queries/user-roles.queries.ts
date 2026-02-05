@@ -1,7 +1,7 @@
 import type { UserRole } from "../types/db/user-roles.types";
 import type { z } from "zod";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
 import { drizzle } from "../drizzle";
 import { RolesModel } from "../models/roles.model";
@@ -68,4 +68,49 @@ export async function deleteUserRole(userRole: z.infer<typeof UserRoleSchema>): 
   }
 
   return UserRoleSchema.parse(deletedUserRole);
+}
+
+/**
+ * Update the roles for a user.
+ * Sets the complete list of non-default roles for a user.
+ * Default roles cannot be removed/added through this function.
+ * @param userId - The user ID.
+ * @param roleIds - The new list of role IDs.
+ */
+export async function updateUserRoles(userId: string, roleIds: number[]): Promise<void> {
+  const nonDefaultRoles = await drizzle
+    .select({ id: RolesModel.id })
+    .from(RolesModel)
+    .where(eq(RolesModel.isDefault, false));
+
+  const nonDefaultRoleIds = nonDefaultRoles.map(r => r.id);
+  const validRoleIds = roleIds.filter(id => nonDefaultRoleIds.includes(id));
+
+  await drizzle
+    .delete(UserRolesModel)
+    .where(and(
+      eq(UserRolesModel.userId, userId),
+      inArray(UserRolesModel.roleId, nonDefaultRoleIds),
+    ));
+
+  if (validRoleIds.length > 0) {
+    await drizzle
+      .insert(UserRolesModel)
+      .values(validRoleIds.map(roleId => ({ userId, roleId })))
+      .onConflictDoNothing();
+  }
+}
+
+/**
+ * Get role IDs for a user.
+ * @param userId - The user ID.
+ * @returns The role IDs.
+ */
+export async function getUserRoleIds(userId: string): Promise<number[]> {
+  const rows = await drizzle
+    .select({ roleId: UserRolesModel.roleId })
+    .from(UserRolesModel)
+    .where(eq(UserRolesModel.userId, userId));
+
+  return rows.map(r => r.roleId);
 }

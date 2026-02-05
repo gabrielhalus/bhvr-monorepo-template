@@ -56,8 +56,9 @@
         "description": "Envoyez un lien d'invitation à un nouvel utilisateur. L'invitation expirera dans 7 jours.",
         "emailLabel": "Adresse e-mail",
         "emailPlaceholder": "utilisateur@exemple.com",
-        "roleLabel": "Rôle",
-        "rolePlaceholder": "Rôle par défaut",
+        "rolesLabel": "Rôles",
+        "rolesPlaceholder": "Sélectionner les rôles...",
+        "noRolesSelected": "Rôle par défaut uniquement",
         "autoValidateEmail": "Valider l'e-mail automatiquement",
         "creating": "Création...",
         "sendInvitation": "Envoyer l'invitation",
@@ -79,6 +80,12 @@
           "edit": {
             "title": "Modifier l'utilisateur",
             "description": "Mettre à jour les informations de l'utilisateur."
+          },
+          "roles": {
+            "title": "Rôles",
+            "description": "Gérer les rôles de l'utilisateur.",
+            "updateSuccess": "Rôles mis à jour avec succès",
+            "updateError": "Échec de la mise à jour des rôles"
           },
           "security": {
             "title": "Sécurité",
@@ -125,65 +132,13 @@
       "toggle": "Basculer"
     },
     "roles": {
-      "title": "Rôles",
-      "list": {
-        "title": "Rôles",
-        "subtitle": "Gérez vos rôles.",
-        "searchPlaceholder": "Rechercher des rôles..."
-      },
-      "columns": {
-        "role": "Rôle",
-        "members": "Membres"
+      "names": {
+        "admin": "Admin",
+        "user": "Utilisateur"
       },
       "badges": {
         "default": "Par défaut",
         "admin": "Admin"
-      },
-      "allUsers": "Tous les utilisateurs",
-      "actions": {
-        "openMenu": "Ouvrir le menu",
-        "actionsLabel": "Actions",
-        "copyRoleId": "Copier l'ID du rôle"
-      },
-      "detail": {
-        "title": "Modifier le rôle - {{role}}",
-        "pages": {
-          "display": {
-            "fields": {
-              "label": "Libellé",
-              "description": "Description"
-            }
-          },
-          "members": {
-            "title": "Membres",
-            "addMembers": {
-              "label": "Ajouter des membres",
-              "description": "Sélectionnez les utilisateurs à assigner au rôle {{role}}"
-            },
-            "searchMembers": "Rechercher des membres...",
-            "defaultRole": "Rôle par défaut",
-            "defaultRoleDescription": "Ce rôle est automatiquement assigné à tous les utilisateurs et ne peut pas être géré manuellement",
-            "allUsersAssigned": "Tous les utilisateurs assignés",
-            "allUsersAssignedDescription": "Chaque utilisateur possède déjà ce rôle",
-            "selected": "Sélectionné(s)",
-            "usersSelected_one": "{{count}} utilisateur sélectionné",
-            "usersSelected_other": "{{count}} utilisateurs sélectionnés",
-            "clearSelection": "Effacer la sélection",
-            "assign": "Assigner",
-            "assignWithCount": "Assigner ({{count}})",
-            "assignSuccess": "Utilisateurs assignés au rôle avec succès",
-            "assignError": "Échec de l'assignation des utilisateurs au rôle",
-            "selectAtLeastOne": "Veuillez sélectionner au moins un utilisateur"
-          },
-          "permissions": {
-            "title": "Permissions"
-          }
-        },
-        "nav": {
-          "display": "Affichage",
-          "members": "Gérer les membres ({{count}})",
-          "permissions": "Permissions"
-        }
       }
     },
     "settings": {
