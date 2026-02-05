@@ -1,18 +1,16 @@
 import type { ConfigNode, RuntimeConfig } from "~shared/types/db/runtime-configs.types";
 
 import { useForm } from "@tanstack/react-form";
-import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import { z } from "zod";
 
+import { useUpdateRuntimeConfig } from "@/hooks/runtime-configs/use-update-runtime-config";
 import { Badge } from "~react/components/badge";
 import { Checkbox } from "~react/components/checkbox";
 import { Input } from "~react/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~react/components/select";
 import { Switch } from "~react/components/switch";
 import { useDebouncedCallback } from "~react/hooks/use-debounced-callback";
-import { api } from "~react/lib/http";
 import { inferConfigValue } from "~shared/helpers/infer-config-value";
 
 function createSchema(type: "string" | "number" | "boolean", nullable: boolean) {
@@ -68,7 +66,7 @@ function evaluateDisabledCondition(disabledWhen: string | null | undefined, allC
 
 export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: RuntimeConfig[] }) {
   const { t } = useTranslation("web", { keyPrefix: "pages.settings.config" });
-  const queryClient = useQueryClient();
+  const updateRuntimeConfig = useUpdateRuntimeConfig();
 
   const { config } = node;
   const isDisabled = evaluateDisabledCondition(config.disabledWhen, allConfigs);
@@ -78,36 +76,10 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
   const form = useForm({
     defaultValues: { value: config.value },
     onSubmit: async ({ value: { value } }) => {
-      try {
-        const parsedValue = inferConfigValue(value);
-        schema.parse(parsedValue);
+      const parsedValue = inferConfigValue(value);
+      schema.parse(parsedValue);
 
-        const res = await api.config[":key"].$put({
-          param: { key: node.fullKey },
-          json: { value },
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to save configuration");
-        }
-
-        queryClient.setQueryData(["get-runtime-configs"], (oldData: { configs: RuntimeConfig[] } | undefined) => {
-          if (!oldData) {
-            return oldData;
-          }
-          return {
-            ...oldData,
-            configs: oldData.configs.map(c =>
-              c.configKey === node.fullKey ? { ...c, value } : c,
-            ),
-          };
-        });
-
-        toast.success("Configuration saved successfully");
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to save configuration");
-        throw error;
-      }
+      await updateRuntimeConfig.mutateAsync({ key: node.fullKey, value });
     },
   });
 
