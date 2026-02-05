@@ -475,6 +475,422 @@ export async function logConfigUpdate(
   });
 }
 
+/**
+ * Log token refresh.
+ */
+export async function logTokenRefresh(
+  userId: string,
+  ctx: Omit<AuditContext, "actorId">,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "auth:token_refresh",
+    actorId: userId,
+    targetId: userId,
+    targetType: "user",
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log account password change (self-service).
+ */
+export async function logAccountPasswordChange(
+  ctx: AuditContext,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "account:password_change",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId: ctx.actorId,
+    targetType: "user",
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log role creation.
+ */
+export async function logRoleCreate(
+  roleId: string,
+  ctx: AuditContext,
+  roleName?: string,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "role:create",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId: roleId,
+    targetType: "role",
+    metadata: roleName ? JSON.stringify({ name: roleName }) : undefined,
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log system error.
+ */
+export async function logSystemError(
+  error: string,
+  ctx: Partial<AuditContext>,
+  metadata?: Record<string, unknown>,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "system:error",
+    actorId: ctx.actorId ?? "system",
+    impersonatorId: ctx.impersonatorId,
+    targetType: "system",
+    metadata: JSON.stringify({ error, ...metadata }),
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+// ============================================================================
+// Generic Action Logging
+// ============================================================================
+
+export type LogActionParams = {
+  action: AuditLogAction;
+  ctx: AuditContext;
+  targetId?: string;
+  targetType?: AuditTargetType;
+  metadata?: Record<string, unknown>;
+};
+
+/**
+ * Generic function to log any action.
+ * Use this for custom or less common actions.
+ */
+export async function logAction({
+  action,
+  ctx,
+  targetId,
+  targetType,
+  metadata,
+}: LogActionParams): Promise<AuditLog> {
+  return createAuditLog({
+    action,
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId,
+    targetType,
+    metadata: metadata ? JSON.stringify(metadata) : undefined,
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log user creation (admin action).
+ */
+export async function logUserCreate(
+  userId: string,
+  ctx: AuditContext,
+  metadata?: Record<string, unknown>,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "user:create",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId: userId,
+    targetType: "user",
+    metadata: metadata ? JSON.stringify(metadata) : undefined,
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log permission denied.
+ */
+export async function logPermissionDenied(
+  permission: string,
+  ctx: AuditContext,
+  resource?: Record<string, unknown>,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "permission:denied",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetType: "permission",
+    metadata: JSON.stringify({ permission, resource }),
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log permission check.
+ */
+export async function logPermissionCheck(
+  permission: string,
+  allowed: boolean,
+  ctx: AuditContext,
+  resource?: Record<string, unknown>,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "permission:check",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetType: "permission",
+    metadata: JSON.stringify({ permission, allowed, resource }),
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log user list access.
+ */
+export async function logUserList(
+  ctx: AuditContext,
+  filters?: Record<string, unknown>,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "user:list",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetType: "user",
+    metadata: filters ? JSON.stringify({ filters }) : undefined,
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log role list access.
+ */
+export async function logRoleList(
+  ctx: AuditContext,
+  filters?: Record<string, unknown>,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "role:list",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetType: "role",
+    metadata: filters ? JSON.stringify({ filters }) : undefined,
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log invitation list access.
+ */
+export async function logInvitationList(
+  ctx: AuditContext,
+  filters?: Record<string, unknown>,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "invitation:list",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetType: "invitation",
+    metadata: filters ? JSON.stringify({ filters }) : undefined,
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log audit log list access.
+ */
+export async function logAuditLogList(
+  ctx: AuditContext,
+  filters?: Record<string, unknown>,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "auditLog:list",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetType: "auditLog",
+    metadata: filters ? JSON.stringify({ filters }) : undefined,
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log invitation resend.
+ */
+export async function logInvitationResend(
+  invitationId: string,
+  ctx: AuditContext,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "invitation:resend",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId: invitationId,
+    targetType: "invitation",
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log token revocation.
+ */
+export async function logTokenRevoke(
+  tokenId: string,
+  ctx: AuditContext,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "auth:token_revoke",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId: tokenId,
+    targetType: "session",
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log user read (viewing user details).
+ */
+export async function logUserRead(
+  userId: string,
+  ctx: AuditContext,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "user:read",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId: userId,
+    targetType: "user",
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log role read (viewing role details).
+ */
+export async function logRoleRead(
+  roleId: string,
+  ctx: AuditContext,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "role:read",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId: roleId,
+    targetType: "role",
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log invitation read (viewing invitation details).
+ */
+export async function logInvitationRead(
+  invitationId: string,
+  ctx: AuditContext,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "invitation:read",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId: invitationId,
+    targetType: "invitation",
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log config read.
+ */
+export async function logConfigRead(
+  configKey: string,
+  ctx: AuditContext,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "config:read",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId: configKey,
+    targetType: "config",
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log config list.
+ */
+export async function logConfigList(
+  ctx: AuditContext,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "config:list",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetType: "config",
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log user data export.
+ */
+export async function logUserExport(
+  ctx: AuditContext,
+  filters?: Record<string, unknown>,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "user:export",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetType: "user",
+    metadata: filters ? JSON.stringify({ filters }) : undefined,
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log audit log export.
+ */
+export async function logAuditLogExport(
+  ctx: AuditContext,
+  filters?: Record<string, unknown>,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "auditLog:export",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetType: "auditLog",
+    metadata: filters ? JSON.stringify({ filters }) : undefined,
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log account deletion (self-service).
+ */
+export async function logAccountDelete(
+  ctx: AuditContext,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "account:delete",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId: ctx.actorId,
+    targetType: "user",
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
 // ============================================================================
 // Paginated Queries
 // ============================================================================

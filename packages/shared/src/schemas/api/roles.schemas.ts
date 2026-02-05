@@ -29,3 +29,14 @@ export const UpdateRoleSchema = z.object({
   label: z.string(),
   description: z.string().nullable(),
 });
+
+/**
+ * Schema for creating a role
+ */
+export const CreateRoleSchema = z.object({
+  name: z.string().min(1).max(50).regex(/^[a-z][a-z0-9_]*$/, "Must start with a letter and contain only lowercase letters, numbers, and underscores"),
+  label: z.string().min(1).max(100),
+  description: z.string().nullable().optional(),
+  index: z.number().int().min(0),
+  isDefault: z.boolean().optional().default(false),
+});

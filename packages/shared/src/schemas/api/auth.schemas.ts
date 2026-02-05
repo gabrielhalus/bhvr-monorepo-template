@@ -49,3 +49,8 @@ export const UpdateAccountSchema = z.object({
   name: z.string().min(1, "requiredErrorMessage").min(3, "minLengthErrorMessage").max(20, "maxLengthErrorMessage"),
   email: z.string().toLowerCase().trim().pipe(z.email("invalidErrorMessage")),
 });
+
+export const ChangePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "requiredErrorMessage"),
+  newPassword: PasswordSchema,
+});
