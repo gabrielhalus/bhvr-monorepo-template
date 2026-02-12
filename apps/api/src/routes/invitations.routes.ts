@@ -46,73 +46,69 @@ export const invitationsRoutes = new Hono()
   .post("/accept", validationMiddleware("json", AcceptInvitationSchema), async (c) => {
     const { token, name, password: rawPassword } = c.req.valid("json");
 
-    try {
-      const invitation = await getInvitationByToken(token);
+    const invitation = await getInvitationByToken(token);
 
-      if (!invitation) {
-        return c.json({ success: false as const, error: "Invalid invitation token" }, 400);
-      }
-
-      if (invitation.status !== "pending") {
-        return c.json({ success: false as const, error: `Invitation has already been ${invitation.status}` }, 400);
-      }
-
-      if (new Date(invitation.expiresAt) < new Date()) {
-        await updateInvitation(invitation.id, { status: "expired" });
-        return c.json({ success: false as const, error: "Invitation has expired" }, 400);
-      }
-
-      if (await emailExists(invitation.email)) {
-        return c.json({ success: false as const, error: "Email is already registered" }, 400);
-      }
-
-      const hashedPassword = await password.hash(rawPassword);
-      const insertedUser = await createUser({
-        name,
-        email: invitation.email,
-        password: hashedPassword,
-        verifiedAt: invitation.autoValidateEmail ? new Date().toISOString() : null,
-      });
-
-      const invitationRoleIds = await getInvitationRoleIds(invitation.id);
-
-      if (invitationRoleIds.length > 0) {
-        for (const roleId of invitationRoleIds) {
-          await createUserRole({ userId: insertedUser.id, roleId });
-        }
-      } else {
-        const defaultRole = await getDefaultRole();
-        if (defaultRole) {
-          await createUserRole({ userId: insertedUser.id, roleId: defaultRole.id });
-        }
-      }
-
-      await updateInvitation(invitation.id, {
-        status: "accepted",
-        acceptedAt: new Date().toISOString(),
-      });
-
-      const insertedToken = await insertToken({
-        userId: insertedUser.id,
-        issuedAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_SECONDS * 1000).toISOString(),
-        ...getClientInfo(c),
-      });
-
-      const accessToken = await createAccessToken(insertedUser.id);
-      setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
-
-      const refreshToken = await createRefreshToken(insertedUser.id, insertedToken.id);
-      setCookie(c, "refreshToken", refreshToken, getCookieSettings("refresh"));
-
-      // Audit log: invitation accepted
-      const clientInfo = getClientInfo(c);
-      await logInvitationAccept(invitation.id, insertedUser.id, clientInfo);
-
-      return c.json({ success: true as const });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    if (!invitation) {
+      return c.json({ success: false as const, error: "Invalid invitation token" }, 400);
     }
+
+    if (invitation.status !== "pending") {
+      return c.json({ success: false as const, error: `Invitation has already been ${invitation.status}` }, 400);
+    }
+
+    if (new Date(invitation.expiresAt) < new Date()) {
+      await updateInvitation(invitation.id, { status: "expired" });
+      return c.json({ success: false as const, error: "Invitation has expired" }, 400);
+    }
+
+    if (await emailExists(invitation.email)) {
+      return c.json({ success: false as const, error: "Email is already registered" }, 400);
+    }
+
+    const hashedPassword = await password.hash(rawPassword);
+    const insertedUser = await createUser({
+      name,
+      email: invitation.email,
+      password: hashedPassword,
+      verifiedAt: invitation.autoValidateEmail ? new Date().toISOString() : null,
+    });
+
+    const invitationRoleIds = await getInvitationRoleIds(invitation.id);
+
+    if (invitationRoleIds.length > 0) {
+      for (const roleId of invitationRoleIds) {
+        await createUserRole({ userId: insertedUser.id, roleId });
+      }
+    } else {
+      const defaultRole = await getDefaultRole();
+      if (defaultRole) {
+        await createUserRole({ userId: insertedUser.id, roleId: defaultRole.id });
+      }
+    }
+
+    await updateInvitation(invitation.id, {
+      status: "accepted",
+      acceptedAt: new Date().toISOString(),
+    });
+
+    const insertedToken = await insertToken({
+      userId: insertedUser.id,
+      issuedAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_SECONDS * 1000).toISOString(),
+      ...getClientInfo(c),
+    });
+
+    const accessToken = await createAccessToken(insertedUser.id);
+    setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
+
+    const refreshToken = await createRefreshToken(insertedUser.id, insertedToken.id);
+    setCookie(c, "refreshToken", refreshToken, getCookieSettings("refresh"));
+
+    // Audit log: invitation accepted
+    const clientInfo = getClientInfo(c);
+    await logInvitationAccept(invitation.id, insertedUser.id, clientInfo);
+
+    return c.json({ success: true as const });
   })
 
   /**
@@ -127,32 +123,28 @@ export const invitationsRoutes = new Hono()
   .get("/validate", validationMiddleware("query", ValidateInvitationSchema), async (c) => {
     const { token } = c.req.valid("query");
 
-    try {
-      const invitation = await getInvitationByToken(token);
+    const invitation = await getInvitationByToken(token);
 
-      if (!invitation) {
-        return c.json({ success: false as const, error: "Invalid invitation token" }, 400);
-      }
-
-      if (invitation.status !== "pending") {
-        return c.json({ success: false as const, error: `Invitation has already been ${invitation.status}` }, 400);
-      }
-
-      if (new Date(invitation.expiresAt) < new Date()) {
-        await updateInvitation(invitation.id, { status: "expired" });
-        return c.json({ success: false as const, error: "Invitation has expired" }, 400);
-      }
-
-      return c.json({
-        success: true as const,
-        invitation: {
-          email: invitation.email,
-          expiresAt: invitation.expiresAt,
-        },
-      });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    if (!invitation) {
+      return c.json({ success: false as const, error: "Invalid invitation token" }, 400);
     }
+
+    if (invitation.status !== "pending") {
+      return c.json({ success: false as const, error: `Invitation has already been ${invitation.status}` }, 400);
+    }
+
+    if (new Date(invitation.expiresAt) < new Date()) {
+      await updateInvitation(invitation.id, { status: "expired" });
+      return c.json({ success: false as const, error: "Invitation has expired" }, 400);
+    }
+
+    return c.json({
+      success: true as const,
+      invitation: {
+        email: invitation.email,
+        expiresAt: invitation.expiresAt,
+      },
+    });
   })
 
   // --- All routes below this point require authentication
@@ -170,12 +162,8 @@ export const invitationsRoutes = new Hono()
   .get("/", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("invitation:list"), auditList("invitation:list", "invitation"), async (c) => {
     const { page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
-    try {
-      const result = await getInvitationsPaginated({ page, limit, sortBy, sortOrder, search });
-      return c.json({ success: true as const, ...result });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    const result = await getInvitationsPaginated({ page, limit, sortBy, sortOrder, search });
+    return c.json({ success: true as const, ...result });
   })
 
   /**
@@ -190,28 +178,24 @@ export const invitationsRoutes = new Hono()
   .get("/relations", validationMiddleware("query", InvitationRelationsQuerySchema), requirePermissionFactory("invitation:list"), async (c) => {
     const { invitationIds = [], include } = c.req.valid("query");
 
-    try {
-      const relations: Record<string, Partial<InvitationRelations>> = {};
-      invitationIds.forEach(id => (relations[id] = {}));
+    const relations: Record<string, Partial<InvitationRelations>> = {};
+    invitationIds.forEach(id => (relations[id] = {}));
 
-      await Promise.all(
-        include.map(async (key) => {
-          const loader = invitationRelationLoaders[key];
-          if (!loader)
-            throw new Error(`No relation loader defined for "${key}"`);
+    await Promise.all(
+      include.map(async (key) => {
+        const loader = invitationRelationLoaders[key];
+        if (!loader)
+          throw new Error(`No relation loader defined for "${key}"`);
 
-          const data = await loader(invitationIds);
+        const data = await loader(invitationIds);
 
-          for (const [invitationId, items] of Object.entries(data)) {
-            relations[invitationId]![key] = items;
-          }
-        }),
-      );
+        for (const [invitationId, items] of Object.entries(data)) {
+          relations[invitationId]![key] = items;
+        }
+      }),
+    );
 
-      return c.json({ success: true as const, relations });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, relations });
   })
 
   /**
@@ -224,20 +208,16 @@ export const invitationsRoutes = new Hono()
    * @access protected
    * @permission invitation:read (resource-specific)
    */
-  .get("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), auditRead("invitation:read", "invitation"), async (c) => {
+  .get("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), auditRead("invitation:read", "invitation"), async (c) => {
     const id = c.req.param("id");
 
-    try {
-      const invitation = await getInvitation(id);
+    const invitation = await getInvitation(id);
 
-      if (!invitation) {
-        return c.json({ success: false, error: "Not Found" }, 404);
-      }
-
-      return c.json({ success: true as const, invitation });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    if (!invitation) {
+      return c.json({ success: false, error: "Not Found" }, 404);
     }
+
+    return c.json({ success: true as const, invitation });
   })
 
 /**
@@ -250,31 +230,27 @@ export const invitationsRoutes = new Hono()
  * @access protected
  * @permission invitation:read
  */
-  .get("/:id{^[a-zA-Z0-9-]{21}$}/relations", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", InvitationRelationsQuerySchema), async (c) => {
+  .get("/:id{[a-zA-Z0-9-]{21}}/relations", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", InvitationRelationsQuerySchema), async (c) => {
     const id = c.req.param("id");
     const { include } = c.req.valid("query");
 
-    try {
-      const relations: Record<string, Partial<InvitationRelations>> = {};
+    const relations: Record<string, Partial<InvitationRelations>> = {};
 
-      await Promise.all(
-        include.map(async (key) => {
-          const loader = invitationRelationLoaders[key];
-          if (!loader)
-            throw new Error(`No relation loader defined for "${key}"`);
+    await Promise.all(
+      include.map(async (key) => {
+        const loader = invitationRelationLoaders[key];
+        if (!loader)
+          throw new Error(`No relation loader defined for "${key}"`);
 
-          const data = await loader([id]);
+        const data = await loader([id]);
 
-          for (const [_, items] of Object.entries(data)) {
-            relations[key] = items as Partial<InvitationRelations>;
-          }
-        }),
-      );
+        for (const [_, items] of Object.entries(data)) {
+          relations[key] = items as Partial<InvitationRelations>;
+        }
+      }),
+    );
 
-      return c.json({ success: true as const, relations });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, relations });
   })
 
   /**
@@ -292,42 +268,38 @@ export const invitationsRoutes = new Hono()
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    try {
-      if (await emailExists(email)) {
-        return c.json({ success: false as const, error: "Email is already registered" }, 400);
-      }
-
-      const existingInvitation = await getPendingInvitationByEmail(email);
-      if (existingInvitation) {
-        return c.json({ success: false as const, error: "A pending invitation already exists for this email" }, 400);
-      }
-
-      const token = randomBytes(32).toString("hex");
-      const expiresAt = new Date(Date.now() + INVITATION_EXPIRATION_DAYS * 24 * 60 * 60 * 1000).toISOString();
-
-      const invitation = await createInvitation({
-        email,
-        token,
-        expiresAt,
-        invitedById: sessionContext.user.id,
-        autoValidateEmail: autoValidateEmail ?? false,
-      });
-
-      if (roleIds && roleIds.length > 0) {
-        await createInvitationRoles(invitation.id, roleIds);
-      }
-
-      // Audit log: invitation created (tracks impersonation if active)
-      await logInvitationCreate(invitation.id, email, {
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      });
-
-      return c.json({ success: true as const, invitation });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    if (await emailExists(email)) {
+      return c.json({ success: false as const, error: "Email is already registered" }, 400);
     }
+
+    const existingInvitation = await getPendingInvitationByEmail(email);
+    if (existingInvitation) {
+      return c.json({ success: false as const, error: "A pending invitation already exists for this email" }, 400);
+    }
+
+    const token = randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + INVITATION_EXPIRATION_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
+    const invitation = await createInvitation({
+      email,
+      token,
+      expiresAt,
+      invitedById: sessionContext.user.id,
+      autoValidateEmail: autoValidateEmail ?? false,
+    });
+
+    if (roleIds && roleIds.length > 0) {
+      await createInvitationRoles(invitation.id, roleIds);
+    }
+
+    // Audit log: invitation created (tracks impersonation if active)
+    await logInvitationCreate(invitation.id, email, {
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    });
+
+    return c.json({ success: true as const, invitation });
   })
 
   /**
@@ -339,25 +311,21 @@ export const invitationsRoutes = new Hono()
    * @access protected
    * @permission invitation:revoke
    */
-  .put("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("invitation:revoke"), async (c) => {
+  .put("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("invitation:revoke"), async (c) => {
     const id = c.req.param("id");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    try {
-      const invitation = await updateInvitation(id, { status: "revoked" });
+    const invitation = await updateInvitation(id, { status: "revoked" });
 
-      // Audit log: invitation revoked (tracks impersonation if active)
-      await logInvitationRevoke(id, {
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      });
+    // Audit log: invitation revoked (tracks impersonation if active)
+    await logInvitationRevoke(id, {
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    });
 
-      return c.json({ success: true as const, invitation });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, invitation });
   })
 
 /**
@@ -369,23 +337,19 @@ export const invitationsRoutes = new Hono()
  * @access protected
  * @permission invitation:delete
  */
-  .delete("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("invitation:delete"), async (c) => {
+  .delete("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("invitation:delete"), async (c) => {
     const id = c.req.param("id");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    try {
-      const invitation = await deleteInvitation(id);
+    const invitation = await deleteInvitation(id);
 
-      // Audit log: invitation deleted (tracks impersonation if active)
-      await logInvitationDelete(id, {
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      });
+    // Audit log: invitation deleted (tracks impersonation if active)
+    await logInvitationDelete(id, {
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    });
 
-      return c.json({ success: true as const, invitation });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, invitation });
   });

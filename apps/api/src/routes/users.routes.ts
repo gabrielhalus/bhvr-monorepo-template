@@ -27,14 +27,10 @@ export const usersRoutes = new Hono()
    * @access public
    */
   .get("/check-email", validationMiddleware("query", z.object({ email: z.email() })), async (c) => {
-    try {
-      const { email } = c.req.valid("query");
-      const exists = await emailExists(email);
+    const { email } = c.req.valid("query");
+    const exists = await emailExists(email);
 
-      return c.json({ success: true as const, available: !exists });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, available: !exists });
   })
 
   // --- All routes below this point require authentication
@@ -52,13 +48,9 @@ export const usersRoutes = new Hono()
   .get("/", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("user:list"), auditList("user:list", "user"), async (c) => {
     const { page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
-    try {
-      const result = await getUsersPaginated({ page, limit, sortBy, sortOrder, search });
+    const result = await getUsersPaginated({ page, limit, sortBy, sortOrder, search });
 
-      return c.json({ success: true as const, ...result });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, ...result });
   })
 
   /**
@@ -73,28 +65,24 @@ export const usersRoutes = new Hono()
   .get("/relations", validationMiddleware("query", UserRelationsQuerySchema), requirePermissionFactory("user:list"), async (c) => {
     const { userIds = [], include } = c.req.valid("query");
 
-    try {
-      const relations: Record<string, Partial<UserRelations>> = {};
-      userIds.forEach(id => (relations[id] = {}));
+    const relations: Record<string, Partial<UserRelations>> = {};
+    userIds.forEach(id => (relations[id] = {}));
 
-      await Promise.all(
-        include.map(async (key) => {
-          const loader = userRelationLoaders[key];
-          if (!loader)
-            throw new Error(`No relation loader defined for "${key}"`);
+    await Promise.all(
+      include.map(async (key) => {
+        const loader = userRelationLoaders[key];
+        if (!loader)
+          throw new Error(`No relation loader defined for "${key}"`);
 
-          const data = await loader(userIds);
+        const data = await loader(userIds);
 
-          for (const [userId, items] of Object.entries(data)) {
-            relations[userId]![key] = items;
-          }
-        }),
-      );
+        for (const [userId, items] of Object.entries(data)) {
+          relations[userId]![key] = items;
+        }
+      }),
+    );
 
-      return c.json({ success: true as const, relations });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, relations });
   })
 
   /**
@@ -109,28 +97,24 @@ export const usersRoutes = new Hono()
   .get("/relations/count", validationMiddleware("query", UserRelationsQuerySchema), requirePermissionFactory("user:list"), async (c) => {
     const { userIds = [], include } = c.req.valid("query");
 
-    try {
-      const relations: Record<string, Record<string, number>> = {};
-      userIds.forEach(id => (relations[id] = {}));
+    const relations: Record<string, Record<string, number>> = {};
+    userIds.forEach(id => (relations[id] = {}));
 
-      await Promise.all(
-        include.map(async (key) => {
-          const loader = userRelationCountLoaders[key];
-          if (!loader)
-            throw new Error(`No relation loader defined for "${key}"`);
+    await Promise.all(
+      include.map(async (key) => {
+        const loader = userRelationCountLoaders[key];
+        if (!loader)
+          throw new Error(`No relation loader defined for "${key}"`);
 
-          const data = await loader(userIds);
+        const data = await loader(userIds);
 
-          for (const [userId, items] of Object.entries(data)) {
-            relations[userId]![key] = items;
-          }
-        }),
-      );
+        for (const [userId, items] of Object.entries(data)) {
+          relations[userId]![key] = items;
+        }
+      }),
+    );
 
-      return c.json({ success: true as const, relations });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, relations });
   })
 
   /**
@@ -143,20 +127,16 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:read (resource-specific)
    */
-  .get("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), auditRead("user:read", "user"), async (c) => {
+  .get("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), auditRead("user:read", "user"), async (c) => {
     const id = c.req.param("id");
 
-    try {
-      const user = await getUser(id);
+    const user = await getUser(id);
 
-      if (!user) {
-        return c.json({ success: false, error: "Not Found" }, 404);
-      }
-
-      return c.json({ success: true as const, user });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    if (!user) {
+      return c.json({ success: false, error: "Not Found" }, 404);
     }
+
+    return c.json({ success: true as const, user });
   })
 
   /**
@@ -169,31 +149,27 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:read
    */
-  .get("/:id{^[a-zA-Z0-9-]{21}$}/relations", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", UserRelationsQuerySchema), async (c) => {
+  .get("/:id{[a-zA-Z0-9-]{21}}/relations", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", UserRelationsQuerySchema), async (c) => {
     const id = c.req.param("id");
     const { include } = c.req.valid("query");
 
-    try {
-      const relations: Record<string, Partial<UserRelations>> = {};
+    const relations: Record<string, Partial<UserRelations>> = {};
 
-      await Promise.all(
-        include.map(async (key) => {
-          const loader = userRelationLoaders[key];
-          if (!loader)
-            throw new Error(`No relation loader defined for "${key}"`);
+    await Promise.all(
+      include.map(async (key) => {
+        const loader = userRelationLoaders[key];
+        if (!loader)
+          throw new Error(`No relation loader defined for "${key}"`);
 
-          const data = await loader([id]);
+        const data = await loader([id]);
 
-          for (const [_, items] of Object.entries(data)) {
-            relations[key] = items as Partial<UserRelations>;
-          }
-        }),
-      );
+        for (const [_, items] of Object.entries(data)) {
+          relations[key] = items as Partial<UserRelations>;
+        }
+      }),
+    );
 
-      return c.json({ success: true as const, relations });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, relations });
   })
 
   /**
@@ -206,31 +182,27 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:read
    */
-  .get("/:id{^[a-zA-Z0-9-]{21}$}/relations/count", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", UserRelationsQuerySchema), async (c) => {
+  .get("/:id{[a-zA-Z0-9-]{21}}/relations/count", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", UserRelationsQuerySchema), async (c) => {
     const id = c.req.param("id");
     const { include } = c.req.valid("query");
 
-    try {
-      const relations: Record<string, number> = {};
+    const relations: Record<string, number> = {};
 
-      await Promise.all(
-        include.map(async (key) => {
-          const loader = userRelationCountLoaders[key];
-          if (!loader)
-            throw new Error(`No relation loader defined for "${key}"`);
+    await Promise.all(
+      include.map(async (key) => {
+        const loader = userRelationCountLoaders[key];
+        if (!loader)
+          throw new Error(`No relation loader defined for "${key}"`);
 
-          const data = await loader([id]);
+        const data = await loader([id]);
 
-          for (const [_, items] of Object.entries(data)) {
-            relations[key] = items;
-          }
-        }),
-      );
+        for (const [_, items] of Object.entries(data)) {
+          relations[key] = items;
+        }
+      }),
+    );
 
-      return c.json({ success: true as const, relations });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, relations });
   })
 
   /**
@@ -242,26 +214,21 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:update (resource-specific)
    */
-  .put("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateUserSchema), async (c) => {
+  .put("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateUserSchema), async (c) => {
     const id = c.req.param("id");
     const data = c.req.valid("json");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    try {
-      const user = await updateUser(id, data);
+    const user = await updateUser(id, data);
 
-      // Audit log: user update (tracks impersonation if active)
-      await logUserUpdate(id, {
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      }, data);
+    await logUserUpdate(id, {
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    }, data);
 
-      return c.json({ success: true as const, user });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, user });
   })
 
   /**
@@ -274,33 +241,28 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:update (resource-specific)
    */
-  .post("/:id{^[a-zA-Z0-9-]{21}$}/reset-password", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), async (c) => {
+  .post("/:id{[a-zA-Z0-9-]{21}}/reset-password", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), async (c) => {
     const id = c.req.param("id");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    try {
-      const user = await getUser(id);
-      if (!user) {
-        return c.json({ success: false as const, error: "User not found" }, 404);
-      }
-
-      const newPassword = generateRandomPassword();
-      const hashedPassword = await password.hash(newPassword);
-
-      await updateUserPassword(id, hashedPassword);
-
-      // Audit log: password reset (tracks impersonation if active)
-      await logPasswordReset(id, {
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      });
-
-      return c.json({ success: true as const, password: newPassword });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    const user = await getUser(id);
+    if (!user) {
+      return c.json({ success: false as const, error: "User not found" }, 404);
     }
+
+    const newPassword = generateRandomPassword();
+    const hashedPassword = await password.hash(newPassword);
+
+    await updateUserPassword(id, hashedPassword);
+
+    await logPasswordReset(id, {
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    });
+
+    return c.json({ success: true as const, password: newPassword });
   })
 
   /**
@@ -313,31 +275,27 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission userRole:create
    */
-  .put("/:id{^[a-zA-Z0-9-]{21}$}/roles", requirePermissionFactory("userRole:create"), validationMiddleware("json", UpdateUserRolesSchema), async (c) => {
+  .put("/:id{[a-zA-Z0-9-]{21}}/roles", requirePermissionFactory("userRole:create"), validationMiddleware("json", UpdateUserRolesSchema), async (c) => {
     const id = c.req.param("id");
     const { roleIds } = c.req.valid("json");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    try {
-      const user = await getUser(id);
-      if (!user) {
-        return c.json({ success: false as const, error: "User not found" }, 404);
-      }
-
-      const previousRoleIds = await getUserRoleIds(id);
-      await updateUserRoles(id, roleIds);
-
-      await logUserRolesUpdate(id, roleIds, previousRoleIds, {
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      });
-
-      return c.json({ success: true as const, roleIds });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    const user = await getUser(id);
+    if (!user) {
+      return c.json({ success: false as const, error: "User not found" }, 404);
     }
+
+    const previousRoleIds = await getUserRoleIds(id);
+    await updateUserRoles(id, roleIds);
+
+    await logUserRolesUpdate(id, roleIds, previousRoleIds, {
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    });
+
+    return c.json({ success: true as const, roleIds });
   })
 
   /**
@@ -349,23 +307,18 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:delete (resource-specific)
    */
-  .delete("/:id{^[a-zA-Z0-9-]{21}$}", requirePermissionFactory("user:delete", c => ({ id: c.req.param("id") })), async (c) => {
+  .delete("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("user:delete", c => ({ id: c.req.param("id") })), async (c) => {
     const id = c.req.param("id");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    try {
-      const user = await deleteUser(id);
+    const user = await deleteUser(id);
 
-      // Audit log: user deletion (tracks impersonation if active)
-      await logUserDelete(id, {
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      });
+    await logUserDelete(id, {
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    });
 
-      return c.json({ success: true as const, user });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, user });
   });

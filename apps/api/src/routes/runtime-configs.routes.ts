@@ -15,16 +15,12 @@ export const configRoutes = new Hono()
    * @access public
    */
   .get("/", async (c) => {
-    try {
-      const configs = await getRuntimeConfigs();
+    const configs = await getRuntimeConfigs();
 
-      return c.json({
-        success: true as const,
-        configs,
-      });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({
+      success: true as const,
+      configs,
+    });
   })
 
   /**
@@ -39,17 +35,13 @@ export const configRoutes = new Hono()
   .get("/:key", async (c) => {
     const key = c.req.param("key");
 
-    try {
-      const value = await getRuntimeConfig(key);
+    const value = await getRuntimeConfig(key);
 
-      if (!value) {
-        return c.json({ success: false as const, error: "Config not found" }, 404);
-      }
-
-      return c.json({ success: true as const, value });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    if (!value) {
+      return c.json({ success: false as const, error: "Config not found" }, 404);
     }
+
+    return c.json({ success: true as const, value });
   })
 
   // --- All routes below this point require authentication
@@ -70,22 +62,16 @@ export const configRoutes = new Hono()
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    try {
-      // Get old value for audit log
-      const oldConfig = await getRuntimeConfig(key);
-      const oldValue = oldConfig?.value;
+    const oldConfig = await getRuntimeConfig(key);
+    const oldValue = oldConfig?.value;
 
-      const config = await updateRuntimeConfig(key, value, sessionContext.user.id);
+    const config = await updateRuntimeConfig(key, value, sessionContext.user.id);
 
-      // Audit log: config update (tracks impersonation if active)
-      await logConfigUpdate(key, {
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      }, oldValue, value);
+    await logConfigUpdate(key, {
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    }, oldValue, value);
 
-      return c.json({ success: true as const, config });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, config });
   });

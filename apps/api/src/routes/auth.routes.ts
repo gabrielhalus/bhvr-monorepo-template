@@ -68,8 +68,7 @@ export const authRoutes = new Hono()
       if (error instanceof Error && error.message.includes("UNIQUE constraint failed: users.email")) {
         return c.json({ success: false as const, error: "Email is already taken" }, 400);
       }
-
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+      throw error;
     }
   })
 
@@ -86,34 +85,30 @@ export const authRoutes = new Hono()
     const { email, password } = c.req.valid("json");
     const clientInfo = getClientInfo(c);
 
-    try {
-      const userId = await signIn(email, password);
-      if (!userId) {
-        // Audit log: failed login attempt
-        await logLoginFailed(email, clientInfo);
-        return c.json({ success: false as const, error: "Invalid credentials" }, 200);
-      }
-
-      const insertedToken = await insertToken({
-        userId,
-        issuedAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_SECONDS * 1000).toISOString(),
-        ...clientInfo,
-      });
-
-      const accessToken = await createAccessToken(userId);
-      setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
-
-      const refreshToken = await createRefreshToken(userId, insertedToken.id);
-      setCookie(c, "refreshToken", refreshToken, getCookieSettings("refresh"));
-
-      // Audit log: successful login
-      await logLogin(userId, clientInfo);
-
-      return c.json({ success: true as const });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    const userId = await signIn(email, password);
+    if (!userId) {
+      // Audit log: failed login attempt
+      await logLoginFailed(email, clientInfo);
+      return c.json({ success: false as const, error: "Invalid credentials" }, 200);
     }
+
+    const insertedToken = await insertToken({
+      userId,
+      issuedAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_SECONDS * 1000).toISOString(),
+      ...clientInfo,
+    });
+
+    const accessToken = await createAccessToken(userId);
+    setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
+
+    const refreshToken = await createRefreshToken(userId, insertedToken.id);
+    setCookie(c, "refreshToken", refreshToken, getCookieSettings("refresh"));
+
+    // Audit log: successful login
+    await logLogin(userId, clientInfo);
+
+    return c.json({ success: true as const });
   })
 
   /**
@@ -130,7 +125,6 @@ export const authRoutes = new Hono()
     const clientInfo = getClientInfo(c);
     let userId: string | undefined;
 
-    // Try to get user ID from access token for audit logging
     if (accessToken) {
       try {
         const payload = await verifyToken(accessToken, "access");
@@ -141,17 +135,13 @@ export const authRoutes = new Hono()
     }
 
     if (refreshToken) {
-      try {
-        const payload = await verifyToken(refreshToken, "refresh");
-        if (payload?.jti) {
-          await deleteToken(payload.jti);
-        }
-        // Get user ID from refresh token if not already set
-        if (!userId) {
-          userId = payload?.sub;
-        }
-      } catch {
-        return c.json({ success: false as const, error: "Failed to delete refresh token" }, 401);
+      const payload = await verifyToken(refreshToken, "refresh");
+      if (payload?.jti) {
+        await deleteToken(payload.jti);
+      }
+      // Get user ID from refresh token if not already set
+      if (!userId) {
+        userId = payload?.sub;
       }
     }
 
@@ -198,20 +188,16 @@ export const authRoutes = new Hono()
     const data = c.req.valid("json");
     const clientInfo = getClientInfo(c);
 
-    try {
-      const user = await updateUser(sessionContext.user.id, data);
+    const user = await updateUser(sessionContext.user.id, data);
 
-      // Audit log: account update (tracks impersonation if active)
-      await logAccountUpdate({
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      }, data);
+    // Audit log: account update (tracks impersonation if active)
+    await logAccountUpdate({
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    }, data);
 
-      return c.json({ success: true as const, user });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, user });
   })
 
   /**
@@ -228,33 +214,26 @@ export const authRoutes = new Hono()
     const { currentPassword, newPassword } = c.req.valid("json");
     const clientInfo = getClientInfo(c);
 
-    try {
-      // Verify current password
-      const user = await getUser(sessionContext.user.id);
-      if (!user || !user.password) {
-        return c.json({ success: false as const, error: "User not found" }, 404);
-      }
-
-      const isValidPassword = await password.verify(currentPassword, user.password);
-      if (!isValidPassword) {
-        return c.json({ success: false as const, error: "Current password is incorrect" }, 400);
-      }
-
-      // Hash and update new password
-      const hashedPassword = await password.hash(newPassword);
-      await updateUserPassword(sessionContext.user.id, hashedPassword);
-
-      // Audit log: password change (tracks impersonation if active)
-      await logAccountPasswordChange({
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      });
-
-      return c.json({ success: true as const });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    const user = await getUser(sessionContext.user.id);
+    if (!user || !user.password) {
+      return c.json({ success: false as const, error: "User not found" }, 404);
     }
+
+    const isValidPassword = await password.verify(currentPassword, user.password);
+    if (!isValidPassword) {
+      return c.json({ success: false as const, error: "Current password is incorrect" }, 400);
+    }
+
+    const hashedPassword = await password.hash(newPassword);
+    await updateUserPassword(sessionContext.user.id, hashedPassword);
+
+    await logAccountPasswordChange({
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    });
+
+    return c.json({ success: true as const });
   })
 
   /**
@@ -269,13 +248,9 @@ export const authRoutes = new Hono()
     const sessionContext = c.var.sessionContext;
     const { permission, resource } = c.req.valid("json");
 
-    try {
-      const authorize = await isAuthorized(permission, sessionContext.user, resource);
+    const authorize = await isAuthorized(permission, sessionContext.user, resource);
 
-      return c.json({ success: true as const, authorize });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, authorize });
   })
 
   /**
@@ -289,45 +264,35 @@ export const authRoutes = new Hono()
    * @access protected
    * @permission user:impersonate
    */
-  .post("/impersonate/:id{^[a-zA-Z0-9-]{21}$}", async (c) => {
+  .post("/impersonate/:id{[a-zA-Z0-9-]{21}}", async (c) => {
     const sessionContext = c.var.sessionContext;
     const targetUserId = c.req.param("id");
 
-    try {
-      // Cannot impersonate while already impersonating
-      if (sessionContext.impersonator) {
-        return c.json({ success: false as const, error: "Already impersonating a user. Stop impersonation first." }, 400);
-      }
-
-      // Cannot impersonate self
-      if (sessionContext.user.id === targetUserId) {
-        return c.json({ success: false as const, error: "Cannot impersonate yourself" }, 400);
-      }
-
-      // Check if user has impersonate permission
-      const canImpersonate = await isAuthorized("user:impersonate", sessionContext.user, { id: targetUserId });
-      if (!canImpersonate) {
-        return c.json({ success: false as const, error: "Forbidden" }, 403);
-      }
-
-      // Get target user
-      const targetUser = await getUser(targetUserId, ["roles"]);
-      if (!targetUser) {
-        return c.json({ success: false as const, error: "User not found" }, 404);
-      }
-
-      // Create new access token with impersonator info
-      const accessToken = await createAccessToken(targetUserId, sessionContext.user.id);
-      setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
-
-      // Audit log: impersonation started
-      const clientInfo = getClientInfo(c);
-      await logImpersonationStart(sessionContext.user.id, targetUserId, clientInfo);
-
-      return c.json({ success: true as const, user: targetUser });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    if (sessionContext.impersonator) {
+      return c.json({ success: false as const, error: "Already impersonating a user. Stop impersonation first." }, 400);
     }
+
+    if (sessionContext.user.id === targetUserId) {
+      return c.json({ success: false as const, error: "Cannot impersonate yourself" }, 400);
+    }
+
+    const canImpersonate = await isAuthorized("user:impersonate", sessionContext.user, { id: targetUserId });
+    if (!canImpersonate) {
+      return c.json({ success: false as const, error: "Forbidden" }, 403);
+    }
+
+    const targetUser = await getUser(targetUserId, ["roles"]);
+    if (!targetUser) {
+      return c.json({ success: false as const, error: "User not found" }, 404);
+    }
+
+    const accessToken = await createAccessToken(targetUserId, sessionContext.user.id);
+    setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
+
+    const clientInfo = getClientInfo(c);
+    await logImpersonationStart(sessionContext.user.id, targetUserId, clientInfo);
+
+    return c.json({ success: true as const, user: targetUser });
   })
 
   /**
@@ -341,22 +306,15 @@ export const authRoutes = new Hono()
   .post("/stop-impersonation", async (c) => {
     const sessionContext = c.var.sessionContext;
 
-    try {
-      // Check if currently impersonating
-      if (!sessionContext.impersonator) {
-        return c.json({ success: false as const, error: "Not currently impersonating" }, 400);
-      }
-
-      // Create new access token for the original user (the impersonator)
-      const accessToken = await createAccessToken(sessionContext.impersonator.id);
-      setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
-
-      // Audit log: impersonation stopped
-      const clientInfo = getClientInfo(c);
-      await logImpersonationStop(sessionContext.impersonator.id, sessionContext.user.id, clientInfo);
-
-      return c.json({ success: true as const, user: sessionContext.impersonator });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    if (!sessionContext.impersonator) {
+      return c.json({ success: false as const, error: "Not currently impersonating" }, 400);
     }
+
+    const accessToken = await createAccessToken(sessionContext.impersonator.id);
+    setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
+
+    const clientInfo = getClientInfo(c);
+    await logImpersonationStop(sessionContext.impersonator.id, sessionContext.user.id, clientInfo);
+
+    return c.json({ success: true as const, user: sessionContext.impersonator });
   });

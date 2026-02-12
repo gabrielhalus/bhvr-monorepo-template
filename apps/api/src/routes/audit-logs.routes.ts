@@ -33,25 +33,21 @@ export const auditLogsRoutes = new Hono()
   .get("/", validationMiddleware("query", AuditLogsQuerySchema), requirePermissionFactory("auditLog:list"), auditList("auditLog:list", "auditLog"), async (c) => {
     const { page, limit, sortBy, sortOrder, search, action, actionCategory, actorId, targetId, targetType, includeImpersonated } = c.req.valid("query");
 
-    try {
-      const result = await getAuditLogsPaginated({
-        page,
-        limit,
-        sortBy,
-        sortOrder,
-        search,
-        action,
-        actionCategory,
-        actorId,
-        targetId,
-        targetType,
-        includeImpersonated,
-      });
+    const result = await getAuditLogsPaginated({
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+      search,
+      action,
+      actionCategory,
+      actorId,
+      targetId,
+      targetType,
+      includeImpersonated,
+    });
 
-      return c.json({ success: true as const, ...result });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, ...result });
   })
 
   /**
@@ -64,10 +60,6 @@ export const auditLogsRoutes = new Hono()
    * @permission auditLog:delete
    */
   .delete("/", requirePermissionFactory("auditLog:delete"), async (c) => {
-    try {
-      await deleteAllAuditLogs();
-      return c.json({ success: true as const });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    await deleteAllAuditLogs();
+    return c.json({ success: true as const });
   });

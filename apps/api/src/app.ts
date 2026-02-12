@@ -11,6 +11,8 @@ import { configRoutes } from "@/routes/runtime-configs.routes";
 import { usersRoutes } from "@/routes/users.routes";
 import { logSystemError } from "~shared/queries/audit-logs.queries";
 
+import { env } from "./lib/env";
+
 const app = new Hono({ strict: false });
 
 // -------------------
@@ -56,6 +58,28 @@ const _api = app
   .route("/roles", rolesRoutes)
   .route("/config", configRoutes)
   .route("/users", usersRoutes);
+app.onError(async (err, c) => {
+  const { method, path } = c.req;
+  const clientInfo = getClientInfo(c);
+
+  console.error(`[ERREUR API] ${method} ${path}`);
+  console.error(`Message: ${err.message}`);
+  console.error(`Stack: ${err.stack}`);
+
+  try {
+    await logSystemError(err.message, clientInfo, { stack: err.stack, path, method });
+  } catch (logErr) {
+    console.error("Échec de l'enregistrement du log d'audit:", logErr);
+  }
+
+  const isDev = env.NODE_ENV === "development";
+
+  return c.json({
+    success: false,
+    error: isDev ? err.message : "Une erreur interne est survenue",
+    ...(isDev && { stack: err.stack }),
+  }, 500);
+});
 
 export default app;
 export type AppType = typeof _api;

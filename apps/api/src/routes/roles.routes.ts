@@ -52,28 +52,24 @@ export const rolesRoutes = new Hono()
   .get("/relations", validationMiddleware("query", RoleRelationsQuerySchema), requirePermissionFactory("role:list"), async (c) => {
     const { roleIds = [], include } = c.req.valid("query");
 
-    try {
-      const relations: Record<string, Partial<RoleRelations>> = {};
-      roleIds.forEach(id => (relations[id] = {}));
+    const relations: Record<string, Partial<RoleRelations>> = {};
+    roleIds.forEach(id => (relations[id] = {}));
 
-      await Promise.all(
-        include.map(async (key) => {
-          const loader = roleRelationLoaders[key];
-          if (!loader)
-            throw new Error(`No relation loader defined for "${key}"`);
+    await Promise.all(
+      include.map(async (key) => {
+        const loader = roleRelationLoaders[key];
+        if (!loader)
+          throw new Error(`No relation loader defined for "${key}"`);
 
-          const data = await loader(roleIds);
+        const data = await loader(roleIds);
 
-          for (const [roleId, items] of Object.entries(data)) {
-            relations[roleId]![key] = items;
-          }
-        }),
-      );
+        for (const [roleId, items] of Object.entries(data)) {
+          relations[roleId]![key] = items;
+        }
+      }),
+    );
 
-      return c.json({ success: true as const, relations });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, relations });
   })
 
   /**
@@ -88,28 +84,24 @@ export const rolesRoutes = new Hono()
   .get("/relations/count", validationMiddleware("query", RoleRelationsQuerySchema), requirePermissionFactory("role:list"), async (c) => {
     const { roleIds = [], include } = c.req.valid("query");
 
-    try {
-      const relations: Record<string, Record<string, number>> = {};
-      roleIds.forEach(id => (relations[id] = {}));
+    const relations: Record<string, Record<string, number>> = {};
+    roleIds.forEach(id => (relations[id] = {}));
 
-      await Promise.all(
-        include.map(async (key) => {
-          const loader = roleRelationCountLoaders[key];
-          if (!loader)
-            throw new Error(`No relation loader defined for "${key}"`);
+    await Promise.all(
+      include.map(async (key) => {
+        const loader = roleRelationCountLoaders[key];
+        if (!loader)
+          throw new Error(`No relation loader defined for "${key}"`);
 
-          const data = await loader(roleIds);
+        const data = await loader(roleIds);
 
-          for (const [roleId, items] of Object.entries(data)) {
-            relations[roleId]![key] = items;
-          }
-        }),
-      );
+        for (const [roleId, items] of Object.entries(data)) {
+          relations[roleId]![key] = items;
+        }
+      }),
+    );
 
-      return c.json({ success: true as const, relations });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, relations });
   })
 
   /**
@@ -130,7 +122,6 @@ export const rolesRoutes = new Hono()
     try {
       const role = await createRole(data);
 
-      // Audit log: role creation
       await logRoleCreate(String(role.id), {
         actorId: sessionContext.user.id,
         impersonatorId: sessionContext.impersonator?.id,
@@ -142,7 +133,7 @@ export const rolesRoutes = new Hono()
       if (error instanceof Error && error.message.includes("UNIQUE constraint failed")) {
         return c.json({ success: false as const, error: "Role name already exists" }, 400);
       }
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+      throw error;
     }
   })
 
@@ -159,17 +150,13 @@ export const rolesRoutes = new Hono()
   .get("/:id{[0-9]+}", requirePermissionFactory("role:read"), auditRead("role:read", "role"), async (c) => {
     const id = Number(c.req.param("id"));
 
-    try {
-      const role = await getRole(id);
+    const role = await getRole(id);
 
-      if (!role) {
-        return c.json({ success: false as const, error: "Role not found" }, 404);
-      }
-
-      return c.json({ success: true as const, role });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    if (!role) {
+      return c.json({ success: false as const, error: "Role not found" }, 404);
     }
+
+    return c.json({ success: true as const, role });
   })
 
   /**
@@ -186,27 +173,23 @@ export const rolesRoutes = new Hono()
     const id = Number(c.req.param("id"));
     const { include } = c.req.valid("query");
 
-    try {
-      const relations: Record<string, Partial<RoleRelations>> = {};
+    const relations: Record<string, Partial<RoleRelations>> = {};
 
-      await Promise.all(
-        include.map(async (key) => {
-          const loader = roleRelationLoaders[key];
-          if (!loader)
-            throw new Error(`No relation loader defined for "${key}"`);
+    await Promise.all(
+      include.map(async (key) => {
+        const loader = roleRelationLoaders[key];
+        if (!loader)
+          throw new Error(`No relation loader defined for "${key}"`);
 
-          const data = await loader([id]);
+        const data = await loader([id]);
 
-          for (const [_, items] of Object.entries(data)) {
-            relations[key] = items as Partial<RoleRelations>;
-          }
-        }),
-      );
+        for (const [_, items] of Object.entries(data)) {
+          relations[key] = items as Partial<RoleRelations>;
+        }
+      }),
+    );
 
-      return c.json({ success: true as const, relations });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, relations });
   })
 
   /**
@@ -223,27 +206,23 @@ export const rolesRoutes = new Hono()
     const id = Number(c.req.param("id"));
     const { include } = c.req.valid("query");
 
-    try {
-      const relations: Record<string, number> = {};
+    const relations: Record<string, number> = {};
 
-      await Promise.all(
-        include.map(async (key) => {
-          const loader = roleRelationCountLoaders[key];
-          if (!loader)
-            throw new Error(`No relation loader defined for "${key}"`);
+    await Promise.all(
+      include.map(async (key) => {
+        const loader = roleRelationCountLoaders[key];
+        if (!loader)
+          throw new Error(`No relation loader defined for "${key}"`);
 
-          const data = await loader([id]);
+        const data = await loader([id]);
 
-          for (const [_, items] of Object.entries(data)) {
-            relations[key] = items;
-          }
-        }),
-      );
+        for (const [_, items] of Object.entries(data)) {
+          relations[key] = items;
+        }
+      }),
+    );
 
-      return c.json({ success: true as const, relations });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, relations });
   })
 
   /**
@@ -259,17 +238,13 @@ export const rolesRoutes = new Hono()
   .get("/:name", requirePermissionFactory("role:read"), async (c) => {
     const name = c.req.param("name");
 
-    try {
-      const role = await getRoleByName(name);
+    const role = await getRoleByName(name);
 
-      if (!role) {
-        return c.json({ success: false as const, error: "Role not found" }, 404);
-      }
-
-      return c.json({ success: true as const, role });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    if (!role) {
+      return c.json({ success: false as const, error: "Role not found" }, 404);
     }
+
+    return c.json({ success: true as const, role });
   })
 
   /**
@@ -286,20 +261,15 @@ export const rolesRoutes = new Hono()
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    try {
-      const role = await deleteRole(id);
+    const role = await deleteRole(id);
 
-      // Audit log: role deletion (tracks impersonation if active)
-      await logRoleDelete(String(id), {
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      });
+    await logRoleDelete(String(id), {
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    });
 
-      return c.json({ success: true as const, role });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
-    }
+    return c.json({ success: true as const, role });
   })
 
   /**
@@ -317,22 +287,17 @@ export const rolesRoutes = new Hono()
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    try {
-      for (const userId of userIds) {
-        await createUserRole({ userId, roleId: id });
-      }
-
-      // Audit log: members added to role (tracks impersonation if active)
-      await logRoleMembersAdd(String(id), userIds, {
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      });
-
-      return c.json({ success: true as const });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    for (const userId of userIds) {
+      await createUserRole({ userId, roleId: id });
     }
+
+    await logRoleMembersAdd(String(id), userIds, {
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    });
+
+    return c.json({ success: true as const });
   })
 
   /**
@@ -350,20 +315,15 @@ export const rolesRoutes = new Hono()
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    try {
-      for (const userId of userIds) {
-        await deleteUserRole({ userId, roleId: id });
-      }
-
-      // Audit log: members removed from role (tracks impersonation if active)
-      await logRoleMembersRemove(String(id), userIds, {
-        actorId: sessionContext.user.id,
-        impersonatorId: sessionContext.impersonator?.id,
-        ...clientInfo,
-      });
-
-      return c.json({ success: true as const });
-    } catch (error) {
-      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    for (const userId of userIds) {
+      await deleteUserRole({ userId, roleId: id });
     }
+
+    await logRoleMembersRemove(String(id), userIds, {
+      actorId: sessionContext.user.id,
+      impersonatorId: sessionContext.impersonator?.id,
+      ...clientInfo,
+    });
+
+    return c.json({ success: true as const });
   });
