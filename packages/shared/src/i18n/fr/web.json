@@ -116,20 +116,79 @@
       "title": "Compte",
       "subtitle": "Gérez les paramètres de votre compte.",
       "joinedAt": "Membre depuis le {{date, date}}",
+      "changePasswordSuccess": "Mot de passe modifié avec succès",
+      "changePasswordError": "Échec de la modification du mot de passe",
       "sections": {
         "profile": {
           "title": "Informations du profil",
           "description": "Mettez à jour vos informations de profil."
+        },
+        "password": {
+          "title": "Changer le mot de passe",
+          "description": "Mettez à jour le mot de passe de votre compte.",
+          "submit": "Changer le mot de passe"
         }
       },
       "fields": {
         "name": "Nom",
-        "email": "E-mail"
+        "email": "E-mail",
+        "currentPassword": "Mot de passe actuel",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le mot de passe",
+        "passwordMismatch": "Les mots de passe ne correspondent pas"
       }
     },
     "nav": {
       "myAccount": "Mon compte",
       "toggle": "Basculer"
+    },
+    "logs": {
+      "title": "Journaux",
+      "subtitle": "Consulter l’activité du système et les actions des utilisateurs.",
+      "searchPlaceholder": "Rechercher dans les journaux...",
+      "impersonated": "Usurpé",
+      "impersonatedBy": "Action effectuée par l’usurpateur : {{id}}",
+      "columns": {
+        "action": "Action",
+        "actor": "Auteur",
+        "target": "Cible",
+        "ip": "Adresse IP",
+        "timestamp": "Horodatage"
+      },
+      "filters": {
+        "actionCategory": "Catégorie d'action",
+        "allActions": "Toutes les actions",
+        "targetType": "Type de cible",
+        "allTargets": "Toutes les cibles",
+        "categories": {
+          "auth": "Authentification",
+          "user": "Gestion des utilisateurs",
+          "account": "Compte",
+          "role": "Gestion des rôles",
+          "invitation": "Invitations",
+          "config": "Configuration",
+          "auditLog": "Journaux d'audit",
+          "impersonation": "Usurpation",
+          "permission": "Permissions",
+          "system": "Système"
+        },
+        "targets": {
+          "user": "Utilisateur",
+          "role": "Rôle",
+          "invitation": "Invitation",
+          "config": "Configuration",
+          "auditLog": "Journal d'audit",
+          "permission": "Permission",
+          "session": "Session",
+          "system": "Système"
+        }
+      },
+      "actions": {
+        "clearLogs": "Effacer les journaux",
+        "clearLogsConfirm": "Cela supprimera définitivement tous les journaux d'audit. Cette action est irréversible.",
+        "clearLogsSuccess": "Tous les journaux ont été effacés.",
+        "clearLogsError": "Échec de la suppression des journaux."
+      }
     },
     "roles": {
       "names": {

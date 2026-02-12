@@ -50,6 +50,7 @@ export type AuditLogAction =
   | "config:update"
   // Audit log actions
   | "auditLog:list"
+  | "auditLog:delete"
   | "auditLog:export"
   // Permission actions
   | "permission:check"

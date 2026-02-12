@@ -116,15 +116,26 @@
       "title": "Account",
       "subtitle": "Manage your account settings.",
       "joinedAt": "Joined at {{date, date}}",
+      "changePasswordSuccess": "Password changed successfully",
+      "changePasswordError": "Failed to change password",
       "sections": {
         "profile": {
           "title": "Profile Information",
           "description": "Update your profile information."
+        },
+        "password": {
+          "title": "Change Password",
+          "description": "Update your account password.",
+          "submit": "Change Password"
         }
       },
       "fields": {
         "name": "Name",
-        "email": "Email"
+        "email": "Email",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password",
+        "passwordMismatch": "Passwords do not match"
       }
     },
     "nav": {
@@ -132,7 +143,7 @@
       "toggle": "Toggle"
     },
     "logs": {
-      "title": "Audit Logs",
+      "title": "Logs",
       "subtitle": "View system activity and user actions.",
       "searchPlaceholder": "Search logs...",
       "impersonated": "Impersonated",
@@ -143,6 +154,40 @@
         "target": "Target",
         "ip": "IP Address",
         "timestamp": "Timestamp"
+      },
+      "filters": {
+        "actionCategory": "Action category",
+        "allActions": "All actions",
+        "targetType": "Target type",
+        "allTargets": "All targets",
+        "categories": {
+          "auth": "Authentication",
+          "user": "User management",
+          "account": "Account",
+          "role": "Role management",
+          "invitation": "Invitations",
+          "config": "Configuration",
+          "auditLog": "Audit logs",
+          "impersonation": "Impersonation",
+          "permission": "Permissions",
+          "system": "System"
+        },
+        "targets": {
+          "user": "User",
+          "role": "Role",
+          "invitation": "Invitation",
+          "config": "Configuration",
+          "auditLog": "Audit log",
+          "permission": "Permission",
+          "session": "Session",
+          "system": "System"
+        }
+      },
+      "actions": {
+        "clearLogs": "Clear logs",
+        "clearLogsConfirm": "This will permanently delete all audit logs. This action cannot be undone.",
+        "clearLogsSuccess": "All logs have been cleared.",
+        "clearLogsError": "Failed to clear logs."
       }
     },
     "roles": {

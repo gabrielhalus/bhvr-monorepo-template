@@ -912,12 +912,21 @@ export async function logAccountDelete(
   });
 }
 
+/**
+ * Delete all audit logs.
+ */
+export async function deleteAllAuditLogs(): Promise<void> {
+  // eslint-disable-next-line drizzle/enforce-delete-with-where
+  await drizzle.delete(AuditLogsModel);
+}
+
 // ============================================================================
 // Paginated Queries
 // ============================================================================
 
 export type AuditLogsPaginatedQuery = PaginationQuery & {
   action?: string;
+  actionCategory?: string;
   actorId?: string;
   targetId?: string;
   targetType?: string;
@@ -937,6 +946,7 @@ export async function getAuditLogsPaginated(
     sortOrder = "desc",
     search,
     action,
+    actionCategory,
     actorId,
     targetId,
     targetType,
@@ -956,6 +966,10 @@ export async function getAuditLogsPaginated(
 
   if (action) {
     conditions.push(eq(AuditLogsModel.action, action));
+  }
+
+  if (actionCategory) {
+    conditions.push(ilike(AuditLogsModel.action, `${actionCategory}:%`));
   }
 
   if (actorId) {
