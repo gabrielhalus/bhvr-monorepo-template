@@ -2,8 +2,14 @@ import type { PaginationParams } from "~react/query/paginated/types";
 
 import { api } from "~react/lib/http";
 
+export type AuditLogFilters = {
+  actionCategory?: string;
+  targetType?: string;
+};
+
 export type AuditLogsParams = PaginationParams & {
   action?: string;
+  actionCategory?: string;
   actorId?: string;
   targetId?: string;
   targetType?: string;
@@ -19,6 +25,7 @@ export async function fetchPaginatedAuditLogs(params: AuditLogsParams) {
       sortOrder: params.sortOrder,
       search: params.search,
       action: params.action,
+      actionCategory: params.actionCategory,
       actorId: params.actorId,
       targetId: params.targetId,
       targetType: params.targetType,

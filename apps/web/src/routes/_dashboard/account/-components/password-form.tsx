@@ -1,51 +1,48 @@
-import type { z } from "zod";
-
 import { useForm } from "@tanstack/react-form";
-import { useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
-import { useUpdateAccount } from "@/hooks/users/use-update-account";
-import { useUser } from "@/hooks/users/use-user";
+import { useChangePassword } from "@/hooks/users/use-change-password";
 import { Button } from "~react/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
-import { Input } from "~react/components/input";
+import { PasswordInput } from "~react/components/password-input";
 import { Separator } from "~react/components/separator";
 import { Spinner } from "~react/components/spinner";
-import { UpdateAccountSchema } from "~shared/schemas/api/auth.schemas";
+import { ChangePasswordSchema, passwordChecks, passwordRules } from "~shared/schemas/api/auth.schemas";
 
-export function UserInformationsForm({ userId }: { userId: string }) {
+const PasswordFormSchema = ChangePasswordSchema.extend({
+  confirmPassword: z.string(),
+});
+
+const defaultValues = {
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+};
+
+export function PasswordForm({ userId: _userId }: { userId: string }) {
   const { t } = useTranslation(["common", "web"]);
 
-  const userQuery = useUser(userId);
-
-  const formRef = useRef<{ reset: (values: z.infer<typeof UpdateAccountSchema>) => void } | null>(null);
-
-  const mutation = useUpdateAccount();
-
-  const handleSuccess = (response: { user: { name: string; email: string } }) => {
-    formRef.current?.reset({ name: response.user.name, email: response.user.email });
-  };
+  const mutation = useChangePassword();
 
   const form = useForm({
-    validators: { onChange: UpdateAccountSchema },
-    defaultValues: {
-      name: userQuery.data?.user?.name ?? "",
-      email: userQuery.data?.user?.email ?? "",
-    },
+    validators: { onChange: PasswordFormSchema },
+    defaultValues,
     onSubmit: async ({ value }) => {
-      const response = await mutation.mutateAsync(value);
-      handleSuccess(response);
+      await mutation.mutateAsync({
+        currentPassword: value.currentPassword,
+        newPassword: value.newPassword,
+      });
+      form.reset();
     },
   });
-
-  formRef.current = form;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("web:pages.account.sections.profile.title")}</CardTitle>
-        <CardDescription>{t("web:pages.account.sections.profile.description")}</CardDescription>
+        <CardTitle>{t("web:pages.account.sections.password.title")}</CardTitle>
+        <CardDescription>{t("web:pages.account.sections.password.description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form
@@ -57,21 +54,19 @@ export function UserInformationsForm({ userId }: { userId: string }) {
         >
           <div className="grid gap-4">
             <form.Field
-              name="name"
+              name="currentPassword"
               children={field => (
                 <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
                   <FieldLabel htmlFor={field.name}>
-                    {t("web:pages.account.fields.name")}
+                    {t("web:pages.account.fields.currentPassword")}
                   </FieldLabel>
                   <FieldContent>
-                    <Input
+                    <PasswordInput
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={e => field.handleChange(e.target.value)}
-                      type="text"
-                      placeholder="User name"
-                      required
+                      showRequirements={false}
                     />
                     <FieldError errors={field.state.meta.errors} />
                   </FieldContent>
@@ -79,21 +74,50 @@ export function UserInformationsForm({ userId }: { userId: string }) {
               )}
             />
             <form.Field
-              name="email"
+              name="newPassword"
               children={field => (
                 <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
                   <FieldLabel htmlFor={field.name}>
-                    {t("web:pages.account.fields.email")}
+                    {t("web:pages.account.fields.newPassword")}
                   </FieldLabel>
                   <FieldContent>
-                    <Input
+                    <PasswordInput
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={e => field.handleChange(e.target.value)}
-                      type="email"
-                      placeholder="user@email.com"
-                      required
+                      rules={passwordRules}
+                      checks={passwordChecks}
+                      showRequirements
+                    />
+                    <FieldError errors={field.state.meta.errors} />
+                  </FieldContent>
+                </Field>
+              )}
+            />
+            <form.Field
+              name="confirmPassword"
+              validators={{
+                onChangeListenTo: ["newPassword"],
+                onChange: ({ value, fieldApi }) => {
+                  if (value && value !== fieldApi.form.getFieldValue("newPassword")) {
+                    return { message: t("web:pages.account.fields.passwordMismatch") };
+                  }
+                  return undefined;
+                },
+              }}
+              children={field => (
+                <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                  <FieldLabel htmlFor={field.name}>
+                    {t("web:pages.account.fields.confirmPassword")}
+                  </FieldLabel>
+                  <FieldContent>
+                    <PasswordInput
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={e => field.handleChange(e.target.value)}
+                      showRequirements={false}
                     />
                     <FieldError errors={field.state.meta.errors} />
                   </FieldContent>
@@ -114,9 +138,7 @@ export function UserInformationsForm({ userId }: { userId: string }) {
                           {t("common:form.saving")}
                         </span>
                       )
-                    : isDefaultValue
-                      ? t("common:form.noChanges")
-                      : t("common:form.save")}
+                    : t("web:pages.account.sections.password.submit")}
                 </Button>
               )}
             />

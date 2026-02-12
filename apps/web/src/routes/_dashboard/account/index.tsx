@@ -7,6 +7,7 @@ import { Badge } from "~react/components/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
 import { useAuth } from "~react/hooks/use-auth";
 
+import { PasswordForm } from "./-components/password-form";
 import { UserInformationsForm } from "./-components/user-informations-form";
 
 export const Route = createFileRoute("/_dashboard/account/")({
@@ -66,6 +67,7 @@ function Account() {
         </Card>
 
         <UserInformationsForm userId={user.id} />
+        <PasswordForm userId={user.id} />
       </div>
     </div>
   );

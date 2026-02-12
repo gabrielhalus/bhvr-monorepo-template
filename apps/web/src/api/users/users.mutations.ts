@@ -1,14 +1,15 @@
 import type { QueryClient } from "@tanstack/react-query";
-import type { z } from "zod";
+import type { ChangePasswordSchema, UpdateAccountSchema } from "~shared/schemas/api/auth.schemas";
 import type { User } from "~shared/types/db/users.types";
+import type { z } from "zod";
 
 import { api } from "~react/lib/http";
 import { authQueryOptions } from "~react/queries/auth";
-import type { UpdateAccountSchema } from "~shared/schemas/api/auth.schemas";
 
 import { usersKeys } from "./users.keys";
 
 type UpdateUserData = z.infer<typeof UpdateAccountSchema>;
+type ChangePasswordData = z.infer<typeof ChangePasswordSchema>;
 
 // ============================================================================
 // Mutation Functions
@@ -46,6 +47,16 @@ async function resetUserPassword(id: string) {
 
   if (!res.ok) {
     throw new Error("Failed to reset password");
+  }
+
+  return res.json();
+}
+
+async function changePassword(data: ChangePasswordData) {
+  const res = await api.auth.account.password.$put({ json: data });
+
+  if (!res.ok) {
+    throw new Error("Failed to change password");
   }
 
   return res.json();
@@ -124,6 +135,12 @@ export function deleteUserMutationOptions(queryClient: QueryClient) {
 export function resetUserPasswordMutationOptions() {
   return {
     mutationFn: (id: string) => resetUserPassword(id),
+  };
+}
+
+export function changePasswordMutationOptions() {
+  return {
+    mutationFn: (data: ChangePasswordData) => changePassword(data),
   };
 }
 
