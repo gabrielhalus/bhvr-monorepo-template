@@ -1,4 +1,4 @@
-import { UsePaginatedQueryOptions } from "./types";
+import type { UsePaginatedQueryOptions } from "./types";
 
 export function paginatedQueryOptions<TData, TError = Error>({
   queryKey,
@@ -17,5 +17,5 @@ export function paginatedQueryOptions<TData, TError = Error>({
     searchDebounceMs,
     staleTime,
     enabled,
-  }
+  };
 }

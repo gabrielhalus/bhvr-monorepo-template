@@ -69,8 +69,8 @@ export function auditMiddleware(options: AuditMiddlewareOptions) {
 /**
  * Pre-configured audit middleware for common list operations.
  */
-export const auditList = (action: AuditLogAction, targetType: AuditTargetType) =>
-  auditMiddleware({
+export function auditList(action: AuditLogAction, targetType: AuditTargetType) {
+  return auditMiddleware({
     action,
     targetType,
     getMetadata: (c) => {
@@ -78,22 +78,24 @@ export const auditList = (action: AuditLogAction, targetType: AuditTargetType) =
       return Object.keys(query).length > 0 ? { filters: query } : undefined;
     },
   });
+}
 
 /**
  * Pre-configured audit middleware for common read operations.
  */
-export const auditRead = (action: AuditLogAction, targetType: AuditTargetType, paramName = "id") =>
-  auditMiddleware({
+export function auditRead(action: AuditLogAction, targetType: AuditTargetType, paramName = "id") {
+  return auditMiddleware({
     action,
     targetType,
-    getTargetId: (c) => c.req.param(paramName),
+    getTargetId: c => c.req.param(paramName),
   });
+}
 
 /**
  * Pre-configured audit middleware for common create operations.
  */
-export const auditCreate = (action: AuditLogAction, targetType: AuditTargetType) =>
-  auditMiddleware({
+export function auditCreate(action: AuditLogAction, targetType: AuditTargetType) {
+  return auditMiddleware({
     action,
     targetType,
     getMetadata: async (c) => {
@@ -105,15 +107,16 @@ export const auditCreate = (action: AuditLogAction, targetType: AuditTargetType)
       }
     },
   });
+}
 
 /**
  * Pre-configured audit middleware for common update operations.
  */
-export const auditUpdate = (action: AuditLogAction, targetType: AuditTargetType, paramName = "id") =>
-  auditMiddleware({
+export function auditUpdate(action: AuditLogAction, targetType: AuditTargetType, paramName = "id") {
+  return auditMiddleware({
     action,
     targetType,
-    getTargetId: (c) => c.req.param(paramName),
+    getTargetId: c => c.req.param(paramName),
     getMetadata: async (c) => {
       try {
         const body = await c.req.json();
@@ -123,13 +126,15 @@ export const auditUpdate = (action: AuditLogAction, targetType: AuditTargetType,
       }
     },
   });
+}
 
 /**
  * Pre-configured audit middleware for common delete operations.
  */
-export const auditDelete = (action: AuditLogAction, targetType: AuditTargetType, paramName = "id") =>
-  auditMiddleware({
+export function auditDelete(action: AuditLogAction, targetType: AuditTargetType, paramName = "id") {
+  return auditMiddleware({
     action,
     targetType,
-    getTargetId: (c) => c.req.param(paramName),
+    getTargetId: c => c.req.param(paramName),
   });
+}

@@ -2,8 +2,8 @@ import type { NotificationChannelUnion } from "../types/db/notification-channels
 
 import { eq } from "drizzle-orm";
 
-import { NotificationChannelsModel } from "../models/notifications-channels.model";
 import { drizzle } from "../drizzle";
+import { NotificationChannelsModel } from "../models/notifications-channels.model";
 import { NotificationChannelSchema } from "../schemas/db/notification-channels.schemas";
 
 // ============================================================================

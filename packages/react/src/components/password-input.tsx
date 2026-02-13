@@ -5,7 +5,7 @@ import { Check, Eye, EyeOff, X } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "~react/components/input-group";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "~react/components/input-group";
 import { cn } from "~react/lib/utils";
 
 export type PasswordInputProps = {
@@ -63,7 +63,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
   const { t } = useTranslation("ui");
 
   const [showPassword, setShowPassword] = React.useState(false);
-  const password = value?.toString() ?? ""
+  const password = value?.toString() ?? "";
 
   const requirements = React.useMemo(() => checkRequirements(password, checks), [password, checks]);
 

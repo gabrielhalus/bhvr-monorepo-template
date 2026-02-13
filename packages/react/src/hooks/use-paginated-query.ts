@@ -1,16 +1,15 @@
 import type { SortingState } from "@tanstack/react-table";
+import type { PaginationParams, UsePaginatedQueryOptions, UsePaginatedQueryResult } from "~react/query/paginated/types";
 
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 
 import { useDebouncedCallback } from "./use-debounced-callback";
-import { PaginationParams, UsePaginatedQueryOptions, UsePaginatedQueryResult } from "~react/query/paginated/types";
-
 
 export function paginatedQueryOptions<TData, TError = Error>({
   ...options
 }: UsePaginatedQueryOptions<TData, TError>): UsePaginatedQueryOptions<TData, TError> {
-  return options
+  return options;
 }
 
 export function usePaginatedQuery<TData, TError = Error>({

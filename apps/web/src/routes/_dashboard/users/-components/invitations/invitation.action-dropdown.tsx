@@ -1,8 +1,7 @@
+import type { InvitationRow } from "./invitations.data-table";
 import type { Row } from "@tanstack/react-table";
 
 import { Ban, Copy, Link, MoreHorizontal, Trash2 } from "lucide-react";
-
-import type { InvitationRow } from "./invitations.data-table";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 

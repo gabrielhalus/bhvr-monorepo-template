@@ -1,17 +1,16 @@
-import type { SortingState } from "@tanstack/react-table";
-
 import type { QueryKey } from "@tanstack/react-query";
+import type { SortingState } from "@tanstack/react-table";
 import type { PaginatedResponse, PaginationMeta } from "~shared/schemas/api/pagination.schemas";
 
 export type PaginationParams = {
   page: number;
   limit: number;
   sortBy?: string;
-  sortOrder?:  "asc" | "desc";
+  sortOrder?: "asc" | "desc";
   search?: string;
 };
 
-export type UsePaginatedQueryOptions<TData, TError = Error> = {
+export type UsePaginatedQueryOptions<TData, _TError = Error> = {
   queryKey: QueryKey;
   queryFn: (params: PaginationParams) => Promise<PaginatedResponse<TData>>;
   initialPage?: number;

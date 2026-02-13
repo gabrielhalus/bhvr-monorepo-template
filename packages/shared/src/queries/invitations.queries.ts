@@ -343,7 +343,8 @@ export async function createInvitationRole(invitationId: string, roleId: number)
  * @param roleIds - The role ids.
  */
 export async function createInvitationRoles(invitationId: string, roleIds: number[]): Promise<void> {
-  if (!roleIds.length) return;
+  if (!roleIds.length)
+    return;
 
   await drizzle
     .insert(InvitationRolesModel)

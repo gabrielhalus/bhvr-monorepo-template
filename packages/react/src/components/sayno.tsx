@@ -1,10 +1,10 @@
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangleIcon, HelpCircleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "~react/components/button";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { handleDialogResult } from "~react/lib/sayno";
 import { cn } from "~react/lib/utils";
 
