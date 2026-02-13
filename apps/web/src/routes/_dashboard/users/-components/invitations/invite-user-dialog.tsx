@@ -1,6 +1,8 @@
+import type { z } from "zod";
+
 import { useForm } from "@tanstack/react-form";
 import { CheckCircle2Icon, CopyIcon, MailIcon, SendIcon, ShieldIcon } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -17,29 +19,34 @@ import { Spinner } from "~react/components/spinner";
 import { cn } from "~react/lib/utils";
 import { CreateInvitationSchema } from "~shared/schemas/api/invitations.schemas";
 
+const defaultValues: z.input<typeof CreateInvitationSchema> = {
+  email: "",
+  roleIds: [],
+  autoValidateEmail: false,
+};
+
 export function InviteUserDialog() {
   const { t } = useTranslation(["common", "web"]);
   const [open, setOpen] = useState(false);
   const [invitationLink, setInvitationLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const { data: rolesData } = useRoles();
-  const roles = rolesData?.roles ?? [];
-  const nonDefaultRoles = roles.filter(role => !role.isDefault);
+  const rolesQuery = useRoles();
+
+  const nonDefaultRoles = useMemo(
+    () => rolesQuery.data?.roles.filter(role => !role.isDefault),
+    [rolesQuery.data],
+  ) ?? [];
 
   const mutation = useCreateInvitation();
 
   const form = useForm({
     validators: { onChange: CreateInvitationSchema },
-    defaultValues: {
-      email: "",
-      roleIds: [] as number[],
-      autoValidateEmail: false,
-    },
+    defaultValues,
     onSubmit: async ({ value }) => {
       const response = await mutation.mutateAsync({
         email: value.email,
-        roleIds: value.roleIds.length > 0 ? value.roleIds : undefined,
+        roleIds: value.roleIds,
         autoValidateEmail: value.autoValidateEmail,
       });
 
@@ -195,7 +202,7 @@ export function InviteUserDialog() {
                             ? (
                                 <MultiSelect
                                   options={roleOptions}
-                                  value={field.state.value}
+                                  value={field.state.value ?? []}
                                   onChange={field.handleChange}
                                   placeholder={t("web:pages.users.invite.rolesPlaceholder")}
                                 />

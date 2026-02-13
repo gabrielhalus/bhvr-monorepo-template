@@ -1,14 +1,14 @@
 import type { QueryClient } from "@tanstack/react-query";
-import type { z } from "zod";
+import type { AcceptInvitationSchema, CreateInvitationSchema } from "~shared/schemas/api/invitations.schemas";
 import type { Invitation } from "~shared/types/db/invitations.types";
+import type { z } from "zod";
 
 import { api } from "~react/lib/http";
-import type { AcceptInvitationSchema, CreateInvitationSchema } from "~shared/schemas/api/invitations.schemas";
 
 import { invitationsKeys } from "./invitations.keys";
 
-type CreateInvitationData = z.infer<typeof CreateInvitationSchema>;
-type AcceptInvitationData = z.infer<typeof AcceptInvitationSchema>;
+type CreateInvitationData = z.input<typeof CreateInvitationSchema>;
+type AcceptInvitationData = z.input<typeof AcceptInvitationSchema>;
 
 // ============================================================================
 // Mutation Functions
@@ -33,7 +33,7 @@ async function createInvitation(data: CreateInvitationData) {
 }
 
 async function revokeInvitation(id: string) {
-  const res = await api.invitations[":id{^[a-zA-Z0-9-]{21}$}"].$put({ param: { id } });
+  const res = await api.invitations[":id{[a-zA-Z0-9-]{21}}"].$put({ param: { id } });
 
   if (!res.ok) {
     throw new Error("Failed to revoke invitation");
@@ -43,7 +43,7 @@ async function revokeInvitation(id: string) {
 }
 
 async function deleteInvitation(id: string) {
-  const res = await api.invitations[":id{^[a-zA-Z0-9-]{21}$}"].$delete({ param: { id } });
+  const res = await api.invitations[":id{[a-zA-Z0-9-]{21}}"].$delete({ param: { id } });
 
   if (!res.ok) {
     throw new Error("Failed to delete invitation");
@@ -91,7 +91,7 @@ export function revokeInvitationMutationOptions(queryClient: QueryClient) {
 export function deleteInvitationMutationOptions(queryClient: QueryClient) {
   return {
     mutationFn: (id: string) => deleteInvitation(id),
-    onSuccess: (_data: { success: true; invitation: Invitation }, id: string) => {
+    onSuccess: (_data: { success: true; invitation: Invitation }, _id: string) => {
       queryClient.invalidateQueries({ queryKey: invitationsKeys.paginated });
     },
   };
