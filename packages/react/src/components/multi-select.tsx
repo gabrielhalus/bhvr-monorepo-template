@@ -54,7 +54,7 @@ function MultiSelect<T extends string | number>({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "border-input data-[placeholder]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 flex min-h-9 w-full items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30 dark:hover:bg-input/50",
+            "border-input data-placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 flex min-h-9 w-full items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30 dark:hover:bg-input/50",
             className,
           )}
           data-placeholder={selectedOptions.length === 0 ? "" : undefined}
@@ -93,7 +93,7 @@ function MultiSelect<T extends string | number>({
           <ChevronDownIcon className="size-4 shrink-0 opacity-50" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-1" align="start">
+      <PopoverContent className="w-(--radix-popover-trigger-width) p-1" align="start">
         <div className="max-h-60 overflow-y-auto">
           {options.length === 0
             ? (
