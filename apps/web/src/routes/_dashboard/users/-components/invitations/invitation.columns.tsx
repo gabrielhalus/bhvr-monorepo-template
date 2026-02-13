@@ -1,7 +1,6 @@
+import type { InvitationRow } from "./invitations.data-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { TFunction } from "i18next";
-
-import type { InvitationRow } from "./invitations.data-table";
 
 import { CheckCircle2Icon, ClockIcon, MailIcon, XCircleIcon } from "lucide-react";
 
@@ -93,6 +92,10 @@ export function getInvitationColumns(t: TFunction): ColumnDef<InvitationRow>[] {
 
         const dateString = formatValue(expiresAt, { locale: i18n.language, format: "datetime" });
 
+        if (row.original.status !== "pending") {
+          return <div className="text-muted-foreground">-</div>;
+        }
+
         return (
           <div
             className={cn(
@@ -102,6 +105,28 @@ export function getInvitationColumns(t: TFunction): ColumnDef<InvitationRow>[] {
               !isExpired && !isExpiringSoon && "text-muted-foreground",
             )}
           >
+            <ClockIcon className="size-3.5" />
+            <span>{dateString}</span>
+          </div>
+        );
+      },
+      size: 160,
+    },
+    {
+      accessorKey: "acceptedAt",
+      header: ({ column }) => <SortableHeader column={column} title={t("pages.users.columns.accepted")} />,
+      cell: ({ row }) => {
+        if (row.original.status !== "accepted") {
+          return <div className="text-muted-foreground">-</div>;
+        }
+
+        const timestamp = row.original.acceptedAt;
+        const acceptedAt = new Date(timestamp ?? "");
+
+        const dateString = formatValue(acceptedAt, { locale: i18n.language, format: "datetime" });
+
+        return (
+          <div className={cn("flex items-center gap-1.5 text-muted-foreground")}>
             <ClockIcon className="size-3.5" />
             <span>{dateString}</span>
           </div>
