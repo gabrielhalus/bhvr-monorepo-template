@@ -21,7 +21,7 @@ export async function fetchPaginatedUsers(params: PaginationParams) {
 }
 
 export async function fetchUser(userId: string) {
-  const res = await api.users[":id{^[a-zA-Z0-9-]{21}$}"].$get({
+  const res = await api.users[":id{[a-zA-Z0-9-]{21}}"].$get({
     param: { id: userId },
   });
 

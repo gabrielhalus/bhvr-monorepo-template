@@ -16,7 +16,7 @@ type ChangePasswordData = z.infer<typeof ChangePasswordSchema>;
 // ============================================================================
 
 async function updateUser(id: string, data: UpdateUserData) {
-  const res = await api.users[":id{^[a-zA-Z0-9-]{21}$}"].$put({
+  const res = await api.users[":id{[a-zA-Z0-9-]{21}}"].$put({
     param: { id },
     json: data,
   });
@@ -29,7 +29,7 @@ async function updateUser(id: string, data: UpdateUserData) {
 }
 
 async function deleteUser(id: string) {
-  const res = await api.users[":id{^[a-zA-Z0-9-]{21}$}"].$delete({
+  const res = await api.users[":id{[a-zA-Z0-9-]{21}}"].$delete({
     param: { id },
   });
 
@@ -41,7 +41,7 @@ async function deleteUser(id: string) {
 }
 
 async function resetUserPassword(id: string) {
-  const res = await api.users[":id{^[a-zA-Z0-9-]{21}$}"]["reset-password"].$post({
+  const res = await api.users[":id{[a-zA-Z0-9-]{21}}"]["reset-password"].$post({
     param: { id },
   });
 
@@ -73,7 +73,7 @@ async function updateAccount(data: UpdateUserData) {
 }
 
 async function impersonateUser(id: string) {
-  const res = await api.auth.impersonate[":id{^[a-zA-Z0-9-]{21}$}"].$post({
+  const res = await api.auth.impersonate[":id{[a-zA-Z0-9-]{21}}"].$post({
     param: { id },
   });
 
@@ -96,7 +96,7 @@ async function stopImpersonation() {
 }
 
 async function updateUserRoles(id: string, roleIds: number[]) {
-  const res = await api.users[":id{^[a-zA-Z0-9-]{21}$}"].roles.$put({
+  const res = await api.users[":id{[a-zA-Z0-9-]{21}}"].roles.$put({
     param: { id },
     json: { roleIds },
   });

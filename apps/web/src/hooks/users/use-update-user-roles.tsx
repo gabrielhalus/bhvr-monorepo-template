@@ -11,9 +11,10 @@ export function useUpdateUserRoles() {
 
   return useMutation({
     ...updateUserRolesMutationOptions(queryClient),
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: usersKeys.byId(variables.id) });
       queryClient.invalidateQueries({ queryKey: usersKeys.paginated });
+      queryClient.invalidateQueries({ queryKey: usersKeys.relations([], ["roles"]) });
       toast.success(t("pages.users.detail.sections.roles.updateSuccess"));
     },
     onError: () => {

@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useRoles } from "@/hooks/roles/use-roles";
 import { useUpdateUserRoles } from "@/hooks/users/use-update-user-roles";
-import { useUser } from "@/hooks/users/use-user";
+import { useUsersRelations } from "@/hooks/users/use-users-relations";
 import { Button } from "~react/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
 import { MultiSelect } from "~react/components/multi-select";
@@ -16,20 +16,45 @@ type UserRolesFormProps = {
 export function UserRolesForm({ userId }: UserRolesFormProps) {
   const { t } = useTranslation(["common", "web"]);
 
-  const userQuery = useUser(userId);
-  const { data: rolesData } = useRoles();
   const mutation = useUpdateUserRoles();
 
-  const roles = rolesData?.roles ?? [];
-  const nonDefaultRoles = roles.filter(role => !role.isDefault);
-  const userRoleIds = userQuery.data?.user?.roles?.map(r => r.id) ?? [];
-  const nonDefaultUserRoleIds = userRoleIds.filter(id => nonDefaultRoles.some(r => r.id === id));
+  const userRolesQuery = useUsersRelations([userId], ["roles"]);
+  const rolesQuery = useRoles();
 
-  const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
+  const nonDefaultRoles = useMemo(
+    () => {
+      const roles = rolesQuery.data?.roles;
+      if (!roles) {
+        return [];
+      }
+
+      return roles.filter(role => !role.isDefault);
+    },
+    [rolesQuery.data],
+  );
+
+  const nonDefaultUserRoleIds = useMemo<number[]>(() => {
+    const roles = userRolesQuery.data?.relations?.[userId]?.roles;
+    if (!roles) {
+      return [];
+    }
+
+    return roles
+      .filter(role => !role.isDefault)
+      .map(role => role.id);
+  }, [userRolesQuery.data, userId]);
+
+  const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>(nonDefaultUserRoleIds);
 
   useEffect(() => {
-    setSelectedRoleIds(nonDefaultUserRoleIds);
-  }, [userQuery.data?.user?.roles]);
+    // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
+    setSelectedRoleIds((prev) => {
+      if (prev.length === nonDefaultUserRoleIds.length && prev.every((id, i) => id === nonDefaultUserRoleIds[i])) {
+        return prev;
+      }
+      return nonDefaultUserRoleIds;
+    });
+  }, [nonDefaultUserRoleIds]);
 
   const handleSubmit = () => {
     mutation.mutate({ id: userId, roleIds: selectedRoleIds });
