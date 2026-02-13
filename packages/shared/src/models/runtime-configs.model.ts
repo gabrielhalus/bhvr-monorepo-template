@@ -10,7 +10,7 @@ export const RuntimeConfigModel = pgTable("runtime_configs", {
   options: text("options"),
   disabledWhen: text("disabled_when"),
   order: integer("order").notNull().default(0),
-  updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "string", withTimezone: true }).notNull().defaultNow(),
   updatedBy: varchar("updated_by", { length: 21 }).references(() => UsersModel.id),
 }, table => [
   index("idx_config_key_prefix").on(table.configKey),

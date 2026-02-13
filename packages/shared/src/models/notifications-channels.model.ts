@@ -7,6 +7,6 @@ export const NotificationChannelsModel = pgTable("notification_channels", {
   type: varchar("type", { length: 16 }).$type<"DISCORD" | "TELEGRAM" | "SLACK">().notNull(),
   name: text("name").notNull(),
   config: jsonb("config").notNull(),
-  createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { mode: "string", withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "string", withTimezone: true }).notNull().defaultNow(),
 });

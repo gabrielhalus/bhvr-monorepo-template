@@ -25,5 +25,5 @@ export const AuditLogsModel = pgTable("audit_logs", {
   /** User agent of the actor */
   userAgent: text("user_agent"),
   /** When the action occurred */
-  createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { mode: "string", withTimezone: true }).notNull().defaultNow(),
 });

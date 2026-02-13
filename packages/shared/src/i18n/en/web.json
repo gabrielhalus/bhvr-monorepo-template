@@ -22,7 +22,8 @@
         "email": "Email",
         "status": "Status",
         "invitedBy": "Invited By",
-        "expires": "Expires"
+        "expires": "Expires",
+        "accepted": "Accepted"
       },
       "status": {
         "pending": "Pending",

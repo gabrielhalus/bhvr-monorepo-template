@@ -8,7 +8,7 @@ export const UsersModel = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password"),
   avatar: text("avatar"),
-  verifiedAt: timestamp("verified_at", { mode: "string" }),
-  createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow(),
+  verifiedAt: timestamp("verified_at", { mode: "string", withTimezone: true }),
+  createdAt: timestamp("created_at", { mode: "string", withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "string", withTimezone: true }).notNull().defaultNow(),
 });

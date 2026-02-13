@@ -6,6 +6,6 @@ export const RolesModel = pgTable("roles", {
   index: integer("index").notNull().unique(),
   isDefault: boolean("is_default").notNull().default(false),
   isSuperAdmin: boolean("is_super_admin").notNull().default(false),
-  createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { mode: "string", withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "string", withTimezone: true }).notNull().defaultNow(),
 });
