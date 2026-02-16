@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~reac
 import { UserInformationsForm } from "./-components/user-informations-form";
 import { UserRolesForm } from "./-components/user-roles-form";
 import { UserSecurityActions } from "./-components/user-security-actions";
+import { UserSessionsCard } from "./-components/user-sessions-card";
 
 export const Route = createFileRoute("/_dashboard/users/$userId/")({
   component: User,
@@ -82,6 +83,7 @@ function User() {
         <UserInformationsForm userId={userId} />
         <UserRolesForm userId={userId} />
         <UserSecurityActions userId={userId} />
+        <UserSessionsCard userId={userId} userName={userQuery.data?.user?.name ?? ""} />
       </div>
     </div>
   );
