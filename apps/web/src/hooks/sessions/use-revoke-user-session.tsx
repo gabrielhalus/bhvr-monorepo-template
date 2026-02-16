@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { revokeUserSessionMutationOptions } from "@/api/sessions/sessions.mutations";
+import { sessionsKeys } from "@/api/sessions/sessions.keys";
 
 export function useRevokeUserSession(userId: string) {
   const { t } = useTranslation("web");
@@ -11,6 +12,7 @@ export function useRevokeUserSession(userId: string) {
   return useMutation({
     ...revokeUserSessionMutationOptions(queryClient, userId),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: sessionsKeys.forUser(userId) });
       toast.success(t("pages.users.detail.sessions.revokeSuccess"));
     },
     onError: () => {

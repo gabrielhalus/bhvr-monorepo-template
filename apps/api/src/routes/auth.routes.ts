@@ -419,7 +419,7 @@ export const authRoutes = new Hono()
   })
 
   /**
-   * Revoke all sessions for the authenticated user except the current one
+   * Revoke all sessions for the authenticated user including the current one
    *
    * @param c - The Hono context object with session context
    * @returns JSON response indicating success
@@ -429,24 +429,11 @@ export const authRoutes = new Hono()
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    const refreshToken = getCookie(c, "refreshToken");
-    let currentTokenId: string | undefined;
-    if (refreshToken) {
-      try {
-        const payload = await verifyToken(refreshToken, "refresh");
-        currentTokenId = payload?.jti;
-      } catch {
-        // ignore
-      }
-    }
-
     try {
-      if (currentTokenId) {
-        await revokeAllTokensByUserIdExcept(sessionContext.user.id, currentTokenId);
-      } else {
-        // No current token identified — revoke all (user will need to log in again)
-        await revokeAllTokensByUserId(sessionContext.user.id);
-      }
+      await revokeAllTokensByUserId(sessionContext.user.id);
+
+      setCookie(c, "accessToken", "", getCookieSettings("clear"));
+      setCookie(c, "refreshToken", "", getCookieSettings("clear"));
 
       await logSessionRevokeAll(sessionContext.user.id, {
         actorId: sessionContext.user.id,
