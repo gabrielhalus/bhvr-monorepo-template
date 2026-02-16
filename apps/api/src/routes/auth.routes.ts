@@ -17,9 +17,11 @@ import {
   logLoginFailed,
   logLogout,
   logRegister,
+  logSessionRevokeAll,
+  logTokenRevoke,
 } from "~shared/queries/audit-logs.queries";
 import { getDefaultRole } from "~shared/queries/roles.queries";
-import { deleteToken, insertToken } from "~shared/queries/tokens.queries";
+import { deleteToken, getActiveTokensByUserId, insertToken, revokeAllTokensByUserId, revokeAllTokensByUserIdExcept, revokeToken } from "~shared/queries/tokens.queries";
 import { createUserRole } from "~shared/queries/user-roles.queries";
 import { createUser, getUser, signIn, updateUser, updateUserPassword } from "~shared/queries/users.queries";
 import { ChangePasswordSchema, isAuthorizedSchema, LoginSchema, RegisterSchema, UpdateAccountSchema } from "~shared/schemas/api/auth.schemas";
@@ -227,6 +229,19 @@ export const authRoutes = new Hono()
     const hashedPassword = await password.hash(newPassword);
     await updateUserPassword(sessionContext.user.id, hashedPassword);
 
+    // Revoke all sessions except the current one after password change
+    const refreshToken = getCookie(c, "refreshToken");
+    if (refreshToken) {
+      try {
+        const payload = await verifyToken(refreshToken, "refresh");
+        if (payload?.jti) {
+          await revokeAllTokensByUserIdExcept(sessionContext.user.id, payload.jti);
+        }
+      } catch {
+        // Best-effort: skip if token cannot be parsed
+      }
+    }
+
     await logAccountPasswordChange({
       actorId: sessionContext.user.id,
       impersonatorId: sessionContext.impersonator?.id,
@@ -317,4 +332,130 @@ export const authRoutes = new Hono()
     await logImpersonationStop(sessionContext.impersonator.id, sessionContext.user.id, clientInfo);
 
     return c.json({ success: true as const, user: sessionContext.impersonator });
+  })
+
+  /**
+   * Get all active sessions for the authenticated user
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response with list of active sessions and isCurrent flag
+   * @access protected
+   */
+  .get("/sessions", async (c) => {
+    const sessionContext = c.var.sessionContext;
+    const refreshToken = getCookie(c, "refreshToken");
+
+    let currentTokenId: string | undefined;
+    if (refreshToken) {
+      try {
+        const payload = await verifyToken(refreshToken, "refresh");
+        currentTokenId = payload?.jti;
+      } catch {
+        // ignore
+      }
+    }
+
+    try {
+      const tokens = await getActiveTokensByUserId(sessionContext.user.id);
+      const sessions = tokens.map(token => ({
+        ...token,
+        isCurrent: token.id === currentTokenId,
+      }));
+
+      return c.json({ success: true as const, sessions });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Revoke a specific session for the authenticated user
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response indicating success
+   * @throws {403} If the token does not belong to the current user
+   * @throws {404} If the token is not found
+   * @access protected
+   */
+  .delete("/sessions/:tokenId", async (c) => {
+    const sessionContext = c.var.sessionContext;
+    const tokenId = c.req.param("tokenId");
+    const clientInfo = getClientInfo(c);
+
+    try {
+      const tokens = await getActiveTokensByUserId(sessionContext.user.id);
+      const token = tokens.find(t => t.id === tokenId);
+
+      if (!token) {
+        return c.json({ success: false as const, error: "Session not found" }, 404);
+      }
+
+      await revokeToken(tokenId);
+
+      // If this was the current session, clear cookies
+      const refreshToken = getCookie(c, "refreshToken");
+      if (refreshToken) {
+        try {
+          const payload = await verifyToken(refreshToken, "refresh");
+          if (payload?.jti === tokenId) {
+            setCookie(c, "accessToken", "", getCookieSettings("clear"));
+            setCookie(c, "refreshToken", "", getCookieSettings("clear"));
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      await logTokenRevoke(tokenId, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
+      return c.json({ success: true as const });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Revoke all sessions for the authenticated user except the current one
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response indicating success
+   * @access protected
+   */
+  .delete("/sessions", async (c) => {
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
+
+    const refreshToken = getCookie(c, "refreshToken");
+    let currentTokenId: string | undefined;
+    if (refreshToken) {
+      try {
+        const payload = await verifyToken(refreshToken, "refresh");
+        currentTokenId = payload?.jti;
+      } catch {
+        // ignore
+      }
+    }
+
+    try {
+      if (currentTokenId) {
+        await revokeAllTokensByUserIdExcept(sessionContext.user.id, currentTokenId);
+      } else {
+        // No current token identified — revoke all (user will need to log in again)
+        await revokeAllTokensByUserId(sessionContext.user.id);
+      }
+
+      await logSessionRevokeAll(sessionContext.user.id, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
+      return c.json({ success: true as const });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
   });

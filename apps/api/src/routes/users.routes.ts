@@ -10,8 +10,9 @@ import { requirePermissionFactory } from "@/middlewares/access-control";
 import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { logPasswordReset, logUserDelete, logUserRolesUpdate, logUserUpdate } from "~shared/queries/audit-logs.queries";
+import { logPasswordReset, logSessionRevokeAll, logTokenRevoke, logUserDelete, logUserRolesUpdate, logUserUpdate } from "~shared/queries/audit-logs.queries";
 import { getUserRoleIds, updateUserRoles } from "~shared/queries/user-roles.queries";
+import { getActiveTokensByUserId, revokeAllTokensByUserId, revokeToken } from "~shared/queries/tokens.queries";
 import { deleteUser, emailExists, getUser, getUsersPaginated, updateUser, updateUserPassword, userRelationCountLoaders, userRelationLoaders } from "~shared/queries/users.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
 import { UpdateUserRolesSchema, UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
@@ -256,6 +257,9 @@ export const usersRoutes = new Hono()
 
     await updateUserPassword(id, hashedPassword);
 
+    // Revoke all sessions for the user after admin password reset
+    await revokeAllTokensByUserId(id);
+
     await logPasswordReset(id, {
       actorId: sessionContext.user.id,
       impersonatorId: sessionContext.impersonator?.id,
@@ -321,4 +325,101 @@ export const usersRoutes = new Hono()
     });
 
     return c.json({ success: true as const, user });
+  })
+
+  /**
+   * Get all active sessions for a specific user (admin)
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response with list of active sessions
+   * @throws {404} If the user is not found
+   * @access protected
+   * @permission session:list
+   */
+  .get("/:id{[a-zA-Z0-9-]{21}}/sessions", requirePermissionFactory("session:list"), async (c) => {
+    const id = c.req.param("id");
+
+    try {
+      const user = await getUser(id);
+      if (!user) {
+        return c.json({ success: false as const, error: "User not found" }, 404);
+      }
+
+      const sessions = await getActiveTokensByUserId(id);
+
+      return c.json({ success: true as const, sessions });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Revoke a specific session for a user (admin)
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response indicating success
+   * @throws {404} If the session is not found for this user
+   * @access protected
+   * @permission session:revoke
+   */
+  .delete("/:id{[a-zA-Z0-9-]{21}}/sessions/:tokenId", requirePermissionFactory("session:revoke"), async (c) => {
+    const id = c.req.param("id");
+    const tokenId = c.req.param("tokenId");
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
+
+    try {
+      const tokens = await getActiveTokensByUserId(id);
+      const token = tokens.find(t => t.id === tokenId);
+
+      if (!token) {
+        return c.json({ success: false as const, error: "Session not found" }, 404);
+      }
+
+      await revokeToken(tokenId);
+
+      await logTokenRevoke(tokenId, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
+      return c.json({ success: true as const });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Revoke all sessions for a specific user (admin)
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response indicating success
+   * @throws {404} If the user is not found
+   * @access protected
+   * @permission session:revoke
+   */
+  .delete("/:id{[a-zA-Z0-9-]{21}}/sessions", requirePermissionFactory("session:revoke"), async (c) => {
+    const id = c.req.param("id");
+    const sessionContext = c.var.sessionContext;
+    const clientInfo = getClientInfo(c);
+
+    try {
+      const user = await getUser(id);
+      if (!user) {
+        return c.json({ success: false as const, error: "User not found" }, 404);
+      }
+
+      await revokeAllTokensByUserId(id);
+
+      await logSessionRevokeAll(id, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
+      return c.json({ success: true as const });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
   });
