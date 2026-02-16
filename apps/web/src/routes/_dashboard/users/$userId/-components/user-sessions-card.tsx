@@ -1,3 +1,5 @@
+import type { Token } from "~shared/types/db/tokens.types";
+
 import { useQuery } from "@tanstack/react-query";
 import { MonitorIcon, SmartphoneIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -6,7 +8,7 @@ import { useRevokeAllUserSessions } from "@/hooks/sessions/use-revoke-all-user-s
 import { useRevokeUserSession } from "@/hooks/sessions/use-revoke-user-session";
 import { useUserSessions } from "@/hooks/sessions/use-user-sessions";
 import { Button } from "~react/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~react/components/card";
 import { Separator } from "~react/components/separator";
 import { Spinner } from "~react/components/spinner";
 import sayno from "~react/lib/sayno";
@@ -93,17 +95,6 @@ export function UserSessionsCard({ userId, userName }: UserSessionsCardProps) {
           <CardTitle>{t("pages.users.detail.sections.sessions.title")}</CardTitle>
           <CardDescription>{t("pages.users.detail.sections.sessions.description")}</CardDescription>
         </div>
-        {canRevoke && sessions.length > 0 && (
-          <Button
-            variant="destructive"
-            size="sm"
-            disabled={revokeAll.isPending}
-            onClick={handleRevokeAll}
-          >
-            {revokeAll.isPending ? <Spinner /> : <Trash2Icon className="size-4" />}
-            {t("pages.users.detail.sessions.revokeAll")}
-          </Button>
-        )}
       </CardHeader>
       <CardContent>
         {sessionsQuery.isLoading && (
@@ -118,7 +109,7 @@ export function UserSessionsCard({ userId, userName }: UserSessionsCardProps) {
 
         {!sessionsQuery.isLoading && sessions.length > 0 && (
           <div className="space-y-1">
-            {sessions.map((session, index) => {
+            {sessions.map((session: Token, index: number) => {
               const DeviceIcon = getDeviceIcon(session.userAgent);
               const deviceName = parseDeviceName(session.userAgent, t("pages.users.detail.sessions.unknownDevice"));
 
@@ -131,7 +122,14 @@ export function UserSessionsCard({ userId, userName }: UserSessionsCardProps) {
                     <div className="min-w-0 flex-1">
                       <span className="truncate text-sm font-medium">{deviceName}</span>
                       <div className="text-muted-foreground flex flex-wrap gap-x-3 text-xs">
-                        {session.ip && <span>{t("pages.users.detail.sessions.ip")}: {session.ip}</span>}
+                        {session.ip && (
+                          <span>
+                            {t("pages.users.detail.sessions.ip")}
+                            :
+                            {" "}
+                            {session.ip}
+                          </span>
+                        )}
                         <span>{t("pages.users.detail.sessions.issuedAt", { date: new Date(session.issuedAt) })}</span>
                       </div>
                     </div>
@@ -154,6 +152,19 @@ export function UserSessionsCard({ userId, userName }: UserSessionsCardProps) {
           </div>
         )}
       </CardContent>
+      <CardFooter>
+        {canRevoke && sessions.length > 0 && (
+          <Button
+            variant="destructive"
+            size="sm"
+            disabled={revokeAll.isPending}
+            onClick={handleRevokeAll}
+          >
+            {revokeAll.isPending ? <Spinner /> : <Trash2Icon className="size-4" />}
+            {t("pages.users.detail.sessions.revokeAll")}
+          </Button>
+        )}
+      </CardFooter>
     </Card>
   );
 }
