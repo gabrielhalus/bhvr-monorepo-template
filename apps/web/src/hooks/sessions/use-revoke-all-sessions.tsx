@@ -14,6 +14,7 @@ export function useRevokeAllSessions() {
   return useMutation({
     ...revokeAllMySessionsMutationOptions(queryClient),
     onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ["auth"] });
       navigate({ href: `${env.VITE_AUTH_URL}/login`, replace: true });
     },
     onError: () => {

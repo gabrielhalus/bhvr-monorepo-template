@@ -16,6 +16,7 @@ import { AccessTokenSchema, RefreshTokenSchema } from "~shared/schemas/api/token
 /**
  * Get the user from the JWT token and set the session context
  * Automatically refreshes the access token if it's expired but refresh token is valid
+ * Always validates the session against the DB to ensure revoked tokens are rejected
  * @param c - The context
  * @param next - The next middleware
  * @returns The user
@@ -28,6 +29,24 @@ export const getSessionContext = factory.createMiddleware(async (c, next) => {
     if (accessToken) {
       const verified = await verify(accessToken, env.JWT_SECRET);
       decoded = AccessTokenSchema.parse(verified);
+
+      // A valid JWT alone is not sufficient — verify the session is still active in the DB
+      const refreshToken = getCookie(c, "refreshToken");
+      if (refreshToken) {
+        try {
+          const refreshVerified = await verify(refreshToken, env.JWT_SECRET);
+          const refreshDecoded = RefreshTokenSchema.parse(refreshVerified);
+          const tokenRecord = await getToken(refreshDecoded.jti);
+          if (!tokenRecord || tokenRecord.revokedAt || tokenRecord.expiresAt < new Date().toISOString()) {
+            decoded = null;
+          }
+        } catch {
+          decoded = null;
+        }
+      } else {
+        // No refresh token — no valid session
+        decoded = null;
+      }
     } else {
       decoded = await attemptTokenRefresh(c);
     }
@@ -36,12 +55,16 @@ export const getSessionContext = factory.createMiddleware(async (c, next) => {
   }
 
   if (!decoded) {
+    setCookie(c, "accessToken", "", getCookieSettings("clear"));
+    setCookie(c, "refreshToken", "", getCookieSettings("clear"));
     return c.json({ error: "Unauthorized" }, 401);
   }
 
   const user = await getUser(decoded.sub, ["roles"]);
 
   if (!user) {
+    setCookie(c, "accessToken", "", getCookieSettings("clear"));
+    setCookie(c, "refreshToken", "", getCookieSettings("clear"));
     return c.json({ error: "Unauthorized" }, 401);
   }
 
