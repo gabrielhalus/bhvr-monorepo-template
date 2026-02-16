@@ -91,11 +91,31 @@
           "security": {
             "title": "Security",
             "description": "Manage user security settings."
+          },
+          "sessions": {
+            "title": "Sessions",
+            "description": "View and revoke active sessions for this user."
           }
         },
         "fields": {
           "name": "Name",
           "email": "Email"
+        },
+        "sessions": {
+          "device": "Device",
+          "ip": "IP Address",
+          "issuedAt": "Signed in {{date, date}}",
+          "expiresAt": "Expires {{date, date}}",
+          "revoke": "Revoke",
+          "revokeConfirm": "Are you sure you want to revoke this session?",
+          "revokeSuccess": "Session revoked successfully",
+          "revokeError": "Failed to revoke session",
+          "revokeAll": "Revoke all sessions",
+          "revokeAllConfirm": "This will sign out {{name}} from all devices immediately.",
+          "revokeAllSuccess": "All sessions revoked successfully",
+          "revokeAllError": "Failed to revoke sessions",
+          "noSessions": "No active sessions found",
+          "unknownDevice": "Unknown device"
         },
         "resetPassword": {
           "button": "Reset Password",
@@ -128,6 +148,10 @@
           "title": "Change Password",
           "description": "Update your account password.",
           "submit": "Change Password"
+        },
+        "sessions": {
+          "title": "Active Sessions",
+          "description": "Manage devices currently signed in to your account."
         }
       },
       "fields": {
@@ -137,6 +161,23 @@
         "newPassword": "New Password",
         "confirmPassword": "Confirm Password",
         "passwordMismatch": "Passwords do not match"
+      },
+      "sessions": {
+        "current": "Current session",
+        "device": "Device",
+        "ip": "IP Address",
+        "issuedAt": "Signed in {{date, date}}",
+        "expiresAt": "Expires {{date, date}}",
+        "revoke": "Revoke",
+        "revokeConfirm": "Are you sure you want to revoke this session? The device will be signed out immediately.",
+        "revokeSuccess": "Session revoked successfully",
+        "revokeError": "Failed to revoke session",
+        "revokeOthers": "Revoke all other sessions",
+        "revokeOthersConfirm": "This will sign out all other devices. Your current session will remain active.",
+        "revokeAllSuccess": "All other sessions revoked successfully",
+        "revokeAllError": "Failed to revoke sessions",
+        "noSessions": "No active sessions found",
+        "unknownDevice": "Unknown device"
       }
     },
     "nav": {

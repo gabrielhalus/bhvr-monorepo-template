@@ -2,7 +2,7 @@ import type { InsertTokenSchema, UpdateTokenSchema } from "../schemas/db/tokens.
 import type { Token } from "../types/db/tokens.types";
 import type { z } from "zod";
 
-import { eq } from "drizzle-orm";
+import { and, eq, gt, isNull, ne } from "drizzle-orm";
 
 import { drizzle } from "../drizzle";
 import { TokensModel } from "../models/tokens.model";
@@ -112,4 +112,77 @@ export async function deleteAllTokens(): Promise<Token[]> {
   }
 
   return deletedTokens;
+}
+
+// ============================================================================
+// Session Management
+// ============================================================================
+
+/**
+ * Get all active (non-revoked, non-expired) tokens for a user.
+ * @param userId - The user ID.
+ * @returns The active tokens.
+ */
+export async function getActiveTokensByUserId(userId: string): Promise<Token[]> {
+  return drizzle
+    .select()
+    .from(TokensModel)
+    .where(
+      and(
+        eq(TokensModel.userId, userId),
+        isNull(TokensModel.revokedAt),
+        gt(TokensModel.expiresAt, new Date().toISOString()),
+      ),
+    )
+    .orderBy(TokensModel.issuedAt);
+}
+
+/**
+ * Soft-revoke a token by setting its revokedAt timestamp.
+ * @param id - The token ID.
+ * @returns The revoked token.
+ * @throws An error if the token could not be revoked.
+ */
+export async function revokeToken(id: string): Promise<Token> {
+  const [revokedToken] = await drizzle
+    .update(TokensModel)
+    .set({ revokedAt: new Date().toISOString() })
+    .where(eq(TokensModel.id, id))
+    .returning();
+
+  if (!revokedToken) {
+    throw new Error("Failed to revoke token");
+  }
+
+  return revokedToken;
+}
+
+/**
+ * Hard-delete all tokens for a user.
+ * @param userId - The user ID.
+ * @returns The deleted tokens.
+ */
+export async function revokeAllTokensByUserId(userId: string): Promise<Token[]> {
+  return drizzle
+    .delete(TokensModel)
+    .where(eq(TokensModel.userId, userId))
+    .returning();
+}
+
+/**
+ * Hard-delete all tokens for a user except one (e.g. current session).
+ * @param userId - The user ID.
+ * @param exceptTokenId - The token ID to keep.
+ * @returns The deleted tokens.
+ */
+export async function revokeAllTokensByUserIdExcept(userId: string, exceptTokenId: string): Promise<Token[]> {
+  return drizzle
+    .delete(TokensModel)
+    .where(
+      and(
+        eq(TokensModel.userId, userId),
+        ne(TokensModel.id, exceptTokenId),
+      ),
+    )
+    .returning();
 }

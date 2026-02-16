@@ -772,6 +772,26 @@ export async function logTokenRevoke(
 }
 
 /**
+ * Log revocation of all sessions for a user.
+ * @param targetUserId - The user whose sessions were revoked.
+ * @param ctx - The audit context.
+ */
+export async function logSessionRevokeAll(
+  targetUserId: string,
+  ctx: AuditContext,
+): Promise<AuditLog> {
+  return createAuditLog({
+    action: "auth:session_revoke_all",
+    actorId: ctx.actorId,
+    impersonatorId: ctx.impersonatorId,
+    targetId: targetUserId,
+    targetType: "session",
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
  * Log user read (viewing user details).
  */
 export async function logUserRead(

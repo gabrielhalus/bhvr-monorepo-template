@@ -91,11 +91,31 @@
           "security": {
             "title": "Sécurité",
             "description": "Gérer les paramètres de sécurité de l'utilisateur."
+          },
+          "sessions": {
+            "title": "Sessions",
+            "description": "Voir et révoquer les sessions actives de cet utilisateur."
           }
         },
         "fields": {
           "name": "Nom",
           "email": "E-mail"
+        },
+        "sessions": {
+          "device": "Appareil",
+          "ip": "Adresse IP",
+          "issuedAt": "Connecté le {{date, date}}",
+          "expiresAt": "Expire le {{date, date}}",
+          "revoke": "Révoquer",
+          "revokeConfirm": "Êtes-vous sûr de vouloir révoquer cette session ?",
+          "revokeSuccess": "Session révoquée avec succès",
+          "revokeError": "Échec de la révocation de la session",
+          "revokeAll": "Révoquer toutes les sessions",
+          "revokeAllConfirm": "Cela déconnectera {{name}} de tous ses appareils immédiatement.",
+          "revokeAllSuccess": "Toutes les sessions révoquées avec succès",
+          "revokeAllError": "Échec de la révocation des sessions",
+          "noSessions": "Aucune session active trouvée",
+          "unknownDevice": "Appareil inconnu"
         },
         "resetPassword": {
           "button": "Réinitialiser le mot de passe",
@@ -128,6 +148,10 @@
           "title": "Changer le mot de passe",
           "description": "Mettez à jour le mot de passe de votre compte.",
           "submit": "Changer le mot de passe"
+        },
+        "sessions": {
+          "title": "Sessions actives",
+          "description": "Gérez les appareils actuellement connectés à votre compte."
         }
       },
       "fields": {
@@ -137,6 +161,23 @@
         "newPassword": "Nouveau mot de passe",
         "confirmPassword": "Confirmer le mot de passe",
         "passwordMismatch": "Les mots de passe ne correspondent pas"
+      },
+      "sessions": {
+        "current": "Session actuelle",
+        "device": "Appareil",
+        "ip": "Adresse IP",
+        "issuedAt": "Connecté le {{date, date}}",
+        "expiresAt": "Expire le {{date, date}}",
+        "revoke": "Révoquer",
+        "revokeConfirm": "Êtes-vous sûr de vouloir révoquer cette session ? L'appareil sera déconnecté immédiatement.",
+        "revokeSuccess": "Session révoquée avec succès",
+        "revokeError": "Échec de la révocation de la session",
+        "revokeOthers": "Révoquer toutes les autres sessions",
+        "revokeOthersConfirm": "Cela déconnectera tous vos autres appareils. Votre session actuelle restera active.",
+        "revokeAllSuccess": "Toutes les autres sessions révoquées avec succès",
+        "revokeAllError": "Échec de la révocation des sessions",
+        "noSessions": "Aucune session active trouvée",
+        "unknownDevice": "Appareil inconnu"
       }
     },
     "nav": {

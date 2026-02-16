@@ -11,6 +11,7 @@ export type AuditLogAction
     | "auth:logout"
     | "auth:token_refresh"
     | "auth:token_revoke"
+    | "auth:session_revoke_all"
     | "auth:session_expired"
   // Impersonation actions
     | "impersonation:start"
