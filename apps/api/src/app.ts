@@ -49,7 +49,7 @@ app.use(logger());
 app.use(cors());
 
 // -------------------
-// API (Hono @ port 3030)
+// API (Hono @ port 5173)
 // -------------------
 const _api = app
   .route("/audit-logs", auditLogsRoutes)
