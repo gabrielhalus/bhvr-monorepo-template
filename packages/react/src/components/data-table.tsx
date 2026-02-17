@@ -169,26 +169,26 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="absolute left-2 top-2.5 size-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-2.5 size-3.5 text-muted-foreground" />
             <Input
               ref={searchInputRef}
               placeholder={searchPlaceholder ?? t("dataTable.searchPlaceholder")}
               value={searchValue}
               onChange={event => onSearchChange?.(event.target.value)}
-              className="pl-8 max-w-sm"
+              className="pl-9 max-w-xs h-9"
               disabled={isLoading}
             />
           </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto bg-transparent" disabled={isLoading}>
-              <Settings2 className="mr-2 size-4" />
+            <Button variant="outline" size="sm" className="ml-auto" disabled={isLoading}>
+              <Settings2 className="size-3.5" />
               {t("dataTable.columns")}
-              <ChevronDown className="ml-2 size-4" />
+              <ChevronDown className="size-3.5" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -210,7 +210,7 @@ export function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="relative rounded-md border">
+      <div className="relative rounded-xl border overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
@@ -247,7 +247,7 @@ export function DataTable<TData, TValue>({
                       >
                         {row.getVisibleCells().map(cell => (
                           <TableCell
-                            className="text-muted-foreground"
+                            className="text-foreground"
                             key={cell.id}
                             style={{
                               width: cell.column.columnDef.size,
