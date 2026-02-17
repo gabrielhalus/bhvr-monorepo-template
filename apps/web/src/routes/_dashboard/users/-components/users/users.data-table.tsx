@@ -33,8 +33,8 @@ export function UsersDataTable() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-3xl font-bold">{t("pages.users.list.title")}</h1>
-        <p className="text-muted-foreground">{t("pages.users.list.subtitle")}</p>
+        <h2 className="text-xl font-bold tracking-tight">{t("pages.users.list.title")}</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">{t("pages.users.list.subtitle")}</p>
       </div>
       <DataTable
         columns={columns}

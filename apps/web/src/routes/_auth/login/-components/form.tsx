@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 import { runtimeConfigQueryOptions } from "@/api/runtime-configs/runtime-configs.queries";
 import { Button } from "~react/components/button";
-import { Card, CardContent, CardHeader, CardTitle } from "~react/components/card";
+import { Card, CardContent } from "~react/components/card";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
 import { Input } from "~react/components/input";
 import { PasswordInput } from "~react/components/password-input";
@@ -53,18 +53,19 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-5", className)} {...props}>
+      <div>
+        <h1 className="text-2xl font-extrabold tracking-tight">{t("login.title")}</h1>
+        <p className="text-sm text-muted-foreground mt-1">{t("login.subtitle", { defaultValue: "Welcome back. Sign in to continue." })}</p>
+      </div>
       <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">{t("login.title")}</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <form
             onSubmit={handleSubmit}
             onKeyDown={e => e.key === "Enter" && e.currentTarget.requestSubmit()}
           >
-            <div className="grid gap-6">
-              <div className="grid gap-6">
+            <div className="grid gap-5">
+              <div className="grid gap-5">
                 <form.Field
                   name="email"
                   children={field => (
@@ -135,4 +136,5 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
       </Card>
     </div>
   );
+
 }

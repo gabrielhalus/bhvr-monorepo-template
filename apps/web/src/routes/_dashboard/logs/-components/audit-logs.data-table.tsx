@@ -85,12 +85,8 @@ export function AuditLogsDataTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{t("pages.logs.title")}</h1>
-          <p className="text-muted-foreground">{t("pages.logs.subtitle")}</p>
-        </div>
-        {canDelete && (
+      {canDelete && (
+        <div className="flex justify-end">
           <Button
             variant="destructive"
             size="sm"
@@ -100,8 +96,8 @@ export function AuditLogsDataTable() {
             {clearMutation.isPending ? <Spinner /> : <Trash2 className="size-4" />}
             {t("pages.logs.actions.clearLogs")}
           </Button>
-        )}
-      </div>
+        </div>
+      )}
       <div className="flex items-center gap-2">
         <Select value={filters.actionCategory ?? "all"} onValueChange={handleActionCategoryChange}>
           <SelectTrigger size="sm">

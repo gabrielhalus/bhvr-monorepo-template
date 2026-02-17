@@ -18,8 +18,8 @@ export function Sidebar() {
   }, [configs]);
 
   return (
-    <aside className="h-full w-75 p-2 border-r">
-      <div className="flex p-2 flex-col space-y-1">
+    <aside className="w-52 shrink-0 pr-4 border-r">
+      <div className="flex flex-col gap-0.5">
         {Array.from(configTree.values()).map(node => (
           <ConfigSection key={node.fullKey} node={node} />
         ))}

@@ -37,8 +37,8 @@ export function InvitationsDataTable() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-bold">{t("pages.users.invitations.title")}</h2>
-        <p className="text-muted-foreground">{t("pages.users.invitations.subtitle")}</p>
+        <h2 className="text-xl font-bold tracking-tight">{t("pages.users.invitations.title")}</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">{t("pages.users.invitations.subtitle")}</p>
       </div>
       <DataTable
         columns={columns}

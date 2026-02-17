@@ -64,12 +64,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link to="/">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Box className="size-4" />
+                <div
+                  className="flex aspect-square size-8 items-center justify-center rounded-lg shrink-0"
+                  style={{ background: "linear-gradient(135deg, oklch(0.660 0.228 38), oklch(0.580 0.228 30))" }}
+                >
+                  <Box className="size-4 text-white" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{t("common:core.name")}</span>
-                  <span className="truncate text-xs">{t("common:core.caption")}</span>
+                  <span className="truncate font-bold tracking-tight">{t("common:core.name")}</span>
+                  <span className="truncate text-xs" style={{ color: "oklch(0.640 0.222 42 / 0.65)" }}>{t("common:core.caption")}</span>
                 </div>
               </Link>
             </SidebarMenuButton>

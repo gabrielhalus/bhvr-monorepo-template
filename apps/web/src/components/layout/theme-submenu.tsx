@@ -18,7 +18,7 @@ export function ThemeSubmenu() {
   const { t } = useTranslation("common");
   const { theme, setTheme } = useTheme();
 
-  type ThemeValue = "system" | "light" | "dark" | "modern-minimal-light" | "modern-minimal-dark";
+  type ThemeValue = "system" | "light" | "dark";
   type ThemeOption = {
     value: ThemeValue;
     label: string;
@@ -31,12 +31,10 @@ export function ThemeSubmenu() {
 
   const lightThemes: ThemeOption[] = [
     { value: "light", label: t("generic.themeLight"), icon: Sun },
-    { value: "modern-minimal-light", label: t("generic.themeModernMinimalLight"), icon: Sun },
   ] as const;
 
   const darkThemes: ThemeOption[] = [
     { value: "dark", label: t("generic.themeDark"), icon: Moon },
-    { value: "modern-minimal-dark", label: t("generic.themeModernMinimalDark"), icon: Moon },
   ] as const;
 
   const themeOptions = [...systemThemes, ...lightThemes, ...darkThemes];
