@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { NavMain } from "@/components/layout/nav-main";
 import { NavUser } from "@/components/layout/nav-user";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "~react/components/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarTrigger } from "~react/components/sidebar";
 import { authorizeQueryOptions } from "~react/queries/auth";
 
 import { NavSettings } from "./nav-settings";
@@ -59,25 +59,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link to="/">
-                <div
-                  className="flex aspect-square size-8 items-center justify-center rounded-lg shrink-0"
-                  style={{ background: "linear-gradient(135deg, oklch(0.660 0.228 38), oklch(0.580 0.228 30))" }}
-                >
-                  <Box className="size-4 text-white" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-bold tracking-tight">{t("common:core.name")}</span>
-                  <span className="truncate text-xs" style={{ color: "oklch(0.640 0.222 42 / 0.65)" }}>{t("common:core.caption")}</span>
-                </div>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      {/* Header: brand + collapse trigger + search */}
+      <SidebarHeader className="border-b border-sidebar-border/40 px-3 py-3">
+        <div className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
+          {/* Brand link — hidden in icon-collapsed mode */}
+          <Link
+            to="/"
+            className="flex items-center gap-2.5 flex-1 min-w-0 group-data-[collapsible=icon]:hidden"
+          >
+            <div className="flex size-8 items-center justify-center rounded-lg shrink-0 brand-gradient">
+              <Box className="size-4 text-white" />
+            </div>
+            <div className="grid text-left text-sm leading-tight min-w-0">
+              <span className="truncate font-bold tracking-tight text-sidebar-accent-foreground">
+                {t("common:core.name")}
+              </span>
+              <span className="truncate text-[11px] text-primary/65">
+                {t("common:core.caption")}
+              </span>
+            </div>
+          </Link>
+
+          {/* Collapse / expand trigger — always visible */}
+          <SidebarTrigger className="shrink-0 text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors" />
+        </div>
       </SidebarHeader>
 
       <SidebarContent>

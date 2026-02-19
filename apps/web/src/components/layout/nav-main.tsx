@@ -29,13 +29,10 @@ export function NavMain({ items }: { items: { title: string; icon: LucideIcon; h
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild tooltip={item.title} isActive={isActive}>
                 <Link {...item.href}>
-                  <span
-                    className={cn(
-                      "size-1.5 rounded-full shrink-0 transition-colors group-data-[collapsible=icon]:hidden",
-                      isActive ? "bg-sidebar-primary" : "bg-sidebar-foreground/25",
-                    )}
-                  />
-                  <item.icon className="hidden group-data-[collapsible=icon]:block" />
+                  <item.icon className={cn(
+                    "size-4 shrink-0 transition-colors",
+                    isActive ? "text-sidebar-primary" : "text-sidebar-foreground/50",
+                  )} />
                   <span>{item.title}</span>
                 </Link>
               </SidebarMenuButton>

@@ -6,7 +6,6 @@ import { Trans, useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { Button } from "~react/components/button";
-import { Card, CardContent } from "~react/components/card";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
 import { Input } from "~react/components/input";
 import { PasswordInput } from "~react/components/password-input";
@@ -68,8 +67,8 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
         <h1 className="text-2xl font-extrabold tracking-tight">{t("register.title")}</h1>
         <p className="text-sm text-muted-foreground mt-1">{t("register.subtitle", { defaultValue: "Create your account to get started." })}</p>
       </div>
-      <Card>
-        <CardContent className="pt-6">
+      <div className="rounded-xl border border-border overflow-hidden">
+        <div className="px-6 py-5">
           <form
             onSubmit={handleSubmit}
             onKeyDown={e => e.key === "Enter" && e.currentTarget.requestSubmit()}
@@ -166,8 +165,8 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
               </div>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

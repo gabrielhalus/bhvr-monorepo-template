@@ -10,7 +10,7 @@ import { useCreateInvitation } from "@/hooks/invitations/use-create-invitation";
 import { useRoles } from "@/hooks/roles/use-roles";
 import { Button } from "~react/components/button";
 import { Checkbox } from "~react/components/checkbox";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~react/components/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~react/components/dialog";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
 import { Input } from "~react/components/input";
 import { Label } from "~react/components/label";
@@ -25,9 +25,13 @@ const defaultValues: z.input<typeof CreateInvitationSchema> = {
   autoValidateEmail: false,
 };
 
-export function InviteUserDialog() {
+type InviteUserDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
+
+export function InviteUserDialog({ open, onOpenChange }: InviteUserDialogProps) {
   const { t } = useTranslation(["common", "web"]);
-  const [open, setOpen] = useState(false);
   const [invitationLink, setInvitationLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -63,7 +67,7 @@ export function InviteUserDialog() {
       setInvitationLink(null);
       setCopied(false);
     }
-    setOpen(newOpen);
+    onOpenChange(newOpen);
   };
 
   const handleCopyLink = async () => {
@@ -82,12 +86,6 @@ export function InviteUserDialog() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button>
-          <SendIcon />
-          {t("web:pages.users.invite.button")}
-        </Button>
-      </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t("web:pages.users.invite.title")}</DialogTitle>
@@ -237,7 +235,7 @@ export function InviteUserDialog() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setOpen(false)}
+                    onClick={() => handleOpenChange(false)}
                     disabled={mutation.isPending}
                   >
                     {t("common:actions.cancel")}

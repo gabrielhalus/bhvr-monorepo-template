@@ -8,7 +8,6 @@ import { useImpersonateUser } from "@/hooks/users/use-impersonate-user";
 import { useResetUserPassword } from "@/hooks/users/use-reset-user-password";
 import { useUser } from "@/hooks/users/use-user";
 import { Button } from "~react/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~react/components/dialog";
 import { Input } from "~react/components/input";
 import { Spinner } from "~react/components/spinner";
@@ -69,12 +68,12 @@ export function UserSecurityActions({ userId }: { userId: string }) {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("web:pages.users.detail.sections.security.title")}</CardTitle>
-          <CardDescription>{t("web:pages.users.detail.sections.security.description")}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
+      <div>
+        <div className="px-6 py-5">
+          <h3 className="font-bold leading-none">{t("web:pages.users.detail.sections.security.title")}</h3>
+          <p className="text-muted-foreground text-sm mt-1.5">{t("web:pages.users.detail.sections.security.description")}</p>
+        </div>
+        <div className="px-6 py-5 border-t border-border flex flex-wrap gap-2">
           <Button
             variant="outline"
             onClick={handleResetPassword}
@@ -96,8 +95,8 @@ export function UserSecurityActions({ userId }: { userId: string }) {
               {t("web:pages.users.detail.impersonate.button")}
             </Button>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
         <DialogContent>

@@ -41,26 +41,13 @@ function User() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-6 md:p-8">
       {/* Hero panel */}
-      <div
-        className="relative overflow-hidden rounded-2xl p-7 md:p-9"
-        style={{ background: "oklch(0.138 0.028 32)" }}
-      >
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(oklch(0.918 0.010 58 / 0.04) 1px, transparent 1px), linear-gradient(90deg, oklch(0.918 0.010 58 / 0.04) 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
-          }}
-        />
-        <div
-          className="absolute -bottom-16 -right-16 w-56 h-56 rounded-full blur-3xl pointer-events-none"
-          style={{ background: "oklch(0.640 0.222 42)", opacity: 0.18 }}
-        />
+      <div className="relative overflow-hidden rounded-2xl p-7 md:p-9 bg-panel">
+        <div className="absolute inset-0 pointer-events-none hero-grid" />
+        <div className="absolute -bottom-16 -right-16 w-56 h-56 rounded-full blur-3xl pointer-events-none bg-primary opacity-[0.18]" />
 
         <div className="relative z-10 space-y-4">
           {/* Back button row */}
-          <Button variant="ghost" size="sm" asChild className="gap-1.5 -ml-2 opacity-70 hover:opacity-100" style={{ color: "oklch(0.560 0.022 48)" }}>
+          <Button variant="ghost" size="sm" asChild className="gap-1.5 -ml-2 opacity-70 hover:opacity-100 text-panel-meta">
             <Link to="/users">
               <ArrowLeftIcon className="size-3.5" />
               <span className="text-xs font-medium">{t("web:pages.users.title")}</span>
@@ -74,29 +61,23 @@ function User() {
             </div>
             <div className="flex-1 space-y-2">
               <div>
-                <h1
-                  className="text-2xl md:text-3xl font-extrabold leading-tight tracking-tight"
-                  style={{ color: "oklch(0.925 0.012 55)" }}
-                >
+                <h1 className="text-2xl md:text-3xl font-extrabold leading-tight tracking-tight text-panel-heading">
                   {userData?.name ?? "—"}
                 </h1>
-                <div className="flex items-center gap-1.5 mt-1" style={{ color: "oklch(0.560 0.022 48)" }}>
+                <div className="flex items-center gap-1.5 mt-1 text-panel-meta">
                   <MailIcon className="size-3.5" />
                   <span className="text-sm">{userData?.email ?? "—"}</span>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 {userData?.createdAt && (
-                  <div className="flex items-center gap-1.5 text-xs" style={{ color: "oklch(0.560 0.022 48)" }}>
+                  <div className="flex items-center gap-1.5 text-xs text-panel-meta">
                     <CalendarIcon className="size-3.5" />
                     <span>{t("web:pages.users.detail.joinedAt", { date: new Date(userData.createdAt) })}</span>
                   </div>
                 )}
                 {userData?.verifiedAt && (
-                  <span
-                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold"
-                    style={{ background: "oklch(0.640 0.222 42 / 0.20)", color: "oklch(0.640 0.222 42)" }}
-                  >
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/20 text-primary">
                     <span className="size-1.5 rounded-full bg-current inline-block" />
                     Verified
                   </span>
@@ -104,17 +85,16 @@ function User() {
               </div>
               {userData?.roles && userData.roles.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <ShieldIcon className="size-3.5" style={{ color: "oklch(0.560 0.022 48)" }} />
+                  <ShieldIcon className="size-3.5 text-panel-meta" />
                   <div className="flex flex-wrap gap-1">
                     {userData.roles.map(role => (
                       <span
                         key={role.id}
-                        className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                        style={{
-                          background: role.isDefault ? "transparent" : "oklch(0.918 0.010 55 / 0.12)",
-                          color: "oklch(0.918 0.010 55 / 0.80)",
-                          border: role.isDefault ? "1px solid oklch(0.918 0.010 55 / 0.25)" : "1px solid transparent",
-                        }}
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold text-panel-subtle/80 ${
+                          role.isDefault
+                            ? "border border-panel-subtle/25"
+                            : "bg-panel-subtle/12"
+                        }`}
                       >
                         {t(`web:pages.roles.names.${role.name}`, { defaultValue: role.name })}
                       </span>
@@ -139,11 +119,9 @@ function User() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors cursor-pointer"
-                style={{
-                  background: isActive ? "oklch(0.640 0.222 42 / 0.12)" : "transparent",
-                  color: isActive ? "oklch(0.640 0.222 42)" : "oklch(0.570 0.020 48)",
-                }}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                  isActive ? "bg-primary/12 text-primary" : "text-panel-meta"
+                }`}
               >
                 <Icon className="size-4 shrink-0" />
                 {t(tab.labelKey)}
@@ -153,7 +131,7 @@ function User() {
         </nav>
 
         {/* Active section content */}
-        <div className="flex-1 min-w-0 max-w-2xl">
+        <div className="flex-1 min-w-0 max-w-2xl rounded-xl border border-border overflow-hidden">
           {activeTab === "profile" && <UserInformationsForm userId={userId} />}
           {activeTab === "roles" && <UserRolesForm userId={userId} />}
           {activeTab === "security" && <UserSecurityActions userId={userId} />}

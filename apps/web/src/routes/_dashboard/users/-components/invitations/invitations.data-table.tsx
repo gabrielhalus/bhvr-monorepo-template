@@ -1,7 +1,8 @@
 import type { Invitation } from "~shared/types/db/invitations.types";
 import type { User } from "~shared/types/db/users.types";
 
-import { useMemo } from "react";
+import { SendIcon } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useInvitationsRelations } from "@/hooks/invitations/use-invitations-relations";
@@ -15,6 +16,8 @@ export type InvitationRow = Invitation & { invitedBy?: User };
 
 export function InvitationsDataTable() {
   const { t } = useTranslation("web");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const columns = useMemo(() => getInvitationColumns(t), [t]);
 
@@ -40,6 +43,7 @@ export function InvitationsDataTable() {
         <h2 className="text-xl font-bold tracking-tight">{t("pages.users.invitations.title")}</h2>
         <p className="text-sm text-muted-foreground mt-0.5">{t("pages.users.invitations.subtitle")}</p>
       </div>
+      <InviteUserDialog open={dialogOpen} onOpenChange={setDialogOpen} />
       <DataTable
         columns={columns}
         data={rows}
@@ -55,10 +59,11 @@ export function InvitationsDataTable() {
         onSortingChange={invitationsQuery.onSortingChange}
         searchValue={invitationsQuery.searchValue}
         onSearchChange={invitationsQuery.onSearchChange}
+        // Add item props
+        addItemLabel={t("pages.users.invite.button")}
+        addItemIcon={SendIcon}
+        onAddItem={() => setDialogOpen(true)}
       />
-      <div className="flex justify-end">
-        <InviteUserDialog />
-      </div>
     </div>
   );
 }

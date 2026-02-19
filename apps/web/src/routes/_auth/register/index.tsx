@@ -23,61 +23,33 @@ function Register() {
   return (
     <div className="min-h-svh flex">
       {/* Left decorative panel */}
-      <div
-        className="hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col justify-between p-12"
-        style={{ background: "oklch(0.108 0.030 38)" }}
-      >
+      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col justify-between p-12 bg-panel-auth">
         {/* Subtle grid lines */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(oklch(0.918 0.010 58 / 0.04) 1px, transparent 1px), linear-gradient(90deg, oklch(0.918 0.010 58 / 0.04) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
+        <div className="absolute inset-0 pointer-events-none auth-grid" />
         {/* Orange glow blob top-right */}
-        <div
-          className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl pointer-events-none"
-          style={{ background: "oklch(0.625 0.228 35)", opacity: 0.15 }}
-        />
+        <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl pointer-events-none bg-panel-accent opacity-[0.15]" />
 
         {/* Brand mark */}
         <div className="relative z-10 flex items-center gap-3">
-          <div
-            className="size-9 rounded-xl flex items-center justify-center"
-            style={{ background: "oklch(0.625 0.228 35)" }}
-          >
+          <div className="size-9 rounded-xl flex items-center justify-center bg-panel-accent">
             <Box className="size-5 text-white" />
           </div>
-          <span className="text-xl font-bold" style={{ color: "oklch(0.918 0.010 58)" }}>
+          <span className="text-xl font-bold text-panel-heading">
             {t("core.name")}.
           </span>
         </div>
 
         {/* Headline */}
         <div className="relative z-10 space-y-5">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest"
-            style={{
-              background: "oklch(0.625 0.228 35 / 0.18)",
-              color: "oklch(0.625 0.228 35)",
-            }}
-          >
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest bg-panel-accent/18 text-panel-accent">
             <span className="size-1.5 rounded-full bg-current inline-block" />
             Get started
           </div>
-          <h2
-            className="text-[2.6rem] font-extrabold leading-[1.1]"
-            style={{ color: "oklch(0.918 0.010 58)" }}
-          >
+          <h2 className="text-[2.6rem] font-extrabold leading-[1.1] text-panel-heading">
             Your stack,<br />
             your rules.
           </h2>
-          <p
-            className="text-base leading-relaxed max-w-xs"
-            style={{ color: "oklch(0.580 0.018 55)" }}
-          >
+          <p className="text-base leading-relaxed max-w-xs text-panel-meta">
             Join and start building with a modern full-stack monorepo template, designed for speed.
           </p>
         </div>

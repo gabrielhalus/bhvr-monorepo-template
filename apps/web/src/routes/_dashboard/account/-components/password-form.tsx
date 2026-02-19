@@ -4,7 +4,6 @@ import { z } from "zod";
 
 import { useChangePassword } from "@/hooks/users/use-change-password";
 import { Button } from "~react/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
 import { PasswordInput } from "~react/components/password-input";
 import { Separator } from "~react/components/separator";
@@ -39,12 +38,12 @@ export function PasswordForm({ userId: _userId }: { userId: string }) {
   });
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("web:pages.account.sections.password.title")}</CardTitle>
-        <CardDescription>{t("web:pages.account.sections.password.description")}</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div>
+      <div className="px-6 py-5">
+        <h3 className="font-bold leading-none">{t("web:pages.account.sections.password.title")}</h3>
+        <p className="text-muted-foreground text-sm mt-1.5">{t("web:pages.account.sections.password.description")}</p>
+      </div>
+      <div className="px-6 py-5 border-t border-border">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -144,7 +143,7 @@ export function PasswordForm({ userId: _userId }: { userId: string }) {
             />
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

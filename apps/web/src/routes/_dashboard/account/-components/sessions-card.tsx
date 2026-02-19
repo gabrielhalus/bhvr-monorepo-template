@@ -6,7 +6,6 @@ import { useRevokeAllSessions } from "@/hooks/sessions/use-revoke-all-sessions";
 import { useRevokeSession } from "@/hooks/sessions/use-revoke-session";
 import { Badge } from "~react/components/badge";
 import { Button } from "~react/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
 import { Separator } from "~react/components/separator";
 import { Spinner } from "~react/components/spinner";
 import sayno from "~react/lib/sayno";
@@ -75,11 +74,11 @@ export function SessionsCard() {
   };
 
   return (
-    <Card>
-      <CardHeader className="flex-row items-start justify-between">
+    <div>
+      <div className="px-6 py-5 flex flex-row items-start justify-between gap-4">
         <div>
-          <CardTitle>{t("pages.account.sections.sessions.title")}</CardTitle>
-          <CardDescription>{t("pages.account.sections.sessions.description")}</CardDescription>
+          <h3 className="font-bold leading-none">{t("pages.account.sections.sessions.title")}</h3>
+          <p className="text-muted-foreground text-sm mt-1.5">{t("pages.account.sections.sessions.description")}</p>
         </div>
         {nonCurrentSessions.length > 0 && (
           <Button
@@ -92,8 +91,8 @@ export function SessionsCard() {
             {t("pages.account.sessions.revokeOthers")}
           </Button>
         )}
-      </CardHeader>
-      <CardContent>
+      </div>
+      <div className="px-6 py-5 border-t border-border">
         {sessionsQuery.isLoading && (
           <div className="flex justify-center py-6">
             <Spinner />
@@ -148,7 +147,7 @@ export function SessionsCard() {
             })}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -2,16 +2,13 @@ import type { AuditLogFilters } from "@/api/audit-logs/audit-logs.api";
 import type { AuditLog } from "~shared/types/db/audit-logs.types";
 
 import { useQuery } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useClearAuditLogs } from "@/hooks/audit-logs/use-clear-audit-logs";
 import { usePaginatedAuditLogs } from "@/hooks/audit-logs/use-paginated-audit-logs";
-import { Button } from "~react/components/button";
 import { DataTable } from "~react/components/data-table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~react/components/select";
-import { Spinner } from "~react/components/spinner";
 import sayno from "~react/lib/sayno";
 import { authorizeQueryOptions } from "~react/queries/auth";
 
@@ -70,14 +67,14 @@ export function AuditLogsDataTable() {
   };
 
   const handleActionCategoryChange = (value: string) => {
-    setFilters((prev) => ({
+    setFilters(prev => ({
       ...prev,
       actionCategory: value === "all" ? undefined : value,
     }));
   };
 
   const handleTargetTypeChange = (value: string) => {
-    setFilters((prev) => ({
+    setFilters(prev => ({
       ...prev,
       targetType: value === "all" ? undefined : value,
     }));
@@ -85,19 +82,6 @@ export function AuditLogsDataTable() {
 
   return (
     <div className="space-y-4">
-      {canDelete && (
-        <div className="flex justify-end">
-          <Button
-            variant="destructive"
-            size="sm"
-            disabled={clearMutation.isPending}
-            onClick={handleClearLogs}
-          >
-            {clearMutation.isPending ? <Spinner /> : <Trash2 className="size-4" />}
-            {t("pages.logs.actions.clearLogs")}
-          </Button>
-        </div>
-      )}
       <div className="flex items-center gap-2">
         <Select value={filters.actionCategory ?? "all"} onValueChange={handleActionCategoryChange}>
           <SelectTrigger size="sm">
@@ -105,7 +89,7 @@ export function AuditLogsDataTable() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("pages.logs.filters.allActions")}</SelectItem>
-            {ACTION_CATEGORIES.map((category) => (
+            {ACTION_CATEGORIES.map(category => (
               <SelectItem key={category} value={category}>
                 {t(`pages.logs.filters.categories.${category}`)}
               </SelectItem>
@@ -118,7 +102,7 @@ export function AuditLogsDataTable() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("pages.logs.filters.allTargets")}</SelectItem>
-            {TARGET_TYPES.map((type) => (
+            {TARGET_TYPES.map(type => (
               <SelectItem key={type} value={type}>
                 {t(`pages.logs.filters.targets.${type}`)}
               </SelectItem>
@@ -141,6 +125,9 @@ export function AuditLogsDataTable() {
         onSortingChange={auditLogsQuery.onSortingChange}
         searchValue={auditLogsQuery.searchValue}
         onSearchChange={auditLogsQuery.onSearchChange}
+        // Clear items props
+        clearItemsLabel={t("pages.logs.actions.clearLogs")}
+        onClearItems={canDelete && rows.length ? handleClearLogs : undefined}
       />
     </div>
   );

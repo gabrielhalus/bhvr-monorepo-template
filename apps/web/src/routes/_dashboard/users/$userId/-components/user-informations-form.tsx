@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 import { useUpdateUser } from "@/hooks/users/use-update-user";
 import { useUser } from "@/hooks/users/use-user";
 import { Button } from "~react/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
 import { Input } from "~react/components/input";
 import { Separator } from "~react/components/separator";
@@ -42,12 +41,12 @@ export function UserInformationsForm({ userId }: { userId: string }) {
   formRef.current = form;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("web:pages.users.detail.sections.edit.title")}</CardTitle>
-        <CardDescription>{t("web:pages.users.detail.sections.edit.description")}</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div>
+      <div className="px-6 py-5">
+        <h3 className="font-bold leading-none">{t("web:pages.users.detail.sections.edit.title")}</h3>
+        <p className="text-muted-foreground text-sm mt-1.5">{t("web:pages.users.detail.sections.edit.description")}</p>
+      </div>
+      <div className="px-6 py-5 border-t border-border">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -122,7 +121,7 @@ export function UserInformationsForm({ userId }: { userId: string }) {
             />
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

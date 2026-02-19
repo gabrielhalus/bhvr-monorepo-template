@@ -37,26 +37,29 @@ export function NavUser() {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton size="lg" className="data-[state=open]:text-sidebar-accent-foreground rounded-xl">
-              <AvatarUser {...user} />
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs text-sidebar-foreground/50">{user.email}</span>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent rounded-xl gap-3 h-auto py-2.5 transition-colors"
+            >
+              <AvatarUser {...user} size="lg" />
+              <div className="grid flex-1 text-left leading-tight min-w-0">
+                <span className="truncate font-semibold text-sm">{user.name}</span>
+                <span className="truncate text-xs text-sidebar-foreground/45">{user.email}</span>
               </div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-xl"
             side={isMobile ? "bottom" : "right"}
             align="end"
-            sideOffset={4}
+            sideOffset={8}
           >
             <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <AvatarUser {...user} />
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+              <div className="flex items-center gap-2.5 px-2 py-2 text-left">
+                <AvatarUser {...user} size="lg" />
+                <div className="grid flex-1 text-left leading-tight min-w-0">
+                  <span className="truncate font-semibold text-sm">{user.name}</span>
+                  <span className="truncate text-xs text-muted-foreground">{user.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>

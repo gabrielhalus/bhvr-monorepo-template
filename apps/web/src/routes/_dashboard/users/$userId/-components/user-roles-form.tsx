@@ -5,7 +5,6 @@ import { useRoles } from "@/hooks/roles/use-roles";
 import { useUpdateUserRoles } from "@/hooks/users/use-update-user-roles";
 import { useUsersRelations } from "@/hooks/users/use-users-relations";
 import { Button } from "~react/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~react/components/card";
 import { MultiSelect } from "~react/components/multi-select";
 import { Spinner } from "~react/components/spinner";
 
@@ -72,12 +71,12 @@ export function UserRolesForm({ userId }: UserRolesFormProps) {
   }));
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("web:pages.users.detail.sections.roles.title")}</CardTitle>
-        <CardDescription>{t("web:pages.users.detail.sections.roles.description")}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div>
+      <div className="px-6 py-5">
+        <h3 className="font-bold leading-none">{t("web:pages.users.detail.sections.roles.title")}</h3>
+        <p className="text-muted-foreground text-sm mt-1.5">{t("web:pages.users.detail.sections.roles.description")}</p>
+      </div>
+      <div className="px-6 py-5 border-t border-border space-y-4">
         <MultiSelect
           options={roleOptions}
           value={selectedRoleIds}
@@ -99,7 +98,7 @@ export function UserRolesForm({ userId }: UserRolesFormProps) {
               )
             : t("common:actions.save")}
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

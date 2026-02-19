@@ -8,7 +8,6 @@ import { useRevokeAllUserSessions } from "@/hooks/sessions/use-revoke-all-user-s
 import { useRevokeUserSession } from "@/hooks/sessions/use-revoke-user-session";
 import { useUserSessions } from "@/hooks/sessions/use-user-sessions";
 import { Button } from "~react/components/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~react/components/card";
 import { Separator } from "~react/components/separator";
 import { Spinner } from "~react/components/spinner";
 import sayno from "~react/lib/sayno";
@@ -89,14 +88,12 @@ export function UserSessionsCard({ userId, userName }: UserSessionsCardProps) {
   };
 
   return (
-    <Card>
-      <CardHeader className="flex-row items-start justify-between">
-        <div>
-          <CardTitle>{t("pages.users.detail.sections.sessions.title")}</CardTitle>
-          <CardDescription>{t("pages.users.detail.sections.sessions.description")}</CardDescription>
-        </div>
-      </CardHeader>
-      <CardContent>
+    <div>
+      <div className="px-6 py-5">
+        <h3 className="font-bold leading-none">{t("pages.users.detail.sections.sessions.title")}</h3>
+        <p className="text-muted-foreground text-sm mt-1.5">{t("pages.users.detail.sections.sessions.description")}</p>
+      </div>
+      <div className="px-6 py-5 border-t border-border">
         {sessionsQuery.isLoading && (
           <div className="flex justify-center py-6">
             <Spinner />
@@ -151,9 +148,9 @@ export function UserSessionsCard({ userId, userName }: UserSessionsCardProps) {
             })}
           </div>
         )}
-      </CardContent>
-      <CardFooter>
-        {canRevoke && sessions.length > 0 && (
+      </div>
+      {canRevoke && sessions.length > 0 && (
+        <div className="px-6 py-5 border-t border-border">
           <Button
             variant="destructive"
             size="sm"
@@ -163,8 +160,8 @@ export function UserSessionsCard({ userId, userName }: UserSessionsCardProps) {
             {revokeAll.isPending ? <Spinner /> : <Trash2Icon className="size-4" />}
             {t("pages.users.detail.sessions.revokeAll")}
           </Button>
-        )}
-      </CardFooter>
-    </Card>
+        </div>
+      )}
+    </div>
   );
 }
