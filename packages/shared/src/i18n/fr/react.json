@@ -28,7 +28,9 @@
     "pageOf": "Page {{current}} sur {{total}}",
     "previous": "Précédent",
     "next": "Suivant",
-    "searchPlaceholder": "Rechercher..."
+    "searchPlaceholder": "Rechercher...",
+    "addItemLabel": "Ajouter un élément",
+    "clearItemsLabel": "Effacer les éléments"
   },
   "cookieConsent": {
     "title": "Nous utilisons des cookies",
