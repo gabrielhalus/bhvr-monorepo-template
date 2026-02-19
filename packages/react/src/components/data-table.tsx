@@ -1,7 +1,6 @@
 import type { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from "@tanstack/react-table";
 
 import {
-
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -9,20 +8,14 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDown, Search, Settings2 } from "lucide-react";
+import { PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "~react/components/button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "~react/components/dropdown-menu";
-import { Input } from "~react/components/input";
 import { Skeleton } from "~react/components/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~react/components/table";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "./input-group";
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
@@ -36,12 +29,20 @@ type DataTableProps<TData, TValue> = {
   pagination?: { pageIndex: number; pageSize: number };
   onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
   manualPagination?: boolean;
-  // Add sorting props
+  // Sorting props
   sorting?: SortingState;
   onSortingChange?: (sorting: SortingState) => void;
   manualSorting?: boolean;
-  // Add search props
+  // Search props
   manualFiltering?: boolean;
+  // Add item props
+  addItemLabel?: string,
+  addItemIcon?: React.ElementType
+  onAddItem?: () => void;
+  // Clear items props
+  clearItemsLabel?: string,
+  clearItemsIcon?: React.ElementType
+  onClearItems?: () => void;
 };
 
 function TableSkeleton({ columns }: { columns: ColumnDef<any, any>[] }) {
@@ -72,12 +73,20 @@ export function DataTable<TData, TValue>({
   pagination: externalPagination,
   onPaginationChange,
   manualPagination = false,
-  // Add sorting props
+  // Sorting props
   sorting: externalSorting,
   onSortingChange,
   manualSorting = false,
-  // Add search props
+  // Search props
   manualFiltering = false,
+  // Add item props
+  addItemLabel,
+  addItemIcon: AddItemIcon,
+  onAddItem,
+  // Clear items props
+  clearItemsLabel,
+  clearItemsIcon: ClearItemsIcon,
+  onClearItems,
 }: DataTableProps<TData, TValue>) {
   const { t } = useTranslation("ui");
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -170,47 +179,32 @@ export function DataTable<TData, TValue>({
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-2.5 size-3.5 text-muted-foreground" />
-            <Input
-              ref={searchInputRef}
-              placeholder={searchPlaceholder ?? t("dataTable.searchPlaceholder")}
-              value={searchValue}
-              onChange={event => onSearchChange?.(event.target.value)}
-              className="pl-9 max-w-xs h-9"
-              disabled={isLoading}
-            />
-          </div>
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="ml-auto" disabled={isLoading}>
-              <Settings2 className="size-3.5" />
-              {t("dataTable.columns")}
-              <ChevronDown className="size-3.5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter(column => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={value => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <InputGroup className="max-w-md">
+          <InputGroupAddon>
+            <SearchIcon />
+          </InputGroupAddon>
+          <InputGroupInput
+            ref={searchInputRef}
+            placeholder={searchPlaceholder ?? t("dataTable.searchPlaceholder")}
+            value={searchValue}
+            onChange={event => onSearchChange?.(event.target.value)}
+            disabled={isLoading}
+          />
+        </InputGroup>
+        {onAddItem && (
+          <Button variant="outline" onClick={onAddItem}>
+            {AddItemIcon ? <AddItemIcon /> : <PlusIcon />}
+            {addItemLabel ?? t("dataTable.addItemLabel")}
+          </Button>
+        )}
+        {onClearItems && (
+          <Button variant="destructive-ghost" onClick={onClearItems}>
+            {ClearItemsIcon ? <ClearItemsIcon /> : <Trash2Icon />}
+            {clearItemsLabel ?? t("dataTable.clearItemsLabel")}
+          </Button>
+        )}
       </div>
-      <div className="relative rounded-xl border overflow-hidden">
+      <div className="relative border rounded-md overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
@@ -220,6 +214,7 @@ export function DataTable<TData, TValue>({
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
+                      className="not-last:border-r"
                       style={{
                         width: header.column.columnDef.size !== undefined
                           ? header.getSize()
@@ -247,7 +242,7 @@ export function DataTable<TData, TValue>({
                       >
                         {row.getVisibleCells().map(cell => (
                           <TableCell
-                            className="text-foreground"
+                            className="text-foreground not-last:border-r"
                             key={cell.id}
                             style={{
                               width: cell.column.columnDef.size,

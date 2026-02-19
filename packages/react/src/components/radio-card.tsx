@@ -16,8 +16,8 @@ function RadioCard({ className, color = "#3b82f6", children, ...props }: RadioCa
     <RadioGroupPrimitive.Item
       data-slot="radio-card"
       className={cn(
-        "peer group relative flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-border bg-card p-6 shadow-sm transition-all outline-none",
-        "hover:shadow-md hover:border-gray-300",
+        "peer group relative flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-border p-6 transition-all outline-none",
+        "hover:border-primary/30",
         "focus-visible:ring-4 focus-visible:ring-ring/50",
         "data-[state=checked]:shadow-lg",
         "disabled:cursor-not-allowed disabled:opacity-50",
