@@ -7,7 +7,7 @@ import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN
 import { getSessionContext } from "@/middlewares/auth";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { validationMiddleware } from "@/middlewares/validation";
-import { isAuthorized } from "~shared/auth";
+import { isAuthorized, isAuthorizedBatch } from "~shared/auth";
 import {
   logAccountPasswordChange,
   logAccountUpdate,
@@ -252,20 +252,19 @@ export const authRoutes = new Hono()
   })
 
   /**
-   * Check if the authenticated user is authorized to perform an action on a resource
+   * Check if the authenticated user is authorized to perform one or more actions
    *
    * @param c - The Hono context object with session context
-   * @returns JSON response indicating whether the user is authorized
-   * @throws {500} If an error occurs during authorization check
+   * @returns JSON response with a results array (one boolean per check)
    * @access protected
    */
   .post("/authorize", validationMiddleware("json", isAuthorizedSchema), async (c) => {
     const sessionContext = c.var.sessionContext;
-    const { permission, resource } = c.req.valid("json");
+    const { checks } = c.req.valid("json");
 
-    const authorize = await isAuthorized(permission, sessionContext.user, resource);
+    const results = await isAuthorizedBatch(checks, sessionContext.user);
 
-    return c.json({ success: true as const, authorize });
+    return c.json({ success: true as const, results });
   })
 
   /**
