@@ -31,16 +31,35 @@ export function authorizeQueryOptions(permission: Permission, resource?: Record<
   return queryOptions({
     queryKey: ["authorize", { permission, resource }],
     queryFn: async (): Promise<boolean> => {
-      const res = await api.auth.authorize.$post({ json: { permission, resource } });
+      const res = await api.auth.authorize.$post({ json: { checks: [{ permission, resource }] } });
 
       if (!res.ok) {
         return false;
       }
 
-      const { authorize } = await res.json();
-      return authorize;
+      const { results } = await res.json();
+      return results[0] ?? false;
     },
     staleTime: Infinity,
     retry: false,
+  });
+}
+
+export function authorizeBatchQueryOptions(checks: Array<{ permission: Permission; resource?: Record<string, unknown> }>) {
+  return queryOptions({
+    queryKey: ["authorize-batch", checks],
+    queryFn: async (): Promise<boolean[]> => {
+      const res = await api.auth.authorize.$post({ json: { checks } });
+
+      if (!res.ok) {
+        return checks.map(() => false);
+      }
+
+      const { results } = await res.json();
+      return results;
+    },
+    staleTime: Infinity,
+    retry: false,
+    enabled: checks.length > 0,
   });
 }
