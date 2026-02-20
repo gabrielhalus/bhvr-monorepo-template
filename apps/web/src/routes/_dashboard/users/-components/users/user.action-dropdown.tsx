@@ -1,7 +1,6 @@
 import type { Row } from "@tanstack/react-table";
 import type { User } from "~shared/types/db/users.types";
 
-import { useQuery } from "@tanstack/react-query";
 import { Copy, MoreHorizontal, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,13 +11,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Spinner } from "~react/components/spinner";
 import { useAuth } from "~react/hooks/use-auth";
 import sayno from "~react/lib/sayno";
-import { authorizeQueryOptions } from "~react/queries/auth";
 
-export function ActionDropdown({ row: { original: user } }: { row: Row<User> }) {
+export function ActionDropdown({ row: { original: user }, canDelete }: { row: Row<User>; canDelete: boolean }) {
   const { t } = useTranslation("web");
 
   const { user: loggedUser } = useAuth();
-  const { data: canDelete } = useQuery(authorizeQueryOptions("user:delete", user));
 
   const isSelf = useMemo(() => {
     return user.id === loggedUser.id;

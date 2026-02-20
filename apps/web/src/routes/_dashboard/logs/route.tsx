@@ -2,16 +2,18 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { ScrollTextIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { authorizeQueryOptions } from "~react/queries/auth";
+import { authorizeBatchQueryOptions } from "~react/queries/auth";
 
 import { AuditLogsDataTable } from "./-components/audit-logs.data-table";
 
 export const Route = createFileRoute("/_dashboard/logs")({
   component: LogsPage,
   beforeLoad: async ({ context }) => {
-    const canList = await context.queryClient.ensureQueryData(authorizeQueryOptions("auditLog:list"));
+    const results = await context.queryClient.ensureQueryData(
+      authorizeBatchQueryOptions([{ permission: "auditLog:list" }]),
+    );
 
-    if (!canList) {
+    if (!results[0]) {
       throw redirect({ to: "/" });
     }
   },

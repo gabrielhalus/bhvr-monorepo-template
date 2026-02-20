@@ -7,16 +7,23 @@ import { useTranslation } from "react-i18next";
 import { NavMain } from "@/components/layout/nav-main";
 import { NavUser } from "@/components/layout/nav-user";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarTrigger } from "~react/components/sidebar";
-import { authorizeQueryOptions } from "~react/queries/auth";
+import { authorizeBatchQueryOptions } from "~react/queries/auth";
 
 import { NavSettings } from "./nav-settings";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { t } = useTranslation("web");
 
-  const { data: canListUsers } = useQuery(authorizeQueryOptions("user:list"));
-  const { data: canListConfigs } = useQuery(authorizeQueryOptions("runtimeConfig:list"));
-  const { data: canListAuditLogs } = useQuery(authorizeQueryOptions("auditLog:list"));
+  const { data: sidebarAuth } = useQuery(
+    authorizeBatchQueryOptions([
+      { permission: "user:list" },
+      { permission: "runtimeConfig:list" },
+      { permission: "auditLog:list" },
+    ]),
+  );
+  const canListUsers = sidebarAuth?.[0] ?? false;
+  const canListConfigs = sidebarAuth?.[1] ?? false;
+  const canListAuditLogs = sidebarAuth?.[2] ?? false;
 
   const data = useMemo(() => {
     const navSettings = [];

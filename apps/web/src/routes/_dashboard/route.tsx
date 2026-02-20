@@ -7,7 +7,7 @@ import { SidebarInset, SidebarProvider } from "~react/components/sidebar";
 
 export const Route = createFileRoute("/_dashboard")({
   component: DashboardLayout,
-  beforeLoad: async () => await auth({ redirectOnUnauthenticated: false }),
+  beforeLoad: async () => await auth(),
   staticData: { crumb: "pages.home.title" },
 });
 

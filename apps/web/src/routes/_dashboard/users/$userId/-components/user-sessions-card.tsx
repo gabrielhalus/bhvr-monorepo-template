@@ -11,7 +11,7 @@ import { Button } from "~react/components/button";
 import { Separator } from "~react/components/separator";
 import { Spinner } from "~react/components/spinner";
 import sayno from "~react/lib/sayno";
-import { authorizeQueryOptions } from "~react/queries/auth";
+import { authorizeBatchQueryOptions } from "~react/queries/auth";
 
 type UserSessionsCardProps = {
   userId: string;
@@ -50,8 +50,14 @@ function parseDeviceName(userAgent: string | null, fallback: string): string {
 export function UserSessionsCard({ userId, userName }: UserSessionsCardProps) {
   const { t } = useTranslation("web");
 
-  const { data: canRevoke } = useQuery(authorizeQueryOptions("session:revoke"));
-  const { data: canList } = useQuery(authorizeQueryOptions("session:list"));
+  const { data: sessionAuth } = useQuery(
+    authorizeBatchQueryOptions([
+      { permission: "session:revoke" },
+      { permission: "session:list" },
+    ]),
+  );
+  const canRevoke = sessionAuth?.[0] ?? false;
+  const canList = sessionAuth?.[1] ?? false;
 
   const sessionsQuery = useUserSessions(userId);
   const revokeSession = useRevokeUserSession(userId);

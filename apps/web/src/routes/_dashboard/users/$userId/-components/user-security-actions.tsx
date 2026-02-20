@@ -13,7 +13,7 @@ import { Input } from "~react/components/input";
 import { Spinner } from "~react/components/spinner";
 import { useAuth } from "~react/hooks/use-auth";
 import sayno from "~react/lib/sayno";
-import { authorizeQueryOptions } from "~react/queries/auth";
+import { authorizeBatchQueryOptions } from "~react/queries/auth";
 
 export function UserSecurityActions({ userId }: { userId: string }) {
   const { t } = useTranslation();
@@ -25,7 +25,10 @@ export function UserSecurityActions({ userId }: { userId: string }) {
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const { data: canImpersonate } = useQuery(authorizeQueryOptions("user:impersonate", { id: userId }));
+  const { data: securityAuth } = useQuery(
+    authorizeBatchQueryOptions([{ permission: "user:impersonate", resource: { id: userId } }]),
+  );
+  const canImpersonate = securityAuth?.[0] ?? false;
   const isSelf = currentUser.id === userId;
 
   const resetPasswordMutation = useResetUserPassword();

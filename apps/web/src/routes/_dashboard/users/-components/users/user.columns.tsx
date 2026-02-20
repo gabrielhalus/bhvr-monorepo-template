@@ -13,7 +13,7 @@ import { formatValue } from "~shared/i18n";
 
 import { ActionDropdown } from "./user.action-dropdown";
 
-export function getUserColumns(t: TFunction): ColumnDef<UserWithRelations<["roles"]>>[] {
+export function getUserColumns(t: TFunction, canDeleteMap: Record<string, boolean> = {}): ColumnDef<UserWithRelations<["roles"]>>[] {
   return [
     {
       accessorKey: "name",
@@ -86,7 +86,7 @@ export function getUserColumns(t: TFunction): ColumnDef<UserWithRelations<["role
     },
     {
       id: "actions",
-      cell: ({ row }) => <ActionDropdown row={row} />,
+      cell: ({ row }) => <ActionDropdown row={row} canDelete={canDeleteMap[row.original.id] ?? false} />,
       enableSorting: false,
       enableHiding: false,
       size: 50,

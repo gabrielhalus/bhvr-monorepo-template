@@ -10,7 +10,7 @@ import { usePaginatedAuditLogs } from "@/hooks/audit-logs/use-paginated-audit-lo
 import { DataTable } from "~react/components/data-table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~react/components/select";
 import sayno from "~react/lib/sayno";
-import { authorizeQueryOptions } from "~react/queries/auth";
+import { authorizeBatchQueryOptions } from "~react/queries/auth";
 
 import { getAuditLogColumns } from "./audit-log.columns";
 
@@ -41,7 +41,8 @@ const TARGET_TYPES = [
 export function AuditLogsDataTable() {
   const { t } = useTranslation("web");
 
-  const { data: canDelete } = useQuery(authorizeQueryOptions("auditLog:delete"));
+  const { data: auditAuth } = useQuery(authorizeBatchQueryOptions([{ permission: "auditLog:delete" }]));
+  const canDelete = auditAuth?.[0] ?? false;
 
   const [filters, setFilters] = useState<AuditLogFilters>({});
 
