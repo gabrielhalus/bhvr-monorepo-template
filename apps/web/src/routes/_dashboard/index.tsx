@@ -84,8 +84,10 @@ function Dashboard() {
 
   const greeting = (() => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
+    if (hour < 12)
+      return "Good morning";
+    if (hour < 18)
+      return "Good afternoon";
     return "Good evening";
   })();
 
@@ -167,7 +169,7 @@ function Dashboard() {
               className={`group flex items-center gap-4 px-8 md:px-10 py-6 transition-colors hover:bg-panel-subtle/3 ${i < 2 ? "border-r border-panel-subtle/8" : ""}`}
             >
               <div className="size-10 rounded-xl flex items-center justify-center shrink-0 bg-primary/15">
-                <stat.icon className="size-[18px] text-primary" />
+                <stat.icon className="size-4.5 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <span className="text-xs font-semibold uppercase tracking-wider text-panel-meta">
@@ -241,7 +243,7 @@ function Dashboard() {
           </div>
 
           <div className="flex items-end gap-3 h-40">
-            {BAR_DATA.map((bar) => (
+            {BAR_DATA.map(bar => (
               <div key={bar.label} className="flex-1 flex flex-col items-center gap-2">
                 <div className="w-full flex flex-col items-center justify-end h-32">
                   <div
@@ -271,7 +273,10 @@ function Dashboard() {
               <div key={item.label}>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-sm font-medium text-foreground">{item.label}</span>
-                  <span className="text-sm font-bold tabular-nums text-foreground">{item.value}%</span>
+                  <span className="text-sm font-bold tabular-nums text-foreground">
+                    {item.value}
+                    %
+                  </span>
                 </div>
                 <div className="h-1.5 rounded-full bg-muted/50 overflow-hidden">
                   <div
@@ -284,7 +289,7 @@ function Dashboard() {
           </div>
 
           {/* Role badges */}
-          <div className="mt-auto pt-5 border-t mt-8">
+          <div className="pt-5 border-t mt-8">
             <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 mb-3">
               Your Roles
             </div>
