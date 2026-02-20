@@ -404,6 +404,73 @@
       "actions": {
         "edit": "Edit notification provider"
       }
+    },
+    "cron": {
+      "title": "Cron Tasks",
+      "list": {
+        "subtitle": "Manage scheduled background tasks.",
+        "searchPlaceholder": "Search tasks..."
+      },
+      "stats": {
+        "totalTasks": "Total Tasks",
+        "activeTasks": "Active",
+        "successRate": "Success Rate (7d)",
+        "runsToday": "Runs Today"
+      },
+      "columns": {
+        "name": "Name",
+        "expression": "Expression",
+        "handler": "Handler",
+        "status": "Status",
+        "lastRun": "Last Run",
+        "nextRun": "Next Run"
+      },
+      "actions": {
+        "openMenu": "Open menu",
+        "trigger": "Run Now",
+        "triggerSuccess": "Task triggered successfully",
+        "triggerError": "Failed to trigger task",
+        "toggleSuccess": "Task status updated",
+        "toggleError": "Failed to update task status",
+        "createTask": "New Task",
+        "editTask": "Edit Task",
+        "deleteTask": "Delete Task",
+        "deleteConfirm": "Are you sure? All execution history will also be deleted.",
+        "deleteSuccess": "Task deleted successfully",
+        "deleteError": "Failed to delete task",
+        "createSuccess": "Task created successfully",
+        "createError": "Failed to create task",
+        "updateSuccess": "Task updated successfully",
+        "updateError": "Failed to update task"
+      },
+      "detail": {
+        "runsTitle": "Execution History",
+        "chartTitle": "Runs — Last 30 Days",
+        "timelineTitle": "Recent Runs"
+      },
+      "runs": {
+        "columns": {
+          "status": "Status",
+          "startedAt": "Started At",
+          "duration": "Duration",
+          "output": "Output / Error"
+        },
+        "status": {
+          "running": "Running",
+          "success": "Success",
+          "error": "Error"
+        }
+      },
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "Daily Cleanup",
+        "description": "Description",
+        "descriptionPlaceholder": "Optional description...",
+        "cronExpression": "Cron Expression",
+        "cronExpressionHelp": "e.g. 0 * * * * (every hour at minute 0)",
+        "handler": "Handler",
+        "isEnabled": "Enable immediately"
+      }
     }
   },
   "impersonation": {

@@ -38,4 +38,12 @@ export const PermissionSchema = z.enum([
   // Sessions
   "session:list",
   "session:revoke",
+
+  // Cron Tasks
+  "cronTask:list",
+  "cronTask:read",
+  "cronTask:create",
+  "cronTask:update",
+  "cronTask:delete",
+  "cronTask:trigger",
 ]);
