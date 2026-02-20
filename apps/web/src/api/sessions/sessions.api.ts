@@ -11,7 +11,7 @@ export async function fetchMySessions() {
 }
 
 export async function fetchUserSessions(userId: string) {
-  const res = await api.users[":id{^[a-zA-Z0-9-]{21}$}"].sessions.$get({
+  const res = await api.users[":id{[a-zA-Z0-9-]{21}}"].sessions.$get({
     param: { id: userId },
   });
 
@@ -45,7 +45,7 @@ export async function revokeAllMySessions() {
 }
 
 export async function revokeUserSession(userId: string, tokenId: string) {
-  const res = await api.users[":id{^[a-zA-Z0-9-]{21}$}"].sessions[":tokenId"].$delete({
+  const res = await api.users[":id{[a-zA-Z0-9-]{21}}"].sessions[":tokenId"].$delete({
     param: { id: userId, tokenId },
   });
 
@@ -57,7 +57,7 @@ export async function revokeUserSession(userId: string, tokenId: string) {
 }
 
 export async function revokeAllUserSessions(userId: string) {
-  const res = await api.users[":id{^[a-zA-Z0-9-]{21}$}"].sessions.$delete({
+  const res = await api.users[":id{[a-zA-Z0-9-]{21}}"].sessions.$delete({
     param: { id: userId },
   });
 
