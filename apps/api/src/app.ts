@@ -6,6 +6,7 @@ import cors from "@/middlewares/cors";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { auditLogsRoutes } from "@/routes/audit-logs.routes";
 import { authRoutes } from "@/routes/auth.routes";
+import { cronTasksRoutes } from "@/routes/cron-tasks.routes";
 import { invitationsRoutes } from "@/routes/invitations.routes";
 import { rolesRoutes } from "@/routes/roles.routes";
 import { configRoutes } from "@/routes/runtime-configs.routes";
@@ -58,6 +59,7 @@ app.use(rateLimiter(rateLimitPresets.api));
 const _api = app
   .route("/audit-logs", auditLogsRoutes)
   .route("/auth", authRoutes)
+  .route("/cron-tasks", cronTasksRoutes)
   .route("/invitations", invitationsRoutes)
   .route("/roles", rolesRoutes)
   .route("/config", configRoutes)
