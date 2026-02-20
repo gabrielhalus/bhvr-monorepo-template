@@ -93,8 +93,10 @@ export const ChartTooltip = RechartsPrimitive.Tooltip;
 
 export const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
-  ComponentProps<typeof RechartsPrimitive.Tooltip> &
-    ComponentProps<"div"> & {
+  ComponentProps<"div"> &
+    Pick<RechartsPrimitive.DefaultTooltipContentProps<any, any>, "payload" | "label" | "labelFormatter" | "labelClassName" | "formatter"> & {
+      active?: boolean;
+      color?: string;
       hideLabel?: boolean;
       hideIndicator?: boolean;
       indicator?: "line" | "dot" | "dashed";
@@ -164,7 +166,7 @@ export const ChartTooltipContent = React.forwardRef<
 
             return (
               <div
-                key={item.dataKey}
+                key={`${item.dataKey}-${index}`}
                 className={cn(
                   "[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5",
                   indicator === "dot" && "items-center",
@@ -234,7 +236,7 @@ export const ChartLegend = RechartsPrimitive.Legend;
 export const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+    Pick<RechartsPrimitive.DefaultLegendContentProps, "payload" | "verticalAlign"> & {
       hideIcon?: boolean;
       nameKey?: string;
     }
