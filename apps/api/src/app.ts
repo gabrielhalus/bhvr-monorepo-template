@@ -3,6 +3,7 @@ import { logger } from "hono/logger";
 
 import { getClientInfo } from "@/helpers/get-client-info";
 import cors from "@/middlewares/cors";
+import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { auditLogsRoutes } from "@/routes/audit-logs.routes";
 import { authRoutes } from "@/routes/auth.routes";
 import { invitationsRoutes } from "@/routes/invitations.routes";
@@ -10,8 +11,6 @@ import { rolesRoutes } from "@/routes/roles.routes";
 import { configRoutes } from "@/routes/runtime-configs.routes";
 import { usersRoutes } from "@/routes/users.routes";
 import { logSystemError } from "~shared/queries/audit-logs.queries";
-
-import { env } from "./lib/env";
 
 const app = new Hono({ strict: false });
 
@@ -47,6 +46,11 @@ app.use(logger());
 // Dynamic CORS
 // -------------------
 app.use(cors());
+
+// -------------------
+// Rate Limiter
+// -------------------
+app.use(rateLimiter(rateLimitPresets.api));
 
 // -------------------
 // API (Hono @ port 5173)

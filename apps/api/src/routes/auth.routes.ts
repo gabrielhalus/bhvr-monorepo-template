@@ -84,31 +84,58 @@ export const authRoutes = new Hono()
    * @access public
    */
   .post("/login", rateLimiter(rateLimitPresets.login), validationMiddleware("json", LoginSchema), async (c) => {
+    const MIN_RESPONSE_TIME_MS = 500;
+
+    const start = performance.now();
+
     const { email, password } = c.req.valid("json");
     const clientInfo = getClientInfo(c);
 
-    const userId = await signIn(email, password);
+    let success = false;
+    let userId: string | null = null;
+
+    userId = await signIn(email, password);
+
     if (!userId) {
-      // Audit log: failed login attempt
       await logLoginFailed(email, clientInfo);
-      return c.json({ success: false as const, error: "Invalid credentials" }, 200);
+    } else {
+      const insertedToken = await insertToken({
+        userId,
+        issuedAt: new Date().toISOString(),
+        expiresAt: new Date(
+          Date.now() + REFRESH_TOKEN_EXPIRATION_SECONDS * 1000,
+        ).toISOString(),
+        ...clientInfo,
+      });
+
+      const accessToken = await createAccessToken(userId);
+      setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
+
+      const refreshToken = await createRefreshToken(
+        userId,
+        insertedToken.id,
+      );
+      setCookie(c, "refreshToken", refreshToken, getCookieSettings("refresh"));
+
+      await logLogin(userId, clientInfo);
+
+      success = true;
     }
 
-    const insertedToken = await insertToken({
-      userId,
-      issuedAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_SECONDS * 1000).toISOString(),
-      ...clientInfo,
-    });
+    //  Constant-time floor
+    const elapsed = performance.now() - start;
+    const remaining = MIN_RESPONSE_TIME_MS - elapsed;
 
-    const accessToken = await createAccessToken(userId);
-    setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
+    if (remaining > 0) {
+      await Bun.sleep(remaining);
+    }
 
-    const refreshToken = await createRefreshToken(userId, insertedToken.id);
-    setCookie(c, "refreshToken", refreshToken, getCookieSettings("refresh"));
-
-    // Audit log: successful login
-    await logLogin(userId, clientInfo);
+    if (!success) {
+      return c.json(
+        { success: false as const, error: "Invalid credentials" },
+        200,
+      );
+    }
 
     return c.json({ success: true as const });
   })

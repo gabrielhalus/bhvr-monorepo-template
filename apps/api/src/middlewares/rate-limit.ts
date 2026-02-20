@@ -21,8 +21,7 @@ const stores = new Map<string, RateLimitStore>();
  * @param options - Rate limiting configuration
  * @returns Hono middleware function
  *
- * @example
- * // Allow 5 login attempts per minute
+ * @example Allow 5 login attempts per minute
  * app.post("/login", rateLimiter({ limit: 5, windowMs: 60 * 1000 }), handler)
  */
 export function rateLimiter(options: RateLimitOptions) {
@@ -33,12 +32,10 @@ export function rateLimiter(options: RateLimitOptions) {
     message = "Too many requests, please try again later",
   } = options;
 
-  // Create a unique store for this limiter instance
   const storeKey = `${limit}-${windowMs}-${Math.random()}`;
   const store: RateLimitStore = new Map();
   stores.set(storeKey, store);
 
-  // Cleanup expired entries periodically
   const cleanupInterval = setInterval(() => {
     const now = Date.now();
     for (const [key, value] of store.entries()) {
@@ -48,7 +45,6 @@ export function rateLimiter(options: RateLimitOptions) {
     }
   }, windowMs);
 
-  // Allow cleanup to be garbage collected when the process exits
   if (typeof cleanupInterval.unref === "function") {
     cleanupInterval.unref();
   }
@@ -59,7 +55,6 @@ export function rateLimiter(options: RateLimitOptions) {
 
     let record = store.get(key);
 
-    // If no record exists or window has expired, create new record
     if (!record || now >= record.resetAt) {
       record = { count: 1, resetAt: now + windowMs };
       store.set(key, record);
@@ -67,7 +62,6 @@ export function rateLimiter(options: RateLimitOptions) {
       record.count++;
     }
 
-    // Set rate limit headers
     const remaining = Math.max(0, limit - record.count);
     const resetTime = Math.ceil((record.resetAt - now) / 1000);
 
@@ -75,7 +69,6 @@ export function rateLimiter(options: RateLimitOptions) {
     c.header("X-RateLimit-Remaining", String(remaining));
     c.header("X-RateLimit-Reset", String(resetTime));
 
-    // Check if rate limit exceeded
     if (record.count > limit) {
       c.header("Retry-After", String(resetTime));
       return c.json({ success: false as const, error: message }, 429);
@@ -109,10 +102,7 @@ function defaultKeyGenerator(c: Context): string {
  * Rate limit configuration presets
  */
 export const rateLimitPresets = {
-  /** Strict limit for login attempts: 5 attempts per 15 minutes */
   login: { limit: 5, windowMs: 15 * 60 * 1000 },
-  /** Moderate limit for registration: 3 attempts per hour */
   register: { limit: 3, windowMs: 60 * 60 * 1000 },
-  /** Standard API limit: 100 requests per minute */
   api: { limit: 100, windowMs: 60 * 1000 },
 } as const;
