@@ -40,3 +40,44 @@ export async function isAuthorized(permission: Permission, user: UserWithRelatio
 
   return false;
 }
+
+/**
+ * Check multiple permissions at once, hydrating roles only once
+ * @param checks - Array of permission/resource pairs to evaluate
+ * @param user - The user with roles
+ * @returns Array of booleans corresponding to each check
+ */
+export async function isAuthorizedBatch(
+  checks: Array<{ permission: Permission; resource?: Record<string, unknown> }>,
+  user: UserWithRelations<["roles"]>,
+): Promise<boolean[]> {
+  if (user.roles.some(role => role.isSuperAdmin)) {
+    return checks.map(() => true);
+  }
+
+  const hydratedRoles = await hydrateRoles(user.roles, ["permissions", "policies"]);
+
+  return checks.map(({ permission, resource }) => {
+    for (const role of hydratedRoles) {
+      const { policies, permissions } = role;
+
+      if (policies?.length) {
+        const policyDecision = evaluatePolicies(policies, permission, user, resource);
+
+        if (policyDecision === "allow") {
+          return true;
+        }
+
+        if (policyDecision === "deny") {
+          continue;
+        }
+      }
+
+      if (permissions?.includes(permission)) {
+        return true;
+      }
+    }
+
+    return false;
+  });
+}

@@ -41,8 +41,15 @@ export const LoginSchema = z.object({
 });
 
 export const isAuthorizedSchema = z.object({
-  permission: PermissionSchema,
-  resource: z.record(z.string(), z.unknown()).optional(),
+  checks: z
+    .array(
+      z.object({
+        permission: PermissionSchema,
+        resource: z.record(z.string(), z.unknown()).optional(),
+      }),
+    )
+    .min(1)
+    .max(100),
 });
 
 export const UpdateAccountSchema = z.object({
