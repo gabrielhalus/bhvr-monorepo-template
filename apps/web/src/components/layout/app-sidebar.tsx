@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Box, CogIcon, Home, ScrollTextIcon, UsersRound } from "lucide-react";
+import { Box, CalendarClockIcon, CogIcon, Home, ScrollTextIcon, UsersRound } from "lucide-react";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -19,11 +19,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       { permission: "user:list" },
       { permission: "runtimeConfig:list" },
       { permission: "auditLog:list" },
+      { permission: "cronTask:list" },
     ]),
   );
   const canListUsers = sidebarAuth?.[0] ?? false;
   const canListConfigs = sidebarAuth?.[1] ?? false;
   const canListAuditLogs = sidebarAuth?.[2] ?? false;
+  const canListCronTasks = sidebarAuth?.[3] ?? false;
 
   const data = useMemo(() => {
     const navSettings = [];
@@ -41,6 +43,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: t("pages.logs.title"),
         icon: ScrollTextIcon,
         href: { to: "/logs" } as const,
+      });
+    }
+
+    if (canListCronTasks) {
+      navSettings.push({
+        title: t("pages.cron.title"),
+        icon: CalendarClockIcon,
+        href: { to: "/cron" } as const,
       });
     }
 
@@ -62,7 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ],
       navSettings,
     };
-  }, [t, canListUsers, canListConfigs, canListAuditLogs]);
+  }, [t, canListUsers, canListConfigs, canListAuditLogs, canListCronTasks]);
 
   return (
     <Sidebar collapsible="icon" {...props}>

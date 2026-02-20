@@ -9,6 +9,7 @@ import { z } from "zod";
 
 import { validateInvitationQueryOptions } from "@/api/invitations/invitations.queries";
 import { useAcceptInvitation } from "@/hooks/invitations/use-accept-invitation";
+import { Card, CardContent } from "~/react/components/card";
 import { Button } from "~react/components/button";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
 import { Input } from "~react/components/input";
@@ -41,7 +42,8 @@ function AuthShell({ children }: { children: React.ReactNode }) {
             <BoxIcon className="size-5 text-white" />
           </div>
           <span className="text-xl font-bold text-panel-heading">
-            {t("core.name")}.
+            {t("core.name")}
+            .
           </span>
         </div>
 
@@ -51,7 +53,8 @@ function AuthShell({ children }: { children: React.ReactNode }) {
             You've been invited
           </div>
           <h2 className="text-[2.6rem] font-extrabold leading-[1.1] text-panel-heading">
-            Join the<br />
+            Join the
+            <br />
             team today.
           </h2>
           <p className="text-base leading-relaxed max-w-xs text-panel-meta">
@@ -66,7 +69,10 @@ function AuthShell({ children }: { children: React.ReactNode }) {
           <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-lg">
             <BoxIcon className="size-4" />
           </div>
-          <span className="font-bold text-lg">{t("core.name")}.</span>
+          <span className="font-bold text-lg">
+            {t("core.name")}
+            .
+          </span>
         </div>
         <div className="w-full max-w-sm">
           {children}
@@ -77,7 +83,6 @@ function AuthShell({ children }: { children: React.ReactNode }) {
 }
 
 function AcceptInvitation() {
-  const { t } = useTranslation("common");
   const { token } = Route.useSearch();
 
   const { data, isPending, error } = useQuery({
@@ -234,8 +239,18 @@ function AcceptInvitation() {
                   children={([canSubmit, isSubmitting]) => (
                     <Button type="submit" disabled={!canSubmit} className="w-full">
                       {isSubmitting
-                        ? <><Spinner /><span>Creating Account...</span></>
-                        : <><UserPlusIcon /><span>Create Account</span></>}
+                        ? (
+                            <>
+                              <Spinner />
+                              <span>Creating Account...</span>
+                            </>
+                          )
+                        : (
+                            <>
+                              <UserPlusIcon />
+                              <span>Create Account</span>
+                            </>
+                          )}
                     </Button>
                   )}
                 />

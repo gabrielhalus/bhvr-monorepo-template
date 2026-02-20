@@ -16,11 +16,14 @@ import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
 import { Route as DashboardUsersRouteRouteImport } from './routes/_dashboard/users/route'
 import { Route as DashboardSettingsRouteRouteImport } from './routes/_dashboard/settings/route'
 import { Route as DashboardLogsRouteRouteImport } from './routes/_dashboard/logs/route'
+import { Route as DashboardCronRouteRouteImport } from './routes/_dashboard/cron/route'
 import { Route as DashboardUsersIndexRouteImport } from './routes/_dashboard/users/index'
+import { Route as DashboardCronIndexRouteImport } from './routes/_dashboard/cron/index'
 import { Route as DashboardAccountIndexRouteImport } from './routes/_dashboard/account/index'
 import { Route as AuthRegisterIndexRouteImport } from './routes/_auth/register/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as DashboardSettingsSplatRouteImport } from './routes/_dashboard/settings/$'
+import { Route as DashboardCronTaskIdRouteImport } from './routes/_dashboard/cron/$taskId'
 import { Route as DashboardUsersUserIdIndexRouteImport } from './routes/_dashboard/users/$userId/index'
 
 const AcceptInvitationRoute = AcceptInvitationRouteImport.update({
@@ -56,10 +59,20 @@ const DashboardLogsRouteRoute = DashboardLogsRouteRouteImport.update({
   path: '/logs',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardCronRouteRoute = DashboardCronRouteRouteImport.update({
+  id: '/cron',
+  path: '/cron',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardUsersIndexRoute = DashboardUsersIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardUsersRouteRoute,
+} as any)
+const DashboardCronIndexRoute = DashboardCronIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardCronRouteRoute,
 } as any)
 const DashboardAccountIndexRoute = DashboardAccountIndexRouteImport.update({
   id: '/account/',
@@ -81,6 +94,11 @@ const DashboardSettingsSplatRoute = DashboardSettingsSplatRouteImport.update({
   path: '/$',
   getParentRoute: () => DashboardSettingsRouteRoute,
 } as any)
+const DashboardCronTaskIdRoute = DashboardCronTaskIdRouteImport.update({
+  id: '/$taskId',
+  path: '/$taskId',
+  getParentRoute: () => DashboardCronRouteRoute,
+} as any)
 const DashboardUsersUserIdIndexRoute =
   DashboardUsersUserIdIndexRouteImport.update({
     id: '/$userId/',
@@ -90,14 +108,17 @@ const DashboardUsersUserIdIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/accept-invitation': typeof AcceptInvitationRoute
+  '/cron': typeof DashboardCronRouteRouteWithChildren
   '/logs': typeof DashboardLogsRouteRoute
   '/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/users': typeof DashboardUsersRouteRouteWithChildren
   '/': typeof DashboardIndexRoute
+  '/cron/$taskId': typeof DashboardCronTaskIdRoute
   '/settings/$': typeof DashboardSettingsSplatRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
   '/account': typeof DashboardAccountIndexRoute
+  '/cron/': typeof DashboardCronIndexRoute
   '/users/': typeof DashboardUsersIndexRoute
   '/users/$userId': typeof DashboardUsersUserIdIndexRoute
 }
@@ -106,10 +127,12 @@ export interface FileRoutesByTo {
   '/logs': typeof DashboardLogsRouteRoute
   '/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/': typeof DashboardIndexRoute
+  '/cron/$taskId': typeof DashboardCronTaskIdRoute
   '/settings/$': typeof DashboardSettingsSplatRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
   '/account': typeof DashboardAccountIndexRoute
+  '/cron': typeof DashboardCronIndexRoute
   '/users': typeof DashboardUsersIndexRoute
   '/users/$userId': typeof DashboardUsersUserIdIndexRoute
 }
@@ -118,14 +141,17 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteRouteWithChildren
   '/_dashboard': typeof DashboardRouteRouteWithChildren
   '/accept-invitation': typeof AcceptInvitationRoute
+  '/_dashboard/cron': typeof DashboardCronRouteRouteWithChildren
   '/_dashboard/logs': typeof DashboardLogsRouteRoute
   '/_dashboard/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/_dashboard/users': typeof DashboardUsersRouteRouteWithChildren
   '/_dashboard/': typeof DashboardIndexRoute
+  '/_dashboard/cron/$taskId': typeof DashboardCronTaskIdRoute
   '/_dashboard/settings/$': typeof DashboardSettingsSplatRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/register/': typeof AuthRegisterIndexRoute
   '/_dashboard/account/': typeof DashboardAccountIndexRoute
+  '/_dashboard/cron/': typeof DashboardCronIndexRoute
   '/_dashboard/users/': typeof DashboardUsersIndexRoute
   '/_dashboard/users/$userId/': typeof DashboardUsersUserIdIndexRoute
 }
@@ -133,14 +159,17 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/accept-invitation'
+    | '/cron'
     | '/logs'
     | '/settings'
     | '/users'
     | '/'
+    | '/cron/$taskId'
     | '/settings/$'
     | '/login'
     | '/register'
     | '/account'
+    | '/cron/'
     | '/users/'
     | '/users/$userId'
   fileRoutesByTo: FileRoutesByTo
@@ -149,10 +178,12 @@ export interface FileRouteTypes {
     | '/logs'
     | '/settings'
     | '/'
+    | '/cron/$taskId'
     | '/settings/$'
     | '/login'
     | '/register'
     | '/account'
+    | '/cron'
     | '/users'
     | '/users/$userId'
   id:
@@ -160,14 +191,17 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/_dashboard'
     | '/accept-invitation'
+    | '/_dashboard/cron'
     | '/_dashboard/logs'
     | '/_dashboard/settings'
     | '/_dashboard/users'
     | '/_dashboard/'
+    | '/_dashboard/cron/$taskId'
     | '/_dashboard/settings/$'
     | '/_auth/login/'
     | '/_auth/register/'
     | '/_dashboard/account/'
+    | '/_dashboard/cron/'
     | '/_dashboard/users/'
     | '/_dashboard/users/$userId/'
   fileRoutesById: FileRoutesById
@@ -229,12 +263,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLogsRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/_dashboard/cron': {
+      id: '/_dashboard/cron'
+      path: '/cron'
+      fullPath: '/cron'
+      preLoaderRoute: typeof DashboardCronRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/_dashboard/users/': {
       id: '/_dashboard/users/'
       path: '/'
       fullPath: '/users/'
       preLoaderRoute: typeof DashboardUsersIndexRouteImport
       parentRoute: typeof DashboardUsersRouteRoute
+    }
+    '/_dashboard/cron/': {
+      id: '/_dashboard/cron/'
+      path: '/'
+      fullPath: '/cron/'
+      preLoaderRoute: typeof DashboardCronIndexRouteImport
+      parentRoute: typeof DashboardCronRouteRoute
     }
     '/_dashboard/account/': {
       id: '/_dashboard/account/'
@@ -264,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsSplatRouteImport
       parentRoute: typeof DashboardSettingsRouteRoute
     }
+    '/_dashboard/cron/$taskId': {
+      id: '/_dashboard/cron/$taskId'
+      path: '/$taskId'
+      fullPath: '/cron/$taskId'
+      preLoaderRoute: typeof DashboardCronTaskIdRouteImport
+      parentRoute: typeof DashboardCronRouteRoute
+    }
     '/_dashboard/users/$userId/': {
       id: '/_dashboard/users/$userId/'
       path: '/$userId'
@@ -287,6 +342,19 @@ const AuthRouteRouteChildren: AuthRouteRouteChildren = {
 const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
+
+interface DashboardCronRouteRouteChildren {
+  DashboardCronTaskIdRoute: typeof DashboardCronTaskIdRoute
+  DashboardCronIndexRoute: typeof DashboardCronIndexRoute
+}
+
+const DashboardCronRouteRouteChildren: DashboardCronRouteRouteChildren = {
+  DashboardCronTaskIdRoute: DashboardCronTaskIdRoute,
+  DashboardCronIndexRoute: DashboardCronIndexRoute,
+}
+
+const DashboardCronRouteRouteWithChildren =
+  DashboardCronRouteRoute._addFileChildren(DashboardCronRouteRouteChildren)
 
 interface DashboardSettingsRouteRouteChildren {
   DashboardSettingsSplatRoute: typeof DashboardSettingsSplatRoute
@@ -316,6 +384,7 @@ const DashboardUsersRouteRouteWithChildren =
   DashboardUsersRouteRoute._addFileChildren(DashboardUsersRouteRouteChildren)
 
 interface DashboardRouteRouteChildren {
+  DashboardCronRouteRoute: typeof DashboardCronRouteRouteWithChildren
   DashboardLogsRouteRoute: typeof DashboardLogsRouteRoute
   DashboardSettingsRouteRoute: typeof DashboardSettingsRouteRouteWithChildren
   DashboardUsersRouteRoute: typeof DashboardUsersRouteRouteWithChildren
@@ -324,6 +393,7 @@ interface DashboardRouteRouteChildren {
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardCronRouteRoute: DashboardCronRouteRouteWithChildren,
   DashboardLogsRouteRoute: DashboardLogsRouteRoute,
   DashboardSettingsRouteRoute: DashboardSettingsRouteRouteWithChildren,
   DashboardUsersRouteRoute: DashboardUsersRouteRouteWithChildren,
