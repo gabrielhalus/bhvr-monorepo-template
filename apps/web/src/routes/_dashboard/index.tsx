@@ -16,6 +16,7 @@ import { QUERY_STALE_TIMES } from "@/api/query-config";
 import { mySessionsQueryOptions } from "@/api/sessions/sessions.queries";
 import { fetchPaginatedUsers } from "@/api/users/users.api";
 import { usersKeys } from "@/api/users/users.keys";
+import { parseUserName } from "~react/lib/name-utils";
 import { useAuth } from "~react/hooks/use-auth";
 
 export const Route = createFileRoute("/_dashboard/")({
@@ -91,7 +92,7 @@ function Dashboard() {
     return "Good evening";
   })();
 
-  const firstName = user.name.split(" ")[0];
+  const { firstName } = parseUserName(user.name);
 
   const usersQuery = useQuery({
     queryKey: [...usersKeys.paginated, { page: 1, limit: 1, sortOrder: "desc" as const }],

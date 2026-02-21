@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AvatarUser } from "@/components/avatar-user";
+import { parseUserName } from "~react/lib/name-utils";
 import { useAuth } from "~react/hooks/use-auth";
 
 import { PasswordForm } from "./-components/password-form";
@@ -27,6 +28,7 @@ function Account() {
   const { t } = useTranslation(["common", "web"]);
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabId>("profile");
+  const { fullName } = parseUserName(user.name);
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6 md:p-8">
@@ -42,7 +44,7 @@ function Account() {
           <div className="flex-1 space-y-2">
             <div>
               <h1 className="text-2xl md:text-3xl font-extrabold leading-tight tracking-tight text-panel-heading">
-                {user.name}
+                {fullName}
               </h1>
               <div className="flex items-center gap-1.5 mt-1 text-panel-meta">
                 <MailIcon className="size-3.5" />

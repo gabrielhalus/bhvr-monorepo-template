@@ -1,12 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CalendarClockIcon, PlusIcon } from "lucide-react";
-import { useState } from "react";
+import { CalendarClockIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "~react/components/button";
-
 import { CronStatsCards } from "./-components/cron-stats-cards";
-import { CronTaskFormDialog } from "./-components/cron-task-form-dialog";
 import { CronTasksDataTable } from "./-components/cron-tasks.data-table";
 
 export const Route = createFileRoute("/_dashboard/cron/")({
@@ -15,7 +11,6 @@ export const Route = createFileRoute("/_dashboard/cron/")({
 
 function CronTasksPage() {
   const { t } = useTranslation("web");
-  const [createOpen, setCreateOpen] = useState(false);
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6 md:p-8">
@@ -53,15 +48,6 @@ function CronTasksPage() {
               </p>
             </div>
           </div>
-
-          <Button
-            onClick={() => setCreateOpen(true)}
-            className="shrink-0"
-            size="sm"
-          >
-            <PlusIcon className="size-4" />
-            {t("pages.cron.actions.createTask")}
-          </Button>
         </div>
       </div>
 
@@ -76,8 +62,6 @@ function CronTasksPage() {
         </div>
         <CronTasksDataTable />
       </div>
-
-      <CronTaskFormDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   );
 }

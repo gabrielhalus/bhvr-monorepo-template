@@ -19,6 +19,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "~react/components/sidebar";
+import { parseUserName } from "~react/lib/name-utils";
 import { useAuth } from "~react/hooks/use-auth";
 
 import { AvatarUser } from "../avatar-user";
@@ -32,6 +33,8 @@ export function NavUser() {
     return null;
   }
 
+  const { fullName } = parseUserName(user.name);
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -43,7 +46,7 @@ export function NavUser() {
             >
               <AvatarUser {...user} size="lg" />
               <div className="grid flex-1 text-left leading-tight min-w-0">
-                <span className="truncate font-semibold text-sm">{user.name}</span>
+                <span className="truncate font-semibold text-sm">{fullName}</span>
                 <span className="truncate text-xs text-sidebar-foreground/45">{user.email}</span>
               </div>
             </SidebarMenuButton>
@@ -58,7 +61,7 @@ export function NavUser() {
               <div className="flex items-center gap-2.5 px-2 py-2 text-left">
                 <AvatarUser {...user} size="lg" />
                 <div className="grid flex-1 text-left leading-tight min-w-0">
-                  <span className="truncate font-semibold text-sm">{user.name}</span>
+                  <span className="truncate font-semibold text-sm">{fullName}</span>
                   <span className="truncate text-xs text-muted-foreground">{user.email}</span>
                 </div>
               </div>
