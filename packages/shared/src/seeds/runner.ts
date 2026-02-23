@@ -41,6 +41,7 @@ type RuntimeConfigSeedData = Array<{
   value: string | null;
   type: "string" | "number" | "boolean" | "list";
   nullable: boolean;
+  order?: number;
   options?: string;
   disabledWhen?: string;
 }>;
@@ -75,7 +76,16 @@ async function applyRuntimeConfigsSeed(data: RuntimeConfigSeedData): Promise<voi
     await drizzle
       .insert(RuntimeConfigModel)
       .values(config)
-      .onConflictDoNothing();
+      .onConflictDoUpdate({
+        target: RuntimeConfigModel.configKey,
+        set: {
+          type: config.type,
+          nullable: config.nullable,
+          order: config.order ?? 0,
+          options: config.options ?? null,
+          disabledWhen: config.disabledWhen ?? null,
+        },
+      });
   }
 }
 

@@ -2,7 +2,7 @@ import type { SeedMeta } from "~shared/seeds";
 
 export const seed: SeedMeta = {
   id: "runtime-configs",
-  version: 1,
+  version: 2,
   description: "Default runtime configuration values",
   data: [
     {
@@ -25,7 +25,7 @@ export const seed: SeedMeta = {
       type: "string",
       nullable: true,
       order: 1,
-      disabled_when: "notifications.discord.enable!=true",
+      disabledWhen: "notifications.discord.enable!=true",
     },
     {
       configKey: "notifications.smtp.enable",
@@ -40,7 +40,7 @@ export const seed: SeedMeta = {
       type: "string",
       nullable: true,
       order: 1,
-      disabled_when: "notifications.smtp.enable!=true",
+      disabledWhen: "notifications.smtp.enable!=true",
     },
     {
       configKey: "notifications.smtp.port",
@@ -48,7 +48,7 @@ export const seed: SeedMeta = {
       type: "number",
       nullable: true,
       order: 2,
-      disabled_when: "notifications.smtp.enable!=true",
+      disabledWhen: "notifications.smtp.enable!=true",
     },
     {
       configKey: "notifications.smtp.user",
@@ -56,7 +56,7 @@ export const seed: SeedMeta = {
       type: "string",
       nullable: true,
       order: 3,
-      disabled_when: "notifications.smtp.enable!=true",
+      disabledWhen: "notifications.smtp.enable!=true",
     },
     {
       configKey: "notifications.smtp.password",
@@ -64,7 +64,7 @@ export const seed: SeedMeta = {
       type: "string",
       nullable: true,
       order: 4,
-      disabled_when: "notifications.smtp.enable!=true",
+      disabledWhen: "notifications.smtp.enable!=true",
     },
     {
       configKey: "notifications.smtp.fromAddress",
@@ -72,7 +72,7 @@ export const seed: SeedMeta = {
       type: "string",
       nullable: true,
       order: 4,
-      disabled_when: "notifications.smtp.enable!=true",
+      disabledWhen: "notifications.smtp.enable!=true",
     },
   ],
 };
