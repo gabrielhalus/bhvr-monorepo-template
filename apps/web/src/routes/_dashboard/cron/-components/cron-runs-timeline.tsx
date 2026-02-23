@@ -1,11 +1,11 @@
 import type { CronTaskRun } from "~shared/queries/cron-task-runs.queries";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
-import { useCronTaskRecentRuns } from "@/hooks/cron-tasks/use-cron-task-recent-runs";
+import { cronTaskRecentRunsQueryOptions } from "@/api/cron-tasks/cron-tasks.queries";
 import i18n from "@/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "~react/components/card";
-import { Skeleton } from "~react/components/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~react/components/tooltip";
 import { formatValue } from "~shared/i18n";
 
@@ -53,7 +53,7 @@ function RunDot({ run }: { run: CronTaskRun }) {
 
 export function CronRunsTimeline({ taskId }: { taskId: string }) {
   const { t } = useTranslation("web");
-  const { data, isLoading } = useCronTaskRecentRuns(taskId);
+  const { data } = useSuspenseQuery(cronTaskRecentRunsQueryOptions(taskId));
 
   const runs = data?.success ? data.runs : [];
 
@@ -63,9 +63,7 @@ export function CronRunsTimeline({ taskId }: { taskId: string }) {
         <CardTitle className="text-base">{t("pages.cron.detail.timelineTitle")}</CardTitle>
       </CardHeader>
       <CardContent className="px-5 pb-5 pt-0">
-        {isLoading ? (
-          <Skeleton className="h-8 w-full rounded-lg" />
-        ) : runs.length === 0 ? (
+        {runs.length === 0 ? (
           <p className="text-sm text-muted-foreground">No runs yet</p>
         ) : (
           <div className="flex items-center gap-2 flex-wrap">

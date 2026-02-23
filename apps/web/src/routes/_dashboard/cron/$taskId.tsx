@@ -1,10 +1,10 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeftIcon, CalendarClockIcon, EditIcon, PlayIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { cronTaskQueryOptions } from "@/api/cron-tasks/cron-tasks.queries";
-import { useCronTask } from "@/hooks/cron-tasks/use-cron-task";
+import { cronTaskQueryOptions, cronTaskRecentRunsQueryOptions, cronTaskRunsChartQueryOptions, cronTaskRunStatsQueryOptions } from "@/api/cron-tasks/cron-tasks.queries";
 import { useTriggerCronTask } from "@/hooks/cron-tasks/use-trigger-cron-task";
 import { Button } from "~react/components/button";
 import { Spinner } from "~react/components/spinner";
@@ -20,7 +20,11 @@ export const Route = createFileRoute("/_dashboard/cron/$taskId")({
   loader: async ({ params, context }) => {
     const data = await context.queryClient.ensureQueryData(cronTaskQueryOptions(params.taskId));
     if (!data.success) throw notFound();
-    return data;
+    await Promise.all([
+      context.queryClient.ensureQueryData(cronTaskRunStatsQueryOptions(params.taskId)),
+      context.queryClient.ensureQueryData(cronTaskRunsChartQueryOptions(params.taskId)),
+      context.queryClient.ensureQueryData(cronTaskRecentRunsQueryOptions(params.taskId)),
+    ]);
   },
   staticData: { crumb: "pages.cron.title" },
 });
@@ -30,7 +34,7 @@ function CronTaskDetailPage() {
   const { taskId } = Route.useParams();
   const [editOpen, setEditOpen] = useState(false);
 
-  const { data } = useCronTask(taskId);
+  const { data } = useSuspenseQuery(cronTaskQueryOptions(taskId));
   const triggerMutation = useTriggerCronTask();
 
   const task = data?.success ? data.task : null;

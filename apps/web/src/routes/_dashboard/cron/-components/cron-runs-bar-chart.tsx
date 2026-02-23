@@ -1,9 +1,9 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { useTranslation } from "react-i18next";
 
-import { useCronTaskRunsChart } from "@/hooks/cron-tasks/use-cron-task-runs-chart";
+import { cronTaskRunsChartQueryOptions } from "@/api/cron-tasks/cron-tasks.queries";
 import { Card, CardContent, CardHeader, CardTitle } from "~react/components/card";
-import { Skeleton } from "~react/components/skeleton";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "~react/components/chart";
 
 const chartConfig = {
@@ -19,7 +19,7 @@ const chartConfig = {
 
 export function CronRunsBarChart({ taskId }: { taskId: string }) {
   const { t } = useTranslation("web");
-  const { data, isLoading } = useCronTaskRunsChart(taskId);
+  const { data } = useSuspenseQuery(cronTaskRunsChartQueryOptions(taskId));
 
   const chartData = data?.success ? data.data : [];
 
@@ -35,9 +35,7 @@ export function CronRunsBarChart({ taskId }: { taskId: string }) {
         <CardTitle className="text-base">{t("pages.cron.detail.chartTitle")}</CardTitle>
       </CardHeader>
       <CardContent className="px-5 pb-5 pt-0">
-        {isLoading ? (
-          <Skeleton className="h-48 w-full rounded-lg" />
-        ) : formattedData.length === 0 ? (
+        {formattedData.length === 0 ? (
           <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">
             No execution data yet
           </div>

@@ -26,6 +26,7 @@ export function updateCronTaskMutationOptions(queryClient: QueryClient) {
     onSuccess: (_: unknown, variables: { id: string; data: UpdateCronTask }) => {
       queryClient.invalidateQueries({ queryKey: cronTasksKeys.byId(variables.id) });
       queryClient.invalidateQueries({ queryKey: cronTasksKeys.paginated });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.stats });
     },
   };
 }
@@ -35,6 +36,8 @@ export function deleteCronTaskMutationOptions(queryClient: QueryClient) {
     mutationFn: (taskId: string) => deleteCronTaskRequest(taskId),
     onSuccess: (_: unknown, taskId: string) => {
       queryClient.removeQueries({ queryKey: cronTasksKeys.byId(taskId) });
+      queryClient.removeQueries({ queryKey: cronTasksKeys.runs(taskId) });
+      queryClient.removeQueries({ queryKey: cronTasksKeys.runStats(taskId) });
       queryClient.invalidateQueries({ queryKey: cronTasksKeys.paginated });
       queryClient.invalidateQueries({ queryKey: cronTasksKeys.stats });
     },
@@ -56,8 +59,9 @@ export function triggerCronTaskMutationOptions(queryClient: QueryClient) {
   return {
     mutationFn: (taskId: string) => triggerCronTaskRequest(taskId),
     onSuccess: (_: unknown, taskId: string) => {
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.byId(taskId) });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.paginated });
       queryClient.invalidateQueries({ queryKey: cronTasksKeys.runs(taskId) });
-      queryClient.invalidateQueries({ queryKey: cronTasksKeys.runsChart(taskId) });
       queryClient.invalidateQueries({ queryKey: cronTasksKeys.runStats(taskId) });
       queryClient.invalidateQueries({ queryKey: cronTasksKeys.stats });
     },
