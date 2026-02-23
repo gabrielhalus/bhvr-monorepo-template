@@ -30,7 +30,6 @@ export const getSessionContext = factory.createMiddleware(async (c, next) => {
       const verified = await verify(accessToken, env.JWT_SECRET);
       decoded = AccessTokenSchema.parse(verified);
 
-      // A valid JWT alone is not sufficient — verify the session is still active in the DB
       const refreshToken = getCookie(c, "refreshToken");
       if (refreshToken) {
         try {
@@ -44,7 +43,6 @@ export const getSessionContext = factory.createMiddleware(async (c, next) => {
           decoded = null;
         }
       } else {
-        // No refresh token — no valid session
         decoded = null;
       }
     } else {

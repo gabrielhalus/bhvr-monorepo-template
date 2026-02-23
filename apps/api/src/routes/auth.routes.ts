@@ -24,7 +24,8 @@ import { getDefaultRole } from "~shared/queries/roles.queries";
 import { deleteToken, getActiveTokensByUserId, insertToken, revokeAllTokensByUserId, revokeAllTokensByUserIdExcept, revokeToken } from "~shared/queries/tokens.queries";
 import { createUserRole } from "~shared/queries/user-roles.queries";
 import { createUser, getUser, signIn, updateUser, updateUserPassword } from "~shared/queries/users.queries";
-import { ChangePasswordSchema, isAuthorizedSchema, LoginSchema, RegisterSchema, UpdateAccountSchema } from "~shared/schemas/api/auth.schemas";
+import { ChangePasswordSchema, isAuthorizedSchema, LoginSchema, RegisterSchema, UpdateAccountSchema, UpdatePreferencesSchema } from "~shared/schemas/api/auth.schemas";
+import { UserPreferencesSchema } from "~shared/schemas/db/users.schemas";
 
 export const authRoutes = new Hono()
   /**
@@ -225,6 +226,25 @@ export const authRoutes = new Hono()
       impersonatorId: sessionContext.impersonator?.id,
       ...clientInfo,
     }, data);
+
+    return c.json({ success: true as const, user });
+  })
+
+  /**
+   * Update the authenticated user's preferences (sidebar, theme, locale)
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response with the updated user data
+   * @access protected
+   */
+  .patch("/preferences", validationMiddleware("json", UpdatePreferencesSchema), async (c) => {
+    const sessionContext = c.var.sessionContext;
+    const data = c.req.valid("json");
+
+    const currentPreferences = UserPreferencesSchema.catch(null).parse(sessionContext.user.preferences);
+    const updatedPreferences = { ...(currentPreferences ?? {}), ...data };
+
+    const user = await updateUser(sessionContext.user.id, { preferences: updatedPreferences });
 
     return c.json({ success: true as const, user });
   })
