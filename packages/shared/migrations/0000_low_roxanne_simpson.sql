@@ -11,6 +11,30 @@ CREATE TABLE "audit_logs" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "cron_task_runs" (
+	"id" varchar(21) PRIMARY KEY NOT NULL,
+	"task_id" varchar(21) NOT NULL,
+	"status" varchar(10) NOT NULL,
+	"started_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"completed_at" timestamp with time zone,
+	"duration_ms" integer,
+	"output" text,
+	"error" text
+);
+--> statement-breakpoint
+CREATE TABLE "cron_tasks" (
+	"id" varchar(21) PRIMARY KEY NOT NULL,
+	"name" varchar(100) NOT NULL,
+	"description" text,
+	"cron_expression" varchar(100) NOT NULL,
+	"handler" varchar(100) NOT NULL,
+	"is_enabled" boolean DEFAULT true NOT NULL,
+	"last_run_at" timestamp with time zone,
+	"next_run_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "invitation_roles" (
 	"invitation_id" varchar(21) NOT NULL,
 	"role_id" integer NOT NULL,
@@ -106,7 +130,8 @@ CREATE TABLE "user_roles" (
 --> statement-breakpoint
 CREATE TABLE "users" (
 	"id" varchar(21) PRIMARY KEY NOT NULL,
-	"name" text NOT NULL,
+	"first_name" text NOT NULL,
+	"last_name" text NOT NULL,
 	"email" text NOT NULL,
 	"password" text,
 	"avatar" text,
@@ -116,6 +141,7 @@ CREATE TABLE "users" (
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
+ALTER TABLE "cron_task_runs" ADD CONSTRAINT "cron_task_runs_task_id_cron_tasks_id_fk" FOREIGN KEY ("task_id") REFERENCES "public"."cron_tasks"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "invitation_roles" ADD CONSTRAINT "invitation_roles_invitation_id_invitations_id_fk" FOREIGN KEY ("invitation_id") REFERENCES "public"."invitations"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "invitation_roles" ADD CONSTRAINT "invitation_roles_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."roles"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "invitations" ADD CONSTRAINT "invitations_invited_by_id_users_id_fk" FOREIGN KEY ("invited_by_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
@@ -124,4 +150,8 @@ ALTER TABLE "role_permissions" ADD CONSTRAINT "role_permissions_role_id_roles_id
 ALTER TABLE "runtime_configs" ADD CONSTRAINT "runtime_configs_updated_by_users_id_fk" FOREIGN KEY ("updated_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."roles"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+CREATE INDEX "idx_cron_task_runs_task_id" ON "cron_task_runs" USING btree ("task_id");--> statement-breakpoint
+CREATE INDEX "idx_cron_task_runs_started_at" ON "cron_task_runs" USING btree ("started_at");--> statement-breakpoint
+CREATE INDEX "idx_cron_task_runs_status" ON "cron_task_runs" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "idx_cron_tasks_is_enabled" ON "cron_tasks" USING btree ("is_enabled");--> statement-breakpoint
 CREATE INDEX "idx_config_key_prefix" ON "runtime_configs" USING btree ("config_key");
