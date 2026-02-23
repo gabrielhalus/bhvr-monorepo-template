@@ -13,7 +13,10 @@ export function useDeleteCronTask() {
     ...deleteCronTaskMutationOptions(queryClient),
     onSuccess: (_data, taskId) => {
       queryClient.removeQueries({ queryKey: cronTasksKeys.byId(taskId) });
+      queryClient.removeQueries({ queryKey: cronTasksKeys.runs(taskId) });
+      queryClient.removeQueries({ queryKey: cronTasksKeys.runStats(taskId) });
       queryClient.invalidateQueries({ queryKey: cronTasksKeys.paginated });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.stats });
       toast.success(t("pages.cron.actions.deleteSuccess"));
     },
     onError: () => {
