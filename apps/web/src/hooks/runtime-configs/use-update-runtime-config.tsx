@@ -8,12 +8,12 @@ import { updateRuntimeConfigMutationOptions } from "@/api/runtime-configs/runtim
 export function useUpdateRuntimeConfig() {
   const { t } = useTranslation("web");
   const queryClient = useQueryClient();
+  const baseOptions = updateRuntimeConfigMutationOptions(queryClient);
 
   return useMutation({
-    ...updateRuntimeConfigMutationOptions(queryClient),
+    ...baseOptions,
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: runtimeConfigsKeys.byKey(variables.key) });
-      queryClient.invalidateQueries({ queryKey: runtimeConfigsKeys.list });
+      baseOptions.onSuccess(_data, variables);
       toast.success(t("pages.settings.updateSuccess"));
     },
     onError: () => {

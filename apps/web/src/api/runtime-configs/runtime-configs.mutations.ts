@@ -8,7 +8,7 @@ import { runtimeConfigsKeys } from "./runtime-configs.keys";
 // Mutation Functions
 // ============================================================================
 
-async function updateRuntimeConfig(key: string, value: string) {
+async function updateRuntimeConfig(key: string, value: string | null) {
   const res = await api.config[":key"].$put({
     param: { key },
     json: { value },
@@ -27,9 +27,9 @@ async function updateRuntimeConfig(key: string, value: string) {
 
 export function updateRuntimeConfigMutationOptions(queryClient: QueryClient) {
   return {
-    mutationFn: ({ key, value }: { key: string; value: string }) =>
+    mutationFn: ({ key, value }: { key: string; value: string | null }) =>
       updateRuntimeConfig(key, value),
-    onSuccess: (_data: unknown, variables: { key: string; value: string }) => {
+    onSuccess: (_data: unknown, variables: { key: string; value: string | null }) => {
       queryClient.invalidateQueries({ queryKey: runtimeConfigsKeys.byKey(variables.key) });
       queryClient.invalidateQueries({ queryKey: runtimeConfigsKeys.list });
     },

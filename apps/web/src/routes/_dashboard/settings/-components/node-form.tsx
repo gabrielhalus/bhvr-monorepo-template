@@ -76,10 +76,11 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
   const form = useForm({
     defaultValues: { value: config.value },
     onSubmit: async ({ value: { value } }) => {
-      const parsedValue = inferConfigValue(value);
+      const finalValue = config.nullable && (value === "" || value === null) ? null : value;
+      const parsedValue = inferConfigValue(finalValue ?? "");
       schema.parse(parsedValue);
 
-      await updateRuntimeConfig.mutateAsync({ key: node.fullKey, value });
+      await updateRuntimeConfig.mutateAsync({ key: node.fullKey, value: finalValue });
     },
   });
 
