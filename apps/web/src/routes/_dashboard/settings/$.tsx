@@ -1,11 +1,11 @@
-import { createFileRoute, getRouteApi, Navigate } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 
+import { runtimeConfigsQueryOptions } from "@/api/runtime-configs/runtime-configs.queries";
 import { buildConfigTree, findFirstLeafSection, findNodeBySegments } from "~shared/helpers/config-tree";
 
 import { NodeForm } from "./-components/node-form";
-
-const settingsRoute = getRouteApi("/_dashboard/settings");
 
 export const Route = createFileRoute("/_dashboard/settings/$")(
   {
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_dashboard/settings/$")(
 
 function RouteComponent() {
   const { _splat: splat } = Route.useParams();
-  const { configs } = settingsRoute.useLoaderData();
+  const { data: { configs } } = useSuspenseQuery(runtimeConfigsQueryOptions);
 
   const segments = splat?.split("/").filter(Boolean) ?? [];
 

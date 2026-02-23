@@ -1,14 +1,13 @@
-import { getRouteApi } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
+import { runtimeConfigsQueryOptions } from "@/api/runtime-configs/runtime-configs.queries";
 import { buildConfigTree } from "~shared/helpers/config-tree";
 
 import { ConfigSection } from "./config-section";
 
-const settingsRoute = getRouteApi("/_dashboard/settings");
-
 export function Sidebar() {
-  const { configs } = settingsRoute.useLoaderData();
+  const { data: { configs } } = useSuspenseQuery(runtimeConfigsQueryOptions);
 
   const configTree = useMemo(() => {
     if (!configs) {

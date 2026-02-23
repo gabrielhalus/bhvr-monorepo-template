@@ -84,7 +84,7 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
     },
   });
 
-  const handleAutoSave = useDebouncedCallback(() => form.handleSubmit(), 500);
+  const handleAutoSave = useDebouncedCallback(() => form.handleSubmit(), 250);
 
   return (
     <div className={`flex items-center justify-between gap-8 first:pt-0 last:pb-0 py-5 not-last:border-b transition-opacity ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}>
