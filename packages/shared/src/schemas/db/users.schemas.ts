@@ -3,15 +3,23 @@ import { z } from "zod";
 
 import { UsersModel } from "~shared/models/users.model";
 
+const jsonOverride = z.unknown();
+
 /**
  * Schema for users
  */
-export const UserSchema = createSelectSchema(UsersModel);
+export const UserSchema = createSelectSchema(UsersModel, {
+  preferences: jsonOverride,
+  metadata: jsonOverride,
+});
 
 /**
  * Schema for inserting a new user
  */
-export const InsertUserSchema = createInsertSchema(UsersModel).omit({ id: true, createdAt: true, updatedAt: true, verifiedAt: true }).extend({
+export const InsertUserSchema = createInsertSchema(UsersModel, {
+  preferences: jsonOverride,
+  metadata: jsonOverride,
+}).omit({ id: true, createdAt: true, updatedAt: true, verifiedAt: true }).extend({
   firstName: z
     .string()
     .min(1)
@@ -36,7 +44,10 @@ export const InsertUserSchema = createInsertSchema(UsersModel).omit({ id: true, 
 /**
  * Schema for updating a user
  */
-export const UpdateUserSchema = createUpdateSchema(UsersModel).extend({
+export const UpdateUserSchema = createUpdateSchema(UsersModel, {
+  preferences: jsonOverride,
+  metadata: jsonOverride,
+}).extend({
   firstName: z
     .string()
     .min(1)
