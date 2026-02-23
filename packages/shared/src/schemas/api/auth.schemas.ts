@@ -30,7 +30,8 @@ export const PasswordSchema = z
   .refine(passwordChecks.minSpecialChars, "minSpecialCharsErrorMessage");
 
 export const RegisterSchema = z.object({
-  name: z.string().min(1, "requiredErrorMessage").min(3, "minLengthErrorMessage").max(20, "maxLengthErrorMessage"),
+  firstName: z.string().min(1, "requiredErrorMessage").max(50, "maxLengthErrorMessage"),
+  lastName: z.string().min(1, "requiredErrorMessage").max(50, "maxLengthErrorMessage"),
   email: z.string().toLowerCase().trim().pipe(z.email("invalidErrorMessage")),
   password: PasswordSchema,
 });
@@ -53,7 +54,8 @@ export const isAuthorizedSchema = z.object({
 });
 
 export const UpdateAccountSchema = z.object({
-  name: z.string().min(1, "requiredErrorMessage").min(3, "minLengthErrorMessage").max(20, "maxLengthErrorMessage"),
+  firstName: z.string().min(1, "requiredErrorMessage").max(50, "maxLengthErrorMessage"),
+  lastName: z.string().min(1, "requiredErrorMessage").max(50, "maxLengthErrorMessage"),
   email: z.string().toLowerCase().trim().pipe(z.email("invalidErrorMessage")),
 });
 

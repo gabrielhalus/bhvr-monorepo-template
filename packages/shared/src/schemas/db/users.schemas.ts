@@ -12,10 +12,14 @@ export const UserSchema = createSelectSchema(UsersModel);
  * Schema for inserting a new user
  */
 export const InsertUserSchema = createInsertSchema(UsersModel).omit({ id: true, createdAt: true, updatedAt: true, verifiedAt: true }).extend({
-  name: z
+  firstName: z
     .string()
-    .min(3)
-    .max(20),
+    .min(1)
+    .max(50),
+  lastName: z
+    .string()
+    .min(1)
+    .max(50),
   email: z
     .email()
     .transform(val => val.toLowerCase()),
@@ -33,10 +37,14 @@ export const InsertUserSchema = createInsertSchema(UsersModel).omit({ id: true, 
  * Schema for updating a user
  */
 export const UpdateUserSchema = createUpdateSchema(UsersModel).extend({
-  name: z
+  firstName: z
     .string()
-    .min(3)
-    .max(20),
+    .min(1)
+    .max(50),
+  lastName: z
+    .string()
+    .min(1)
+    .max(50),
   email: z
     .email()
     .transform(val => val?.toLowerCase()),

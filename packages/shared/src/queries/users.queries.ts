@@ -190,14 +190,16 @@ export async function getUsersPaginated<T extends UserRelationKey[]>(
 
   const searchCondition = search
     ? or(
-        ilike(UsersModel.name, `%${search}%`),
+        ilike(UsersModel.firstName, `%${search}%`),
+        ilike(UsersModel.lastName, `%${search}%`),
         ilike(UsersModel.email, `%${search}%`),
       )
     : undefined;
 
-  const sortableColumns: Record<string, typeof UsersModel.id | typeof UsersModel.name | typeof UsersModel.email | typeof UsersModel.createdAt> = {
+  const sortableColumns: Record<string, typeof UsersModel.id | typeof UsersModel.firstName | typeof UsersModel.lastName | typeof UsersModel.email | typeof UsersModel.createdAt> = {
     id: UsersModel.id,
-    name: UsersModel.name,
+    firstName: UsersModel.firstName,
+    lastName: UsersModel.lastName,
     email: UsersModel.email,
     createdAt: UsersModel.createdAt,
   };

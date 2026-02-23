@@ -56,7 +56,6 @@ class CronScheduler {
 
     const handler = HANDLERS[task.handler];
     if (!handler) {
-      // eslint-disable-next-line no-console
       console.warn(`[Scheduler] Unknown handler "${task.handler}" for task "${task.name}" — skipping`);
       return;
     }
@@ -71,7 +70,6 @@ class CronScheduler {
       const nextRun = job.nextRun()?.toISOString() ?? null;
       setTaskRunTimestamps(task.id, task.lastRunAt ?? new Date().toISOString(), nextRun).catch(() => {});
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error(`[Scheduler] Failed to schedule task "${task.name}":`, err);
     }
   }
@@ -111,10 +109,14 @@ class CronScheduler {
    */
   async triggerTask(taskId: string): Promise<ReturnType<typeof completeCronTaskRun>> {
     const task = await getCronTask(taskId);
-    if (!task) throw new Error(`Task "${taskId}" not found`);
+    if (!task) {
+      throw new Error(`Task "${taskId}" not found`);
+    }
 
     const handler = HANDLERS[task.handler];
-    if (!handler) throw new Error(`Handler "${task.handler}" not registered`);
+    if (!handler) {
+      throw new Error(`Handler "${task.handler}" not registered`);
+    }
 
     return this.executeTask(taskId, handler);
   }
@@ -153,7 +155,6 @@ class CronScheduler {
       const completedAt = new Date().toISOString();
       const errorMsg = err instanceof Error ? err.message : String(err);
 
-      // eslint-disable-next-line no-console
       console.error(`[Scheduler] Task ${taskId} failed after ${Date.now() - start}ms:`, err);
 
       const completedRun = await completeCronTaskRun(run.id, "error", undefined, errorMsg);

@@ -37,7 +37,8 @@ export const CreateInvitationSchema = z.object({
  */
 export const AcceptInvitationSchema = z.object({
   token: z.string().length(64),
-  name: z.string().min(1, "requiredErrorMessage").min(3, "minLengthErrorMessage").max(20, "maxLengthErrorMessage"),
+  firstName: z.string().min(1, "requiredErrorMessage").max(50, "maxLengthErrorMessage"),
+  lastName: z.string().min(1, "requiredErrorMessage").max(50, "maxLengthErrorMessage"),
   password: PasswordSchema,
 });
 

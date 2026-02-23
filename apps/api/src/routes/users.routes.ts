@@ -11,8 +11,8 @@ import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
 import { logPasswordReset, logSessionRevokeAll, logTokenRevoke, logUserDelete, logUserRolesUpdate, logUserUpdate } from "~shared/queries/audit-logs.queries";
-import { getUserRoleIds, updateUserRoles } from "~shared/queries/user-roles.queries";
 import { getActiveTokensByUserId, revokeAllTokensByUserId, revokeToken } from "~shared/queries/tokens.queries";
+import { getUserRoleIds, updateUserRoles } from "~shared/queries/user-roles.queries";
 import { deleteUser, emailExists, getUser, getUsersPaginated, updateUser, updateUserPassword, userRelationCountLoaders, userRelationLoaders } from "~shared/queries/users.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
 import { UpdateUserRolesSchema, UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
@@ -72,8 +72,9 @@ export const usersRoutes = new Hono()
     await Promise.all(
       include.map(async (key) => {
         const loader = userRelationLoaders[key];
-        if (!loader)
+        if (!loader) {
           throw new Error(`No relation loader defined for "${key}"`);
+        }
 
         const data = await loader(userIds);
 
@@ -104,8 +105,9 @@ export const usersRoutes = new Hono()
     await Promise.all(
       include.map(async (key) => {
         const loader = userRelationCountLoaders[key];
-        if (!loader)
+        if (!loader) {
           throw new Error(`No relation loader defined for "${key}"`);
+        }
 
         const data = await loader(userIds);
 
@@ -159,8 +161,9 @@ export const usersRoutes = new Hono()
     await Promise.all(
       include.map(async (key) => {
         const loader = userRelationLoaders[key];
-        if (!loader)
+        if (!loader) {
           throw new Error(`No relation loader defined for "${key}"`);
+        }
 
         const data = await loader([id]);
 
@@ -192,8 +195,9 @@ export const usersRoutes = new Hono()
     await Promise.all(
       include.map(async (key) => {
         const loader = userRelationCountLoaders[key];
-        if (!loader)
+        if (!loader) {
           throw new Error(`No relation loader defined for "${key}"`);
+        }
 
         const data = await loader([id]);
 

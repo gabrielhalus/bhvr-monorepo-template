@@ -24,7 +24,9 @@ export async function createCronTaskRun(taskId: string): Promise<CronTaskRun> {
     .values({ taskId, status: "running" })
     .returning();
 
-  if (!run) throw new Error("Failed to create cron task run");
+  if (!run) {
+    throw new Error("Failed to create cron task run");
+  }
 
   return CronTaskRunSchema.parse(run);
 }
@@ -60,7 +62,9 @@ export async function completeCronTaskRun(
     .where(eq(CronTaskRunsModel.id, runId))
     .returning();
 
-  if (!updatedRun) throw new Error("Failed to complete cron task run");
+  if (!updatedRun) {
+    throw new Error("Failed to complete cron task run");
+  }
 
   return CronTaskRunSchema.parse(updatedRun);
 }

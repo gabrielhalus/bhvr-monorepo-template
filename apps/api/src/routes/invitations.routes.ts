@@ -44,7 +44,7 @@ export const invitationsRoutes = new Hono()
    * @access public
    */
   .post("/accept", validationMiddleware("json", AcceptInvitationSchema), async (c) => {
-    const { token, name, password: rawPassword } = c.req.valid("json");
+    const { token, firstName, lastName, password: rawPassword } = c.req.valid("json");
 
     const invitation = await getInvitationByToken(token);
 
@@ -67,7 +67,8 @@ export const invitationsRoutes = new Hono()
 
     const hashedPassword = await password.hash(rawPassword);
     const insertedUser = await createUser({
-      name,
+      firstName,
+      lastName,
       email: invitation.email,
       password: hashedPassword,
       verifiedAt: invitation.autoValidateEmail ? new Date().toISOString() : null,

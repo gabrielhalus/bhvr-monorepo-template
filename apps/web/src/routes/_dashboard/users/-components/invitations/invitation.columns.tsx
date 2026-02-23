@@ -10,6 +10,7 @@ import { Badge } from "~react/components/badge";
 import { SortableHeader } from "~react/components/sortable-header";
 import { cn } from "~react/lib/utils";
 import { formatValue } from "~shared/i18n";
+import { formatFullName } from "~react/lib/name-utils";
 
 import { InvitationActionDropdown } from "./invitation.action-dropdown";
 
@@ -66,10 +67,11 @@ export function getInvitationColumns(t: TFunction): ColumnDef<InvitationRow>[] {
         if (!invitedBy) {
           return <span className="text-muted-foreground">—</span>;
         }
+        const fullName = formatFullName(invitedBy.firstName, invitedBy.lastName);
         return (
           <div className="flex items-center gap-2">
-            <AvatarUser {...invitedBy} size="sm" />
-            <span className="text-sm text-muted-foreground">{invitedBy.name}</span>
+            <AvatarUser avatar={invitedBy.avatar ?? ""} firstName={invitedBy.firstName} lastName={invitedBy.lastName} size="sm" />
+            <span className="text-sm text-muted-foreground">{fullName}</span>
           </div>
         );
       },

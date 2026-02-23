@@ -16,7 +16,6 @@ import { QUERY_STALE_TIMES } from "@/api/query-config";
 import { mySessionsQueryOptions } from "@/api/sessions/sessions.queries";
 import { fetchPaginatedUsers } from "@/api/users/users.api";
 import { usersKeys } from "@/api/users/users.keys";
-import { parseUserName } from "~react/lib/name-utils";
 import { useAuth } from "~react/hooks/use-auth";
 
 export const Route = createFileRoute("/_dashboard/")({
@@ -85,14 +84,14 @@ function Dashboard() {
 
   const greeting = (() => {
     const hour = new Date().getHours();
-    if (hour < 12)
+    if (hour < 12) {
       return "Good morning";
-    if (hour < 18)
+    }
+    if (hour < 18) {
       return "Good afternoon";
+    }
     return "Good evening";
   })();
-
-  const { firstName } = parseUserName(user.name);
 
   const usersQuery = useQuery({
     queryKey: [...usersKeys.paginated, { page: 1, limit: 1, sortOrder: "desc" as const }],
@@ -139,7 +138,7 @@ function Dashboard() {
                 {greeting}
                 ,
                 <br />
-                {firstName}
+                {user.firstName}
                 .
               </h1>
               <p className="text-sm max-w-sm leading-relaxed text-panel-meta">

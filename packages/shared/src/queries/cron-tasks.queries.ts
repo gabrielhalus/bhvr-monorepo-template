@@ -41,13 +41,17 @@ export async function getCronTasksPaginated(pagination: PaginationQuery): Promis
   };
 
   const countQuery = drizzle.select({ count: count() }).from(CronTasksModel);
-  if (searchCondition) countQuery.where(searchCondition);
+  if (searchCondition) {
+    countQuery.where(searchCondition);
+  }
 
   const [countResult] = await countQuery;
   const total = countResult?.count ?? 0;
 
   const dataQuery = drizzle.select().from(CronTasksModel);
-  if (searchCondition) dataQuery.where(searchCondition);
+  if (searchCondition) {
+    dataQuery.where(searchCondition);
+  }
 
   const sortColumn = sortBy && sortableColumns[sortBy] ? sortableColumns[sortBy] : CronTasksModel.createdAt;
   if (sortOrder === "asc") {
@@ -102,7 +106,9 @@ export async function createCronTask(data: InsertCronTask): Promise<CronTask> {
     .values(InsertCronTaskSchema.parse(data))
     .returning();
 
-  if (!task) throw new Error("Failed to create cron task");
+  if (!task) {
+    throw new Error("Failed to create cron task");
+  }
 
   return CronTaskSchema.parse(task);
 }
@@ -120,7 +126,9 @@ export async function updateCronTask(id: string, data: UpdateCronTask): Promise<
     .where(eq(CronTasksModel.id, id))
     .returning();
 
-  if (!task) throw new Error("Failed to update cron task");
+  if (!task) {
+    throw new Error("Failed to update cron task");
+  }
 
   return CronTaskSchema.parse(task);
 }
@@ -136,7 +144,9 @@ export async function deleteCronTask(id: string): Promise<CronTask> {
     .where(eq(CronTasksModel.id, id))
     .returning();
 
-  if (!task) throw new Error("Failed to delete cron task");
+  if (!task) {
+    throw new Error("Failed to delete cron task");
+  }
 
   return CronTaskSchema.parse(task);
 }
@@ -163,7 +173,9 @@ export async function toggleCronTask(id: string, isEnabled: boolean): Promise<Cr
     .where(eq(CronTasksModel.id, id))
     .returning();
 
-  if (!task) throw new Error("Failed to toggle cron task");
+  if (!task) {
+    throw new Error("Failed to toggle cron task");
+  }
 
   return CronTaskSchema.parse(task);
 }
@@ -258,4 +270,3 @@ export async function getCronTaskRunStats(taskId: string): Promise<{
 
   return { totalRuns, successRate, avgDurationMs, lastRunAt: lastRun?.startedAt ?? null };
 }
-

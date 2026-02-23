@@ -6,7 +6,8 @@ export const seed: SeedMeta = {
   description: "Default admin user",
   data: [
     {
-      name: "Admin",
+      firstName: "Admin",
+      lastName: "Admin",
       email: "admin@example.org",
       password: "admin",
       roles: ["admin", "user"],

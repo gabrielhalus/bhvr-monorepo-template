@@ -19,7 +19,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "~react/components/sidebar";
-import { parseUserName } from "~react/lib/name-utils";
+import { formatFullName } from "~react/lib/name-utils";
 import { useAuth } from "~react/hooks/use-auth";
 
 import { AvatarUser } from "../avatar-user";
@@ -33,7 +33,7 @@ export function NavUser() {
     return null;
   }
 
-  const { fullName } = parseUserName(user.name);
+  const fullName = formatFullName(user.firstName, user.lastName);
 
   return (
     <SidebarMenu>

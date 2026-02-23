@@ -40,7 +40,8 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
   const form = useForm({
     validators: { onSubmit: RegisterSchema },
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
     },
@@ -75,28 +76,52 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
           >
             <div className="grid gap-5">
               <div className="grid gap-5">
-                <form.Field
-                  name="name"
-                  children={field => (
-                    <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
-                      <FieldLabel htmlFor={field.name}>{t("fields.name")}</FieldLabel>
-                      <FieldContent>
-                        <Input
-                          name={field.name}
-                          value={field.state.value}
-                          onBlur={field.handleBlur}
-                          onChange={e => field.handleChange(e.target.value)}
-                          placeholder="John Doe"
-                        />
-                        <FieldError errors={field.state.meta.errors}>
-                          {field.state.meta.isTouched && !field.state.meta.isValid && field.state.meta.errors[0]?.message
-                            ? t(`errors.${field.name}.${field.state.meta.errors[0]?.message}`)
-                            : null}
-                        </FieldError>
-                      </FieldContent>
-                    </Field>
-                  )}
-                />
+                <div className="grid grid-cols-2 gap-5">
+                  <form.Field
+                    name="firstName"
+                    children={field => (
+                      <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                        <FieldLabel htmlFor={field.name}>First Name</FieldLabel>
+                        <FieldContent>
+                          <Input
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={e => field.handleChange(e.target.value)}
+                            placeholder="John"
+                          />
+                          <FieldError errors={field.state.meta.errors}>
+                            {field.state.meta.isTouched && !field.state.meta.isValid && field.state.meta.errors[0]?.message
+                              ? t(`errors.${field.name}.${field.state.meta.errors[0]?.message}`)
+                              : null}
+                          </FieldError>
+                        </FieldContent>
+                      </Field>
+                    )}
+                  />
+                  <form.Field
+                    name="lastName"
+                    children={field => (
+                      <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                        <FieldLabel htmlFor={field.name}>Last Name</FieldLabel>
+                        <FieldContent>
+                          <Input
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={e => field.handleChange(e.target.value)}
+                            placeholder="Doe"
+                          />
+                          <FieldError errors={field.state.meta.errors}>
+                            {field.state.meta.isTouched && !field.state.meta.isValid && field.state.meta.errors[0]?.message
+                              ? t(`errors.${field.name}.${field.state.meta.errors[0]?.message}`)
+                              : null}
+                          </FieldError>
+                        </FieldContent>
+                      </Field>
+                    )}
+                  />
+                </div>
                 <form.Field
                   name="email"
                   validators={{

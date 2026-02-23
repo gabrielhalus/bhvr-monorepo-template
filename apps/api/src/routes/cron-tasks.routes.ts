@@ -20,15 +20,14 @@ import {
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
 import { InsertCronTaskSchema, UpdateCronTaskSchema } from "~shared/schemas/db/cron-tasks.schemas";
 
-// Runtime-safe cron expression validation using croner's CronPattern
-const CronExpressionRefine = (val: string) => {
+function CronExpressionRefine(val: string) {
   try {
-    new CronPattern(val);
+    void new CronPattern(val);
     return true;
   } catch {
     return false;
   }
-};
+}
 
 const InsertCronTaskRouteSchema = InsertCronTaskSchema.superRefine((data, ctx) => {
   if (!CronExpressionRefine(data.cronExpression)) {
@@ -83,7 +82,9 @@ export const cronTasksRoutes = new Hono()
   .get("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("cronTask:read"), async (c) => {
     const id = c.req.param("id");
     const task = await getCronTask(id);
-    if (!task) return c.json({ success: false, error: "Not Found" }, 404);
+    if (!task) {
+      return c.json({ success: false, error: "Not Found" }, 404);
+    }
     return c.json({ success: true as const, task });
   })
 
@@ -117,7 +118,9 @@ export const cronTasksRoutes = new Hono()
   .patch("/:id{[a-zA-Z0-9-]{21}}/toggle", requirePermissionFactory("cronTask:update"), async (c) => {
     const id = c.req.param("id");
     const existing = await getCronTask(id);
-    if (!existing) return c.json({ success: false, error: "Not Found" }, 404);
+    if (!existing) {
+      return c.json({ success: false, error: "Not Found" }, 404);
+    }
     const task = await toggleCronTask(id, !existing.isEnabled);
     await cronScheduler.reload(id);
     return c.json({ success: true as const, task });

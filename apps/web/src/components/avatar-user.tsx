@@ -3,12 +3,14 @@ import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 
 import { generateAvatarFallback } from "@/helpers/generate-avatar-fallback";
+import { formatFullName } from "~react/lib/name-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "~react/components/avatar";
 import { cn } from "~react/lib/utils";
 
 type AvatarUserProps = {
   avatar: string | null;
-  name: string;
+  firstName: string;
+  lastName: string;
 };
 
 const avatarVariants = cva(
@@ -27,8 +29,9 @@ const avatarVariants = cva(
   },
 );
 
-export function AvatarUser({ avatar, name, size }: AvatarUserProps & VariantProps<typeof avatarVariants>) {
-  const avatarFallback = generateAvatarFallback(name);
+export function AvatarUser({ avatar, firstName, lastName, size }: AvatarUserProps & VariantProps<typeof avatarVariants>) {
+  const fullName = formatFullName(firstName, lastName);
+  const avatarFallback = generateAvatarFallback(fullName);
 
   return (
     <Avatar className={avatarVariants({ size })}>

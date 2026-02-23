@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { userQueryOptions } from "@/api/users/users.queries";
 import { AvatarUser } from "@/components/avatar-user";
 import { useUser } from "@/hooks/users/use-user";
+import { formatFullName } from "~react/lib/name-utils";
 import { Button } from "~react/components/button";
 
 import { UserInformationsForm } from "./-components/user-informations-form";
@@ -18,7 +19,7 @@ import { UserSessionsCard } from "./-components/user-sessions-card";
 export const Route = createFileRoute("/_dashboard/users/$userId/")({
   component: User,
   loader: ({ params, context }) => context.queryClient.ensureQueryData(userQueryOptions(params.userId)),
-  staticData: { crumb: (data: { user?: _User }) => data.user?.name },
+  staticData: { crumb: (data: { user?: _User }) => data.user ? formatFullName(data.user.firstName, data.user.lastName) : undefined },
 });
 
 type TabId = "profile" | "roles" | "security" | "sessions";
@@ -57,12 +58,12 @@ function User() {
           {/* Profile row */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-5">
             <div className="shrink-0">
-              <AvatarUser avatar={userData?.avatar ?? ""} name={userData?.name ?? ""} size="lg" />
+              <AvatarUser avatar={userData?.avatar ?? ""} firstName={userData?.firstName ?? ""} lastName={userData?.lastName ?? ""} size="lg" />
             </div>
             <div className="flex-1 space-y-2">
               <div>
                 <h1 className="text-2xl md:text-3xl font-extrabold leading-tight tracking-tight text-panel-heading">
-                  {userData?.name ?? "—"}
+                  {userData ? formatFullName(userData.firstName, userData.lastName) : "—"}
                 </h1>
                 <div className="flex items-center gap-1.5 mt-1 text-panel-meta">
                   <MailIcon className="size-3.5" />
@@ -135,7 +136,7 @@ function User() {
           {activeTab === "profile" && <UserInformationsForm userId={userId} />}
           {activeTab === "roles" && <UserRolesForm userId={userId} />}
           {activeTab === "security" && <UserSecurityActions userId={userId} />}
-          {activeTab === "sessions" && <UserSessionsCard userId={userId} userName={userData?.name ?? ""} />}
+          {activeTab === "sessions" && <UserSessionsCard userId={userId} userName={userData ? formatFullName(userData.firstName, userData.lastName) : ""} />}
         </div>
       </div>
     </div>

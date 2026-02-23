@@ -4,7 +4,8 @@ import { nanoid } from "~shared/lib/nanoid";
 
 export const UsersModel = pgTable("users", {
   id: varchar("id", { length: 21 }).primaryKey().$defaultFn(() => nanoid()),
-  name: text("name").notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
   email: text("email").notNull().unique(),
   password: text("password"),
   avatar: text("avatar"),

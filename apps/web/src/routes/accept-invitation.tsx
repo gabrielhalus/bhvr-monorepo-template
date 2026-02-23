@@ -97,7 +97,8 @@ function AcceptInvitation() {
       onSubmit: AcceptInvitationSchema.omit({ token: true }),
     },
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       password: "",
     },
     onSubmit: async ({ value }) => {
@@ -195,24 +196,44 @@ function AcceptInvitation() {
                   </FieldContent>
                 </Field>
 
-                <form.Field
-                  name="name"
-                  children={field => (
-                    <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
-                      <FieldLabel htmlFor={field.name}>Full Name</FieldLabel>
-                      <FieldContent>
-                        <Input
-                          name={field.name}
-                          value={field.state.value}
-                          onBlur={field.handleBlur}
-                          onChange={e => field.handleChange(e.target.value)}
-                          placeholder="Enter your full name"
-                        />
-                        <FieldError errors={field.state.meta.errors} />
-                      </FieldContent>
-                    </Field>
-                  )}
-                />
+                <div className="grid grid-cols-2 gap-5">
+                  <form.Field
+                    name="firstName"
+                    children={field => (
+                      <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                        <FieldLabel htmlFor={field.name}>First Name</FieldLabel>
+                        <FieldContent>
+                          <Input
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={e => field.handleChange(e.target.value)}
+                            placeholder="John"
+                          />
+                          <FieldError errors={field.state.meta.errors} />
+                        </FieldContent>
+                      </Field>
+                    )}
+                  />
+                  <form.Field
+                    name="lastName"
+                    children={field => (
+                      <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                        <FieldLabel htmlFor={field.name}>Last Name</FieldLabel>
+                        <FieldContent>
+                          <Input
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={e => field.handleChange(e.target.value)}
+                            placeholder="Doe"
+                          />
+                          <FieldError errors={field.state.meta.errors} />
+                        </FieldContent>
+                      </Field>
+                    )}
+                  />
+                </div>
 
                 <form.Field
                   name="password"

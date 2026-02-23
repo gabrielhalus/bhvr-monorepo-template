@@ -10,32 +10,36 @@ import i18n from "@/i18n";
 import { Badge } from "~react/components/badge";
 import { SortableHeader } from "~react/components/sortable-header";
 import { formatValue } from "~shared/i18n";
+import { formatFullName } from "~react/lib/name-utils";
 
 import { ActionDropdown } from "./user.action-dropdown";
 
 export function getUserColumns(t: TFunction, canDeleteMap: Record<string, boolean> = {}): ColumnDef<UserWithRelations<["roles"]>>[] {
   return [
     {
-      accessorKey: "name",
+      id: "name",
       header: ({ column }) => <SortableHeader column={column} title={t("pages.users.columns.name")} />,
-      cell: ({ row }) => (
-        <Link
-          to="/users/$userId"
-          params={{ userId: encodeURIComponent(row.original.id) }}
-          className="group flex items-center gap-3"
-        >
-          <AvatarUser {...row.original} />
-          <div className="min-w-0">
-            <p className="truncate font-medium text-foreground group-hover:underline">
-              {row.getValue("name")}
-            </p>
-            <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
-              <MailIcon className="size-3 shrink-0" />
-              {row.original.email}
-            </p>
-          </div>
-        </Link>
-      ),
+      cell: ({ row }) => {
+        const fullName = formatFullName(row.original.firstName, row.original.lastName);
+        return (
+          <Link
+            to="/users/$userId"
+            params={{ userId: encodeURIComponent(row.original.id) }}
+            className="group flex items-center gap-3"
+          >
+            <AvatarUser avatar={row.original.avatar ?? ""} firstName={row.original.firstName} lastName={row.original.lastName} />
+            <div className="min-w-0">
+              <p className="truncate font-medium text-foreground group-hover:underline">
+                {fullName}
+              </p>
+              <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
+                <MailIcon className="size-3 shrink-0" />
+                {row.original.email}
+              </p>
+            </div>
+          </Link>
+        );
+      },
       size: 300,
     },
     {

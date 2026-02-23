@@ -22,14 +22,15 @@ export function UserInformationsForm({ userId }: { userId: string }) {
 
   const mutation = useUpdateUser();
 
-  const handleSuccess = (response: { user: { name: string; email: string } }) => {
-    formRef.current?.reset({ name: response.user.name, email: response.user.email });
+  const handleSuccess = (response: { user: { firstName: string; lastName: string; email: string } }) => {
+    formRef.current?.reset({ firstName: response.user.firstName, lastName: response.user.lastName, email: response.user.email });
   };
 
   const form = useForm({
     validators: { onChange: UpdateAccountSchema },
     defaultValues: {
-      name: userQuery.data?.user.name ?? "",
+      firstName: userQuery.data?.user.firstName ?? "",
+      lastName: userQuery.data?.user.lastName ?? "",
       email: userQuery.data?.user.email ?? "",
     },
     onSubmit: async ({ value }) => {
@@ -55,28 +56,52 @@ export function UserInformationsForm({ userId }: { userId: string }) {
           }}
         >
           <div className="grid gap-4">
-            <form.Field
-              name="name"
-              children={field => (
-                <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
-                  <FieldLabel htmlFor={field.name}>
-                    {t("web:pages.users.detail.fields.name")}
-                  </FieldLabel>
-                  <FieldContent>
-                    <Input
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={e => field.handleChange(e.target.value)}
-                      type="text"
-                      placeholder="User name"
-                      required
-                    />
-                    <FieldError errors={field.state.meta.errors} />
-                  </FieldContent>
-                </Field>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <form.Field
+                name="firstName"
+                children={field => (
+                  <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                    <FieldLabel htmlFor={field.name}>
+                      First Name
+                    </FieldLabel>
+                    <FieldContent>
+                      <Input
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={e => field.handleChange(e.target.value)}
+                        type="text"
+                        placeholder="John"
+                        required
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <form.Field
+                name="lastName"
+                children={field => (
+                  <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Last Name
+                    </FieldLabel>
+                    <FieldContent>
+                      <Input
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={e => field.handleChange(e.target.value)}
+                        type="text"
+                        placeholder="Doe"
+                        required
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+            </div>
             <form.Field
               name="email"
               children={field => (

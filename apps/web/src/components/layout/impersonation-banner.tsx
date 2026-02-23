@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useStopImpersonation } from "@/hooks/users/use-stop-impersonation";
 import { Button } from "~react/components/button";
 import { Spinner } from "~react/components/spinner";
-import { parseUserName } from "~react/lib/name-utils";
+import { formatFullName } from "~react/lib/name-utils";
 import { useAuth } from "~react/hooks/use-auth";
 
 export function ImpersonationBanner() {
@@ -17,8 +17,8 @@ export function ImpersonationBanner() {
     return null;
   }
 
-  const impersonatorName = parseUserName(impersonator.name).fullName;
-  const userName = parseUserName(user.name).fullName;
+  const impersonatorName = formatFullName(impersonator.firstName, impersonator.lastName);
+  const userName = formatFullName(user.firstName, user.lastName);
 
   return (
     <div className="bg-primary text-primary-foreground px-4 py-2 text-center text-sm font-medium">

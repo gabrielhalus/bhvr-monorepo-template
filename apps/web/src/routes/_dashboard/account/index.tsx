@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AvatarUser } from "@/components/avatar-user";
-import { parseUserName } from "~react/lib/name-utils";
+import { formatFullName } from "~react/lib/name-utils";
 import { useAuth } from "~react/hooks/use-auth";
 
 import { PasswordForm } from "./-components/password-form";
@@ -28,7 +28,7 @@ function Account() {
   const { t } = useTranslation(["common", "web"]);
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabId>("profile");
-  const { fullName } = parseUserName(user.name);
+  const fullName = formatFullName(user.firstName, user.lastName);
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6 md:p-8">
@@ -39,7 +39,7 @@ function Account() {
 
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-5">
           <div className="shrink-0">
-            <AvatarUser avatar={user.avatar} name={user.name} size="lg" />
+            <AvatarUser avatar={user.avatar} firstName={user.firstName} lastName={user.lastName} size="lg" />
           </div>
           <div className="flex-1 space-y-2">
             <div>

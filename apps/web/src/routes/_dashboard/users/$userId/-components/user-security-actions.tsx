@@ -11,6 +11,7 @@ import { Button } from "~react/components/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~react/components/dialog";
 import { Input } from "~react/components/input";
 import { Spinner } from "~react/components/spinner";
+import { formatFullName } from "~react/lib/name-utils";
 import { useAuth } from "~react/hooks/use-auth";
 import sayno from "~react/lib/sayno";
 import { authorizeBatchQueryOptions } from "~react/queries/auth";
@@ -32,7 +33,9 @@ export function UserSecurityActions({ userId }: { userId: string }) {
   const isSelf = currentUser.id === userId;
 
   const resetPasswordMutation = useResetUserPassword();
-  const impersonateMutation = useImpersonateUser(userQuery.data?.user?.name);
+  const user = userQuery.data?.user;
+  const userName = user ? formatFullName(user.firstName, user.lastName) : "";
+  const impersonateMutation = useImpersonateUser(userName);
 
   const handleResetPassword = async () => {
     const confirmation = await sayno.confirm({
@@ -61,7 +64,7 @@ export function UserSecurityActions({ userId }: { userId: string }) {
   const handleImpersonate = async () => {
     const confirmation = await sayno.confirm({
       title: t("web:pages.users.detail.impersonate.confirmTitle"),
-      description: t("web:pages.users.detail.impersonate.confirmDescription", { name: userQuery.data?.user?.name }),
+      description: t("web:pages.users.detail.impersonate.confirmDescription", { name: userName }),
     });
 
     if (confirmation) {
