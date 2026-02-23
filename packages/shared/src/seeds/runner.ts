@@ -3,7 +3,7 @@ import type { Policy } from "~shared/types/db/policies.types";
 import type { Permission } from "~shared/types/permissions.types";
 
 import { eq } from "drizzle-orm";
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 
 import { drizzle } from "~shared/drizzle";
 import { PoliciesModel } from "~shared/models/policies.model";
@@ -54,10 +54,11 @@ type PolicySeedData = Array<{
 
 type UserSeedData = Array<{
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  password: string;
   roles: string[];
+  metadata: object;
 }>;
 
 async function applyRolesSeed(data: RoleSeedData): Promise<void> {
@@ -88,11 +89,20 @@ async function applyPoliciesSeed(data: PolicySeedData): Promise<void> {
 }
 
 async function applyUsersSeed(data: UserSeedData): Promise<void> {
-  const usersWithHashedPasswords = await Promise.all(
-    data.map(async ({ roles, ...userData }) => ({
-      userData: { ...userData, password: await Bun.password.hash(userData.password) },
-      roles,
-    })),
+  const usersWithCredentials = await Promise.all(
+    data.map(async ({ roles, ...userData }) => {
+      const passwordPlain = randomBytes(16).toString("base64url");
+      const passwordHash = await Bun.password.hash(passwordPlain);
+
+      return {
+        userData: { ...userData, password: passwordHash },
+        roles,
+        credential: {
+          email: userData.email,
+          password: passwordPlain,
+        },
+      };
+    }),
   );
 
   const allRoles = await drizzle.select().from(RolesModel);
@@ -101,8 +111,9 @@ async function applyUsersSeed(data: UserSeedData): Promise<void> {
   const defaultRole = allRoles.find(r => r.isDefault);
 
   const userRoleAssignments: Array<{ roleId: number; userId: string }> = [];
+  const createdCredentials: Array<{ email: string; password: string }> = [];
 
-  for (const { userData, roles } of usersWithHashedPasswords) {
+  for (const { userData, roles, credential } of usersWithCredentials) {
     const [insertedUser] = await drizzle
       .insert(UsersModel)
       .values(userData)
@@ -113,10 +124,16 @@ async function applyUsersSeed(data: UserSeedData): Promise<void> {
       continue;
     }
 
+    createdCredentials.push(credential);
+
     for (const roleName of roles) {
       const role = rolesByName.get(roleName);
+
       if (role && role.id !== defaultRole?.id) {
-        userRoleAssignments.push({ roleId: role.id, userId: insertedUser.id });
+        userRoleAssignments.push({
+          roleId: role.id,
+          userId: insertedUser.id,
+        });
       }
     }
   }
@@ -126,6 +143,17 @@ async function applyUsersSeed(data: UserSeedData): Promise<void> {
       .insert(UserRolesModel)
       .values(userRoleAssignments)
       .onConflictDoNothing();
+  }
+
+  if (createdCredentials.length > 0) {
+    // eslint-disable-next-line no-console
+    console.info("Bootstrap users credentials:");
+    for (const cred of createdCredentials) {
+      // eslint-disable-next-line no-console
+      console.info(`- ${cred.email} → ${cred.password}`);
+    }
+    // eslint-disable-next-line no-console
+    console.info("Please store passwords securely and change them after first login.");
   }
 }
 

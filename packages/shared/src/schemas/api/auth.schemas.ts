@@ -37,7 +37,7 @@ export const RegisterSchema = z.object({
 });
 
 export const LoginSchema = z.object({
-  email: z.string().toLowerCase().trim().pipe(z.email("invalidErrorMessage")),
+  email: z.string().toLowerCase().trim(),
   password: z.string().min(1, "requiredErrorMessage"),
 });
 

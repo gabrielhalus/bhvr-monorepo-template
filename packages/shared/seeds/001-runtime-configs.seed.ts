@@ -53,7 +53,7 @@ export const seed: SeedMeta = {
     {
       configKey: "notifications.smtp.user",
       value: null,
-      type: "number",
+      type: "string",
       nullable: true,
       order: 3,
       disabled_when: "notifications.smtp.enable!=true",
@@ -61,7 +61,7 @@ export const seed: SeedMeta = {
     {
       configKey: "notifications.smtp.password",
       value: null,
-      type: "number",
+      type: "string",
       nullable: true,
       order: 4,
       disabled_when: "notifications.smtp.enable!=true",
@@ -69,7 +69,7 @@ export const seed: SeedMeta = {
     {
       configKey: "notifications.smtp.fromAddress",
       value: null,
-      type: "number",
+      type: "string",
       nullable: true,
       order: 4,
       disabled_when: "notifications.smtp.enable!=true",

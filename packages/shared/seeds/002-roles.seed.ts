@@ -2,7 +2,7 @@ import type { SeedMeta } from "~shared/seeds";
 
 export const seed: SeedMeta = {
   id: "roles",
-  version: 2,
+  version: 1,
   description: "Base system roles",
   data: [
     {

@@ -1,5 +1,5 @@
 {
-  "id": "c75b1e8b-a0f8-4ea4-b524-ab260b3561a9",
+  "id": "8af076e8-b16a-40ed-b48d-060021771b00",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -989,6 +989,18 @@
         "avatar": {
           "name": "avatar",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "preferences": {
+          "name": "preferences",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "json",
           "primaryKey": false,
           "notNull": false
         },

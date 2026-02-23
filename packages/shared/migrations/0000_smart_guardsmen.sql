@@ -135,6 +135,8 @@ CREATE TABLE "users" (
 	"email" text NOT NULL,
 	"password" text,
 	"avatar" text,
+	"preferences" json,
+	"metadata" json,
 	"verified_at" timestamp with time zone,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
