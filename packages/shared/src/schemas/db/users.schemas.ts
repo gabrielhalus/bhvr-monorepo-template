@@ -25,8 +25,8 @@ export const UserSchema = createSelectSchema(UsersModel, {
  * Schema for inserting a new user
  */
 export const InsertUserSchema = createInsertSchema(UsersModel, {
-  preferences: jsonOverride,
-  metadata: jsonOverride,
+  preferences: jsonOverride.optional(),
+  metadata: jsonOverride.optional(),
 }).omit({ id: true, createdAt: true, updatedAt: true, verifiedAt: true }).extend({
   firstName: z
     .string()
