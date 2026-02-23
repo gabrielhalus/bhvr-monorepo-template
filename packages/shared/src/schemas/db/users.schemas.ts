@@ -5,11 +5,19 @@ import { UsersModel } from "~shared/models/users.model";
 
 const jsonOverride = z.unknown();
 
+export const UserPreferencesSchema = z.object({
+  sidebarOpen: z.boolean().optional(),
+  theme: z.enum(["system", "light", "dark"]).optional(),
+  locale: z.string().optional(),
+}).nullable();
+
+export type UserPreferences = z.infer<typeof UserPreferencesSchema>;
+
 /**
  * Schema for users
  */
 export const UserSchema = createSelectSchema(UsersModel, {
-  preferences: jsonOverride,
+  preferences: UserPreferencesSchema,
   metadata: jsonOverride,
 });
 

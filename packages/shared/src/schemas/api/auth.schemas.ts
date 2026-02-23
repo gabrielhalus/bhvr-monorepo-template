@@ -63,3 +63,9 @@ export const ChangePasswordSchema = z.object({
   currentPassword: z.string().min(1, "requiredErrorMessage"),
   newPassword: PasswordSchema,
 });
+
+export const UpdatePreferencesSchema = z.object({
+  sidebarOpen: z.boolean().optional(),
+  theme: z.enum(["system", "light", "dark"]).optional(),
+  locale: z.string().optional(),
+});
