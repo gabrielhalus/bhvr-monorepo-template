@@ -1,0 +1,1 @@
+ALTER TABLE "audit_logs" ALTER COLUMN "target_id" SET DATA TYPE text;

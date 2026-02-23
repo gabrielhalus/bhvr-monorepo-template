@@ -14,8 +14,8 @@ export const AuditLogsModel = pgTable("audit_logs", {
   actorId: varchar("actor_id", { length: 21 }).notNull(),
   /** If action was performed while impersonating, this is the real user (admin) */
   impersonatorId: varchar("impersonator_id", { length: 21 }),
-  /** The target resource ID (user, role, etc.) */
-  targetId: varchar("target_id", { length: 21 }),
+  /** The target resource ID (user, role, config key, etc.) */
+  targetId: text("target_id"),
   /** The type of target resource (e.g., "user", "role", "invitation") */
   targetType: varchar("target_type", { length: 50 }),
   /** Additional metadata about the action (JSON stringified) */
