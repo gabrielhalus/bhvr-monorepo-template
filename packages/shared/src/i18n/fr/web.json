@@ -244,6 +244,8 @@
     },
     "settings": {
       "title": "Paramètres",
+      "updateSuccess": "Configuration mise à jour",
+      "updateError": "Échec de la mise à jour de la configuration",
       "config": {
         "authentication": {
           "label": "Authentification",

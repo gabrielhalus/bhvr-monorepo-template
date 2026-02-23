@@ -244,6 +244,8 @@
     },
     "settings": {
       "title": "Settings",
+      "updateSuccess": "Configuration updated",
+      "updateError": "Failed to update configuration",
       "config": {
         "authentication": {
           "label": "Authentication",
