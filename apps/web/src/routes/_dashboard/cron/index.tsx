@@ -3,6 +3,7 @@ import { CalendarClockIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { cronTaskStatsQueryOptions } from "@/api/cron-tasks/cron-tasks.queries";
+
 import { CronStatsCards } from "./-components/cron-stats-cards";
 import { CronTasksDataTable } from "./-components/cron-tasks.data-table";
 

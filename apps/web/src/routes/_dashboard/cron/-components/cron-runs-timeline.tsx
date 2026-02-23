@@ -10,8 +10,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "~react/components/toolt
 import { formatValue } from "~shared/i18n";
 
 function formatDuration(ms: number | null): string {
-  if (ms === null) return "—";
-  if (ms < 1000) return `${ms}ms`;
+  if (ms === null)
+    return "—";
+  if (ms < 1000)
+    return `${ms}ms`;
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
@@ -63,18 +65,20 @@ export function CronRunsTimeline({ taskId }: { taskId: string }) {
         <CardTitle className="text-base">{t("pages.cron.detail.timelineTitle")}</CardTitle>
       </CardHeader>
       <CardContent className="px-5 pb-5 pt-0">
-        {runs.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No runs yet</p>
-        ) : (
-          <div className="flex items-center gap-2 flex-wrap">
-            {runs.map(run => (
-              <RunDot key={run.id} run={run} />
-            ))}
-            <span className="text-xs text-muted-foreground ml-1">
-              ← older · newer →
-            </span>
-          </div>
-        )}
+        {runs.length === 0
+          ? (
+              <p className="text-sm text-muted-foreground">No runs yet</p>
+            )
+          : (
+              <div className="flex items-center gap-2 flex-wrap">
+                {runs.map(run => (
+                  <RunDot key={run.id} run={run} />
+                ))}
+                <span className="text-xs text-muted-foreground ml-1">
+                  ← older · newer →
+                </span>
+              </div>
+            )}
 
         {/* Legend */}
         <div className="flex items-center gap-4 mt-3">

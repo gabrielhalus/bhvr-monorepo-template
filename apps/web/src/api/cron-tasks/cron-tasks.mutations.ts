@@ -8,33 +8,62 @@ import {
   triggerCronTaskRequest,
   updateCronTaskRequest,
 } from "./cron-tasks.api";
+import { cronTasksKeys } from "./cron-tasks.keys";
 
-export function createCronTaskMutationOptions(_queryClient: QueryClient) {
+export function createCronTaskMutationOptions(queryClient: QueryClient) {
   return {
     mutationFn: (data: InsertCronTask) => createCronTaskRequest(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.paginated });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.stats });
+    },
   };
 }
 
-export function updateCronTaskMutationOptions(_queryClient: QueryClient) {
+export function updateCronTaskMutationOptions(queryClient: QueryClient) {
   return {
     mutationFn: ({ id, data }: { id: string; data: UpdateCronTask }) => updateCronTaskRequest(id, data),
+    onSuccess: (_data: unknown, variables: { id: string; data: UpdateCronTask }) => {
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.byId(variables.id) });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.paginated });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.stats });
+    },
   };
 }
 
-export function deleteCronTaskMutationOptions(_queryClient: QueryClient) {
+export function deleteCronTaskMutationOptions(queryClient: QueryClient) {
   return {
     mutationFn: (taskId: string) => deleteCronTaskRequest(taskId),
+    onSuccess: (_data: unknown, taskId: string) => {
+      queryClient.removeQueries({ queryKey: cronTasksKeys.byId(taskId) });
+      queryClient.removeQueries({ queryKey: cronTasksKeys.runs(taskId) });
+      queryClient.removeQueries({ queryKey: cronTasksKeys.runStats(taskId) });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.paginated });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.stats });
+    },
   };
 }
 
-export function toggleCronTaskMutationOptions(_queryClient: QueryClient) {
+export function toggleCronTaskMutationOptions(queryClient: QueryClient) {
   return {
     mutationFn: (taskId: string) => toggleCronTaskRequest(taskId),
+    onSuccess: (_data: unknown, taskId: string) => {
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.byId(taskId) });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.paginated });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.stats });
+    },
   };
 }
 
-export function triggerCronTaskMutationOptions(_queryClient: QueryClient) {
+export function triggerCronTaskMutationOptions(queryClient: QueryClient) {
   return {
     mutationFn: (taskId: string) => triggerCronTaskRequest(taskId),
+    onSuccess: (_data: unknown, taskId: string) => {
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.byId(taskId) });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.paginated });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.runs(taskId) });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.runStats(taskId) });
+      queryClient.invalidateQueries({ queryKey: cronTasksKeys.stats });
+    },
   };
 }

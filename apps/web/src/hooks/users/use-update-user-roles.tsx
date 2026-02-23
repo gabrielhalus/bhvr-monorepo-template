@@ -14,7 +14,7 @@ export function useUpdateUserRoles() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: usersKeys.byId(variables.id) });
       queryClient.invalidateQueries({ queryKey: usersKeys.paginated });
-      queryClient.invalidateQueries({ queryKey: usersKeys.relations([], ["roles"]) });
+      queryClient.invalidateQueries({ queryKey: ["users", "relations"] });
       toast.success(t("pages.users.detail.sections.roles.updateSuccess"));
     },
     onError: () => {
