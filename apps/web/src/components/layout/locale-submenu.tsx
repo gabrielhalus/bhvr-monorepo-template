@@ -1,6 +1,7 @@
 import { Languages } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { useUpdatePreferences } from "@/hooks/preferences/use-update-preferences";
 import {
   DropdownMenuItem,
   DropdownMenuSub,
@@ -11,6 +12,7 @@ import { cn } from "~react/lib/utils";
 
 export function LocaleSubmenu() {
   const { t, i18n } = useTranslation("common");
+  const { mutate: updatePreferences } = useUpdatePreferences();
 
   const locales = [
     { code: "en", name: "English", flag: "🇬🇧" },
@@ -23,6 +25,7 @@ export function LocaleSubmenu() {
     event.preventDefault();
     event.stopPropagation();
     i18n.changeLanguage(localeCode);
+    updatePreferences({ locale: localeCode });
   };
 
   return (

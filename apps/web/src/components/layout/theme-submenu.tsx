@@ -4,6 +4,7 @@ import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
 
+import { useUpdatePreferences } from "@/hooks/preferences/use-update-preferences";
 import {
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -17,6 +18,7 @@ import { cn } from "~react/lib/utils";
 export function ThemeSubmenu() {
   const { t } = useTranslation("common");
   const { theme, setTheme } = useTheme();
+  const { mutate: updatePreferences } = useUpdatePreferences();
 
   type ThemeValue = "system" | "light" | "dark";
   type ThemeOption = {
@@ -47,6 +49,7 @@ export function ThemeSubmenu() {
     event.preventDefault();
     event.stopPropagation();
     setTheme(themeValue);
+    updatePreferences({ theme: themeValue });
   };
 
   return (
