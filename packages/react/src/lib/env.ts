@@ -3,9 +3,8 @@ import { z } from "zod";
 import { validateEnv } from "~shared/env";
 
 export const env = validateEnv({
-  // eslint-disable-next-line node/no-process-env
-  VITE_API_URL: process.env.NODE_ENV === "production" ? z.url() : z.string(),
+  // VITE_API_URL can be relative path (/api) in development, or full URL in production
+  VITE_API_URL: z.string().min(1, "VITE_API_URL is required"),
   VITE_SITE_URL: z.url(),
-  // Dashboard URL where auth routes (/, /register, /verify) are hosted
   VITE_AUTH_URL: z.url(),
 });
