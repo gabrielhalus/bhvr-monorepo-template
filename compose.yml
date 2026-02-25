@@ -4,13 +4,73 @@ services:
     container_name: postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-admin}"
+      POSTGRES_USER: ${POSTGRES_USER:-bunstack}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pgadmin}
       POSTGRES_DB: bunstack
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - bunstack
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bunstack}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrations:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: migrations
+    env_file: ".env.production"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bunstack
+    working_dir: /usr/src/app/packages/shared
+    command: ["bun", "run", "drizzle:push"]
+    entrypoint: []
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: api
+    restart: unless-stopped
+    env_file: ".env.production"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    networks:
+      - bunstack
+    expose:
+      - "3000"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-/api}
+        VITE_AUTH_URL: ${VITE_AUTH_URL:-http://localhost}
+        VITE_SITE_URL: ${VITE_SITE_URL:-http://localhost}
+    container_name: web
+    restart: unless-stopped
+    depends_on:
+      - api
+    networks:
+      - bunstack
+    ports:
+      - "80:80"
+
+networks:
+  bunstack:
+    driver: bridge
 
 volumes:
   pgdata:
