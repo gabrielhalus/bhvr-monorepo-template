@@ -24,7 +24,6 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     container_name: migrations
-    env_file: ".env.production"
     depends_on:
       postgres:
         condition: service_healthy
@@ -40,7 +39,6 @@ services:
       dockerfile: apps/api/Dockerfile
     container_name: api
     restart: unless-stopped
-    env_file: ".env.production"
     depends_on:
       postgres:
         condition: service_healthy
