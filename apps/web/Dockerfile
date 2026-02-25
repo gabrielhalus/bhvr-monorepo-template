@@ -17,16 +17,19 @@ COPY packages ./packages
 # Install dev dependencies (for building)
 RUN bun install --frozen-lockfile
 
-# Install production dependencies separately
-FROM install AS install-prod
-RUN mkdir -p /temp/prod
-COPY bun.lock package.json turbo.json ./ 
-RUN bun install --frozen-lockfile --production
-
 # -----------------------------
 # Build the app
 # -----------------------------
 FROM install AS build
+
+# Vite bakes VITE_* env vars into the JS bundle at build time
+ARG VITE_API_URL=/api
+ARG VITE_AUTH_URL=http://localhost
+ARG VITE_SITE_URL=http://localhost
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_AUTH_URL=$VITE_AUTH_URL
+ENV VITE_SITE_URL=$VITE_SITE_URL
+
 RUN bun run build --filter=@bunstack/web...
 
 # -----------------------------
