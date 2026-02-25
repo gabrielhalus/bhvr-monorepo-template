@@ -29,7 +29,6 @@
         "@bunstack/shared": "workspace:*",
         "@hono/zod-validator": "^0.7.0",
         "croner": "^10.0.1",
-        "dotenv": "^17.2.2",
         "hono": "^4.7.11",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
@@ -138,6 +137,7 @@
       "name": "@bunstack/shared",
       "version": "0.0.0",
       "dependencies": {
+        "dotenv": "^17.2.2",
         "drizzle-orm": "^0.44.2",
         "drizzle-zod": "^0.7.1",
         "i18next": "^25.5.3",
@@ -151,7 +151,6 @@
       "devDependencies": {
         "@bunstack/eslint-config": "workspace:*",
         "@bunstack/typescript-config": "workspace:*",
-        "dotenv": "^17.2.2",
         "drizzle-kit": "^0.31.8",
         "eslint": "^9.28.0",
         "eslint-plugin-drizzle": "^0.2.3",
