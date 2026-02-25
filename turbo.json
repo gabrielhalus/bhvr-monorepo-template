@@ -1,6 +1,18 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
+  "globalPassThroughEnv": [
+    "NODE_ENV",
+    "HOSTNAME",
+    "PORT",
+    "DATABASE_URL",
+    "JWT_SECRET",
+    "AUTH_URL",
+    "SITE_URL",
+    "VITE_API_URL",
+    "VITE_AUTH_URL",
+    "VITE_SITE_URL"
+  ],
   "tasks": {
     "build": {
       "cache": false,
