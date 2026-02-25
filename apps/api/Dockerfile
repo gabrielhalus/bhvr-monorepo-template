@@ -17,12 +17,6 @@ COPY packages ./packages
 # Install dev dependencies (for building)
 RUN bun install --frozen-lockfile
 
-# Install production dependencies separately
-FROM install AS install-prod
-RUN mkdir -p /temp/prod
-COPY bun.lock package.json turbo.json ./ 
-RUN bun install --frozen-lockfile --production
-
 # -----------------------------
 # Build the app
 # -----------------------------
@@ -41,4 +35,4 @@ COPY --from=build /usr/src/app/packages ./packages
 COPY package.json bun.lock turbo.json ./
 
 EXPOSE 3000/tcp
-ENTRYPOINT ["bun", "run", "start", "--filter=@bunstack/api", "--ui=stream"]
+ENTRYPOINT ["bun", "run", "apps/api/src/index.ts"]

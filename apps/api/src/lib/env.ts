@@ -1,11 +1,15 @@
+import path from "node:path";
 import { z } from "zod";
 
 import { validateEnv } from "~shared/env";
 import { loadEnv } from "~shared/env/loader";
 
+// Resolve monorepo root from this file's location (apps/api/src/lib → ../../../../)
+const monorepoRoot = path.resolve(import.meta.dir, "../../../../");
+
 // Load env files from monorepo root in Vite-like cascade order
 /* eslint-disable-next-line node/no-process-env */
-loadEnv(process.env.NODE_ENV ?? "development", "../../");
+loadEnv(process.env.NODE_ENV ?? "development", monorepoRoot);
 
 export const env = validateEnv({
   NODE_ENV: z.enum(["development", "production"]).default("development"),
