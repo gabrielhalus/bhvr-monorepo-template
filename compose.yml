@@ -14,7 +14,7 @@ services:
     networks:
       - bunstack
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bunstack}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -32,6 +32,24 @@ services:
     working_dir: /usr/src/app/packages/shared
     command: ["bun", "run", "drizzle:push"]
     entrypoint: []
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
+
+  seed:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: seed
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    networks:
+      - bunstack
+    working_dir: /usr/src/app/packages/shared
+    command: ["bun", "run", "seed"]
+    entrypoint: []
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
 
   api:
     build:
@@ -42,12 +60,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      migrations:
-        condition: service_completed_successfully
     networks:
       - bunstack
     expose:
       - "3000"
+    env_file: apps/api/.env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
 
   web:
     build:
