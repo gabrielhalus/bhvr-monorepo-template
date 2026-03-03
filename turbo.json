@@ -1,7 +1,7 @@
 {
   "$schema": "https://v2-8-11.turborepo.dev/schema.json",
   "ui": "tui",
-  "globalPassThroughEnv": [
+  "globalEnv": [
     "NODE_ENV",
     "HOSTNAME",
     "DATABASE_URL",
