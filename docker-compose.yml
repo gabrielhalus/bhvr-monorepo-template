@@ -64,7 +64,6 @@ services:
       - bunstack
     expose:
       - "3000"
-    env_file: apps/api/.env
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
 
@@ -72,10 +71,6 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL:-/api}
-        VITE_AUTH_URL: ${VITE_AUTH_URL:-http://localhost}
-        VITE_SITE_URL: ${VITE_SITE_URL:-http://localhost}
     container_name: web
     restart: unless-stopped
     depends_on:
@@ -83,7 +78,7 @@ services:
     networks:
       - bunstack
     ports:
-      - "80:80"
+      - "8000:80"
 
 networks:
   bunstack:
