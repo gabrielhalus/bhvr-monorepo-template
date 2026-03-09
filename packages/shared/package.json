@@ -10,7 +10,7 @@
     "drizzle:generate": "drizzle-kit generate --config=drizzle.config.cjs",
     "drizzle:push": "drizzle-kit push --config=drizzle.config.cjs",
     "drizzle:studio": "drizzle-kit studio --config=drizzle.config.cjs",
-    "seed": "bun run scripts/seed.ts"
+    "drizzle:seed": "bun run scripts/seed.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
