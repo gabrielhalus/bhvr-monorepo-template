@@ -27,7 +27,7 @@ category.configName
 - **category**: Groups related configs (e.g., `authentication`, `features`)
 - **configName**: Descriptive camelCase name
 
-Example: `authentication.disableRegister`
+Example: `authentication.register.enable`
 
 ## API Endpoints
 
@@ -59,7 +59,7 @@ export const seed: SeedMeta = {
   description: "Default runtime configuration values",
   data: [
     {
-      configKey: "authentication.disableRegister",
+      configKey: "authentication.register.enable",
       value: "true",
       type: "boolean",
       nullable: false,
