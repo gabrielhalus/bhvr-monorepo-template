@@ -6,11 +6,34 @@ export const seed: SeedMeta = {
   description: "Default runtime configuration values",
   data: [
     {
-      configKey: "authentication.disableRegister",
-      value: "true",
+      configKey: "authentication.register.enable",
+      value: "false",
       type: "boolean",
       nullable: false,
       order: 0,
+    },
+    {
+      configKey: "authentication.google.enable",
+      value: "false",
+      type: "boolean",
+      nullable: false,
+      order: 0,
+    },
+    {
+      configKey: "authentication.google.clientId",
+      value: null,
+      type: "string",
+      nullable: true,
+      order: 1,
+      disabledWhen: "authentication.google.enable!=true",
+    },
+    {
+      configKey: "authentication.google.clientSecret",
+      value: null,
+      type: "string",
+      nullable: true,
+      order: 2,
+      disabledWhen: "authentication.google.enable!=true",
     },
     {
       configKey: "notifications.discord.enable",
