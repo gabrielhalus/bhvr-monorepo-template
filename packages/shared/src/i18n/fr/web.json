@@ -249,9 +249,12 @@
       "config": {
         "authentication": {
           "label": "Authentification",
-          "disableRegister": {
-            "label": "Désactiver l'inscription des utilisateurs",
-            "description": "Empêche les nouveaux utilisateurs de s'inscrire. Les nouveaux comptes ne pourront être créés que via invitation."
+          "register": {
+            "label": "Inscription",
+            "enable": {
+              "label": "Activer l'inscription des utilisateurs",
+              "description": "Permet aux nouveaux utilisateurs de s'inscrire. Les nouveaux comptes peuvent être créés librement, sans invitation."
+            }
           }
         },
         "notifications": {

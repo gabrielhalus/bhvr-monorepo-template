@@ -249,9 +249,27 @@
       "config": {
         "authentication": {
           "label": "Authentication",
-          "disableRegister": {
-            "label": "Disable user registration",
-            "description": "Prevents new users from signing up. New accounts can only be created through invitations."
+          "register": {
+            "label": "Register",
+            "enable": {
+              "label": "Enable user registration",
+              "description": "Allows new users to sign up. New accounts can be created freely, without an invitation."
+            }
+          },
+          "google": {
+            "label": "Google",
+            "enable": {
+              "label": "Enable login via Google",
+              "description": ""
+            },
+            "clientId": {
+              "label": "Goole client ID",
+              "description": ""
+            },
+            "clientSecret": {
+              "label": "Goole client secret",
+              "description": ""
+            }
           }
         },
         "notifications": {
