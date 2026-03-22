@@ -20,8 +20,8 @@ import { LoginSchema } from "~shared/schemas/api/auth.schemas";
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const { t } = useTranslation("auth");
 
-  const { data: config } = useQuery(runtimeConfigQueryOptions("authentication.disableRegister"));
-  const disableRegister = config ? inferConfigValue(config.value.value!) : false;
+  const { data: config } = useQuery(runtimeConfigQueryOptions("authentication.register.enable"));
+  const enableRegister = config ? inferConfigValue(config.value.value!) : false;
 
   const navigate = useNavigate();
   const location = useRouterState({ select: s => s.location });
@@ -124,7 +124,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                   )}
                 />
               </div>
-              {!disableRegister && (
+              {enableRegister && (
                 <div className="text-center text-sm">
                   <Trans i18nKey="login.cta" ns="auth" components={{ Link: <Link key="link" to="/register" search={location.search} className="underline underline-offset-4" /> }} />
                 </div>
@@ -135,5 +135,4 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
       </div>
     </div>
   );
-
 }
