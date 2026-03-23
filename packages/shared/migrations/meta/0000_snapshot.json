@@ -1,5 +1,5 @@
 {
-  "id": "8af076e8-b16a-40ed-b48d-060021771b00",
+  "id": "20b808e4-f38a-4626-a38c-129bd189db85",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -34,7 +34,7 @@
         },
         "target_id": {
           "name": "target_id",
-          "type": "varchar(21)",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },

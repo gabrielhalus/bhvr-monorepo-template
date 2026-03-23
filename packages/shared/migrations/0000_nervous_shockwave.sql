@@ -3,7 +3,7 @@ CREATE TABLE "audit_logs" (
 	"action" varchar(100) NOT NULL,
 	"actor_id" varchar(21) NOT NULL,
 	"impersonator_id" varchar(21),
-	"target_id" varchar(21),
+	"target_id" text,
 	"target_type" varchar(50),
 	"metadata" text,
 	"ip" varchar(45),
