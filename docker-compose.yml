@@ -45,8 +45,7 @@ services:
         condition: service_completed_successfully
     networks:
       - bunstack
-    working_dir: /usr/src/app/packages/shared
-    command: ["bun", "run", "seed"]
+    command: ["bun", "run", "drizzle:seed"]
     entrypoint: []
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
