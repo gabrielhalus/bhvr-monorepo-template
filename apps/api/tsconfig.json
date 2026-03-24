@@ -19,5 +19,5 @@
   "references": [
     { "path": "../../packages/shared" }
   ],
-  "include": ["src"]
+  "include": ["src", "../../env.d.ts"]
 }
