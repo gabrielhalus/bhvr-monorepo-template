@@ -17,12 +17,12 @@
     "types": [],
     "baseUrl": "../..",
     "paths": {
-      "@bunstack/api/*": ["apps/api/src/*"],
-      "@bunstack/web/*": ["apps/web/src/*"],
-      "@bunstack/shared/*": ["packages/shared/src/*"],
-      "@bunstack/react/*": ["packages/react/src/*"],
-      "@bunstack/eslint-config": ["packages/eslint-config/*"],
-      "@bunstack/typescript-config": ["packages/typescript-config/*"]
+      "api/*": ["apps/api/src/*"],
+      "web/*": ["apps/web/src/*"],
+      "shared/*": ["packages/shared/src/*"],
+      "react/*": ["packages/react/src/*"],
+      "eslint-config": ["packages/eslint-config/*"],
+      "typescript-config": ["packages/typescript-config/*"]
     }
   }
 }

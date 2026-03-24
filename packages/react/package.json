@@ -1,5 +1,5 @@
 {
-  "name": "@bunstack/react",
+  "name": "react",
   "type": "module",
   "version": "0.0.0",
   "scripts": {
@@ -8,12 +8,12 @@
     "lint": "eslint . --max-warnings 0"
   },
   "peerDependencies": {
-    "@bunstack/api": "workspace:*",
+    "api": "workspace:*",
     "@tanstack/react-query": "^5.80.6",
     "@tanstack/react-router": "^1.120.18"
   },
   "dependencies": {
-    "@bunstack/shared": "workspace:*",
+    "shared": "workspace:*",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-collapsible": "^1.1.12",
@@ -42,8 +42,8 @@
     "tailwindcss": "^4.1.8"
   },
   "devDependencies": {
-    "@bunstack/eslint-config": "workspace:*",
-    "@bunstack/typescript-config": "workspace:*",
+    "eslint-config": "workspace:*",
+    "typescript-config": "workspace:*",
     "tw-animate-css": "^1.3.4"
   }
 }

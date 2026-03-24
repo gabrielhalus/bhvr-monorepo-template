@@ -11,10 +11,10 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@bunstack/react/components",
-    "utils": "@bunstack/react/lib/utils",
-    "hooks": "@bunstack/react/hooks",
-    "lib": "@bunstack/react/lib",
-    "ui": "@bunstack/react/components"
+    "components": "react/components",
+    "utils": "react/lib/utils",
+    "hooks": "react/hooks",
+    "lib": "react/lib",
+    "ui": "react/components"
   }
 }

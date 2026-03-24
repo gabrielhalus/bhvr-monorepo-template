@@ -21,7 +21,7 @@ RUN bun install --frozen-lockfile
 # Build the app
 # -----------------------------
 FROM install AS build
-RUN bun run build --filter=@bunstack/api...
+RUN bun run build --filter=api...
 
 # -----------------------------
 # Prepare final runtime image
