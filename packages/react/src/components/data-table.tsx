@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "~react/components/button";
 import { Skeleton } from "~react/components/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~react/components/table";
+
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./input-group";
 
 type DataTableProps<TData, TValue> = {
@@ -36,12 +37,12 @@ type DataTableProps<TData, TValue> = {
   // Search props
   manualFiltering?: boolean;
   // Add item props
-  addItemLabel?: string,
-  addItemIcon?: React.ElementType
+  addItemLabel?: string;
+  addItemIcon?: React.ElementType;
   onAddItem?: () => void;
   // Clear items props
-  clearItemsLabel?: string,
-  clearItemsIcon?: React.ElementType
+  clearItemsLabel?: string;
+  clearItemsIcon?: React.ElementType;
   onClearItems?: () => void;
 };
 
