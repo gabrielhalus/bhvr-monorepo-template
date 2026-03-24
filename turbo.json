@@ -35,6 +35,10 @@
       "cache": false,
       "persistent": true
     },
+    "drizzle:bootstrap": {
+      "cache": false,
+      "persistent": true
+    },
     "drizzle:generate": {
       "cache": false,
       "dependsOn": ["^drizzle:generate"]
@@ -47,9 +51,5 @@
       "cache": false,
       "persistent": true
     },
-    "drizzle:seed": {
-      "cache": false,
-      "persistent": true
-    }
   }
 }
