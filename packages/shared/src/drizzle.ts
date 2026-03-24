@@ -1,12 +1,9 @@
 import { drizzle as drizzleClient } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { z } from "zod";
 
-import { validateEnv } from "./env";
+// eslint-disable-next-line node/no-process-env
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) throw new Error("DATABASE_URL is not set");
 
-const env = validateEnv({
-  DATABASE_URL: z.string(),
-});
-
-const client = postgres(env.DATABASE_URL);
+const client = postgres(DATABASE_URL);
 export const drizzle = drizzleClient(client);
