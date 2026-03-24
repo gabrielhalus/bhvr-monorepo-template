@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { useTranslation } from "react-i18next";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import { cronTaskRunsChartQueryOptions } from "@/api/cron-tasks/cron-tasks.queries";
 import { Card, CardContent, CardHeader, CardTitle } from "~react/components/card";
@@ -35,28 +35,30 @@ export function CronRunsBarChart({ taskId }: { taskId: string }) {
         <CardTitle className="text-base">{t("pages.cron.detail.chartTitle")}</CardTitle>
       </CardHeader>
       <CardContent className="px-5 pb-5 pt-0">
-        {formattedData.length === 0 ? (
-          <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">
-            No execution data yet
-          </div>
-        ) : (
-          <ChartContainer config={chartConfig} className="h-48 w-full">
-            <BarChart data={formattedData} barGap={2}>
-              <CartesianGrid vertical={false} stroke="currentColor" strokeOpacity={0.07} />
-              <XAxis
-                dataKey="date"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 11 }}
-                interval="preserveStartEnd"
-              />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11 }} width={28} allowDecimals={false} />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="success" stackId="a" fill="var(--color-success)" radius={[0, 0, 0, 0]} />
-              <Bar dataKey="error" stackId="a" fill="var(--color-error)" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ChartContainer>
-        )}
+        {formattedData.length === 0
+          ? (
+              <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">
+                No execution data yet
+              </div>
+            )
+          : (
+              <ChartContainer config={chartConfig} className="h-48 w-full">
+                <BarChart data={formattedData} barGap={2}>
+                  <CartesianGrid vertical={false} stroke="currentColor" strokeOpacity={0.07} />
+                  <XAxis
+                    dataKey="date"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 11 }}
+                    interval="preserveStartEnd"
+                  />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11 }} width={28} allowDecimals={false} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="success" stackId="a" fill="var(--color-success)" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="error" stackId="a" fill="var(--color-error)" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ChartContainer>
+            )}
       </CardContent>
     </Card>
   );

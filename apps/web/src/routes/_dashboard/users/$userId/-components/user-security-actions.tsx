@@ -11,8 +11,8 @@ import { Button } from "~react/components/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~react/components/dialog";
 import { Input } from "~react/components/input";
 import { Spinner } from "~react/components/spinner";
-import { formatFullName } from "~react/lib/name-utils";
 import { useAuth } from "~react/hooks/use-auth";
+import { formatFullName } from "~react/lib/name-utils";
 import sayno from "~react/lib/sayno";
 import { authorizeBatchQueryOptions } from "~react/queries/auth";
 
