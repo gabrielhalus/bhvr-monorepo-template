@@ -1,8 +1,7 @@
 import type { MiddlewareHandler } from "hono";
 
 import { cors } from "hono/cors";
-
-import { env } from "@/lib/env";
+import { ENV } from "varlock/env";
 
 /**
  * The CORS middleware.
@@ -16,7 +15,7 @@ export default function (): MiddlewareHandler {
       }
 
       const url = new URL(originHeader);
-      return url.hostname === env.HOSTNAME || url.hostname.endsWith(`.${env.HOSTNAME}`) ? originHeader : null;
+      return url.hostname === ENV.APP_HOST || url.hostname.endsWith(`.${ENV.APP_HOST}`) ? originHeader : null;
     },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
