@@ -1,6 +1,5 @@
-import drizzle from "eslint-plugin-drizzle";
-
 import createConfig from "eslint-config/create-config";
+import drizzle from "eslint-plugin-drizzle";
 
 export default createConfig({
   ignores: ["./migrations/*"],
