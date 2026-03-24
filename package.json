@@ -12,7 +12,7 @@
     "drizzle:generate": "turbo run drizzle:generate --filter=shared",
     "drizzle:push": "turbo run drizzle:push --filter=shared",
     "drizzle:studio": "turbo run drizzle:studio --filter=shared",
-    "drizzle:seed": "turbo run drizzle:seed --filter=shared"
+    "drizzle:bootstrap": "turbo run drizzle:bootstrap --filter=shared"
   },
   "devDependencies": {
     "@types/bun": "^1.3.0",

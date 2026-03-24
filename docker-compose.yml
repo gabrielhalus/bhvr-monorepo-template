@@ -35,17 +35,18 @@ services:
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
 
-  seed:
+  bootstrap:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-    container_name: seed
+    container_name: bootstrap
     depends_on:
       migrations:
         condition: service_completed_successfully
     networks:
       - bunstack
-    command: ["bun", "run", "drizzle:seed"]
+    working_dir: /usr/src/app/packages/shared
+    command: ["bun", "run", "drizzle:bootstrap"]
     entrypoint: []
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
@@ -57,8 +58,8 @@ services:
     container_name: api
     restart: unless-stopped
     depends_on:
-      postgres:
-        condition: service_healthy
+      bootstrap:
+        condition: service_completed_successfully
     networks:
       - bunstack
     expose:
