@@ -2,8 +2,7 @@ import type { CookieType } from "./types";
 import type { JwtPayload } from "~shared/types/db/tokens.types";
 
 import { sign, verify } from "hono/jwt";
-
-import { env } from "@/lib/env";
+import { ENV } from "varlock/env";
 
 export const ACCESS_TOKEN_EXPIRATION_SECONDS = 60 * 15; // 15 minutes
 export const REFRESH_TOKEN_EXPIRATION_SECONDS = 60 * 60 * 24 * 30; // 30 days
@@ -25,7 +24,7 @@ export async function createAccessToken(userId: string, impersonatorId?: string)
     ...(impersonatorId && { impersonatorId }),
   };
 
-  return await sign(payload, env.JWT_SECRET);
+  return await sign(payload, ENV.JWT_SECRET);
 }
 
 /**
@@ -44,7 +43,7 @@ export async function createRefreshToken(userId: string, jti: string): Promise<s
     iss: "bunstack",
   };
 
-  return await sign(payload, env.JWT_SECRET);
+  return await sign(payload, ENV.JWT_SECRET);
 }
 
 /**
@@ -63,7 +62,7 @@ export async function createVerificationToken(userId: string, jti: string): Prom
     iss: "bunstack",
   };
 
-  return await sign(payload, env.JWT_SECRET);
+  return await sign(payload, ENV.JWT_SECRET);
 }
 
 /**
@@ -74,7 +73,7 @@ export async function createVerificationToken(userId: string, jti: string): Prom
  * @returns null if the token is invalid.
  */
 export async function verifyToken<T extends JwtPayload["ttyp"]>(token: string, type: T): Promise<Extract<JwtPayload, { ttyp: T }> | null> {
-  const payload = await verify(token, env.JWT_SECRET) as JwtPayload;
+  const payload = await verify(token, ENV.JWT_SECRET) as JwtPayload;
   return payload.ttyp === type ? payload as Extract<JwtPayload, { ttyp: T }> : null;
 }
 
@@ -85,17 +84,17 @@ export async function verifyToken<T extends JwtPayload["ttyp"]>(token: string, t
  * @throws An error if the cookie type is invalid.
  */
 export function getCookieSettings(type: CookieType) {
-  const isProd = env.NODE_ENV === "production";
+  const isProd = ENV.APP_ENV === "production";
 
-  const isSubdomainDev = !isProd && env.HOSTNAME?.endsWith(".localhost.dev");
+  const isSubdomainDev = !isProd && ENV.APP_HOST?.endsWith(".localhost.dev");
 
   const base = {
     httpOnly: true,
     path: "/",
     domain: isProd
-      ? `.${env.HOSTNAME}` // prod: example.com → .example.com
+      ? `.${ENV.APP_HOST}` // prod: example.com → .example.com
       : isSubdomainDev
-        ? `.${env.HOSTNAME}` // dev subdomains → .localhost.dev
+        ? `.${ENV.APP_HOST}` // dev subdomains → .localhost.dev
         : undefined, // real dev with ports → no domain, host-only
     secure: isProd || isSubdomainDev, // must be true for SameSite=None
     sameSite: isProd || isSubdomainDev ? "none" as const : "lax" as const,
