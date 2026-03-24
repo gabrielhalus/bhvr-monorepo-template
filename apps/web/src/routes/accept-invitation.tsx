@@ -9,8 +9,8 @@ import { z } from "zod";
 
 import { validateInvitationQueryOptions } from "@/api/invitations/invitations.queries";
 import { useAcceptInvitation } from "@/hooks/invitations/use-accept-invitation";
-import { Card, CardContent } from "~react/components/card";
 import { Button } from "~react/components/button";
+import { Card, CardContent } from "~react/components/card";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
 import { Input } from "~react/components/input";
 import { PasswordInput } from "~react/components/password-input";

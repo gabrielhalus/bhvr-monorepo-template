@@ -8,8 +8,8 @@ import { useTranslation } from "react-i18next";
 import { userQueryOptions } from "@/api/users/users.queries";
 import { AvatarUser } from "@/components/avatar-user";
 import { useUser } from "@/hooks/users/use-user";
-import { formatFullName } from "~react/lib/name-utils";
 import { Button } from "~react/components/button";
+import { formatFullName } from "~react/lib/name-utils";
 
 import { UserInformationsForm } from "./-components/user-informations-form";
 import { UserRolesForm } from "./-components/user-roles-form";
@@ -112,7 +112,7 @@ function User() {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Tab navigation */}
         <nav className="flex lg:flex-col gap-1 lg:w-56 shrink-0 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
-          {tabs.map(tab => {
+          {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (

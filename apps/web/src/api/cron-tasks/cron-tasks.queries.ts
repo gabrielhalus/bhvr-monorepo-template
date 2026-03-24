@@ -6,8 +6,8 @@ import { QUERY_STALE_TIMES } from "../query-config";
 import {
   fetchCronTask,
   fetchCronTaskRecentRuns,
-  fetchCronTaskRunsPaginated,
   fetchCronTaskRunsChart,
+  fetchCronTaskRunsPaginated,
   fetchCronTaskRunStats,
   fetchCronTaskStats,
   fetchPaginatedCronTasks,
@@ -38,7 +38,7 @@ export function cronTaskQueryOptions(taskId: string) {
 export function cronTaskRunsPaginatedQueryOptions(taskId: string) {
   return paginatedQueryOptions({
     queryKey: cronTasksKeys.runsPaginated(taskId),
-    queryFn: (params) => fetchCronTaskRunsPaginated(taskId, params),
+    queryFn: params => fetchCronTaskRunsPaginated(taskId, params),
     staleTime: QUERY_STALE_TIMES.PAGINATED_LIST,
   });
 }

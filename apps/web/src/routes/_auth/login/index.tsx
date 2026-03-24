@@ -34,8 +34,10 @@ function Login() {
             Developer platform
           </div>
           <h2 className="text-[2.6rem] font-extrabold leading-[1.1] text-panel-heading">
-            Build at the<br />
-            speed of<br />
+            Build at the
+            <br />
+            speed of
+            <br />
             thought.
           </h2>
           <p className="text-base leading-relaxed max-w-xs text-panel-meta">

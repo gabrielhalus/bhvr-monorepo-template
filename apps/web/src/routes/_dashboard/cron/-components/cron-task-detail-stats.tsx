@@ -8,7 +8,8 @@ import { Card, CardContent } from "~react/components/card";
 import { formatValue } from "~shared/i18n";
 
 function formatDuration(ms: number): string {
-  if (ms < 1000) return `${ms}ms`;
+  if (ms < 1000)
+    return `${ms}ms`;
   return `${(ms / 1000).toFixed(1)}s`;
 }
 

@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { runtimeConfigsKeys } from "@/api/runtime-configs/runtime-configs.keys";
 import { updateRuntimeConfigMutationOptions } from "@/api/runtime-configs/runtime-configs.mutations";
 
 export function useUpdateRuntimeConfig() {

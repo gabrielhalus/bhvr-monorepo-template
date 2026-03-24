@@ -76,7 +76,13 @@ export function CronTaskFormDialog({
     if (isEdit && task) {
       updateMutation.mutate({ id: task.id, data }, { onSuccess: () => onOpenChange(false) });
     } else {
-      createMutation.mutate(data as Parameters<typeof createMutation.mutate>[0], { onSuccess: () => { onOpenChange(false); setForm(defaultForm); } });
+      createMutation.mutate(
+        data as Parameters<typeof createMutation.mutate>[0],
+        { onSuccess: () => {
+          onOpenChange(false);
+          setForm(defaultForm);
+        } },
+      );
     }
   };
 

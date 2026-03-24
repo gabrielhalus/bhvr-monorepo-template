@@ -35,7 +35,8 @@ function Register() {
             <Box className="size-5 text-white" />
           </div>
           <span className="text-xl font-bold text-panel-heading">
-            {t("core.name")}.
+            {t("core.name")}
+            .
           </span>
         </div>
 
@@ -46,7 +47,8 @@ function Register() {
             Get started
           </div>
           <h2 className="text-[2.6rem] font-extrabold leading-[1.1] text-panel-heading">
-            Your stack,<br />
+            Your stack,
+            <br />
             your rules.
           </h2>
           <p className="text-base leading-relaxed max-w-xs text-panel-meta">
@@ -62,7 +64,10 @@ function Register() {
           <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-lg">
             <Box className="size-4" />
           </div>
-          <span className="font-bold text-lg">{t("core.name")}.</span>
+          <span className="font-bold text-lg">
+            {t("core.name")}
+            .
+          </span>
         </div>
 
         <div className="w-full max-w-sm">

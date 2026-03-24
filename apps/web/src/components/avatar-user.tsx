@@ -3,8 +3,8 @@ import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 
 import { generateAvatarFallback } from "@/helpers/generate-avatar-fallback";
-import { formatFullName } from "~react/lib/name-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "~react/components/avatar";
+import { formatFullName } from "~react/lib/name-utils";
 import { cn } from "~react/lib/utils";
 
 type AvatarUserProps = {

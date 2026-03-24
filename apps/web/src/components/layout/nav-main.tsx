@@ -32,7 +32,8 @@ export function NavMain({ items }: { items: { title: string; icon: LucideIcon; h
                   <item.icon className={cn(
                     "size-4 shrink-0 transition-colors",
                     isActive ? "text-sidebar-primary" : "text-sidebar-foreground/50",
-                  )} />
+                  )}
+                  />
                   <span>{item.title}</span>
                 </Link>
               </SidebarMenuButton>

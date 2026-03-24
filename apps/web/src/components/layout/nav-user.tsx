@@ -19,8 +19,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "~react/components/sidebar";
-import { formatFullName } from "~react/lib/name-utils";
 import { useAuth } from "~react/hooks/use-auth";
+import { formatFullName } from "~react/lib/name-utils";
 
 import { AvatarUser } from "../avatar-user";
 

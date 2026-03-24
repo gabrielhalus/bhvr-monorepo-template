@@ -125,7 +125,14 @@ export function SessionsCard() {
                         )}
                       </div>
                       <div className="text-muted-foreground flex flex-wrap gap-x-3 text-xs">
-                        {session.ip && <span>{t("pages.account.sessions.ip")}: {session.ip}</span>}
+                        {session.ip && (
+                          <span>
+                            {t("pages.account.sessions.ip")}
+                            :
+                            {" "}
+                            {session.ip}
+                          </span>
+                        )}
                         <span>{t("pages.account.sessions.issuedAt", { date: new Date(session.issuedAt) })}</span>
                       </div>
                     </div>

@@ -10,8 +10,8 @@ import { Button } from "~react/components/button";
 import { Spinner } from "~react/components/spinner";
 
 import { CronRunsBarChart } from "./-components/cron-runs-bar-chart";
-import { CronRunsDataTable } from "./-components/cron-runs.data-table";
 import { CronRunsTimeline } from "./-components/cron-runs-timeline";
+import { CronRunsDataTable } from "./-components/cron-runs.data-table";
 import { CronTaskDetailStats } from "./-components/cron-task-detail-stats";
 import { CronTaskFormDialog } from "./-components/cron-task-form-dialog";
 
@@ -19,7 +19,8 @@ export const Route = createFileRoute("/_dashboard/cron/$taskId")({
   component: CronTaskDetailPage,
   loader: async ({ params, context }) => {
     const data = await context.queryClient.ensureQueryData(cronTaskQueryOptions(params.taskId));
-    if (!data.success) throw notFound();
+    if (!data.success)
+      throw notFound();
     await Promise.all([
       context.queryClient.ensureQueryData(cronTaskRunStatsQueryOptions(params.taskId)),
       context.queryClient.ensureQueryData(cronTaskRunsChartQueryOptions(params.taskId)),
@@ -81,7 +82,10 @@ function CronTaskDetailPage() {
                 {task && (
                   <p className="text-sm mt-0.5 font-mono" style={{ color: "oklch(0.550 0.012 265)" }}>
                     {task.cronExpression}
-                    <span className="ml-2 font-sans not-italic opacity-70">· {task.handler}</span>
+                    <span className="ml-2 font-sans not-italic opacity-70">
+                      ·
+                      {task.handler}
+                    </span>
                   </p>
                 )}
               </div>

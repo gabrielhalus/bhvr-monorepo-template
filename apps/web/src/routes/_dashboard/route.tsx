@@ -6,12 +6,12 @@ import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useUpdatePreferences } from "@/hooks/preferences/use-update-preferences";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { ImpersonationBanner } from "@/components/layout/impersonation-banner";
+import { useUpdatePreferences } from "@/hooks/preferences/use-update-preferences";
 import { auth } from "@/lib/auth";
-import { authQueryOptions } from "~react/queries/auth";
 import { SidebarInset, SidebarProvider } from "~react/components/sidebar";
+import { authQueryOptions } from "~react/queries/auth";
 
 export const Route = createFileRoute("/_dashboard")({
   component: DashboardLayout,
@@ -28,8 +28,10 @@ function DashboardLayout() {
   const preferences = (session?.user?.preferences ?? null) as UserPreferences;
 
   useEffect(() => {
-    if (preferences?.theme) setTheme(preferences.theme);
-    if (preferences?.locale) i18n.changeLanguage(preferences.locale);
+    if (preferences?.theme)
+      setTheme(preferences.theme);
+    if (preferences?.locale)
+      i18n.changeLanguage(preferences.locale);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
