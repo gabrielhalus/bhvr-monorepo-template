@@ -7,6 +7,7 @@
       "dependencies": {
         "i18next": "^25.5.3",
         "react-i18next": "^16.0.0",
+        "varlock": "^0.6.3",
         "zod": "^4.1.11",
       },
       "devDependencies": {
@@ -1839,6 +1840,8 @@
     "uuid": ["uuid@10.0.0", "", { "bin": { "uuid": "dist/bin/uuid" } }, "sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ=="],
 
     "validate-npm-package-name": ["validate-npm-package-name@7.0.2", "", {}, "sha512-hVDIBwsRruT73PbK7uP5ebUt+ezEtCmzZz3F59BSr2F6OVFnJ/6h8liuvdLrQ88Xmnk6/+xGGuq+pG9WwTuy3A=="],
+
+    "varlock": ["varlock@0.6.3", "", { "bin": { "varlock": "bin/cli.js" } }, "sha512-cIeXMs7Vhw9LCz1mZFJjxaBD2Z+rIpVMK49tYnZT7lNWO5Ey6vyCaW+B2IsL5zufuyNMxG1UvK5FZnfI5kVFBQ=="],
 
     "vary": ["vary@1.1.2", "", {}, "sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg=="],
 

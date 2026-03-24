@@ -1,0 +1,6 @@
+# Disable automatic .env file loading
+env = false
+
+# scripts to run before `bun run`-ing a file or script
+# register plugins by adding them to this list
+preload=["varlock/auto-load"]

@@ -37,6 +37,7 @@
   "dependencies": {
     "i18next": "^25.5.3",
     "react-i18next": "^16.0.0",
+    "varlock": "^0.6.3",
     "zod": "^4.1.11"
   }
 }
