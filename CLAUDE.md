@@ -56,7 +56,7 @@ This is a **bunstack** monorepo template using Bun, Turbo, TypeScript, Hono (API
 ### Import Order (auto-sorted by ESLint)
 1. Type imports (`import type ...`)
 2. External packages
-3. Internal aliases (`@bunstack/`, `@/`, `~shared/`, `~react/`)
+3. Internal aliases (`@/`, `~shared/`, `~react/`)
 4. Relative imports
 
 ### Path Aliases

@@ -1,5 +1,5 @@
 {
-  "name": "@bunstack/api",
+  "name": "api",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@bunstack/shared": "workspace:*",
+    "shared": "workspace:*",
     "@hono/zod-validator": "^0.7.0",
     "croner": "^10.0.1",
     "hono": "^4.7.11",
@@ -19,8 +19,8 @@
     "resend": "^6.1.1"
   },
   "devDependencies": {
-    "@bunstack/eslint-config": "workspace:*",
-    "@bunstack/typescript-config": "workspace:*",
+    "eslint-config": "workspace:*",
+    "typescript-config": "workspace:*",
     "@types/bun": "^1.2.15",
     "eslint": "^9.28.0"
   }

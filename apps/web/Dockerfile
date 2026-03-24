@@ -22,7 +22,7 @@ RUN bun install --frozen-lockfile
 # -----------------------------
 FROM install AS build
 
-RUN bun run build --filter=@bunstack/web...
+RUN bun run build --filter=web...
 
 # -----------------------------
 # Prepare final Nginx image

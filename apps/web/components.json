@@ -15,7 +15,7 @@
     "components": "@/components",
     "hooks": "@/hooks",
     "lib": "@/lib",
-    "utils": "@bunstack/react/lib/utils",
-    "ui": "@bunstack/react/components"
+    "utils": "react/lib/utils",
+    "ui": "react/components"
   }
 }

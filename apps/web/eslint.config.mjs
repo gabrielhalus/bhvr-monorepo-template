@@ -1,6 +1,6 @@
 import pluginQuery from "@tanstack/eslint-plugin-query";
 
-import createConfig from "@bunstack/eslint-config/create-config";
+import createConfig from "eslint-config/create-config";
 
 export default createConfig({
   react: true,

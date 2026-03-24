@@ -1,5 +1,5 @@
 {
-  "name": "@bunstack/shared",
+  "name": "shared",
   "type": "module",
   "version": "0.0.0",
   "scripts": {
@@ -25,8 +25,8 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
-    "@bunstack/eslint-config": "workspace:*",
-    "@bunstack/typescript-config": "workspace:*",
+    "eslint-config": "workspace:*",
+    "typescript-config": "workspace:*",
     "drizzle-kit": "^0.31.8",
     "eslint": "^9.28.0",
     "eslint-plugin-drizzle": "^0.2.3"
