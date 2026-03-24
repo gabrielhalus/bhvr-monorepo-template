@@ -1,12 +1,6 @@
 import type { SeedMeta } from "~shared/seeds";
 
-import { z } from "zod";
-
-import { validateEnv } from "~shared/env";
-
-const env = validateEnv({
-  HOSTNAME: z.string(),
-});
+import { ENV } from "varlock/env";
 
 export const seed: SeedMeta = {
   id: "users",
@@ -16,7 +10,7 @@ export const seed: SeedMeta = {
     {
       firstName: "System",
       lastName: "Administrator",
-      email: `admin@${env.HOSTNAME}`,
+      email: `admin@${ENV.APP_HOST}`,
       roles: ["admin"],
       metadata: {
         system: true,
