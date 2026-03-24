@@ -5,27 +5,13 @@ import type { TFunction } from "i18next";
 import { Link } from "@tanstack/react-router";
 import { CalendarIcon, ClockIcon } from "lucide-react";
 
-import { useToggleCronTask } from "@/hooks/cron-tasks/use-toggle-cron-task";
 import i18n from "@/i18n";
 import { Badge } from "~react/components/badge";
 import { SortableHeader } from "~react/components/sortable-header";
-import { Switch } from "~react/components/switch";
 import { formatValue } from "~shared/i18n";
 
 import { CronTaskActionDropdown } from "./cron-task.action-dropdown";
-
-function EnabledCell({ task }: { task: CronTask }) {
-  const toggle = useToggleCronTask();
-
-  return (
-    <Switch
-      checked={task.isEnabled}
-      onCheckedChange={() => toggle.mutate(task.id)}
-      disabled={toggle.isPending}
-      aria-label={task.isEnabled ? "Disable task" : "Enable task"}
-    />
-  );
-}
+import { EnabledCell } from "./cron-task.enabled-cell";
 
 export function getCronTaskColumns(t: TFunction): ColumnDef<CronTask>[] {
   return [
@@ -80,7 +66,8 @@ export function getCronTaskColumns(t: TFunction): ColumnDef<CronTask>[] {
       header: ({ column }) => <SortableHeader column={column} title={t("pages.cron.columns.lastRun")} />,
       cell: ({ row }) => {
         const ts = row.original.lastRunAt;
-        if (!ts) return <span className="text-muted-foreground text-sm">—</span>;
+        if (!ts)
+          return <span className="text-muted-foreground text-sm">—</span>;
         return (
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <ClockIcon className="size-3.5 shrink-0" />
@@ -95,7 +82,8 @@ export function getCronTaskColumns(t: TFunction): ColumnDef<CronTask>[] {
       header: ({ column }) => <SortableHeader column={column} title={t("pages.cron.columns.nextRun")} />,
       cell: ({ row }) => {
         const ts = row.original.nextRunAt;
-        if (!ts) return <span className="text-muted-foreground text-sm">—</span>;
+        if (!ts)
+          return <span className="text-muted-foreground text-sm">—</span>;
         return (
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <CalendarIcon className="size-3.5 shrink-0" />

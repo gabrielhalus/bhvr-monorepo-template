@@ -5,28 +5,17 @@ import type { TFunction } from "i18next";
 import { ClockIcon } from "lucide-react";
 
 import i18n from "@/i18n";
-import { Badge } from "~react/components/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~react/components/tooltip";
 import { formatValue } from "~shared/i18n";
 
-function formatDuration(ms: number | null): string {
-  if (ms === null) return "—";
-  if (ms < 1000) return `${ms}ms`;
-  return `${(ms / 1000).toFixed(1)}s`;
-}
+import { StatusBadge } from "./cron-runs.status-badge";
 
-function StatusBadge({ status }: { status: CronTaskRun["status"] }) {
-  if (status === "success") {
-    return (
-      <Badge className="bg-primary/15 text-primary border-primary/20 hover:bg-primary/20">
-        Success
-      </Badge>
-    );
-  }
-  if (status === "error") {
-    return <Badge variant="destructive">Error</Badge>;
-  }
-  return <Badge variant="outline">Running</Badge>;
+function formatDuration(ms: number | null): string {
+  if (ms === null)
+    return "—";
+  if (ms < 1000)
+    return `${ms}ms`;
+  return `${(ms / 1000).toFixed(1)}s`;
 }
 
 export function getCronRunColumns(t: TFunction): ColumnDef<CronTaskRun>[] {
@@ -68,16 +57,17 @@ export function getCronRunColumns(t: TFunction): ColumnDef<CronTaskRun>[] {
       header: t("pages.cron.runs.columns.output"),
       cell: ({ row }) => {
         const text = row.original.error ?? row.original.output;
-        if (!text) return <span className="text-muted-foreground">—</span>;
+        if (!text)
+          return <span className="text-muted-foreground">—</span>;
         const truncated = text.length > 60 ? `${text.slice(0, 60)}…` : text;
         return (
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="text-sm text-muted-foreground font-mono cursor-help truncate max-w-[200px] block">
+              <span className="text-sm text-muted-foreground font-mono cursor-help truncate max-w-50 block">
                 {truncated}
               </span>
             </TooltipTrigger>
-            <TooltipContent side="left" className="max-w-xs break-words">
+            <TooltipContent side="left" className="max-w-xs wrap-break-word">
               {text}
             </TooltipContent>
           </Tooltip>
