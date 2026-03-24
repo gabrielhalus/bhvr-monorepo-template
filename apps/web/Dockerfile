@@ -10,7 +10,7 @@ WORKDIR /usr/src/app
 FROM base AS install
 
 # Copy only essential files for install
-COPY bun.lock package.json turbo.json ./
+COPY bun.lock package.json turbo.json env.d.ts ./
 COPY apps ./apps
 COPY packages ./packages
 
