@@ -13,6 +13,6 @@
     "noEmit": false,
     "outDir": "dist"
   },
-  "include": ["src", "src/**/*.json", "seeds"],
+  "include": ["src", "src/**/*.json", "seeds", "../../env.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
