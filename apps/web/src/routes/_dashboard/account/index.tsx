@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AvatarUser } from "@/components/avatar-user";
-import { formatFullName } from "~react/lib/name-utils";
 import { useAuth } from "~react/hooks/use-auth";
+import { formatFullName } from "~react/lib/name-utils";
 
 import { PasswordForm } from "./-components/password-form";
 import { SessionsCard } from "./-components/sessions-card";
@@ -90,7 +90,7 @@ function Account() {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Tab navigation */}
         <nav className="flex lg:flex-col gap-1 lg:w-56 shrink-0 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
-          {tabs.map(tab => {
+          {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (

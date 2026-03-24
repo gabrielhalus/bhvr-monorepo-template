@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { revokeSessionMutationOptions } from "@/api/sessions/sessions.mutations";
 import { sessionsKeys } from "@/api/sessions/sessions.keys";
+import { revokeSessionMutationOptions } from "@/api/sessions/sessions.mutations";
 
 export function useRevokeSession() {
   const { t } = useTranslation("web");

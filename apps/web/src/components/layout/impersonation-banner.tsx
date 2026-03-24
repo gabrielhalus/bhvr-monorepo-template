@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next";
 import { useStopImpersonation } from "@/hooks/users/use-stop-impersonation";
 import { Button } from "~react/components/button";
 import { Spinner } from "~react/components/spinner";
-import { formatFullName } from "~react/lib/name-utils";
 import { useAuth } from "~react/hooks/use-auth";
+import { formatFullName } from "~react/lib/name-utils";
 
 export function ImpersonationBanner() {
   const { t } = useTranslation("web");

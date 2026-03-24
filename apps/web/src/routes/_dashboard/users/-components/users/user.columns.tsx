@@ -9,8 +9,8 @@ import { AvatarUser } from "@/components/avatar-user";
 import i18n from "@/i18n";
 import { Badge } from "~react/components/badge";
 import { SortableHeader } from "~react/components/sortable-header";
-import { formatValue } from "~shared/i18n";
 import { formatFullName } from "~react/lib/name-utils";
+import { formatValue } from "~shared/i18n";
 
 import { ActionDropdown } from "./user.action-dropdown";
 
