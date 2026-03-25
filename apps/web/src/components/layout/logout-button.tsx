@@ -47,7 +47,7 @@ export function LogoutButton({ variant = "button", className }: CommonProps) {
       }
 
       // Redirect to login
-      navigate({ href: `${ENV.VITE_AUTH_URL}/login`, replace: true });
+      navigate({ href: `${ENV.VITE_APP_URL}/login`, replace: true });
     },
     onError: () => {
       toast.error(t("logout.error"));
