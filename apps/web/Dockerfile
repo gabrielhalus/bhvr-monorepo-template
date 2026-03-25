@@ -23,10 +23,8 @@ RUN bun install --frozen-lockfile
 FROM install AS build
 
 ARG VITE_API_URL
-ARG VITE_APP_URL
 
 ENV VITE_API_URL=${VITE_API_URL}
-ENV VITE_APP_URL=${VITE_APP_URL}
 
 RUN bun run build --filter=web...
 
