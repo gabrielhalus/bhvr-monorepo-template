@@ -10,9 +10,6 @@ Dockerfile
 *.sqlite
 *.swp
 *.DS_Store
-*.env.local
-.env.*
-!env.example
 bun.lock
 node_modules
 dist
@@ -79,14 +76,6 @@ ehthumbs.db
 .tmp
 temp
 tmp
-
-# --- Ignore local environment files ---
-.env
-.env.local
-.env.development
-.env.test
-.env.production
-.env.staging
 
 # --- Exclude IDE and config noise ---
 .vscode/

@@ -65,14 +65,7 @@ services:
     expose:
       - "3000"
     environment:
-      APP_ENV: ${APP_ENV:-production}
-      APP_HOST: ${APP_HOST:-localhost}
-      APP_PORT: ${APP_PORT:-3000}
-      API_URL: ${API_URL}
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
-      JWT_SECRET: ${JWT_SECRET}
-      AUTH_URL: ${AUTH_URL}
-      SITE_URL: ${SITE_URL}
 
   web:
     build:
