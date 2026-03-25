@@ -10,7 +10,7 @@ WORKDIR /usr/src/app
 FROM base AS install
 
 # Copy only essential files for install
-COPY bun.lock package.json turbo.json .env.schema env.d.ts ./
+COPY bun.lock package.json turbo.json .env.shared.schema ./
 COPY apps ./apps
 COPY packages ./packages
 
@@ -23,12 +23,10 @@ RUN bun install --frozen-lockfile
 FROM install AS build
 
 ARG VITE_API_URL
-ARG VITE_AUTH_URL
-ARG VITE_SITE_URL
+ARG VITE_APP_URL
 
 ENV VITE_API_URL=${VITE_API_URL}
-ENV VITE_AUTH_URL=${VITE_AUTH_URL}
-ENV VITE_SITE_URL=${VITE_SITE_URL}
+ENV VITE_APP_URL=${VITE_APP_URL}
 
 RUN bun run build --filter=web...
 
