@@ -49,14 +49,14 @@ export function createAuth({
     const session = await queryClient.ensureQueryData(authQueryOptions);
 
     if (session) {
-      if (redirectOnAuthenticated && currentUrl !== ENV.VITE_SITE_URL) {
-        throw redirect({ href: ENV.VITE_SITE_URL, replace: true });
+      if (redirectOnAuthenticated && currentUrl !== ENV.VITE_APP_URL) {
+        throw redirect({ href: ENV.VITE_APP_URL, replace: true });
       }
       return session;
     }
 
-    if (redirectOnUnauthenticated && currentUrl !== ENV.VITE_AUTH_URL) {
-      const authUrl = `${ENV.VITE_AUTH_URL}/login?redirect=${encodeURIComponent(currentUrl)}`;
+    if (redirectOnUnauthenticated && currentUrl !== ENV.VITE_APP_URL) {
+      const authUrl = `${ENV.VITE_APP_URL}/login?redirect=${encodeURIComponent(currentUrl)}`;
       throw redirect({ href: authUrl, replace: true });
     }
 
