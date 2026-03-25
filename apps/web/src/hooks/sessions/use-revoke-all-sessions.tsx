@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { ENV } from "varlock/env";
 
 import { revokeAllMySessionsMutationOptions } from "@/api/sessions/sessions.mutations";
 
@@ -14,7 +15,7 @@ export function useRevokeAllSessions() {
     ...revokeAllMySessionsMutationOptions(queryClient),
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: ["auth"] });
-      navigate({ href: `${import.meta.env.VITE_AUTH_URL}/login`, replace: true });
+      navigate({ href: `${ENV.VITE_AUTH_URL}/login`, replace: true });
     },
     onError: () => {
       toast.error(t("pages.account.sessions.revokeAllError"));
