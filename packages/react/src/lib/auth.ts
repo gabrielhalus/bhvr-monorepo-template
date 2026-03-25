@@ -1,8 +1,8 @@
 import type { Session } from "~shared/types/auth.types";
 
 import { redirect } from "@tanstack/react-router";
+import { ENV } from "varlock/env";
 
-import { env } from "../lib/env";
 import { authQueryOptions } from "../queries/auth";
 import { queryClient } from "./query-client";
 
@@ -49,14 +49,14 @@ export function createAuth({
     const session = await queryClient.ensureQueryData(authQueryOptions);
 
     if (session) {
-      if (redirectOnAuthenticated && currentUrl !== env.VITE_SITE_URL) {
-        throw redirect({ href: env.VITE_SITE_URL, replace: true });
+      if (redirectOnAuthenticated && currentUrl !== ENV.VITE_SITE_URL) {
+        throw redirect({ href: ENV.VITE_SITE_URL, replace: true });
       }
       return session;
     }
 
-    if (redirectOnUnauthenticated && currentUrl !== env.VITE_AUTH_URL) {
-      const authUrl = `${env.VITE_AUTH_URL}/login?redirect=${encodeURIComponent(currentUrl)}`;
+    if (redirectOnUnauthenticated && currentUrl !== ENV.VITE_AUTH_URL) {
+      const authUrl = `${ENV.VITE_AUTH_URL}/login?redirect=${encodeURIComponent(currentUrl)}`;
       throw redirect({ href: authUrl, replace: true });
     }
 
