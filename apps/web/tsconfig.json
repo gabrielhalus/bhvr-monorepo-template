@@ -14,6 +14,6 @@
     { "path": "../../packages/shared" },
     { "path": "../../packages/react" }
   ],
-  "include": ["src", "vite.config.ts", "../../env.d.ts"],
+  "include": ["src", "vite.config.ts", "./env.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
