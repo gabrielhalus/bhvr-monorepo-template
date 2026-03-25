@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { ENV } from "varlock/env";
 
 import { Button } from "~react/components/button";
 import { DropdownMenuItem } from "~react/components/dropdown-menu";
@@ -46,7 +47,7 @@ export function LogoutButton({ variant = "button", className }: CommonProps) {
       }
 
       // Redirect to login
-      navigate({ href: `${import.meta.env.VITE_AUTH_URL}/login`, replace: true });
+      navigate({ href: `${ENV.VITE_AUTH_URL}/login`, replace: true });
     },
     onError: () => {
       toast.error(t("logout.error"));
