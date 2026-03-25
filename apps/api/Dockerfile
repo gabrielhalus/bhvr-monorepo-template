@@ -32,7 +32,7 @@ FROM base AS release
 COPY --from=install /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/apps ./apps
 COPY --from=build /usr/src/app/packages ./packages
-COPY package.json bun.lock turbo.json ./
+COPY package.json bun.lock turbo.json .env.schema ./
 
 EXPOSE 3000/tcp
 ENTRYPOINT ["bun", "run", "apps/api/src/index.ts"]
