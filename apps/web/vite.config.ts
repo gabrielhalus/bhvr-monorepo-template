@@ -14,6 +14,7 @@ export default defineConfig(() => ({
     tailwindcss(),
   ],
   resolve: {
+    dedupe: ["react", "react-dom", "@tanstack/react-query", "@tanstack/react-router"],
     alias: {
       "@": path.resolve(__dirname, "./src"),
       "~auth": path.resolve(__dirname, "../../packages/auth/src"),
