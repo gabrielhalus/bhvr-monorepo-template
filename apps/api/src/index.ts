@@ -2,7 +2,7 @@ import { internal } from "varlock";
 import { ENV } from "varlock/env";
 
 const envGraph = await internal.loadVarlockEnvGraph({
-  entryFilePath: new URL("../../../.env.schema", import.meta.url).pathname,
+  entryFilePath: new URL("../", import.meta.url).pathname,
 });
 await envGraph.resolveEnvValues();
 // eslint-disable-next-line node/no-process-env
