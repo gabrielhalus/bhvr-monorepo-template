@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, isNotNull } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
 
 const { drizzle } = await import("../src/drizzle");
@@ -75,38 +75,49 @@ await drizzle
 // Admin user
 // ============================================================================
 
-const password = randomBytes(6).toString("base64url");
-const passwordHash = await Bun.password.hash(password);
+const [existingSystemUser] = await drizzle
+  .select()
+  .from(UsersModel)
+  .where(isNotNull(sql`metadata->>'system'`))
+  .limit(1);
 
-const [insertedAdmin] = await drizzle
-  .insert(UsersModel)
-  .values({
-    firstName: "System",
-    lastName: "Administrator",
-    email: "admin",
-    password: passwordHash,
-    metadata: { system: true },
-  })
-  .onConflictDoNothing()
-  .returning();
+if (existingSystemUser) {
+  // eslint-disable-next-line no-console
+  console.info("Bootstrap: system admin already exists, skipping admin creation.");
+} else {
+  const password = randomBytes(6).toString("base64url");
+  const passwordHash = await Bun.password.hash(password);
 
-if (insertedAdmin) {
-  const [adminRole] = await drizzle
-    .select()
-    .from(RolesModel)
-    .where(eq(RolesModel.name, "admin"));
+  const [insertedAdmin] = await drizzle
+    .insert(UsersModel)
+    .values({
+      firstName: "System",
+      lastName: "Administrator",
+      email: "admin",
+      password: passwordHash,
+      metadata: { system: true },
+    })
+    .onConflictDoNothing()
+    .returning();
 
-  if (adminRole) {
-    await drizzle
-      .insert(UserRolesModel)
-      .values({ userId: insertedAdmin.id, roleId: adminRole.id })
-      .onConflictDoNothing();
+  if (insertedAdmin) {
+    const [adminRole] = await drizzle
+      .select()
+      .from(RolesModel)
+      .where(eq(RolesModel.name, "admin"));
+
+    if (adminRole) {
+      await drizzle
+        .insert(UserRolesModel)
+        .values({ userId: insertedAdmin.id, roleId: adminRole.id })
+        .onConflictDoNothing();
+    }
+
+    // eslint-disable-next-line no-console
+    console.info(`Bootstrap admin credentials: admin → ${password}`);
+    // eslint-disable-next-line no-console
+    console.info("Store the password securely and change it after first login.");
   }
-
-  // eslint-disable-next-line no-console
-  console.info(`Bootstrap admin credentials: admin → ${password}`);
-  // eslint-disable-next-line no-console
-  console.info("Store the password securely and change it after first login.");
 }
 
 // eslint-disable-next-line no-console
