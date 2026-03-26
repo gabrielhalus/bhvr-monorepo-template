@@ -19,3 +19,13 @@ export async function fetchRuntimeConfig(key: string) {
 
   return res.json();
 }
+
+export async function rotateRuntimeConfig(key: string) {
+  const res = await api.config[":key"].rotate.$post({ param: { key } });
+
+  if (!res.ok) {
+    throw new Error(`Failed to rotate configuration "${key}"`);
+  }
+
+  return res.json();
+}
