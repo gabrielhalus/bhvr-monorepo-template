@@ -10,8 +10,6 @@ services:
       - "5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    networks:
-      - bunstack
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 10s
@@ -25,8 +23,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    networks:
-      - bunstack
     working_dir: /usr/src/app/packages/shared
     command: ["bun", "run", "drizzle:push"]
     entrypoint: []
@@ -40,8 +36,6 @@ services:
     depends_on:
       migrations:
         condition: service_completed_successfully
-    networks:
-      - bunstack
     working_dir: /usr/src/app/packages/shared
     command: ["bun", "run", "drizzle:bootstrap"]
     entrypoint: []
@@ -56,8 +50,6 @@ services:
     depends_on:
       bootstrap:
         condition: service_completed_successfully
-    networks:
-      - bunstack
     expose:
       - "3000"
     environment:
@@ -68,19 +60,12 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        VITE_API_URL: ${VITE_API_URL:-/api}
-        VITE_SITE_URL: ${VITE_SITE_URL:-/}
+        APP_URL: ${BUNSTACK_APP_URL}
     restart: unless-stopped
     depends_on:
       - api
-    networks:
-      - bunstack
     ports:
       - "80"
-
-networks:
-  bunstack:
-    driver: bridge
 
 volumes:
   pgdata:
