@@ -27,6 +27,7 @@ await drizzle
 await drizzle
   .insert(RuntimeConfigModel)
   .values([
+    { configKey: "security.jwt.secret", value: randomBytes(32).toString("base64"), type: "string", nullable: false, order: 0 },
     { configKey: "authentication.register.enable", value: "false", type: "boolean", nullable: false, order: 0 },
     { configKey: "authentication.google.enable", value: "false", type: "boolean", nullable: false, order: 0 },
     { configKey: "authentication.google.clientId", value: null, type: "string", nullable: true, order: 1, disabledWhen: "authentication.google.enable!=true" },
