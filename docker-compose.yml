@@ -60,21 +60,11 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        BUNSTACK_APP_URL: ${BUNSTACK_APP_URL:-http://localhost:5173}
+        BUNSTACK_APP_URL: ${BUNSTACK_APP_URL}
     restart: unless-stopped
     depends_on:
       - api
-    expose:
-      - "80"
-
-  proxy:
-    build:
-      context: ./proxy
-    restart: unless-stopped
-    depends_on:
-      - api
-      - web
-    expose:
+    ports:
       - "80"
 
 volumes:
