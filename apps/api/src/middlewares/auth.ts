@@ -3,10 +3,9 @@ import type { AccessToken } from "~shared/types/db/tokens.types";
 
 import { getCookie, setCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
-import { ENV } from "varlock/env";
 
 import { getClientInfo } from "@/helpers/get-client-info";
-import { createAccessToken, getCookieSettings } from "@/lib/jwt";
+import { createAccessToken, getCookieSettings, getJwtSecret } from "@/lib/jwt";
 import { factory } from "@/utils/hono";
 import { logTokenRefresh } from "~shared/queries/audit-logs.queries";
 import { deleteToken, getToken } from "~shared/queries/tokens.queries";
@@ -27,13 +26,13 @@ export const getSessionContext = factory.createMiddleware(async (c, next) => {
 
   try {
     if (accessToken) {
-      const verified = await verify(accessToken, ENV.JWT_SECRET);
+      const verified = await verify(accessToken, await getJwtSecret());
       decoded = AccessTokenSchema.parse(verified);
 
       const refreshToken = getCookie(c, "refreshToken");
       if (refreshToken) {
         try {
-          const refreshVerified = await verify(refreshToken, ENV.JWT_SECRET);
+          const refreshVerified = await verify(refreshToken, await getJwtSecret());
           const refreshDecoded = RefreshTokenSchema.parse(refreshVerified);
           const tokenRecord = await getToken(refreshDecoded.jti);
           if (!tokenRecord || tokenRecord.revokedAt || tokenRecord.expiresAt < new Date().toISOString()) {
@@ -91,7 +90,7 @@ async function attemptTokenRefresh(c: AppContext): Promise<AccessToken | null> {
   }
 
   try {
-    const verified = await verify(refreshToken, ENV.JWT_SECRET);
+    const verified = await verify(refreshToken, await getJwtSecret());
     const decoded = RefreshTokenSchema.parse(verified);
 
     const tokenRecord = await getToken(decoded.jti);
@@ -108,7 +107,7 @@ async function attemptTokenRefresh(c: AppContext): Promise<AccessToken | null> {
     const newAccessToken = await createAccessToken(decoded.sub);
     setCookie(c, "accessToken", newAccessToken, getCookieSettings("access"));
 
-    const newVerified = await verify(newAccessToken, ENV.JWT_SECRET);
+    const newVerified = await verify(newAccessToken, await getJwtSecret());
     const newDecoded = AccessTokenSchema.parse(newVerified);
 
     // Audit log: token refresh
