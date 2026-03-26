@@ -60,7 +60,7 @@
   --shadow-lg: 0px 8px 24px 0px oklch(0.12 0.01 265 / 0.13), 0px 4px 8px -2px oklch(0.12 0.01 265 / 0.09);
   --shadow-xl: 0px 16px 40px 0px oklch(0.12 0.01 265 / 0.16), 0px 8px 16px -4px oklch(0.12 0.01 265 / 0.1);
   --shadow-2xl: 0px 24px 60px 0px oklch(0.12 0.01 265 / 0.2);
-  --tracking-normal: -0.02em;
+  --tracking-normal: -0.1em;
   --spacing: 0.25rem;
   --panel: oklch(0.115 0.008 265);
   --panel-auth: oklch(0.095 0.008 265);
@@ -122,7 +122,7 @@
   --shadow-lg: 0px 8px 24px 0px oklch(0.03 0.005 265 / 0.5), 0px 4px 8px -2px oklch(0.03 0.005 265 / 0.4);
   --shadow-xl: 0px 16px 40px 0px oklch(0.03 0.005 265 / 0.55), 0px 8px 16px -4px oklch(0.03 0.005 265 / 0.45);
   --shadow-2xl: 0px 24px 60px 0px oklch(0.03 0.005 265 / 0.65);
-  --tracking-normal: -0.02em;
+  --tracking-normal: -0.01em;
   --panel: oklch(0.115 0.008 265);
   --panel-auth: oklch(0.095 0.008 265);
   --panel-heading: oklch(0.93 0.006 265);
