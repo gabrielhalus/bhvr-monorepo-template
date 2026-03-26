@@ -3,6 +3,14 @@ import type { JwtPayload } from "~shared/types/db/tokens.types";
 
 import { sign, verify } from "hono/jwt";
 import { ENV } from "varlock/env";
+import { getRuntimeConfig } from "~shared/queries/runtime-configs.queries";
+
+async function getJwtSecret(): Promise<string> {
+  const config = await getRuntimeConfig("security.jwt.secret");
+  if (config?.value) return config.value;
+  if (ENV.JWT_SECRET) return ENV.JWT_SECRET;
+  throw new Error("JWT secret is not configured. Run bootstrap or set JWT_SECRET env var.");
+}
 
 export const ACCESS_TOKEN_EXPIRATION_SECONDS = 60 * 15; // 15 minutes
 export const REFRESH_TOKEN_EXPIRATION_SECONDS = 60 * 60 * 24 * 30; // 30 days
@@ -24,7 +32,7 @@ export async function createAccessToken(userId: string, impersonatorId?: string)
     ...(impersonatorId && { impersonatorId }),
   };
 
-  return await sign(payload, ENV.JWT_SECRET);
+  return await sign(payload, await getJwtSecret());
 }
 
 /**
@@ -43,7 +51,7 @@ export async function createRefreshToken(userId: string, jti: string): Promise<s
     iss: "bunstack",
   };
 
-  return await sign(payload, ENV.JWT_SECRET);
+  return await sign(payload, await getJwtSecret());
 }
 
 /**
@@ -62,7 +70,7 @@ export async function createVerificationToken(userId: string, jti: string): Prom
     iss: "bunstack",
   };
 
-  return await sign(payload, ENV.JWT_SECRET);
+  return await sign(payload, await getJwtSecret());
 }
 
 /**
@@ -73,7 +81,7 @@ export async function createVerificationToken(userId: string, jti: string): Prom
  * @returns null if the token is invalid.
  */
 export async function verifyToken<T extends JwtPayload["ttyp"]>(token: string, type: T): Promise<Extract<JwtPayload, { ttyp: T }> | null> {
-  const payload = await verify(token, ENV.JWT_SECRET) as JwtPayload;
+  const payload = await verify(token, await getJwtSecret()) as JwtPayload;
   return payload.ttyp === type ? payload as Extract<JwtPayload, { ttyp: T }> : null;
 }
 
