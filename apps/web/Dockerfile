@@ -23,8 +23,7 @@ RUN bun install --frozen-lockfile
 FROM install AS build
 
 ARG BUNSTACK_APP_URL
-
-ENV APP_URL=${BUNSTACK_APP_URL}
+ENV VITE_APP_URL=$BUNSTACK_APP_URL
 
 RUN bun run build --filter=web...
 
