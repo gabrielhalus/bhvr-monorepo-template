@@ -62,8 +62,18 @@ services:
     restart: unless-stopped
     depends_on:
       - api
-    ports:
+    expose:
       - "80"
+
+  proxy:
+    build:
+      context: ./proxy
+    restart: unless-stopped
+    depends_on:
+      - api
+      - web
+    ports:
+      - "80:80"
 
 volumes:
   pgdata:
