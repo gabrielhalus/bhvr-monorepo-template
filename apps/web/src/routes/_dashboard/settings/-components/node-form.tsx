@@ -1,17 +1,22 @@
 import type { ConfigNode, RuntimeConfig } from "~shared/types/db/runtime-configs.types";
 
 import { useForm } from "@tanstack/react-form";
+import { RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
+import { useRotateRuntimeConfig } from "@/hooks/runtime-configs/use-rotate-runtime-config";
 import { useUpdateRuntimeConfig } from "@/hooks/runtime-configs/use-update-runtime-config";
 import { Badge } from "~react/components/badge";
+import { Button } from "~react/components/button";
 import { Checkbox } from "~react/components/checkbox";
 import { Input } from "~react/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~react/components/select";
 import { Switch } from "~react/components/switch";
 import { useDebouncedCallback } from "~react/hooks/use-debounced-callback";
 import { inferConfigValue } from "~shared/helpers/infer-config-value";
+
+const ROTATABLE_KEYS = new Set(["security.jwt.secret"]);
 
 function createSchema(type: "string" | "number" | "boolean", nullable: boolean) {
   let schema;
@@ -67,9 +72,11 @@ function evaluateDisabledCondition(disabledWhen: string | null | undefined, allC
 export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: RuntimeConfig[] }) {
   const { t } = useTranslation("web", { keyPrefix: "pages.settings.config" });
   const updateRuntimeConfig = useUpdateRuntimeConfig();
+  const rotateRuntimeConfig = useRotateRuntimeConfig();
 
   const { config } = node;
   const isDisabled = evaluateDisabledCondition(config.disabledWhen, allConfigs);
+  const isRotatable = ROTATABLE_KEYS.has(node.fullKey);
 
   const schema = createSchema(config.type, config.nullable);
 
@@ -194,18 +201,32 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
 
           return (
             <div className="flex flex-col items-end gap-1">
-              <Input
-                id={field.name}
-                type={config.type === "number" ? "number" : "text"}
-                value={field.state.value}
-                disabled={isDisabled}
-                onChange={e => field.handleChange(e.target.value)}
-                onBlur={field.handleBlur}
-                onKeyUp={handleAutoSave}
-                placeholder={config.nullable ? "null" : undefined}
-                aria-invalid={field.state.meta.errors.length > 0}
-                className="w-48"
-              />
+              <div className="flex items-center gap-2">
+                <Input
+                  id={field.name}
+                  type={config.type === "number" ? "number" : "text"}
+                  value={field.state.value}
+                  disabled={isDisabled}
+                  onChange={e => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  onKeyUp={handleAutoSave}
+                  placeholder={config.nullable ? "null" : undefined}
+                  aria-invalid={field.state.meta.errors.length > 0}
+                  className="w-48"
+                />
+                {isRotatable && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    disabled={isDisabled || rotateRuntimeConfig.isPending}
+                    onClick={() => rotateRuntimeConfig.mutate(node.fullKey)}
+                    title={t(`${node.fullKey}.regenerate`)}
+                  >
+                    <RefreshCw className={`size-4 ${rotateRuntimeConfig.isPending ? "animate-spin" : ""}`} />
+                  </Button>
+                )}
+              </div>
               {field.state.meta.errors.length > 0 && (
                 <span className="text-xs text-destructive">{field.state.meta.errors[0]}</span>
               )}

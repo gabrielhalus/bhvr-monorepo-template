@@ -2,6 +2,7 @@ import type { QueryClient } from "@tanstack/react-query";
 
 import { api } from "~react/lib/http";
 
+import { rotateRuntimeConfig } from "./runtime-configs.api";
 import { runtimeConfigsKeys } from "./runtime-configs.keys";
 
 // ============================================================================
@@ -31,6 +32,16 @@ export function updateRuntimeConfigMutationOptions(queryClient: QueryClient) {
       updateRuntimeConfig(key, value),
     onSuccess: (_data: unknown, variables: { key: string; value: string | null }) => {
       queryClient.invalidateQueries({ queryKey: runtimeConfigsKeys.byKey(variables.key) });
+      queryClient.invalidateQueries({ queryKey: runtimeConfigsKeys.list });
+    },
+  };
+}
+
+export function rotateRuntimeConfigMutationOptions(queryClient: QueryClient) {
+  return {
+    mutationFn: (key: string) => rotateRuntimeConfig(key),
+    onSuccess: (_data: unknown, key: string) => {
+      queryClient.invalidateQueries({ queryKey: runtimeConfigsKeys.byKey(key) });
       queryClient.invalidateQueries({ queryKey: runtimeConfigsKeys.list });
     },
   };
