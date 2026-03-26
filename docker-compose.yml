@@ -59,6 +59,8 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        BUNSTACK_APP_URL: ${BUNSTACK_APP_URL:-http://localhost:5173}
     restart: unless-stopped
     depends_on:
       - api
