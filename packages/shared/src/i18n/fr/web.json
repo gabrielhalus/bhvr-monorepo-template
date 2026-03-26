@@ -246,7 +246,20 @@
       "title": "Paramètres",
       "updateSuccess": "Configuration mise à jour",
       "updateError": "Échec de la mise à jour de la configuration",
+      "rotateSuccess": "Secret régénéré — toutes les sessions actives ont été invalidées",
+      "rotateError": "Échec de la régénération du secret",
       "config": {
+        "security": {
+          "label": "Sécurité",
+          "jwt": {
+            "label": "JWT",
+            "secret": {
+              "label": "Secret JWT",
+              "description": "Clé secrète utilisée pour signer les JSON Web Tokens. La régénération invalidera toutes les sessions actives.",
+              "regenerate": "Régénérer le secret"
+            }
+          }
+        },
         "authentication": {
           "label": "Authentification",
           "register": {
