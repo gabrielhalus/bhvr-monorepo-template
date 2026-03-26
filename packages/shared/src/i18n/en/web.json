@@ -246,7 +246,20 @@
       "title": "Settings",
       "updateSuccess": "Configuration updated",
       "updateError": "Failed to update configuration",
+      "rotateSuccess": "Secret regenerated — all active sessions have been invalidated",
+      "rotateError": "Failed to regenerate secret",
       "config": {
+        "security": {
+          "label": "Security",
+          "jwt": {
+            "label": "JWT",
+            "secret": {
+              "label": "JWT Secret",
+              "description": "Secret key used to sign JSON Web Tokens. Regenerating will invalidate all active sessions.",
+              "regenerate": "Regenerate secret"
+            }
+          }
+        },
         "authentication": {
           "label": "Authentication",
           "register": {
