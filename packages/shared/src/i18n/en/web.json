@@ -285,6 +285,37 @@
             }
           }
         },
+        "branding": {
+          "label": "Branding",
+          "appName": {
+            "label": "Application name",
+            "description": "The name displayed in the sidebar and browser tab."
+          },
+          "appCaption": {
+            "label": "Sidebar caption",
+            "description": "Short tagline shown below the app name in the sidebar."
+          },
+          "logoUrl": {
+            "label": "Logo URL",
+            "description": "A publicly accessible URL to your logo image (PNG/SVG recommended)."
+          },
+          "faviconUrl": {
+            "label": "Favicon URL",
+            "description": "A publicly accessible URL to your favicon (16×16 or 32×32 ICO/PNG)."
+          },
+          "primaryColor": {
+            "label": "Primary color",
+            "description": "OKLCH color string, e.g. oklch(0.61 0.22 42). Overrides the brand accent color."
+          },
+          "loginHeroTitle": {
+            "label": "Login page headline",
+            "description": "Large marketing headline on the left panel of the login page."
+          },
+          "loginHeroSubtitle": {
+            "label": "Login page subtext",
+            "description": "Supporting text beneath the headline on the login page."
+          }
+        },
         "notifications": {
           "label": "Notifications",
           "discord": {

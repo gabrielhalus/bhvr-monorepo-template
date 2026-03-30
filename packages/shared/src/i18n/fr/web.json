@@ -270,6 +270,37 @@
             }
           }
         },
+        "branding": {
+          "label": "Apparence",
+          "appName": {
+            "label": "Nom de l'application",
+            "description": "Le nom affiché dans la barre latérale et l'onglet du navigateur."
+          },
+          "appCaption": {
+            "label": "Sous-titre de la barre latérale",
+            "description": "Courte accroche affichée sous le nom de l'application dans la barre latérale."
+          },
+          "logoUrl": {
+            "label": "URL du logo",
+            "description": "URL accessible publiquement vers votre image de logo (PNG/SVG recommandé)."
+          },
+          "faviconUrl": {
+            "label": "URL du favicon",
+            "description": "URL accessible publiquement vers votre favicon (ICO/PNG 16×16 ou 32×32)."
+          },
+          "primaryColor": {
+            "label": "Couleur principale",
+            "description": "Chaîne de couleur OKLCH, ex. oklch(0.61 0.22 42). Remplace la couleur d'accent principale."
+          },
+          "loginHeroTitle": {
+            "label": "Titre de la page de connexion",
+            "description": "Grand titre marketing sur le panneau gauche de la page de connexion."
+          },
+          "loginHeroSubtitle": {
+            "label": "Sous-titre de la page de connexion",
+            "description": "Texte d'accompagnement sous le titre sur la page de connexion."
+          }
+        },
         "notifications": {
           "label": "Notifications",
           "discord": {
