@@ -40,6 +40,13 @@ await drizzle
     { configKey: "notifications.smtp.user", value: null, type: "string", nullable: true, order: 3, disabledWhen: "notifications.smtp.enable!=true" },
     { configKey: "notifications.smtp.password", value: null, type: "string", nullable: true, order: 4, disabledWhen: "notifications.smtp.enable!=true" },
     { configKey: "notifications.smtp.fromAddress", value: null, type: "string", nullable: true, order: 4, disabledWhen: "notifications.smtp.enable!=true" },
+    { configKey: "branding.appName", value: "Bunstack.", type: "string", nullable: false, order: 0 },
+    { configKey: "branding.appCaption", value: null, type: "string", nullable: true, order: 1 },
+    { configKey: "branding.logoUrl", value: null, type: "string", nullable: true, order: 2 },
+    { configKey: "branding.faviconUrl", value: null, type: "string", nullable: true, order: 3 },
+    { configKey: "branding.primaryColor", value: null, type: "string", nullable: true, order: 4 },
+    { configKey: "branding.loginHeroTitle", value: null, type: "string", nullable: true, order: 5 },
+    { configKey: "branding.loginHeroSubtitle", value: null, type: "string", nullable: true, order: 6 },
   ])
   .onConflictDoUpdate({
     target: RuntimeConfigModel.configKey,
