@@ -8,11 +8,13 @@ import { NavMain } from "@/components/layout/nav-main";
 import { NavUser } from "@/components/layout/nav-user";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarTrigger } from "~react/components/sidebar";
 import { authorizeBatchQueryOptions } from "~react/queries/auth";
+import { useBranding } from "~react/providers/branding-provider";
 
 import { NavSettings } from "./nav-settings";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { t } = useTranslation("web");
+  const branding = useBranding();
 
   const { data: sidebarAuth } = useQuery(
     authorizeBatchQueryOptions([
@@ -84,15 +86,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             to="/"
             className="flex items-center gap-2.5 flex-1 min-w-0 group-data-[collapsible=icon]:hidden"
           >
-            <div className="flex size-8 items-center justify-center rounded-lg shrink-0 brand-gradient">
-              <Box className="size-4 text-white" />
+            <div className="flex size-8 items-center justify-center rounded-lg shrink-0 brand-gradient overflow-hidden">
+              {branding.logoUrl
+                ? <img src={branding.logoUrl} className="size-8 object-cover" alt={branding.appName} />
+                : <Box className="size-4 text-white" />}
             </div>
             <div className="grid text-left text-sm leading-tight min-w-0">
               <span className="truncate font-bold tracking-tight text-sidebar-accent-foreground">
-                {t("common:core.name")}
+                {branding.appName}
               </span>
               <span className="truncate text-[11px] text-primary/65">
-                {t("common:core.caption")}
+                {branding.appCaption ?? t("common:core.caption")}
               </span>
             </div>
           </Link>
