@@ -6,8 +6,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
       POSTGRES_DB: ${POSTGRES_DB:-bunstack}
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -41,31 +41,6 @@ services:
     entrypoint: []
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
-
-  api:
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      bootstrap:
-        condition: service_completed_successfully
-    expose:
-      - "3000"
-    environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
-
-  web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-      args:
-        BUNSTACK_APP_URL: ${BUNSTACK_APP_URL}
-    restart: unless-stopped
-    depends_on:
-      - api
-    expose:
-      - "80"
 
 volumes:
   pgdata:
