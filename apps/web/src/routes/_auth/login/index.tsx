@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Box } from "lucide-react";
 
+import { useBranding } from "~react/providers/branding-provider";
+
 import { LoginForm } from "./-components/form";
 
 export const Route = createFileRoute("/_auth/login/")({
@@ -8,6 +10,8 @@ export const Route = createFileRoute("/_auth/login/")({
 });
 
 function Login() {
+  const branding = useBranding();
+
   return (
     <div className="min-h-svh flex">
       {/* Left decorative panel — deep warm dark inspired by toko */}
@@ -19,11 +23,13 @@ function Login() {
 
         {/* Brand mark */}
         <div className="relative z-10 flex items-center gap-3">
-          <div className="size-9 rounded-xl flex items-center justify-center bg-panel-accent">
-            <Box className="size-5 text-white" />
+          <div className="size-9 rounded-xl flex items-center justify-center bg-panel-accent overflow-hidden">
+            {branding.logoUrl
+              ? <img src={branding.logoUrl} className="size-9 object-cover" alt={branding.appName} />
+              : <Box className="size-5 text-white" />}
           </div>
           <span className="text-xl font-bold text-panel-heading">
-            Bunstack.
+            {branding.appName}
           </span>
         </div>
 
@@ -34,14 +40,18 @@ function Login() {
             Developer platform
           </div>
           <h2 className="text-[2.6rem] font-extrabold leading-[1.1] text-panel-heading">
-            Build at the
-            <br />
-            speed of
-            <br />
-            thought.
+            {branding.loginHeroTitle ?? (
+              <>
+                Build at the
+                <br />
+                speed of
+                <br />
+                thought.
+              </>
+            )}
           </h2>
           <p className="text-base leading-relaxed max-w-xs text-panel-meta">
-            A modern full-stack monorepo template. Fast, typed end-to-end, and ready to ship.
+            {branding.loginHeroSubtitle ?? "A modern full-stack monorepo template. Fast, typed end-to-end, and ready to ship."}
           </p>
         </div>
       </div>
@@ -50,10 +60,12 @@ function Login() {
       <div className="flex flex-1 flex-col items-center justify-center bg-background p-8">
         {/* Mobile logo */}
         <div className="lg:hidden mb-8 flex items-center gap-2">
-          <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-lg">
-            <Box className="size-4" />
+          <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-lg overflow-hidden">
+            {branding.logoUrl
+              ? <img src={branding.logoUrl} className="size-7 object-cover" alt={branding.appName} />
+              : <Box className="size-4" />}
           </div>
-          <span className="font-bold text-lg">Bunstack.</span>
+          <span className="font-bold text-lg">{branding.appName}</span>
         </div>
 
         <div className="w-full max-w-sm">

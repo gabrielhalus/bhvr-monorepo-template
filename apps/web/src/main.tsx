@@ -11,6 +11,7 @@ import { Sayno } from "~react/components/sayno";
 import { Toaster } from "~react/components/sonner";
 import { queryClient } from "~react/lib/query-client";
 import { AuthProvider } from "~react/providers/auth-provider";
+import { BrandingProvider } from "~react/providers/branding-provider";
 import { ThemeProvider } from "~react/providers/theme-provider";
 
 export const router = createRouter({
@@ -40,9 +41,11 @@ async function bootstrap() {
         <I18nextProvider i18n={i18n}>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
-              <RouterProvider router={router} />
-              <Toaster position="bottom-center" />
-              <Sayno />
+              <BrandingProvider>
+                <RouterProvider router={router} />
+                <Toaster position="bottom-center" />
+                <Sayno />
+              </BrandingProvider>
             </AuthProvider>
           </QueryClientProvider>
         </I18nextProvider>
