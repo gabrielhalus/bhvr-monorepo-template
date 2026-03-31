@@ -1,4 +1,4 @@
-import { eq, sql, isNotNull } from "drizzle-orm";
+import { eq, isNotNull, sql } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
 
 const { drizzle } = await import("../src/drizzle");
@@ -27,6 +27,17 @@ await drizzle
 await drizzle
   .insert(RuntimeConfigModel)
   .values([
+    // Nodes
+    { configKey: "security", type: "node", nullable: false, order: 0 },
+    { configKey: "security.jwt", type: "node", nullable: false, order: 0 },
+    { configKey: "authentication", type: "node", nullable: false, order: 1 },
+    { configKey: "authentication.register", type: "node", nullable: false, order: 0 },
+    { configKey: "authentication.google", type: "node", nullable: false, order: 1 },
+    { configKey: "notifications", type: "node", nullable: false, order: 2 },
+    { configKey: "notifications.discord", type: "node", nullable: false, order: 0 },
+    { configKey: "notifications.smtp", type: "node", nullable: false, order: 1 },
+    { configKey: "branding", type: "node", nullable: false, order: 3 },
+    // Leaves
     { configKey: "security.jwt.secret", value: randomBytes(32).toString("base64"), type: "string", nullable: false, order: 0 },
     { configKey: "authentication.register.enable", value: "false", type: "boolean", nullable: false, order: 0 },
     { configKey: "authentication.google.enable", value: "false", type: "boolean", nullable: false, order: 0 },
@@ -39,7 +50,7 @@ await drizzle
     { configKey: "notifications.smtp.port", value: null, type: "number", nullable: true, order: 2, disabledWhen: "notifications.smtp.enable!=true" },
     { configKey: "notifications.smtp.user", value: null, type: "string", nullable: true, order: 3, disabledWhen: "notifications.smtp.enable!=true" },
     { configKey: "notifications.smtp.password", value: null, type: "string", nullable: true, order: 4, disabledWhen: "notifications.smtp.enable!=true" },
-    { configKey: "notifications.smtp.fromAddress", value: null, type: "string", nullable: true, order: 4, disabledWhen: "notifications.smtp.enable!=true" },
+    { configKey: "notifications.smtp.fromAddress", value: null, type: "string", nullable: true, order: 5, disabledWhen: "notifications.smtp.enable!=true" },
     { configKey: "branding.appName", value: "Bunstack.", type: "string", nullable: false, order: 0 },
     { configKey: "branding.appCaption", value: null, type: "string", nullable: true, order: 1 },
     { configKey: "branding.logoUrl", value: null, type: "string", nullable: true, order: 2 },

@@ -8,6 +8,7 @@ export type ConfigNode = {
   key: string;
   fullKey: string;
   isLeaf: boolean;
+  order?: number;
   children: Map<string, ConfigNode>;
   config?: any;
 };
