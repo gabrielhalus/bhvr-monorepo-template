@@ -98,18 +98,13 @@ CREATE TABLE "runtime_configs" (
 	"value" text,
 	"type" varchar(16) NOT NULL,
 	"nullable" boolean NOT NULL,
+	"multiline" boolean DEFAULT false NOT NULL,
+	"secret" boolean DEFAULT false NOT NULL,
 	"options" text,
 	"disabled_when" text,
 	"order" integer DEFAULT 0 NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_by" varchar(21)
-);
---> statement-breakpoint
-CREATE TABLE "seeds" (
-	"id" text PRIMARY KEY NOT NULL,
-	"version" integer NOT NULL,
-	"checksum" text NOT NULL,
-	"applied_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "tokens" (
