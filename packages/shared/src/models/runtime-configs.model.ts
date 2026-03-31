@@ -7,6 +7,8 @@ export const RuntimeConfigModel = pgTable("runtime_configs", {
   value: text("value"),
   type: varchar("type", { length: 16 }).$type<"string" | "number" | "boolean" | "list" | "node">().notNull(),
   nullable: boolean("nullable").notNull(),
+  multiline: boolean("multiline").notNull().default(false),
+  secret: boolean("secret").notNull().default(false),
   options: text("options"),
   disabledWhen: text("disabled_when"),
   order: integer("order").notNull().default(0),

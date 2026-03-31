@@ -10,6 +10,8 @@ Runtime configs allow you to change application behavior without redeploying. Th
 | value        | text                                   | Stored as string, parsed based on `type`         |
 | type         | `string` \| `number` \| `boolean` \| `list` | Determines how value is parsed              |
 | nullable     | boolean                                | Whether null values are allowed                  |
+| multiline    | boolean                                | Renders a textarea instead of a single-line input |
+| secret       | boolean                                | Masks the value in GET responses; only revealed once after rotate/update |
 | options      | text                                   | JSON array of allowed values                     |
 | disabled_when| text                                   | Condition to disable editing (UI only)           |
 | order        | integer                                | Display order (editable only from database)      |

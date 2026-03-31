@@ -248,6 +248,13 @@
       "updateError": "Failed to update configuration",
       "rotateSuccess": "Secret regenerated — all active sessions have been invalidated",
       "rotateError": "Failed to regenerate secret",
+      "secretReveal": {
+        "title": "Secret generated",
+        "description": "This value will only be shown once. Copy it now and store it securely.",
+        "copy": "Copy",
+        "copied": "Copied",
+        "close": "Done"
+      },
       "config": {
         "security": {
           "label": "Security",
