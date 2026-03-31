@@ -3,7 +3,7 @@ import type { ConfigNode, RuntimeConfig } from "~shared/types/db/runtime-configs
 import { useForm } from "@tanstack/react-form";
 import { Check, Copy, RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import { useRotateRuntimeConfig } from "@/hooks/runtime-configs/use-rotate-runtime-config";
@@ -23,7 +23,6 @@ import { Input } from "~react/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~react/components/select";
 import { Switch } from "~react/components/switch";
 import { Textarea } from "~react/components/textarea";
-import { useDebouncedCallback } from "~react/hooks/use-debounced-callback";
 import { inferConfigValue } from "~shared/helpers/infer-config-value";
 
 const ROTATABLE_KEYS = new Set(["security.jwt.secret"]);
@@ -90,7 +89,13 @@ function SecretRevealDialog({ value, onClose }: { value: string; onClose: () => 
   }
 
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog
+      open
+      onOpenChange={(open) => {
+        if (!open)
+          onClose();
+      }}
+    >
       <DialogContent showCloseButton={false}>
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>
@@ -133,24 +138,25 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
     },
   });
 
-  const handleAutoSave = useDebouncedCallback(() => form.handleSubmit(), 250);
-
   function handleRotate() {
     rotateRuntimeConfig.mutate(node.fullKey, {
       onSuccess: (data) => {
         const newValue = (data as { config?: { value?: string | null } }).config?.value;
-        if (newValue) setRevealedValue(newValue);
+        if (newValue)
+          setRevealedValue(newValue);
       },
     });
   }
+
+  const descriptionLinkHref = t(`${node.fullKey}.descriptionLink`, { defaultValue: "" });
 
   return (
     <>
       {revealedValue && (
         <SecretRevealDialog value={revealedValue} onClose={() => setRevealedValue(null)} />
       )}
-      <div className={`flex items-center justify-between gap-8 first:pt-0 last:pb-0 py-5 not-last:border-b transition-opacity ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}>
-        <div className="space-y-1 flex-1 min-w-0">
+      <div className={`flex flex-col gap-3 first:pt-0 last:pb-0 py-5 not-last:border-b transition-opacity ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}>
+        <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-medium">{t(`${node.fullKey}.label`)}</h3>
             <Badge variant="secondary">
@@ -158,7 +164,22 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
               {config.nullable && "?"}
             </Badge>
           </div>
-          <p className="text-xs text-muted-foreground">{t(`${node.fullKey}.description`)}</p>
+          <p className="text-xs text-muted-foreground">
+            <Trans
+              i18nKey={`pages.settings.config.${node.fullKey}.description`}
+              ns="web"
+              components={{
+                docLink: (
+                  <a
+                    href={descriptionLinkHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2"
+                  />
+                ),
+              }}
+            />
+          </p>
         </div>
 
         <form.Field
@@ -187,7 +208,7 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
                   disabled={isDisabled}
                   onCheckedChange={(checked) => {
                     field.handleChange(checked ? "true" : "false");
-                    handleAutoSave();
+                    form.handleSubmit();
                   }}
                 />
               );
@@ -216,7 +237,7 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
                               ? [...currentValues, option]
                               : currentValues.filter((v: string) => v !== option);
                             field.handleChange(newValues.join(";"));
-                            handleAutoSave();
+                            form.handleSubmit();
                           }}
                         />
                         <span className={`text-sm transition-colors ${isChecked ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"}`}>
@@ -237,7 +258,7 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
                   disabled={isDisabled}
                   onValueChange={(value) => {
                     field.handleChange(value);
-                    handleAutoSave();
+                    form.handleSubmit();
                   }}
                 >
                   <SelectTrigger className="w-48">
@@ -259,11 +280,11 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
                 <div className="flex items-center gap-2">
                   <Input
                     readOnly
+                    disabled
                     type="password"
                     value="placeholder"
-                    disabled={isDisabled}
                     placeholder="••••••••"
-                    className="w-48 text-muted-foreground"
+                    className="w-48"
                     aria-label="Hidden secret value"
                   />
                   {isRotatable && (
@@ -284,14 +305,16 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
 
             if (config.multiline) {
               return (
-                <div className="flex flex-col items-end gap-1">
+                <div className="flex flex-col items-start gap-1">
                   <Textarea
                     id={field.name}
                     value={field.state.value ?? ""}
                     disabled={isDisabled}
                     onChange={e => field.handleChange(e.target.value)}
-                    onBlur={field.handleBlur}
-                    onKeyUp={handleAutoSave}
+                    onBlur={() => {
+                      field.handleBlur();
+                      if (field.state.value !== config.value) form.handleSubmit();
+                    }}
                     placeholder={config.nullable ? "null" : undefined}
                     aria-invalid={field.state.meta.errors.length > 0}
                     className="w-64 min-h-20"
@@ -304,7 +327,7 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
             }
 
             return (
-              <div className="flex flex-col items-end gap-1">
+              <div className="flex flex-col items-start gap-1">
                 <div className="flex items-center gap-2">
                   <Input
                     id={field.name}
@@ -312,8 +335,10 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
                     value={field.state.value}
                     disabled={isDisabled}
                     onChange={e => field.handleChange(e.target.value)}
-                    onBlur={field.handleBlur}
-                    onKeyUp={handleAutoSave}
+                    onBlur={() => {
+                      field.handleBlur();
+                      if (field.state.value !== config.value) form.handleSubmit();
+                    }}
                     placeholder={config.nullable ? "null" : undefined}
                     aria-invalid={field.state.meta.errors.length > 0}
                     className="w-48"
