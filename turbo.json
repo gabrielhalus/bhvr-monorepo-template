@@ -15,6 +15,10 @@
     "VITE_SITE_URL"
   ],
   "tasks": {
+    "bootstrap": {
+      "cache": false,
+      "persistent": false
+    },
     "build": {
       "cache": false,
       "dependsOn": ["^build"]
@@ -30,12 +34,12 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
+    "reset-password": {
+      "cache": false,
+      "persistent": false
+    },
     "test": {
       "dependsOn": ["^test"],
-      "cache": false,
-      "persistent": true
-    },
-    "drizzle:bootstrap": {
       "cache": false,
       "persistent": true
     },

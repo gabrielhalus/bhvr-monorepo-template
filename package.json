@@ -12,7 +12,8 @@
     "drizzle:generate": "turbo run drizzle:generate --filter=shared",
     "drizzle:push": "turbo run drizzle:push --filter=shared",
     "drizzle:studio": "turbo run drizzle:studio --filter=shared",
-    "drizzle:bootstrap": "turbo run drizzle:bootstrap --filter=shared"
+    "bootstrap": "turbo run bootstrap --filter=shared",
+    "reset-password": "turbo run reset-password --filter=shared"
   },
   "devDependencies": {
     "@types/bun": "^1.3.0",

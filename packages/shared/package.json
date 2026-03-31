@@ -10,7 +10,8 @@
     "drizzle:generate": "drizzle-kit generate --config=drizzle.config.cjs",
     "drizzle:push": "drizzle-kit push --config=drizzle.config.cjs",
     "drizzle:studio": "drizzle-kit studio --config=drizzle.config.cjs",
-    "drizzle:bootstrap": "bun run scripts/bootstrap.ts"
+    "bootstrap": "bun run scripts/bootstrap.ts",
+    "reset-password": "bun run scripts/reset-password.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.44.2",
