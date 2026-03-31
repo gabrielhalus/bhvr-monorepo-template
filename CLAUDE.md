@@ -297,3 +297,5 @@ After completing a task, provide commit messages like:
 - Be specific about what changed
 - One commit per scope when changes are related
 - Multiple commits per scope if changes are unrelated features/fixes
+- **Always ask for validation** before running `git commit`
+- **Never add co-author attribution** (no `Co-Authored-By` trailers)
