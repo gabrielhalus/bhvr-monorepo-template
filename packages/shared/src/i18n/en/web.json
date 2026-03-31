@@ -244,6 +244,10 @@
     },
     "settings": {
       "title": "Settings",
+      "actions": {
+        "save": "Save",
+        "cancel": "Cancel"
+      },
       "updateSuccess": "Configuration updated",
       "updateError": "Failed to update configuration",
       "rotateSuccess": "Secret regenerated — all active sessions have been invalidated",
@@ -280,15 +284,18 @@
             "label": "Google",
             "enable": {
               "label": "Enable login via Google",
-              "description": ""
+              "description": "Enables sign-in via Google OAuth. Requires a valid client ID and secret from <docLink>Google Cloud Console</docLink>.",
+              "descriptionLink": "https://console.cloud.google.com/apis/credentials"
             },
             "clientId": {
               "label": "Goole client ID",
-              "description": ""
+              "description": "OAuth 2.0 client ID from your <docLink>Google Cloud Console</docLink> credentials.",
+              "descriptionLink": "https://console.cloud.google.com/apis/credentials"
             },
             "clientSecret": {
               "label": "Goole client secret",
-              "description": ""
+              "description": "OAuth 2.0 client secret from your <docLink>Google Cloud Console</docLink> credentials.",
+              "descriptionLink": "https://console.cloud.google.com/apis/credentials"
             }
           }
         },
@@ -329,38 +336,40 @@
             "label": "Discord",
             "enable": {
               "label": "Enable Discord",
-              "description": ""
+              "description": "Send notifications to a Discord channel via webhook. See <docLink>Discord docs</docLink> to create one.",
+              "descriptionLink": "https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
             },
             "url": {
               "label": "Discord Webhook URL",
-              "description": ""
+              "description": "Incoming webhook URL from your <docLink>Discord server settings</docLink>.",
+              "descriptionLink": "https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
             }
           },
           "smtp": {
             "label": "SMTP",
             "enable": {
               "label": "Enable SMTP",
-              "description": ""
+              "description": "Send email notifications via an SMTP server."
             },
             "host": {
               "label": "SMTP Server",
-              "description": ""
+              "description": "Hostname or IP address of the SMTP server."
             },
             "port": {
               "label": "SMTP Port",
-              "description": ""
+              "description": "Port used to connect to the SMTP server (e.g. 465, 587)."
             },
             "user": {
               "label": "Username",
-              "description": ""
+              "description": "Username for authenticating with the SMTP server."
             },
             "password": {
               "label": "Password",
-              "description": ""
+              "description": "Password for authenticating with the SMTP server."
             },
             "fromAddress": {
               "label": "From Address",
-              "description": ""
+              "description": "Email address that appears as the sender for outgoing notifications."
             }
           }
         }
