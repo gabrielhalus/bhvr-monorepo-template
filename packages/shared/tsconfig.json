@@ -2,7 +2,6 @@
   "extends": "typescript-config/base.json",
   "compilerOptions": {
     "composite": true,
-    "baseUrl": ".",
     "rootDir": ".",
     "paths": {
       "~shared/*": ["./src/*"]
