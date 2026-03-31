@@ -1,7 +1,6 @@
 {
   "extends": "typescript-config/react.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "~react/*": ["../../packages/react/src/*"],

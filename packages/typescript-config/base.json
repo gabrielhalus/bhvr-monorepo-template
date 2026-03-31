@@ -14,15 +14,6 @@
     "noUncheckedIndexedAccess": true,
     "noFallthroughCasesInSwitch": true,
     "noEmit": true,
-    "types": [],
-    "baseUrl": "../..",
-    "paths": {
-      "api/*": ["apps/api/src/*"],
-      "web/*": ["apps/web/src/*"],
-      "shared/*": ["packages/shared/src/*"],
-      "react/*": ["packages/react/src/*"],
-      "eslint-config": ["packages/eslint-config/*"],
-      "typescript-config": ["packages/typescript-config/*"]
-    }
+    "types": []
   }
 }

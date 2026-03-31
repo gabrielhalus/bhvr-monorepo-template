@@ -2,7 +2,6 @@
   "extends": "typescript-config/react.json",
   "compilerOptions": {
     "composite": true,
-    "baseUrl": ".",
     "rootDir": "src",
     "paths": {
       "~api/*": ["../../apps/api/src/*"],
