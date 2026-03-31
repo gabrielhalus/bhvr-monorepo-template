@@ -244,6 +244,10 @@
     },
     "settings": {
       "title": "Paramètres",
+      "actions": {
+        "save": "Enregistrer",
+        "cancel": "Annuler"
+      },
       "updateSuccess": "Configuration mise à jour",
       "updateError": "Échec de la mise à jour de la configuration",
       "rotateSuccess": "Secret régénéré — toutes les sessions actives ont été invalidées",
@@ -274,6 +278,24 @@
             "enable": {
               "label": "Activer l'inscription des utilisateurs",
               "description": "Permet aux nouveaux utilisateurs de s'inscrire. Les nouveaux comptes peuvent être créés librement, sans invitation."
+            }
+          },
+          "google": {
+            "label": "Google",
+            "enable": {
+              "label": "Activer la connexion via Google",
+              "description": "Active la connexion via Google OAuth. Nécessite un identifiant client et un secret valides depuis la <docLink>Google Cloud Console</docLink>.",
+              "descriptionLink": "https://console.cloud.google.com/apis/credentials"
+            },
+            "clientId": {
+              "label": "Identifiant client Google",
+              "description": "Identifiant client OAuth 2.0 issu de vos identifiants <docLink>Google Cloud Console</docLink>.",
+              "descriptionLink": "https://console.cloud.google.com/apis/credentials"
+            },
+            "clientSecret": {
+              "label": "Secret client Google",
+              "description": "Secret client OAuth 2.0 issu de vos identifiants <docLink>Google Cloud Console</docLink>.",
+              "descriptionLink": "https://console.cloud.google.com/apis/credentials"
             }
           }
         },
@@ -314,38 +336,40 @@
             "label": "Discord",
             "enable": {
               "label": "Activer Discord",
-              "description": ""
+              "description": "Envoie des notifications dans un salon Discord via webhook. Consultez la <docLink>documentation Discord</docLink> pour en créer un.",
+              "descriptionLink": "https://support.discord.com/hc/fr/articles/228383668-Intro-to-Webhooks"
             },
             "url": {
               "label": "URL du Webhook Discord",
-              "description": ""
+              "description": "URL du webhook entrant depuis les <docLink>paramètres de votre serveur Discord</docLink>.",
+              "descriptionLink": "https://support.discord.com/hc/fr/articles/228383668-Intro-to-Webhooks"
             }
           },
           "smtp": {
             "label": "SMTP",
             "enable": {
               "label": "Activer SMTP",
-              "description": ""
+              "description": "Envoie des notifications par e-mail via un serveur SMTP."
             },
             "host": {
               "label": "Serveur SMTP",
-              "description": ""
+              "description": "Nom d'hôte ou adresse IP du serveur SMTP."
             },
             "port": {
               "label": "Port SMTP",
-              "description": ""
+              "description": "Port utilisé pour se connecter au serveur SMTP (ex. 465, 587)."
             },
             "user": {
               "label": "Nom d'utilisateur",
-              "description": ""
+              "description": "Nom d'utilisateur pour l'authentification auprès du serveur SMTP."
             },
             "password": {
               "label": "Mot de passe",
-              "description": ""
+              "description": "Mot de passe pour l'authentification auprès du serveur SMTP."
             },
             "fromAddress": {
               "label": "Adresse d'expédition",
-              "description": ""
+              "description": "Adresse e-mail affichée comme expéditeur pour les notifications sortantes."
             }
           }
         }
