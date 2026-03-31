@@ -8,7 +8,7 @@ import { RuntimeConfigModel } from "~shared/models/runtime-configs.model";
  */
 export const RuntimeConfigSchema = createSelectSchema(RuntimeConfigModel).extend({
   value: z.string().nullable(),
-  type: z.enum(["string", "number", "boolean", "list"]),
+  type: z.enum(["string", "number", "boolean", "list", "node"]),
   options: z.string().nullable(),
   disabledWhen: z.string().nullable(),
 });
