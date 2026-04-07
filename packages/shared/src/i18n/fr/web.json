@@ -182,7 +182,8 @@
     },
     "nav": {
       "myAccount": "Mon compte",
-      "toggle": "Basculer"
+      "toggle": "Basculer",
+      "developer": "Développeur"
     },
     "logs": {
       "title": "Journaux",
@@ -483,6 +484,46 @@
       },
       "actions": {
         "edit": "Modifier le fournisseur de notifications"
+      }
+    },
+    "sql": {
+      "title": "Console SQL",
+      "subtitle": "Exécutez des requêtes SQL et explorez le schéma de votre base de données.",
+      "sheets": {
+        "title": "Feuilles",
+        "new": "Nouvelle feuille",
+        "empty": "Aucune feuille pour l'instant."
+      },
+      "tables": {
+        "title": "Tables",
+        "empty": "Aucune table trouvée."
+      },
+      "editor": {
+        "label": "Requête",
+        "unsaved": "Non enregistré",
+        "placeholder": "SELECT * FROM users LIMIT 10;",
+        "execute": "Exécuter",
+        "executing": "Exécution...",
+        "save": "Enregistrer",
+        "clear": "Effacer",
+        "shortcut": "⌘ + Entrée"
+      },
+      "results": {
+        "label": "Résultats",
+        "empty": "Lancez une requête pour voir les résultats.",
+        "loading": "Exécution en cours...",
+        "noRows": "Requête exécutée avec succès — aucune ligne retournée.",
+        "rowsAffected_one": "{{count}} ligne",
+        "rowsAffected_other": "{{count}} lignes",
+        "duration": "{{ms}}ms"
+      },
+      "tableView": {
+        "rows_one": "{{count}} ligne",
+        "rows_other": "{{count}} lignes",
+        "empty": "Aucune ligne trouvée.",
+        "page": "Page {{page}}",
+        "prev": "Précédent",
+        "next": "Suivant"
       }
     }
   },

@@ -182,7 +182,8 @@
     },
     "nav": {
       "myAccount": "My Account",
-      "toggle": "Toggle"
+      "toggle": "Toggle",
+      "developer": "Developer"
     },
     "logs": {
       "title": "Logs",
@@ -550,6 +551,46 @@
         "cronExpressionHelp": "e.g. 0 * * * * (every hour at minute 0)",
         "handler": "Handler",
         "isEnabled": "Enable immediately"
+      }
+    },
+    "sql": {
+      "title": "SQL Console",
+      "subtitle": "Execute raw SQL queries and explore your database schema.",
+      "sheets": {
+        "title": "Sheets",
+        "new": "New sheet",
+        "empty": "No sheets yet."
+      },
+      "tables": {
+        "title": "Tables",
+        "empty": "No tables found."
+      },
+      "editor": {
+        "label": "Query",
+        "unsaved": "Unsaved",
+        "placeholder": "SELECT * FROM users LIMIT 10;",
+        "execute": "Execute",
+        "executing": "Executing...",
+        "save": "Save",
+        "clear": "Clear",
+        "shortcut": "⌘ + Enter"
+      },
+      "results": {
+        "label": "Results",
+        "empty": "Run a query to see results.",
+        "loading": "Executing query...",
+        "noRows": "Query executed successfully — no rows returned.",
+        "rowsAffected_one": "{{count}} row",
+        "rowsAffected_other": "{{count}} rows",
+        "duration": "{{ms}}ms"
+      },
+      "tableView": {
+        "rows_one": "{{count}} row",
+        "rows_other": "{{count}} rows",
+        "empty": "No rows found.",
+        "page": "Page {{page}}",
+        "prev": "Previous",
+        "next": "Next"
       }
     }
   },
