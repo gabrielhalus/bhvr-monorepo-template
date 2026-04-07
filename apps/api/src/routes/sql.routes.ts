@@ -32,10 +32,17 @@ export const sqlRoutes = new Hono()
       return c.json({ success: true as const, data: result });
     }
     catch (err) {
-      return c.json({
-        success: false as const,
-        error: err instanceof Error ? err.message : "Query execution failed",
-      }, 400);
+      if (!(err instanceof Error)) {
+        return c.json({ success: false as const, error: "Query execution failed" }, 400);
+      }
+
+      const parts = [err.message];
+      const pg = err as Error & { detail?: string; hint?: string; position?: string; code?: string };
+      if (pg.detail) parts.push(`Detail: ${pg.detail}`);
+      if (pg.hint) parts.push(`Hint: ${pg.hint}`);
+      if (pg.position) parts.push(`Position: ${pg.position}`);
+
+      return c.json({ success: false as const, error: parts.join("\n") }, 400);
     }
   })
 

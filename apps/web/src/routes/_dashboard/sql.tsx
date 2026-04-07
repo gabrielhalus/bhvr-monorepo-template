@@ -689,12 +689,12 @@ function SheetItem({ sheet, isActive, isDirty, onLoad, onRename, onDelete }: She
   return (
     <div
       className={cn(
-        "group flex items-center gap-1.5 rounded px-1.5 py-1 cursor-pointer select-none",
+        "group flex items-center gap-2 rounded px-2 py-1.5 cursor-pointer select-none",
         isActive ? "bg-primary/10 text-primary" : "hover:bg-muted text-foreground",
       )}
       onClick={() => !isEditing && onLoad()}
     >
-      <FileIcon className={cn("size-3 shrink-0", isActive ? "text-primary" : "text-muted-foreground")} />
+      <FileIcon className={cn("size-3.5 shrink-0", isActive ? "text-primary" : "text-muted-foreground")} />
 
       {isEditing
         ? (
@@ -731,9 +731,9 @@ function SheetItem({ sheet, isActive, isDirty, onLoad, onRename, onDelete }: She
           e.stopPropagation();
           onDelete();
         }}
-        className="opacity-0 group-hover:opacity-100 shrink-0 size-4 flex items-center justify-center rounded hover:bg-destructive/10 hover:text-destructive transition-all"
+        className="opacity-0 group-hover:opacity-100 shrink-0 size-6 flex items-center justify-center rounded hover:bg-destructive/10 hover:text-destructive transition-all"
       >
-        <Trash2Icon className="size-2.5" />
+        <Trash2Icon className="size-3.5" />
       </button>
     </div>
   );
