@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Box, CalendarClockIcon, CogIcon, Home, ScrollTextIcon, UsersRound } from "lucide-react";
+import { Box, CalendarClockIcon, CogIcon, DatabaseIcon, Home, ScrollTextIcon, UsersRound } from "lucide-react";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { NavMain } from "@/components/layout/nav-main";
 import { NavUser } from "@/components/layout/nav-user";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarTrigger } from "~react/components/sidebar";
-import { authorizeBatchQueryOptions } from "~react/queries/auth";
 import { useBranding } from "~react/providers/branding-provider";
+import { authorizeBatchQueryOptions } from "~react/queries/auth";
 
 import { NavSettings } from "./nav-settings";
 
@@ -22,12 +22,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       { permission: "runtimeConfig:list" },
       { permission: "auditLog:list" },
       { permission: "cronTask:list" },
+      { permission: "sql:execute" },
     ]),
   );
   const canListUsers = sidebarAuth?.[0] ?? false;
   const canListConfigs = sidebarAuth?.[1] ?? false;
   const canListAuditLogs = sidebarAuth?.[2] ?? false;
   const canListCronTasks = sidebarAuth?.[3] ?? false;
+  const canExecuteSql = (sidebarAuth?.[4] ?? false) && import.meta.env.DEV;
 
   const data = useMemo(() => {
     const navSettings = [];
@@ -64,17 +66,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       });
     }
 
-    return {
-      navMain: [
-        {
-          title: t("pages.home.title"),
-          icon: Home,
-          href: { to: "/" } as const,
-        },
-      ],
-      navSettings,
-    };
-  }, [t, canListUsers, canListConfigs, canListAuditLogs, canListCronTasks]);
+    const navMain = [
+      {
+        title: t("pages.home.title"),
+        icon: Home,
+        href: { to: "/" } as const,
+      },
+    ];
+    const navDev = [];
+
+    if (canExecuteSql) {
+      navDev.push({
+        title: t("pages.sql.title"),
+        icon: DatabaseIcon,
+        href: { to: "/sql" } as const,
+      });
+    }
+
+    return { navMain, navSettings, navDev };
+  }, [t, canListUsers, canListConfigs, canListAuditLogs, canListCronTasks, canExecuteSql]);
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -109,6 +119,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavSettings items={data.navSettings} />
+        <NavSettings items={data.navDev} label={t("nav.developer")} />
       </SidebarContent>
 
       <SidebarFooter>

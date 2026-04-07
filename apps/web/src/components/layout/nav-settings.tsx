@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "~react/components/sidebar";
 import { cn } from "~react/lib/utils";
 
-export function NavSettings({ items }: { items: { title: string; icon: LucideIcon; href: LinkOptions }[] }) {
+export function NavSettings({ items, label }: { items: { title: string; icon: LucideIcon; href: LinkOptions }[]; label?: string }) {
   const { t } = useTranslation("web");
   const matchRoute = useMatchRoute();
 
@@ -17,7 +17,7 @@ export function NavSettings({ items }: { items: { title: string; icon: LucideIco
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{t("pages.settings.title")}</SidebarGroupLabel>
+      <SidebarGroupLabel>{label ?? t("pages.settings.title")}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           const isActive = !!matchRoute({
