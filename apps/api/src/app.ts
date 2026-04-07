@@ -10,6 +10,7 @@ import { cronTasksRoutes } from "@/routes/cron-tasks.routes";
 import { invitationsRoutes } from "@/routes/invitations.routes";
 import { rolesRoutes } from "@/routes/roles.routes";
 import { configRoutes } from "@/routes/runtime-configs.routes";
+import { sqlRoutes } from "@/routes/sql.routes";
 import { usersRoutes } from "@/routes/users.routes";
 import { logSystemError } from "~shared/queries/audit-logs.queries";
 
@@ -63,6 +64,7 @@ const _api = app
   .route("/invitations", invitationsRoutes)
   .route("/roles", rolesRoutes)
   .route("/config", configRoutes)
+  .route("/sql", sqlRoutes)
   .route("/users", usersRoutes);
 
 export default app;
