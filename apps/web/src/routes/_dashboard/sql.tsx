@@ -228,18 +228,18 @@ function SqlConsolePage() {
   return (
     <div className="flex flex-1 flex-col gap-4 p-6 md:p-8 overflow-x-hidden">
       {/* Hero panel */}
-      <div className="relative overflow-hidden rounded-2xl p-6 md:p-8 bg-panel shrink-0">
+      <div className="relative overflow-hidden rounded-2xl p-7 md:p-9 bg-panel shrink-0">
         <div className="absolute inset-0 pointer-events-none hero-grid" />
         <div className="absolute -top-16 -left-16 w-56 h-56 rounded-full blur-3xl pointer-events-none bg-primary opacity-[0.18]" />
         <div className="relative z-10 flex items-center gap-4">
-          <div className="size-10 rounded-xl flex items-center justify-center shrink-0 bg-primary/20">
-            <DatabaseIcon className="size-4.5 text-primary" />
+          <div className="size-11 rounded-xl flex items-center justify-center shrink-0 bg-primary/20">
+            <DatabaseIcon className="size-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl md:text-2xl font-extrabold leading-tight tracking-tight text-panel-heading">
+            <h1 className="text-2xl md:text-3xl font-extrabold leading-tight tracking-tight text-panel-heading">
               {t("pages.sql.title")}
             </h1>
-            <p className="text-xs mt-0.5 text-panel-meta">
+            <p className="text-sm mt-0.5 text-panel-meta">
               {t("pages.sql.subtitle")}
             </p>
           </div>
