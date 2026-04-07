@@ -46,4 +46,7 @@ export const PermissionSchema = z.enum([
   "cronTask:update",
   "cronTask:delete",
   "cronTask:trigger",
+
+  // SQL Console
+  "sql:execute",
 ]);
