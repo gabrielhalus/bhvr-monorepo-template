@@ -13,14 +13,6 @@ const ExecuteSqlSchema = z.object({
 });
 
 export const sqlRoutes = new Hono()
-  // --- Only available in development
-  .use("*", async (c, next) => {
-    if (process.env.NODE_ENV !== "development") {
-      return c.json({ success: false as const, error: "Not found" }, 404);
-    }
-    await next();
-  })
-
   // --- All routes require authentication
   .use(getSessionContext)
 
