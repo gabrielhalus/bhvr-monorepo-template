@@ -26,15 +26,23 @@ export type TableSchema = {
  */
 export async function executeRawSql(query: string): Promise<SqlQueryResult> {
   const start = Date.now();
-  const result = await drizzle.execute(sql.raw(query)) as unknown as Array<Record<string, unknown>> & { count: number };
-  const duration = Date.now() - start;
-  const rows = Array.from(result);
-
-  return {
-    rows,
-    rowCount: rows.length > 0 ? rows.length : (result.count ?? 0),
-    duration,
-  };
+  try {
+    const result = await drizzle.execute(sql.raw(query)) as unknown as Array<Record<string, unknown>> & { count: number };
+    const duration = Date.now() - start;
+    const rows = Array.from(result);
+    return {
+      rows,
+      rowCount: rows.length > 0 ? rows.length : (result.count ?? 0),
+      duration,
+    };
+  }
+  catch (err) {
+    // Reset the connection to clear any aborted transaction state (e.g. from a failed BEGIN)
+    // Without this, postgres returns the connection to the pool in an aborted state,
+    // causing all subsequent requests on that connection to fail with "25P02".
+    try { await drizzle.execute(sql.raw("ROLLBACK")); } catch { /* already outside a transaction, ignore */ }
+    throw err;
+  }
 }
 
 /**
