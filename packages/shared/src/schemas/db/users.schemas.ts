@@ -17,6 +17,14 @@ export type UserPreferences = z.infer<typeof UserPreferencesSchema>;
  * Schema for users
  */
 export const UserSchema = createSelectSchema(UsersModel, {
+  firstName: z
+    .string()
+    .min(1)
+    .transform(val => val[0]!.toUpperCase() + val.slice(1)),
+  lastName: z
+    .string()
+    .min(1)
+    .transform(val => val[0]!.toUpperCase() + val.slice(1)),
   preferences: UserPreferencesSchema,
   metadata: jsonOverride,
 });
@@ -31,14 +39,16 @@ export const InsertUserSchema = createInsertSchema(UsersModel, {
   firstName: z
     .string()
     .min(1)
-    .max(50),
+    .max(50)
+    .transform(val => val.trim().toLowerCase()),
   lastName: z
     .string()
     .min(1)
-    .max(50),
+    .max(50)
+    .transform(val => val.trim().toLowerCase()),
   email: z
     .email()
-    .transform(val => val.toLowerCase()),
+    .transform(val => val.trim().toLowerCase()),
   password: z
     .string()
     .min(8)
@@ -59,14 +69,16 @@ export const UpdateUserSchema = createUpdateSchema(UsersModel, {
   firstName: z
     .string()
     .min(1)
-    .max(50),
+    .max(50)
+    .transform(val => val.trim().toLowerCase()),
   lastName: z
     .string()
     .min(1)
-    .max(50),
+    .max(50)
+    .transform(val => val.trim().toLowerCase()),
   email: z
     .email()
-    .transform(val => val?.toLowerCase()),
+    .transform(val => val.trim().toLowerCase()),
   password: z
     .never(),
 }).partial();
