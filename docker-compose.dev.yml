@@ -37,7 +37,7 @@ services:
       migrations:
         condition: service_completed_successfully
     working_dir: /usr/src/app/packages/shared
-    command: ["bun", "run", "drizzle:bootstrap"]
+    command: ["bun", "run", "bootstrap"]
     entrypoint: []
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
