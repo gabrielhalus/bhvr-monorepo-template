@@ -43,7 +43,7 @@ async function bootstrap() {
             <BrandingProvider>
               <AuthProvider>
                 <RouterProvider router={router} />
-                <Toaster position="bottom-center" />
+                <Toaster position="bottom-right" />
                 <Sayno />
               </AuthProvider>
             </BrandingProvider>
