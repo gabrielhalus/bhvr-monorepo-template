@@ -21,27 +21,15 @@ export function ThemeSubmenu() {
   const { mutate: updatePreferences } = useUpdatePreferences();
 
   type ThemeValue = "system" | "light" | "dark";
-  type ThemeOption = {
-    value: ThemeValue;
-    label: string;
-    icon: LucideIcon;
-  };
+  type ThemeOption = { value: ThemeValue; label: string; icon: LucideIcon };
 
-  const systemThemes: ThemeOption[] = [
-    { value: "system", label: t("generic.themeSystem"), icon: Monitor },
-  ] as const;
-
-  const lightThemes: ThemeOption[] = [
-    { value: "light", label: t("generic.themeLight"), icon: Sun },
-  ] as const;
-
-  const darkThemes: ThemeOption[] = [
-    { value: "dark", label: t("generic.themeDark"), icon: Moon },
-  ] as const;
+  const systemThemes: ThemeOption[] = [{ value: "system", label: t("generic.themeSystem"), icon: Monitor }] as const;
+  const lightThemes: ThemeOption[] = [{ value: "light", label: t("generic.themeLight"), icon: Sun }] as const;
+  const darkThemes: ThemeOption[] = [{ value: "dark", label: t("generic.themeDark"), icon: Moon }] as const;
 
   const themeOptions = [...systemThemes, ...lightThemes, ...darkThemes];
 
-  const currentThemeValue: ThemeValue = (theme as ThemeValue | undefined) ?? "system";
+  const currentThemeValue: ThemeValue = (theme as ThemeValue) ?? "system";
   const currentTheme = themeOptions.find(option => option.value === currentThemeValue) ?? themeOptions[0] as ThemeOption;
   const CurrentThemeIcon = currentTheme.icon;
 
