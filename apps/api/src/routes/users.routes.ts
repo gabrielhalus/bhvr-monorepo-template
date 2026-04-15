@@ -2,6 +2,7 @@ import type { UserRelations } from "~shared/types/db/users.types";
 
 import { password } from "bun";
 import { Hono } from "hono";
+import { randomBytes } from "node:crypto";
 import { z } from "zod";
 
 import { generateRandomPassword } from "@/helpers/generate-random-password";
@@ -10,6 +11,8 @@ import { requirePermissionFactory } from "@/middlewares/access-control";
 import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
+import { nanoid } from "~shared/lib/nanoid";
+import { getActiveApiKeysByUserId, insertApiKey, revokeApiKey } from "~shared/queries/api-key.queries";
 import { logPasswordReset, logSessionRevokeAll, logTokenRevoke, logUserDelete, logUserRolesUpdate, logUserUpdate } from "~shared/queries/logs.queries";
 import { getActiveTokensByUserId, revokeAllTokensByUserId, revokeToken } from "~shared/queries/tokens.queries";
 import { getUserRoleIds, updateUserRoles } from "~shared/queries/user-roles.queries";
@@ -329,6 +332,88 @@ export const usersRoutes = new Hono()
     });
 
     return c.json({ success: true as const, user });
+  })
+
+  /**
+   * Get all active API keys for a specific user (admin)
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response with list of active API keys
+   * @throws {404} If the user is not found
+   * @access protected
+   * @permission apiKeys:list
+   */
+  .get("/:id{[a-zA-Z0-9-]{21}}/api-keys", requirePermissionFactory("apiKey:list"), async (c) => {
+    const id = c.req.param("id");
+
+    try {
+      const user = await getUser(id);
+      if (!user) {
+        return c.json({ success: false as const, error: "User not found" }, 404);
+      }
+
+      const apiKeys = await getActiveApiKeysByUserId(id);
+
+      return c.json({ success: true as const, apiKeys });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Create an API key for a user (admin)
+   *
+   * @param c - The Hono context object with API key context
+   * @returns JSON response indicating success
+   * @access protected
+   * @permission apiKey:create
+   */
+  .post("/:id{[a-zA-Z0-9-]{21}}/api-keys", requirePermissionFactory("apiKey:create"), async (c) => {
+    const id = c.req.param("id");
+
+    try {
+      const prefix = nanoid(8);
+
+      const secret = randomBytes(32).toString("base64url");
+      const secretHash = await password.hash(secret);
+
+      await insertApiKey({
+        prefix,
+        secretHash,
+        userId: id,
+      });
+
+      const apiKey = `sk_live_${prefix}.${secret}`;
+
+      return c.json({ success: true as const, apiKey });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
+  })
+
+  /**
+   * Revoke a specific API key for a user (admin)
+   *
+   * @param c - The Hono context object with API key context
+   * @returns JSON response indicating success
+   * @throws {404} If the API key is not found for this user
+   * @access protected
+   * @permission apiKey:revoke
+   */
+  .delete("/:id{[a-zA-Z0-9-]{21}}/api-keys/:apiKeyId{[a-zA-Z0-9-]{21}}", requirePermissionFactory("apiKey:revoke"), async (c) => {
+    const apiKeyId = c.req.param("apiKeyId");
+
+    try {
+      const revokedApiKey = await revokeApiKey(apiKeyId);
+
+      if (!revokedApiKey) {
+        return c.json({ success: false as const, error: "API key not found" }, 404);
+      }
+
+      return c.json({ success: true as const, sk: revokedApiKey.id });
+    } catch (error) {
+      return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    }
   })
 
   /**
