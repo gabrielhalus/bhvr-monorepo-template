@@ -4,8 +4,8 @@ import { queryOptions } from "@tanstack/react-query";
 
 import { api } from "~react/lib/http";
 
-export const runtimeConfigsQueryOptions = queryOptions({
-  queryKey: ["runtime-configs", "list"],
+export const configsQueryOptions = queryOptions({
+  queryKey: ["configs", "list"],
   queryFn: async (): Promise<InferResponseType<typeof api.config.$get>> => {
     const res = await api.config.$get();
 
