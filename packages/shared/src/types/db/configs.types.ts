@@ -1,8 +1,8 @@
-import type { RuntimeConfigModel } from "~shared/models/runtime-configs.model";
+import type { ConfigModel } from "~shared/models/configs.model";
 
 export type ConfigValue = | string | number | boolean | null;
 
-export type RuntimeConfig = typeof RuntimeConfigModel.$inferSelect;
+export type Config = typeof ConfigModel.$inferSelect;
 
 export type ConfigNode = {
   key: string;

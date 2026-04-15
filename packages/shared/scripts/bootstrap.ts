@@ -4,7 +4,7 @@ import { randomBytes } from "node:crypto";
 const { drizzle } = await import("../src/drizzle");
 const { PoliciesModel } = await import("../src/models/policies.model");
 const { RolesModel } = await import("../src/models/roles.model");
-const { RuntimeConfigModel } = await import("../src/models/runtime-configs.model");
+const { ConfigModel } = await import("../src/models/configs.model");
 const { UserRolesModel } = await import("../src/models/user-roles.model");
 const { UsersModel } = await import("../src/models/users.model");
 
@@ -25,7 +25,7 @@ await drizzle
 // ============================================================================
 
 await drizzle
-  .insert(RuntimeConfigModel)
+  .insert(ConfigModel)
   .values([
     // Nodes
     { configKey: "security", type: "node", nullable: false, order: 0 },
@@ -60,7 +60,7 @@ await drizzle
     { configKey: "branding.loginHeroSubtitle", value: null, type: "string", nullable: true, order: 6 },
   ])
   .onConflictDoUpdate({
-    target: RuntimeConfigModel.configKey,
+    target: ConfigModel.configKey,
     set: {
       type: sql`excluded.type`,
       nullable: sql`excluded.nullable`,

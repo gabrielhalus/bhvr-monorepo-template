@@ -1,9 +1,9 @@
-import type { AuditLogsModel } from "~shared/models/audit-logs.model";
+import type { LogsModel } from "~shared/models/logs.model";
 
-export type AuditLog = typeof AuditLogsModel.$inferSelect;
+export type Log = typeof LogsModel.$inferSelect;
 
-/** Supported audit log action categories and types */
-export type AuditLogAction
+/** Supported log action categories and types */
+export type LogAction
   // Authentication actions
   = | "auth:register"
     | "auth:login"
@@ -49,10 +49,10 @@ export type AuditLogAction
     | "config:read"
     | "config:list"
     | "config:update"
-  // Audit log actions
-    | "auditLog:list"
-    | "auditLog:delete"
-    | "auditLog:export"
+  // Log actions
+    | "log:list"
+    | "log:delete"
+    | "log:export"
   // Permission actions
     | "permission:check"
     | "permission:denied"
@@ -62,12 +62,12 @@ export type AuditLogAction
     | "system:shutdown";
 
 /** Target resource types */
-export type AuditTargetType
+export type LogTargetType
   = | "user"
     | "role"
     | "invitation"
     | "config"
-    | "auditLog"
+    | "log"
     | "permission"
     | "session"
     | "system";

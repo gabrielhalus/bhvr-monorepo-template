@@ -1,12 +1,12 @@
 import type { PaginatedResponse, PaginationQuery } from "../schemas/api/pagination.schemas";
-import type { InsertAuditLogSchema } from "../schemas/db/audit-logs.schemas";
-import type { AuditLog, AuditLogAction, AuditTargetType } from "../types/db/audit-logs.types";
+import type { InsertLogSchema } from "../schemas/db/logs.schemas";
+import type { Log, LogAction, LogTargetType } from "../types/db/logs.types";
 import type { z } from "zod";
 
 import { and, asc, count, desc, eq, ilike, isNotNull, or } from "drizzle-orm";
 
 import { drizzle } from "../drizzle";
-import { AuditLogsModel } from "../models/audit-logs.model";
+import { LogsModel } from "../models/logs.model";
 import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
 
 // ============================================================================
@@ -18,9 +18,9 @@ import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
  * @param log - The audit log data to insert.
  * @returns The created audit log.
  */
-export async function createAuditLog(log: z.infer<typeof InsertAuditLogSchema>): Promise<AuditLog> {
+export async function createLog(log: z.infer<typeof InsertLogSchema>): Promise<Log> {
   const [insertedLog] = await drizzle
-    .insert(AuditLogsModel)
+    .insert(LogsModel)
     .values(log)
     .returning();
 
@@ -37,15 +37,15 @@ export async function createAuditLog(log: z.infer<typeof InsertAuditLogSchema>):
  * @param limit - Maximum number of logs to return.
  * @returns List of audit logs.
  */
-export async function getAuditLogsByActor(actorId: string, limit = 100): Promise<AuditLog[]> {
+export async function getLogsByActor(actorId: string, limit = 100): Promise<Log[]> {
   return drizzle
     .select()
-    .from(AuditLogsModel)
+    .from(LogsModel)
     .where(or(
-      eq(AuditLogsModel.actorId, actorId),
-      eq(AuditLogsModel.impersonatorId, actorId),
+      eq(LogsModel.actorId, actorId),
+      eq(LogsModel.impersonatorId, actorId),
     ))
-    .orderBy(desc(AuditLogsModel.createdAt))
+    .orderBy(desc(LogsModel.createdAt))
     .limit(limit);
 }
 
@@ -56,21 +56,21 @@ export async function getAuditLogsByActor(actorId: string, limit = 100): Promise
  * @param limit - Maximum number of logs to return.
  * @returns List of audit logs.
  */
-export async function getAuditLogsByTarget(
+export async function getLogsByTarget(
   targetId: string,
-  targetType?: AuditTargetType,
+  targetType?: LogTargetType,
   limit = 100,
-): Promise<AuditLog[]> {
-  const conditions = [eq(AuditLogsModel.targetId, targetId)];
+): Promise<Log[]> {
+  const conditions = [eq(LogsModel.targetId, targetId)];
   if (targetType) {
-    conditions.push(eq(AuditLogsModel.targetType, targetType));
+    conditions.push(eq(LogsModel.targetType, targetType));
   }
 
   return drizzle
     .select()
-    .from(AuditLogsModel)
+    .from(LogsModel)
     .where(and(...conditions))
-    .orderBy(desc(AuditLogsModel.createdAt))
+    .orderBy(desc(LogsModel.createdAt))
     .limit(limit);
 }
 
@@ -80,12 +80,12 @@ export async function getAuditLogsByTarget(
  * @param limit - Maximum number of logs to return.
  * @returns List of audit logs.
  */
-export async function getAuditLogsByAction(action: AuditLogAction, limit = 100): Promise<AuditLog[]> {
+export async function getLogsByAction(action: LogAction, limit = 100): Promise<Log[]> {
   return drizzle
     .select()
-    .from(AuditLogsModel)
-    .where(eq(AuditLogsModel.action, action))
-    .orderBy(desc(AuditLogsModel.createdAt))
+    .from(LogsModel)
+    .where(eq(LogsModel.action, action))
+    .orderBy(desc(LogsModel.createdAt))
     .limit(limit);
 }
 
@@ -94,15 +94,15 @@ export async function getAuditLogsByAction(action: AuditLogAction, limit = 100):
  * @param limit - Maximum number of logs to return.
  * @returns List of audit logs for impersonated actions.
  */
-export async function getImpersonatedActions(limit = 100): Promise<AuditLog[]> {
+export async function getImpersonatedActions(limit = 100): Promise<Log[]> {
   return drizzle
     .select()
-    .from(AuditLogsModel)
+    .from(LogsModel)
     .where(and(
       // impersonatorId is not null - this is a SQL expression
       // Using a raw check for NOT NULL
     ))
-    .orderBy(desc(AuditLogsModel.createdAt))
+    .orderBy(desc(LogsModel.createdAt))
     .limit(limit);
 }
 
@@ -110,7 +110,7 @@ export async function getImpersonatedActions(limit = 100): Promise<AuditLog[]> {
 // Session Context Type
 // ============================================================================
 
-export type AuditContext = {
+export type LogContext = {
   /** The session user ID (who the system sees as performing the action) */
   actorId: string;
   /** If impersonating, the real admin user's ID */
@@ -130,9 +130,9 @@ export type AuditContext = {
  */
 export async function logRegister(
   userId: string,
-  ctx: Omit<AuditContext, "actorId">,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: Omit<LogContext, "actorId">,
+): Promise<Log> {
+  return createLog({
     action: "auth:register",
     actorId: userId,
     targetId: userId,
@@ -147,9 +147,9 @@ export async function logRegister(
  */
 export async function logLogin(
   userId: string,
-  ctx: Omit<AuditContext, "actorId">,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: Omit<LogContext, "actorId">,
+): Promise<Log> {
+  return createLog({
     action: "auth:login",
     actorId: userId,
     targetId: userId,
@@ -164,9 +164,9 @@ export async function logLogin(
  */
 export async function logLoginFailed(
   email: string,
-  ctx: Omit<AuditContext, "actorId">,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: Omit<LogContext, "actorId">,
+): Promise<Log> {
+  return createLog({
     action: "auth:login_failed",
     actorId: "anonymous",
     targetType: "user",
@@ -179,8 +179,8 @@ export async function logLoginFailed(
 /**
  * Log a logout.
  */
-export async function logLogout(ctx: AuditContext): Promise<AuditLog> {
-  return createAuditLog({
+export async function logLogout(ctx: LogContext): Promise<Log> {
+  return createLog({
     action: "auth:logout",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -197,9 +197,9 @@ export async function logLogout(ctx: AuditContext): Promise<AuditLog> {
 export async function logImpersonationStart(
   impersonatorId: string,
   targetUserId: string,
-  ctx: Omit<AuditContext, "actorId" | "impersonatorId">,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: Omit<LogContext, "actorId" | "impersonatorId">,
+): Promise<Log> {
+  return createLog({
     action: "impersonation:start",
     actorId: impersonatorId,
     targetId: targetUserId,
@@ -215,9 +215,9 @@ export async function logImpersonationStart(
 export async function logImpersonationStop(
   impersonatorId: string,
   impersonatedUserId: string,
-  ctx: Omit<AuditContext, "actorId" | "impersonatorId">,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: Omit<LogContext, "actorId" | "impersonatorId">,
+): Promise<Log> {
+  return createLog({
     action: "impersonation:stop",
     actorId: impersonatorId,
     targetId: impersonatedUserId,
@@ -231,10 +231,10 @@ export async function logImpersonationStop(
  * Log account update (self-service).
  */
 export async function logAccountUpdate(
-  ctx: AuditContext,
+  ctx: LogContext,
   changes?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "account:update",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -251,10 +251,10 @@ export async function logAccountUpdate(
  */
 export async function logUserUpdate(
   targetUserId: string,
-  ctx: AuditContext,
+  ctx: LogContext,
   changes?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "user:update",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -271,9 +271,9 @@ export async function logUserUpdate(
  */
 export async function logUserDelete(
   targetUserId: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "user:delete",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -291,9 +291,9 @@ export async function logUserRolesUpdate(
   targetUserId: string,
   newRoleIds: number[],
   previousRoleIds: number[],
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "user:roles_update",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -310,9 +310,9 @@ export async function logUserRolesUpdate(
  */
 export async function logPasswordReset(
   targetUserId: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "user:password_reset",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -328,10 +328,10 @@ export async function logPasswordReset(
  */
 export async function logRoleUpdate(
   roleId: string,
-  ctx: AuditContext,
+  ctx: LogContext,
   changes?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "role:update",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -348,9 +348,9 @@ export async function logRoleUpdate(
  */
 export async function logRoleDelete(
   roleId: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "role:delete",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -367,9 +367,9 @@ export async function logRoleDelete(
 export async function logRoleMembersAdd(
   roleId: string,
   userIds: string[],
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "role:members_add",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -387,9 +387,9 @@ export async function logRoleMembersAdd(
 export async function logRoleMembersRemove(
   roleId: string,
   userIds: string[],
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "role:members_remove",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -407,9 +407,9 @@ export async function logRoleMembersRemove(
 export async function logInvitationCreate(
   invitationId: string,
   email: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "invitation:create",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -427,9 +427,9 @@ export async function logInvitationCreate(
 export async function logInvitationAccept(
   invitationId: string,
   userId: string,
-  ctx: Omit<AuditContext, "actorId">,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: Omit<LogContext, "actorId">,
+): Promise<Log> {
+  return createLog({
     action: "invitation:accept",
     actorId: userId,
     targetId: invitationId,
@@ -444,9 +444,9 @@ export async function logInvitationAccept(
  */
 export async function logInvitationRevoke(
   invitationId: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "invitation:revoke",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -462,9 +462,9 @@ export async function logInvitationRevoke(
  */
 export async function logInvitationDelete(
   invitationId: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "invitation:delete",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -480,11 +480,11 @@ export async function logInvitationDelete(
  */
 export async function logConfigUpdate(
   configKey: string,
-  ctx: AuditContext,
+  ctx: LogContext,
   oldValue?: unknown,
   newValue?: unknown,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "config:update",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -501,9 +501,9 @@ export async function logConfigUpdate(
  */
 export async function logTokenRefresh(
   userId: string,
-  ctx: Omit<AuditContext, "actorId">,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: Omit<LogContext, "actorId">,
+): Promise<Log> {
+  return createLog({
     action: "auth:token_refresh",
     actorId: userId,
     targetId: userId,
@@ -517,9 +517,9 @@ export async function logTokenRefresh(
  * Log account password change (self-service).
  */
 export async function logAccountPasswordChange(
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "account:password_change",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -535,10 +535,10 @@ export async function logAccountPasswordChange(
  */
 export async function logRoleCreate(
   roleId: string,
-  ctx: AuditContext,
+  ctx: LogContext,
   roleName?: string,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "role:create",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -555,10 +555,10 @@ export async function logRoleCreate(
  */
 export async function logSystemError(
   error: string,
-  ctx: Partial<AuditContext>,
+  ctx: Partial<LogContext>,
   metadata?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "system:error",
     actorId: ctx.actorId ?? "system",
     impersonatorId: ctx.impersonatorId,
@@ -574,10 +574,10 @@ export async function logSystemError(
 // ============================================================================
 
 export type LogActionParams = {
-  action: AuditLogAction;
-  ctx: AuditContext;
+  action: LogAction;
+  ctx: LogContext;
   targetId?: string;
-  targetType?: AuditTargetType;
+  targetType?: LogTargetType;
   metadata?: Record<string, unknown>;
 };
 
@@ -591,8 +591,8 @@ export async function logAction({
   targetId,
   targetType,
   metadata,
-}: LogActionParams): Promise<AuditLog> {
-  return createAuditLog({
+}: LogActionParams): Promise<Log> {
+  return createLog({
     action,
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -609,10 +609,10 @@ export async function logAction({
  */
 export async function logUserCreate(
   userId: string,
-  ctx: AuditContext,
+  ctx: LogContext,
   metadata?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "user:create",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -629,10 +629,10 @@ export async function logUserCreate(
  */
 export async function logPermissionDenied(
   permission: string,
-  ctx: AuditContext,
+  ctx: LogContext,
   resource?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "permission:denied",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -649,10 +649,10 @@ export async function logPermissionDenied(
 export async function logPermissionCheck(
   permission: string,
   allowed: boolean,
-  ctx: AuditContext,
+  ctx: LogContext,
   resource?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "permission:check",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -667,10 +667,10 @@ export async function logPermissionCheck(
  * Log user list access.
  */
 export async function logUserList(
-  ctx: AuditContext,
+  ctx: LogContext,
   filters?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "user:list",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -685,10 +685,10 @@ export async function logUserList(
  * Log role list access.
  */
 export async function logRoleList(
-  ctx: AuditContext,
+  ctx: LogContext,
   filters?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "role:list",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -703,10 +703,10 @@ export async function logRoleList(
  * Log invitation list access.
  */
 export async function logInvitationList(
-  ctx: AuditContext,
+  ctx: LogContext,
   filters?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "invitation:list",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -720,15 +720,15 @@ export async function logInvitationList(
 /**
  * Log audit log list access.
  */
-export async function logAuditLogList(
-  ctx: AuditContext,
+export async function logLogList(
+  ctx: LogContext,
   filters?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
-    action: "auditLog:list",
+): Promise<Log> {
+  return createLog({
+    action: "log:list",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
-    targetType: "auditLog",
+    targetType: "log",
     metadata: filters ? JSON.stringify({ filters }) : undefined,
     ip: ctx.ip,
     userAgent: ctx.userAgent,
@@ -740,9 +740,9 @@ export async function logAuditLogList(
  */
 export async function logInvitationResend(
   invitationId: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "invitation:resend",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -758,9 +758,9 @@ export async function logInvitationResend(
  */
 export async function logTokenRevoke(
   tokenId: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "auth:token_revoke",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -778,9 +778,9 @@ export async function logTokenRevoke(
  */
 export async function logSessionRevokeAll(
   targetUserId: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "auth:session_revoke_all",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -796,9 +796,9 @@ export async function logSessionRevokeAll(
  */
 export async function logUserRead(
   userId: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "user:read",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -814,9 +814,9 @@ export async function logUserRead(
  */
 export async function logRoleRead(
   roleId: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "role:read",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -832,9 +832,9 @@ export async function logRoleRead(
  */
 export async function logInvitationRead(
   invitationId: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "invitation:read",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -850,9 +850,9 @@ export async function logInvitationRead(
  */
 export async function logConfigRead(
   configKey: string,
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "config:read",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -867,9 +867,9 @@ export async function logConfigRead(
  * Log config list.
  */
 export async function logConfigList(
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "config:list",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -883,10 +883,10 @@ export async function logConfigList(
  * Log user data export.
  */
 export async function logUserExport(
-  ctx: AuditContext,
+  ctx: LogContext,
   filters?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
+): Promise<Log> {
+  return createLog({
     action: "user:export",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -900,15 +900,15 @@ export async function logUserExport(
 /**
  * Log audit log export.
  */
-export async function logAuditLogExport(
-  ctx: AuditContext,
+export async function logLogExport(
+  ctx: LogContext,
   filters?: Record<string, unknown>,
-): Promise<AuditLog> {
-  return createAuditLog({
-    action: "auditLog:export",
+): Promise<Log> {
+  return createLog({
+    action: "log:export",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
-    targetType: "auditLog",
+    targetType: "log",
     metadata: filters ? JSON.stringify({ filters }) : undefined,
     ip: ctx.ip,
     userAgent: ctx.userAgent,
@@ -919,9 +919,9 @@ export async function logAuditLogExport(
  * Log account deletion (self-service).
  */
 export async function logAccountDelete(
-  ctx: AuditContext,
-): Promise<AuditLog> {
-  return createAuditLog({
+  ctx: LogContext,
+): Promise<Log> {
+  return createLog({
     action: "account:delete",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -935,16 +935,16 @@ export async function logAccountDelete(
 /**
  * Delete all audit logs.
  */
-export async function deleteAllAuditLogs(): Promise<void> {
+export async function deleteAllLogs(): Promise<void> {
   // eslint-disable-next-line drizzle/enforce-delete-with-where
-  await drizzle.delete(AuditLogsModel);
+  await drizzle.delete(LogsModel);
 }
 
 // ============================================================================
 // Paginated Queries
 // ============================================================================
 
-export type AuditLogsPaginatedQuery = PaginationQuery & {
+export type LogsPaginatedQuery = PaginationQuery & {
   action?: string;
   actionCategory?: string;
   actorId?: string;
@@ -956,9 +956,9 @@ export type AuditLogsPaginatedQuery = PaginationQuery & {
 /**
  * Get paginated audit logs with filtering options.
  */
-export async function getAuditLogsPaginated(
-  query: AuditLogsPaginatedQuery,
-): Promise<PaginatedResponse<AuditLog>> {
+export async function getLogsPaginated(
+  query: LogsPaginatedQuery,
+): Promise<PaginatedResponse<Log>> {
   const {
     page = 1,
     limit = 20,
@@ -974,47 +974,47 @@ export async function getAuditLogsPaginated(
   } = query;
 
   const sortableColumns = {
-    action: AuditLogsModel.action,
-    actorId: AuditLogsModel.actorId,
-    targetId: AuditLogsModel.targetId,
-    targetType: AuditLogsModel.targetType,
-    ip: AuditLogsModel.ip,
-    createdAt: AuditLogsModel.createdAt,
+    action: LogsModel.action,
+    actorId: LogsModel.actorId,
+    targetId: LogsModel.targetId,
+    targetType: LogsModel.targetType,
+    ip: LogsModel.ip,
+    createdAt: LogsModel.createdAt,
   };
 
   const conditions = [];
 
   if (action) {
-    conditions.push(eq(AuditLogsModel.action, action));
+    conditions.push(eq(LogsModel.action, action));
   }
 
   if (actionCategory) {
-    conditions.push(ilike(AuditLogsModel.action, `${actionCategory}:%`));
+    conditions.push(ilike(LogsModel.action, `${actionCategory}:%`));
   }
 
   if (actorId) {
-    conditions.push(eq(AuditLogsModel.actorId, actorId));
+    conditions.push(eq(LogsModel.actorId, actorId));
   }
 
   if (targetId) {
-    conditions.push(eq(AuditLogsModel.targetId, targetId));
+    conditions.push(eq(LogsModel.targetId, targetId));
   }
 
   if (targetType) {
-    conditions.push(eq(AuditLogsModel.targetType, targetType));
+    conditions.push(eq(LogsModel.targetType, targetType));
   }
 
   if (includeImpersonated) {
-    conditions.push(isNotNull(AuditLogsModel.impersonatorId));
+    conditions.push(isNotNull(LogsModel.impersonatorId));
   }
 
   if (search) {
     conditions.push(
       or(
-        ilike(AuditLogsModel.action, `%${search}%`),
-        ilike(AuditLogsModel.actorId, `%${search}%`),
-        ilike(AuditLogsModel.targetId, `%${search}%`),
-        ilike(AuditLogsModel.ip, `%${search}%`),
+        ilike(LogsModel.action, `%${search}%`),
+        ilike(LogsModel.actorId, `%${search}%`),
+        ilike(LogsModel.targetId, `%${search}%`),
+        ilike(LogsModel.ip, `%${search}%`),
       ),
     );
   }
@@ -1023,11 +1023,11 @@ export async function getAuditLogsPaginated(
 
   const sortColumn = sortBy && sortableColumns[sortBy as keyof typeof sortableColumns]
     ? sortableColumns[sortBy as keyof typeof sortableColumns]
-    : AuditLogsModel.createdAt;
+    : LogsModel.createdAt;
 
   const countQuery = drizzle
     .select({ count: count() })
-    .from(AuditLogsModel);
+    .from(LogsModel);
 
   if (whereClause) {
     countQuery.where(whereClause);
@@ -1038,7 +1038,7 @@ export async function getAuditLogsPaginated(
 
   const dataQuery = drizzle
     .select()
-    .from(AuditLogsModel);
+    .from(LogsModel);
 
   if (whereClause) {
     dataQuery.where(whereClause);

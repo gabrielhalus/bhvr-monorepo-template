@@ -2,7 +2,7 @@ import { boolean, index, integer, pgTable, text, timestamp, varchar } from "driz
 
 import { UsersModel } from "~shared/models/users.model";
 
-export const RuntimeConfigModel = pgTable("runtime_configs", {
+export const ConfigModel = pgTable("configs", {
   configKey: varchar("config_key", { length: 255 }).primaryKey(),
   value: text("value"),
   type: varchar("type", { length: 16 }).$type<"string" | "number" | "boolean" | "list" | "node">().notNull(),

@@ -1,12 +1,12 @@
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { RuntimeConfigModel } from "~shared/models/runtime-configs.model";
+import { ConfigModel } from "~shared/models/configs.model";
 
 /**
- * Schema for runtime-configurations
+ * Schema for configurations
  */
-export const RuntimeConfigSchema = createSelectSchema(RuntimeConfigModel).extend({
+export const ConfigSchema = createSelectSchema(ConfigModel).extend({
   value: z.string().nullable(),
   type: z.enum(["string", "number", "boolean", "list", "node"]),
   options: z.string().nullable(),
