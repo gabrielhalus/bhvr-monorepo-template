@@ -6,7 +6,7 @@ import { getClientInfo } from "@/helpers/get-client-info";
 import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { logRoleCreate, logRoleDelete, logRoleMembersAdd, logRoleMembersRemove } from "~shared/queries/audit-logs.queries";
+import { logRoleCreate, logRoleDelete, logRoleMembersAdd, logRoleMembersRemove } from "~shared/queries/logs.queries";
 import { createRole, deleteRole, getRole, getRoleByName, getRolesPaginated, roleRelationCountLoaders, roleRelationLoaders } from "~shared/queries/roles.queries";
 import { createUserRole, deleteUserRole } from "~shared/queries/user-roles.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";

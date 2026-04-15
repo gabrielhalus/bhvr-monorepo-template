@@ -7,7 +7,7 @@ import { verify } from "hono/jwt";
 import { getClientInfo } from "@/helpers/get-client-info";
 import { createAccessToken, getCookieSettings, getJwtSecret } from "@/lib/jwt";
 import { factory } from "@/utils/hono";
-import { logTokenRefresh } from "~shared/queries/audit-logs.queries";
+import { logTokenRefresh } from "~shared/queries/logs.queries";
 import { deleteToken, getToken } from "~shared/queries/tokens.queries";
 import { getUser } from "~shared/queries/users.queries";
 import { AccessTokenSchema, RefreshTokenSchema } from "~shared/schemas/api/tokens.schemas";
