@@ -9,11 +9,11 @@
     "lint": "turbo run lint --",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "drizzle:generate": "turbo run drizzle:generate --filter=shared",
-    "drizzle:push": "turbo run drizzle:push --filter=shared",
-    "drizzle:studio": "turbo run drizzle:studio --filter=shared",
-    "bootstrap": "turbo run bootstrap --filter=shared",
-    "reset-password": "turbo run reset-password --filter=shared"
+    "drizzle:generate": "bun --cwd packages/shared drizzle:generate",
+    "drizzle:push": "bun --cwd packages/shared drizzle:push",
+    "drizzle:studio": "bun --cwd packages/shared drizzle:studio",
+    "bootstrap": "bun --cwd packages/shared bootstrap",
+    "reset-password": "bun --cwd packages/shared reset-password"
   },
   "devDependencies": {
     "@types/bun": "^1.3.0",
