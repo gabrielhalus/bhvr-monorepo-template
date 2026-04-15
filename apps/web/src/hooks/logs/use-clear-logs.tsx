@@ -2,17 +2,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { auditLogsKeys } from "@/api/audit-logs/audit-logs.keys";
-import { clearAuditLogsMutationOptions } from "@/api/audit-logs/audit-logs.mutations";
+import { logsKeys } from "@/api/logs/logs.keys";
+import { clearLogsMutationOptions } from "@/api/logs/logs.mutations";
 
-export function useClearAuditLogs() {
+export function useClearLogs() {
   const { t } = useTranslation("web");
   const queryClient = useQueryClient();
 
   return useMutation({
-    ...clearAuditLogsMutationOptions(queryClient),
+    ...clearLogsMutationOptions(queryClient),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: auditLogsKeys.all });
+      queryClient.invalidateQueries({ queryKey: logsKeys.all });
       toast.success(t("pages.logs.actions.clearLogsSuccess"));
     },
     onError: () => {

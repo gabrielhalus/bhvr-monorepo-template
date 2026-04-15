@@ -2,12 +2,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { updateRuntimeConfigMutationOptions } from "@/api/runtime-configs/runtime-configs.mutations";
+import { updateConfigMutationOptions } from "@/api/configs/configs.mutations";
 
-export function useUpdateRuntimeConfig() {
+export function useUpdateConfig() {
   const { t } = useTranslation("web");
   const queryClient = useQueryClient();
-  const baseOptions = updateRuntimeConfigMutationOptions(queryClient);
+  const baseOptions = updateConfigMutationOptions(queryClient);
 
   return useMutation({
     ...baseOptions,

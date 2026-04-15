@@ -1,13 +1,13 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import { runtimeConfigsQueryOptions } from "@/api/runtime-configs/runtime-configs.queries";
+import { configsQueryOptions } from "@/api/configs/configs.queries";
 import { buildConfigTree } from "~shared/helpers/config-tree";
 
 import { ConfigSection } from "./config-section";
 
 export function Sidebar() {
-  const { data: { configs } } = useSuspenseQuery(runtimeConfigsQueryOptions);
+  const { data: { configs } } = useSuspenseQuery(configsQueryOptions);
 
   const configTree = useMemo(() => {
     if (!configs) {

@@ -4,13 +4,13 @@ import { useTranslation } from "react-i18next";
 
 import { authorizeBatchQueryOptions } from "~react/queries/auth";
 
-import { AuditLogsDataTable } from "./-components/audit-logs.data-table";
+import { LogsDataTable } from "./-components/logs.data-table";
 
 export const Route = createFileRoute("/_dashboard/logs")({
   component: LogsPage,
   beforeLoad: async ({ context }) => {
     const results = await context.queryClient.ensureQueryData(
-      authorizeBatchQueryOptions([{ permission: "auditLog:list" }]),
+      authorizeBatchQueryOptions([{ permission: "log:list" }]),
     );
 
     if (!results[0]) {
@@ -45,7 +45,7 @@ function LogsPage() {
         </div>
       </div>
 
-      <AuditLogsDataTable />
+      <LogsDataTable />
     </div>
   );
 }

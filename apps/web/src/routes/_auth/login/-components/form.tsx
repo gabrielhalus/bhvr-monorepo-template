@@ -6,7 +6,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Trans, useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { runtimeConfigQueryOptions } from "@/api/runtime-configs/runtime-configs.queries";
+import { configQueryOptions } from "@/api/configs/configs.queries";
 import { Button } from "~react/components/button";
 import { Field, FieldContent, FieldError, FieldLabel } from "~react/components/field";
 import { Input } from "~react/components/input";
@@ -20,7 +20,7 @@ import { LoginSchema } from "~shared/schemas/api/auth.schemas";
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const { t } = useTranslation("auth");
 
-  const { data: config } = useQuery(runtimeConfigQueryOptions("authentication.register.enable"));
+  const { data: config } = useQuery(configQueryOptions("authentication.register.enable"));
   const enableRegister = config ? inferConfigValue(config.value.value!) : false;
 
   const navigate = useNavigate();

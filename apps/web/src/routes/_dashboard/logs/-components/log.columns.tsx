@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import type { AuditLog } from "~shared/types/db/audit-logs.types";
+import type { Log } from "~shared/types/db/logs.types";
 import type { TFunction } from "i18next";
 
 import { CalendarIcon, GlobeIcon, UserIcon } from "lucide-react";
@@ -23,7 +23,7 @@ function getActionBadgeVariant(action: string): "default" | "secondary" | "destr
   return "outline";
 }
 
-export function getAuditLogColumns(t: TFunction): ColumnDef<AuditLog>[] {
+export function getLogColumns(t: TFunction): ColumnDef<Log>[] {
   return [
     {
       accessorKey: "action",

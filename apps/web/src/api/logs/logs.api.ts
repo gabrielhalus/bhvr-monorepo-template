@@ -2,12 +2,12 @@ import type { PaginationParams } from "~react/query/paginated/types";
 
 import { api } from "~react/lib/http";
 
-export type AuditLogFilters = {
+export type LogFilters = {
   actionCategory?: string;
   targetType?: string;
 };
 
-export type AuditLogsParams = PaginationParams & {
+export type LogsParams = PaginationParams & {
   action?: string;
   actionCategory?: string;
   actorId?: string;
@@ -16,8 +16,8 @@ export type AuditLogsParams = PaginationParams & {
   includeImpersonated?: boolean;
 };
 
-export async function fetchPaginatedAuditLogs(params: AuditLogsParams) {
-  const res = await api["audit-logs"].$get({
+export async function fetchPaginatedLogs(params: LogsParams) {
+  const res = await api["logs"].$get({
     query: {
       page: String(params.page),
       limit: String(params.limit),
@@ -34,7 +34,7 @@ export async function fetchPaginatedAuditLogs(params: AuditLogsParams) {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to fetch audit logs");
+    throw new Error("Failed to fetch logs");
   }
 
   return res.json();

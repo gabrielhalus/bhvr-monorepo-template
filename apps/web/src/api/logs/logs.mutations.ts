@@ -2,17 +2,17 @@ import type { QueryClient } from "@tanstack/react-query";
 
 import { api } from "~react/lib/http";
 
-import { auditLogsKeys } from "./audit-logs.keys";
+import { logsKeys } from "./logs.keys";
 
 // ============================================================================
 // Mutation Functions
 // ============================================================================
 
-async function clearAuditLogs() {
-  const res = await api["audit-logs"].$delete();
+async function clearLogs() {
+  const res = await api["logs"].$delete();
 
   if (!res.ok) {
-    throw new Error("Failed to clear audit logs");
+    throw new Error("Failed to clear logs");
   }
 
   return res.json();
@@ -22,11 +22,11 @@ async function clearAuditLogs() {
 // Mutation Options
 // ============================================================================
 
-export function clearAuditLogsMutationOptions(queryClient: QueryClient) {
+export function clearLogsMutationOptions(queryClient: QueryClient) {
   return {
-    mutationFn: () => clearAuditLogs(),
+    mutationFn: () => clearLogs(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: auditLogsKeys.all });
+      queryClient.invalidateQueries({ queryKey: logsKeys.all });
     },
   };
 }

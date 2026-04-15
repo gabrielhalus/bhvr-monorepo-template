@@ -2,14 +2,14 @@ import type { QueryClient } from "@tanstack/react-query";
 
 import { api } from "~react/lib/http";
 
-import { rotateRuntimeConfig } from "./runtime-configs.api";
-import { runtimeConfigsKeys } from "./runtime-configs.keys";
+import { rotateConfig } from "./configs.api";
+import { configsKeys } from "./configs.keys";
 
 // ============================================================================
 // Mutation Functions
 // ============================================================================
 
-async function updateRuntimeConfig(key: string, value: string | null) {
+async function updateConfig(key: string, value: string | null) {
   const res = await api.config[":key"].$put({
     param: { key },
     json: { value },
@@ -26,23 +26,23 @@ async function updateRuntimeConfig(key: string, value: string | null) {
 // Mutation Options
 // ============================================================================
 
-export function updateRuntimeConfigMutationOptions(queryClient: QueryClient) {
+export function updateConfigMutationOptions(queryClient: QueryClient) {
   return {
     mutationFn: ({ key, value }: { key: string; value: string | null }) =>
-      updateRuntimeConfig(key, value),
+      updateConfig(key, value),
     onSuccess: (_data: unknown, variables: { key: string; value: string | null }) => {
-      queryClient.invalidateQueries({ queryKey: runtimeConfigsKeys.byKey(variables.key) });
-      queryClient.invalidateQueries({ queryKey: runtimeConfigsKeys.list });
+      queryClient.invalidateQueries({ queryKey: configsKeys.byKey(variables.key) });
+      queryClient.invalidateQueries({ queryKey: configsKeys.list });
     },
   };
 }
 
-export function rotateRuntimeConfigMutationOptions(queryClient: QueryClient) {
+export function rotateConfigMutationOptions(queryClient: QueryClient) {
   return {
-    mutationFn: (key: string) => rotateRuntimeConfig(key),
+    mutationFn: (key: string) => rotateConfig(key),
     onSuccess: (_data: unknown, key: string) => {
-      queryClient.invalidateQueries({ queryKey: runtimeConfigsKeys.byKey(key) });
-      queryClient.invalidateQueries({ queryKey: runtimeConfigsKeys.list });
+      queryClient.invalidateQueries({ queryKey: configsKeys.byKey(key) });
+      queryClient.invalidateQueries({ queryKey: configsKeys.list });
     },
   };
 }
