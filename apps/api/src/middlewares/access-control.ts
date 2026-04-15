@@ -4,7 +4,7 @@ import type { Permission } from "~shared/types/permissions.types";
 import { getClientInfo } from "@/helpers/get-client-info";
 import { factory } from "@/utils/hono";
 import { isAuthorized } from "~shared/auth";
-import { logPermissionDenied } from "~shared/queries/audit-logs.queries";
+import { logPermissionDenied } from "~shared/queries/logs.queries";
 
 /**
  * Core authorization middleware that checks permissions

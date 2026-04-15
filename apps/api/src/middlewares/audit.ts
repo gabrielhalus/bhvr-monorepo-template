@@ -1,15 +1,15 @@
-import type { AuditContext } from "~shared/queries/audit-logs.queries";
-import type { AuditLogAction, AuditTargetType } from "~shared/types/db/audit-logs.types";
+import type { LogContext } from "~shared/queries/logs.queries";
+import type { LogAction, LogTargetType } from "~shared/types/db/logs.types";
 
 import { getClientInfo } from "@/helpers/get-client-info";
 import { factory } from "@/utils/hono";
-import { logAction } from "~shared/queries/audit-logs.queries";
+import { logAction } from "~shared/queries/logs.queries";
 
 type MiddlewareContext = Parameters<ReturnType<typeof factory.createMiddleware>>[0];
 
 export type AuditMiddlewareOptions = {
-  action: AuditLogAction;
-  targetType?: AuditTargetType;
+  action: LogAction;
+  targetType?: LogTargetType;
   getTargetId?: (c: MiddlewareContext) => string | undefined;
   getMetadata?: (c: MiddlewareContext) => Record<string, unknown> | undefined | Promise<Record<string, unknown> | undefined>;
   /** If true, log before the handler runs. Default is false (log after). */
@@ -32,7 +32,7 @@ export function auditMiddleware(options: AuditMiddlewareOptions) {
     const sessionContext = c.get("sessionContext");
     const clientInfo = getClientInfo(c);
 
-    const ctx: AuditContext = {
+    const ctx: LogContext = {
       actorId: sessionContext.user.id,
       impersonatorId: sessionContext.impersonator?.id,
       ...clientInfo,
@@ -69,7 +69,7 @@ export function auditMiddleware(options: AuditMiddlewareOptions) {
 /**
  * Pre-configured audit middleware for common list operations.
  */
-export function auditList(action: AuditLogAction, targetType: AuditTargetType) {
+export function auditList(action: LogAction, targetType: LogTargetType) {
   return auditMiddleware({
     action,
     targetType,
@@ -83,7 +83,7 @@ export function auditList(action: AuditLogAction, targetType: AuditTargetType) {
 /**
  * Pre-configured audit middleware for common read operations.
  */
-export function auditRead(action: AuditLogAction, targetType: AuditTargetType, paramName = "id") {
+export function auditRead(action: LogAction, targetType: LogTargetType, paramName = "id") {
   return auditMiddleware({
     action,
     targetType,
@@ -94,7 +94,7 @@ export function auditRead(action: AuditLogAction, targetType: AuditTargetType, p
 /**
  * Pre-configured audit middleware for common create operations.
  */
-export function auditCreate(action: AuditLogAction, targetType: AuditTargetType) {
+export function auditCreate(action: LogAction, targetType: LogTargetType) {
   return auditMiddleware({
     action,
     targetType,
@@ -112,7 +112,7 @@ export function auditCreate(action: AuditLogAction, targetType: AuditTargetType)
 /**
  * Pre-configured audit middleware for common update operations.
  */
-export function auditUpdate(action: AuditLogAction, targetType: AuditTargetType, paramName = "id") {
+export function auditUpdate(action: LogAction, targetType: LogTargetType, paramName = "id") {
   return auditMiddleware({
     action,
     targetType,
@@ -131,7 +131,7 @@ export function auditUpdate(action: AuditLogAction, targetType: AuditTargetType,
 /**
  * Pre-configured audit middleware for common delete operations.
  */
-export function auditDelete(action: AuditLogAction, targetType: AuditTargetType, paramName = "id") {
+export function auditDelete(action: LogAction, targetType: LogTargetType, paramName = "id") {
   return auditMiddleware({
     action,
     targetType,

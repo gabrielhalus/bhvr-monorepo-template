@@ -3,10 +3,10 @@ import type { JwtPayload } from "~shared/types/db/tokens.types";
 
 import { sign, verify } from "hono/jwt";
 import { ENV } from "varlock/env";
-import { getRuntimeConfig } from "~shared/queries/runtime-configs.queries";
+import { getConfig } from "~shared/queries/configs.queries";
 
 export async function getJwtSecret(): Promise<string> {
-  const config = await getRuntimeConfig("security.jwt.secret");
+  const config = await getConfig("security.jwt.secret");
   if (config?.value) return config.value;
   throw new Error("JWT secret is not configured. Run bootstrap to initialize it.");
 }

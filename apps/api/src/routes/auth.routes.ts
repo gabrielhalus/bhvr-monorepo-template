@@ -19,7 +19,7 @@ import {
   logRegister,
   logSessionRevokeAll,
   logTokenRevoke,
-} from "~shared/queries/audit-logs.queries";
+} from "~shared/queries/logs.queries";
 import { getDefaultRole } from "~shared/queries/roles.queries";
 import { deleteToken, getActiveTokensByUserId, insertToken, revokeAllTokensByUserId, revokeAllTokensByUserIdExcept, revokeToken } from "~shared/queries/tokens.queries";
 import { createUserRole } from "~shared/queries/user-roles.queries";

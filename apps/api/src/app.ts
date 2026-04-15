@@ -4,14 +4,14 @@ import { logger } from "hono/logger";
 import { getClientInfo } from "@/helpers/get-client-info";
 import cors from "@/middlewares/cors";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
-import { auditLogsRoutes } from "@/routes/audit-logs.routes";
 import { authRoutes } from "@/routes/auth.routes";
+import { configRoutes } from "@/routes/configs.routes";
 import { cronTasksRoutes } from "@/routes/cron-tasks.routes";
 import { invitationsRoutes } from "@/routes/invitations.routes";
+import { logsRoutes } from "@/routes/logs.routes";
 import { rolesRoutes } from "@/routes/roles.routes";
-import { configRoutes } from "@/routes/runtime-configs.routes";
 import { usersRoutes } from "@/routes/users.routes";
-import { logSystemError } from "~shared/queries/audit-logs.queries";
+import { logSystemError } from "~shared/queries/logs.queries";
 
 const app = new Hono({ strict: false });
 
@@ -57,7 +57,7 @@ app.use(rateLimiter(rateLimitPresets.api));
 // API (Hono @ port 5173)
 // -------------------
 const _api = app
-  .route("/audit-logs", auditLogsRoutes)
+  .route("/logs", logsRoutes)
   .route("/auth", authRoutes)
   .route("/cron-tasks", cronTasksRoutes)
   .route("/invitations", invitationsRoutes)
