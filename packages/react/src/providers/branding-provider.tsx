@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useEffect } from "react";
 
-import { runtimeConfigsQueryOptions } from "~react/queries/runtime-configs";
+import { configsQueryOptions } from "~react/queries/configs";
 
 type BrandingConfig = {
   appName: string;
@@ -30,7 +30,7 @@ export function useBranding() {
 }
 
 export function BrandingProvider({ children }: { children: React.ReactNode }) {
-  const { data } = useQuery(runtimeConfigsQueryOptions);
+  const { data } = useQuery(configsQueryOptions);
 
   const branding: BrandingConfig = { ...defaults };
 
