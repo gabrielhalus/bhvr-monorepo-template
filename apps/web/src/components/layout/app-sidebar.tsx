@@ -19,14 +19,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: sidebarAuth } = useQuery(
     authorizeBatchQueryOptions([
       { permission: "user:list" },
-      { permission: "runtimeConfig:list" },
-      { permission: "auditLog:list" },
+      { permission: "config:list" },
+      { permission: "log:list" },
       { permission: "cronTask:list" },
     ]),
   );
   const canListUsers = sidebarAuth?.[0] ?? false;
   const canListConfigs = sidebarAuth?.[1] ?? false;
-  const canListAuditLogs = sidebarAuth?.[2] ?? false;
+  const canListLogs = sidebarAuth?.[2] ?? false;
   const canListCronTasks = sidebarAuth?.[3] ?? false;
 
   const data = useMemo(() => {
@@ -40,7 +40,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       });
     }
 
-    if (canListAuditLogs) {
+    if (canListLogs) {
       navSettings.push({
         title: t("pages.logs.title"),
         icon: ScrollTextIcon,
@@ -74,7 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ],
       navSettings,
     };
-  }, [t, canListUsers, canListConfigs, canListAuditLogs, canListCronTasks]);
+  }, [t, canListUsers, canListConfigs, canListLogs, canListCronTasks]);
 
   return (
     <Sidebar collapsible="icon" {...props}>

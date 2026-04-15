@@ -1,4 +1,4 @@
-import type { ConfigNode, RuntimeConfig } from "~shared/types/db/runtime-configs.types";
+import type { Config, ConfigNode } from "~shared/types/db/configs.types";
 
 import { useForm } from "@tanstack/react-form";
 import { Check, Copy, RefreshCw } from "lucide-react";
@@ -6,8 +6,8 @@ import { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { z } from "zod";
 
-import { useRotateRuntimeConfig } from "@/hooks/runtime-configs/use-rotate-runtime-config";
-import { useUpdateRuntimeConfig } from "@/hooks/runtime-configs/use-update-runtime-config";
+import { useRotateConfig } from "@/hooks/configs/use-rotate-config";
+import { useUpdateConfig } from "@/hooks/configs/use-update-config";
 import { Badge } from "~react/components/badge";
 import { Button } from "~react/components/button";
 import { Checkbox } from "~react/components/checkbox";
@@ -47,7 +47,7 @@ function createSchema(type: "string" | "number" | "boolean", nullable: boolean) 
   return nullable ? schema.nullable() : schema;
 }
 
-function evaluateDisabledCondition(disabledWhen: string | null | undefined, allConfigs: RuntimeConfig[]): boolean {
+function evaluateDisabledCondition(disabledWhen: string | null | undefined, allConfigs: Config[]): boolean {
   if (!disabledWhen) {
     return false;
   }
@@ -115,10 +115,10 @@ function SecretRevealDialog({ value, onClose }: { value: string; onClose: () => 
   );
 }
 
-export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: RuntimeConfig[] }) {
+export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: Config[] }) {
   const { t } = useTranslation("web", { keyPrefix: "pages.settings.config" });
-  const updateRuntimeConfig = useUpdateRuntimeConfig();
-  const rotateRuntimeConfig = useRotateRuntimeConfig();
+  const updateConfig = useUpdateConfig();
+  const rotateConfig = useRotateConfig();
   const [revealedValue, setRevealedValue] = useState<string | null>(null);
 
   const { config } = node;
@@ -134,12 +134,12 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
       const parsedValue = inferConfigValue(finalValue ?? "");
       schema.parse(parsedValue);
 
-      await updateRuntimeConfig.mutateAsync({ key: node.fullKey, value: finalValue });
+      await updateConfig.mutateAsync({ key: node.fullKey, value: finalValue });
     },
   });
 
   function handleRotate() {
-    rotateRuntimeConfig.mutate(node.fullKey, {
+    rotateConfig.mutate(node.fullKey, {
       onSuccess: (data) => {
         const newValue = (data as { config?: { value?: string | null } }).config?.value;
         if (newValue)
@@ -292,11 +292,11 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
                       type="button"
                       variant="outline"
                       size="icon"
-                      disabled={isDisabled || rotateRuntimeConfig.isPending}
+                      disabled={isDisabled || rotateConfig.isPending}
                       onClick={handleRotate}
                       title={t(`${node.fullKey}.regenerate`)}
                     >
-                      <RefreshCw className={`size-4 ${rotateRuntimeConfig.isPending ? "animate-spin" : ""}`} />
+                      <RefreshCw className={`size-4 ${rotateConfig.isPending ? "animate-spin" : ""}`} />
                     </Button>
                   )}
                 </div>
@@ -348,11 +348,11 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: R
                       type="button"
                       variant="outline"
                       size="icon"
-                      disabled={isDisabled || rotateRuntimeConfig.isPending}
+                      disabled={isDisabled || rotateConfig.isPending}
                       onClick={handleRotate}
                       title={t(`${node.fullKey}.regenerate`)}
                     >
-                      <RefreshCw className={`size-4 ${rotateRuntimeConfig.isPending ? "animate-spin" : ""}`} />
+                      <RefreshCw className={`size-4 ${rotateConfig.isPending ? "animate-spin" : ""}`} />
                     </Button>
                   )}
                 </div>

@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Box } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { runtimeConfigQueryOptions } from "@/api/runtime-configs/runtime-configs.queries";
+import { configQueryOptions } from "@/api/configs/configs.queries";
 import { inferConfigValue } from "~shared/helpers/infer-config-value";
 
 import { RegisterForm } from "./-components/form";
@@ -10,7 +10,7 @@ import { RegisterForm } from "./-components/form";
 export const Route = createFileRoute("/_auth/register/")({
   component: Register,
   beforeLoad: async ({ context }) => {
-    const { value: config } = await context.queryClient.ensureQueryData(runtimeConfigQueryOptions("authentication.disableRegister"));
+    const { value: config } = await context.queryClient.ensureQueryData(configQueryOptions("authentication.disableRegister"));
     if (inferConfigValue(config.value!)) {
       throw redirect({ to: "/login", replace: true });
     }

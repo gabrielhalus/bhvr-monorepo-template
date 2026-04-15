@@ -2,13 +2,13 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { CogIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { runtimeConfigsQueryOptions } from "@/api/runtime-configs/runtime-configs.queries";
+import { configsQueryOptions } from "@/api/configs/configs.queries";
 
 import { Sidebar } from "./-components/sidebar";
 
 export const Route = createFileRoute("/_dashboard/settings")({
   component: RouteComponent,
-  loader: ({ context }) => context.queryClient.ensureQueryData(runtimeConfigsQueryOptions),
+  loader: ({ context }) => context.queryClient.ensureQueryData(configsQueryOptions),
   staticData: { crumb: "pages.settings.title" },
 });
 

@@ -1,18 +1,18 @@
-import type { AuditLogFilters } from "@/api/audit-logs/audit-logs.api";
-import type { AuditLog } from "~shared/types/db/audit-logs.types";
+import type { LogFilters } from "@/api/logs/logs.api";
+import type { Log } from "~shared/types/db/logs.types";
 
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useClearAuditLogs } from "@/hooks/audit-logs/use-clear-audit-logs";
-import { usePaginatedAuditLogs } from "@/hooks/audit-logs/use-paginated-audit-logs";
+import { useClearLogs } from "@/hooks/logs/use-clear-logs";
+import { usePaginatedLogs } from "@/hooks/logs/use-paginated-logs";
 import { DataTable } from "~react/components/data-table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~react/components/select";
 import sayno from "~react/lib/sayno";
 import { authorizeBatchQueryOptions } from "~react/queries/auth";
 
-import { getAuditLogColumns } from "./audit-log.columns";
+import { getLogColumns } from "./log.columns";
 
 const ACTION_CATEGORIES = [
   "auth",
@@ -21,7 +21,7 @@ const ACTION_CATEGORIES = [
   "role",
   "invitation",
   "config",
-  "auditLog",
+  "log",
   "impersonation",
   "permission",
   "system",
@@ -32,28 +32,28 @@ const TARGET_TYPES = [
   "role",
   "invitation",
   "config",
-  "auditLog",
+  "log",
   "permission",
   "session",
   "system",
 ] as const;
 
-export function AuditLogsDataTable() {
+export function LogsDataTable() {
   const { t } = useTranslation("web");
 
-  const { data: auditAuth } = useQuery(authorizeBatchQueryOptions([{ permission: "auditLog:delete" }]));
+  const { data: auditAuth } = useQuery(authorizeBatchQueryOptions([{ permission: "log:delete" }]));
   const canDelete = auditAuth?.[0] ?? false;
 
-  const [filters, setFilters] = useState<AuditLogFilters>({});
+  const [filters, setFilters] = useState<LogFilters>({});
 
-  const columns = useMemo(() => getAuditLogColumns(t), [t]);
+  const columns = useMemo(() => getLogColumns(t), [t]);
 
-  const auditLogsQuery = usePaginatedAuditLogs(filters);
-  const clearMutation = useClearAuditLogs();
+  const logsQuery = usePaginatedLogs(filters);
+  const clearMutation = useClearLogs();
 
-  const rows: AuditLog[] = useMemo(() => {
-    return auditLogsQuery.data ?? [];
-  }, [auditLogsQuery.data]);
+  const rows: Log[] = useMemo(() => {
+    return logsQuery.data ?? [];
+  }, [logsQuery.data]);
 
   const handleClearLogs = async () => {
     const confirmation = await sayno.confirm({
@@ -114,18 +114,18 @@ export function AuditLogsDataTable() {
       <DataTable
         columns={columns}
         data={rows}
-        isLoading={auditLogsQuery.isLoading}
+        isLoading={logsQuery.isLoading}
         searchPlaceholder={t("pages.logs.searchPlaceholder")}
         manualPagination
         manualSorting
         manualFiltering
-        pagination={auditLogsQuery.paginationState}
-        onPaginationChange={auditLogsQuery.onPaginationChange}
-        pageCount={auditLogsQuery.pageCount}
-        sorting={auditLogsQuery.sortingState}
-        onSortingChange={auditLogsQuery.onSortingChange}
-        searchValue={auditLogsQuery.searchValue}
-        onSearchChange={auditLogsQuery.onSearchChange}
+        pagination={logsQuery.paginationState}
+        onPaginationChange={logsQuery.onPaginationChange}
+        pageCount={logsQuery.pageCount}
+        sorting={logsQuery.sortingState}
+        onSortingChange={logsQuery.onSortingChange}
+        searchValue={logsQuery.searchValue}
+        onSearchChange={logsQuery.onSearchChange}
         // Clear items props
         clearItemsLabel={t("pages.logs.actions.clearLogs")}
         onClearItems={canDelete && rows.length ? handleClearLogs : undefined}

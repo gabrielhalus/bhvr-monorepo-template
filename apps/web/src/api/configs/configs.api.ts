@@ -1,6 +1,6 @@
 import { api } from "~react/lib/http";
 
-export async function fetchRuntimeConfigs() {
+export async function fetchConfigs() {
   const res = await api.config.$get();
 
   if (!res.ok) {
@@ -10,7 +10,7 @@ export async function fetchRuntimeConfigs() {
   return res.json();
 }
 
-export async function fetchRuntimeConfig(key: string) {
+export async function fetchConfig(key: string) {
   const res = await api.config[":key"].$get({ param: { key } });
 
   if (!res.ok) {
@@ -20,7 +20,7 @@ export async function fetchRuntimeConfig(key: string) {
   return res.json();
 }
 
-export async function rotateRuntimeConfig(key: string) {
+export async function rotateConfig(key: string) {
   const res = await api.config[":key"].rotate.$post({ param: { key } });
 
   if (!res.ok) {
