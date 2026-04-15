@@ -7,7 +7,7 @@ import { arrayParam } from "~shared/helpers";
 /**
  * User relation keys
  */
-const UserRelationKey = ["roles", "tokens"] as const satisfies (keyof UserRelations)[];
+const UserRelationKey = ["apiKeys", "roles", "tokens"] as const satisfies (keyof UserRelations)[];
 
 /**
  * Schema for user relations

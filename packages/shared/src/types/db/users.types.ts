@@ -1,3 +1,4 @@
+import type { ApiKey } from "./api-keys.types";
 import type { WithRelations } from "~shared/lib/type-utils";
 import type { UsersModel } from "~shared/models/users.model";
 import type { UserRelationsSchema } from "~shared/schemas/api/users.schemas";
@@ -8,6 +9,7 @@ import type { z } from "zod";
 export type User = typeof UsersModel.$inferSelect;
 
 export type UserRelations = {
+  apiKeys: ApiKey[];
   roles: Role[];
   tokens: Token[];
 };

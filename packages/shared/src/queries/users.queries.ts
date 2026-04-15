@@ -4,6 +4,9 @@ import type { z } from "zod";
 
 import { asc, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
 
+import { ApiKeysModel } from "~shared/models/api-keys.model";
+import { ApiKeySchema } from "~shared/schemas/db/api-keys.schemas";
+
 import { drizzle } from "../drizzle";
 import { attachRelation } from "../helpers";
 import { RolesModel } from "../models/roles.model";
@@ -20,6 +23,32 @@ import { InsertUserSchema, UpdateUserSchema, UserSchema } from "../schemas/db/us
 // ============================================================================
 
 export const userRelationLoaders: { [K in keyof UserRelations]: (userIds: string[]) => Promise<Record<string, UserRelations[K]>> } = {
+  apiKeys: async (userIds) => {
+    const result: Record<string, UserRelations["apiKeys"]> = {};
+
+    if (!userIds?.length) {
+      return result;
+    }
+
+    userIds.forEach(id => (result[id] = []));
+
+    const userApiKeysRows = await drizzle
+      .select({
+        userId: ApiKeysModel.userId,
+        apiKey: ApiKeysModel,
+      })
+      .from(ApiKeysModel)
+      .where(inArray(ApiKeysModel.userId, userIds));
+
+    for (const row of userApiKeysRows) {
+      if (row.apiKey !== null) {
+        result[row.userId]!.push(ApiKeySchema.parse(row.apiKey));
+      }
+    }
+
+    return result;
+  },
+
   roles: async (userIds) => {
     const result: Record<string, UserRelations["roles"]> = {};
 
@@ -89,6 +118,31 @@ export const userRelationLoaders: { [K in keyof UserRelations]: (userIds: string
 };
 
 export const userRelationCountLoaders: { [K in keyof UserRelations]: (userIds: string[]) => Promise<Record<string, number>>; } = {
+  apiKeys: async (userIds) => {
+    const result: Record<string, number> = {};
+
+    if (!userIds?.length) {
+      return result;
+    }
+
+    userIds.forEach(id => (result[id] = 0));
+
+    const userApiKeysRows = await drizzle
+      .select({
+        userId: ApiKeysModel.userId,
+        count: count(ApiKeysModel.id),
+      })
+      .from(ApiKeysModel)
+      .where(inArray(ApiKeysModel.userId, userIds))
+      .groupBy(ApiKeysModel.userId);
+
+    for (const row of userApiKeysRows) {
+      result[row.userId] = Number(row.count);
+    };
+
+    return result;
+  },
+
   roles: async (userIds) => {
     const result: Record<string, number> = {};
 
