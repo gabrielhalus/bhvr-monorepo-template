@@ -209,7 +209,7 @@
           "role": "Role management",
           "invitation": "Invitations",
           "config": "Configuration",
-          "auditLog": "Audit logs",
+          "log": "Logs",
           "impersonation": "Impersonation",
           "permission": "Permissions",
           "system": "System"
@@ -219,7 +219,7 @@
           "role": "Role",
           "invitation": "Invitation",
           "config": "Configuration",
-          "auditLog": "Audit log",
+          "log": "Log",
           "permission": "Permission",
           "session": "Session",
           "system": "System"

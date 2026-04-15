@@ -20,9 +20,9 @@ export const PermissionSchema = z.enum([
   "userRole:create",
   "userRole:delete",
 
-  // Runtime-config
-  "runtimeConfig:list",
-  "runtimeConfig:update",
+  // Config
+  "config:list",
+  "config:update",
 
   // Invitations
   "invitation:create",
@@ -31,9 +31,9 @@ export const PermissionSchema = z.enum([
   "invitation:revoke",
   "invitation:delete",
 
-  // Audit logs
-  "auditLog:list",
-  "auditLog:delete",
+  // Logs
+  "log:list",
+  "log:delete",
 
   // Sessions
   "session:list",

@@ -3,10 +3,10 @@ import { pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { nanoid } from "~shared/lib/nanoid";
 
 /**
- * Audit logs table for tracking security-sensitive actions and user activity.
+ * Logs table for tracking security-sensitive actions and user activity.
  * Supports tracking of impersonated actions where the real actor differs from the session user.
  */
-export const AuditLogsModel = pgTable("audit_logs", {
+export const LogsModel = pgTable("logs", {
   id: varchar("id", { length: 21 }).primaryKey().$defaultFn(() => nanoid()),
   /** The type of action being logged (e.g., "auth:login", "user:update") */
   action: varchar("action", { length: 100 }).notNull(),

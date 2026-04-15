@@ -209,7 +209,7 @@
           "role": "Gestion des rôles",
           "invitation": "Invitations",
           "config": "Configuration",
-          "auditLog": "Journaux d'audit",
+          "log": "Journaux",
           "impersonation": "Usurpation",
           "permission": "Permissions",
           "system": "Système"
@@ -219,7 +219,7 @@
           "role": "Rôle",
           "invitation": "Invitation",
           "config": "Configuration",
-          "auditLog": "Journal d'audit",
+          "log": "Journal",
           "permission": "Permission",
           "session": "Session",
           "system": "Système"

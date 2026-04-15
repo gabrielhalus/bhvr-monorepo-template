@@ -1,4 +1,4 @@
-import type { ConfigNode } from "~shared/types/db/runtime-configs.types";
+import type { ConfigNode } from "~shared/types/db/configs.types";
 
 function getOrCreate(map: Map<string, ConfigNode>, part: string, fullKey: string, isLeaf: boolean): ConfigNode {
   if (!map.has(part)) {
