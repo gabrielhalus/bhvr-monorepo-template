@@ -1,15 +1,19 @@
 import type { AppContext } from "@/utils/hono";
+import type { ApiKey } from "~shared/types/db/api-keys.types";
 import type { AccessToken } from "~shared/types/db/tokens.types";
 
+import { password } from "bun";
 import { getCookie, setCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
 
 import { getClientInfo } from "@/helpers/get-client-info";
 import { createAccessToken, getCookieSettings, getJwtSecret } from "@/lib/jwt";
 import { factory } from "@/utils/hono";
+import { getApiKeyByPrefix } from "~shared/queries/api-key.queries";
 import { logTokenRefresh } from "~shared/queries/logs.queries";
 import { deleteToken, getToken } from "~shared/queries/tokens.queries";
 import { getUser } from "~shared/queries/users.queries";
+import { apiKeySchema } from "~shared/schemas/api/api-keys.schemas";
 import { AccessTokenSchema, RefreshTokenSchema } from "~shared/schemas/api/tokens.schemas";
 
 /**
@@ -21,6 +25,33 @@ import { AccessTokenSchema, RefreshTokenSchema } from "~shared/schemas/api/token
  * @returns The user
  */
 export const getSessionContext = factory.createMiddleware(async (c, next) => {
+  // =========================
+  // API KEY AUTH
+  // =========================
+  const apiKey = c.req.header("x-api-key");
+
+  if (apiKey) {
+    const apiKeyCtx = await validateApiKey(apiKey);
+
+    if (!apiKeyCtx) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    const user = await getUser(apiKeyCtx.userId, ["roles"]);
+
+    if (!user) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    c.set("sessionContext", { user, impersonator: undefined });
+
+    return next();
+  }
+
+  // =========================
+  // JWT AUTH
+  // =========================
+
   const accessToken = getCookie(c, "accessToken");
   let decoded: AccessToken | null = null;
 
@@ -65,7 +96,6 @@ export const getSessionContext = factory.createMiddleware(async (c, next) => {
     return c.json({ error: "Unauthorized" }, 401);
   }
 
-  // Check if this is an impersonation session
   let impersonator: typeof user | undefined;
   if (decoded.impersonatorId) {
     const impersonatorUser = await getUser(decoded.impersonatorId, ["roles"]);
@@ -76,6 +106,32 @@ export const getSessionContext = factory.createMiddleware(async (c, next) => {
 
   await next();
 });
+
+/**
+ * Validates an API key by checking its format, existence, and secret hash.
+ * @param rawKey - The raw API key to validate (must be prefixed with "sk_")
+ * @returns The matching if valid, or `null` if not found, revoked, or invalid
+ */
+async function validateApiKey(rawKey: string): Promise<ApiKey | null> {
+  if (!rawKey.startsWith("sk_")) {
+    return null;
+  }
+
+  const parsed = apiKeySchema.safeParse(rawKey);
+  if (!parsed.success) {
+    return null;
+  }
+
+  const { prefix, secret } = parsed.data;
+  const apiKey = await getApiKeyByPrefix(prefix);
+
+  if (!apiKey || apiKey.revokedAt) {
+    return null;
+  }
+
+  const isValid = await password.verify(secret, apiKey.secretHash);
+  return isValid ? apiKey : null;
+}
 
 /**
  * Attempt to refresh the access token using the refresh token
@@ -102,19 +158,14 @@ async function attemptTokenRefresh(c: AppContext): Promise<AccessToken | null> {
       return null;
     }
 
-    // Note: When refreshing, we don't preserve impersonation - it only lasts for the access token lifetime
-    // This is a security feature to prevent long-running impersonation sessions
     const newAccessToken = await createAccessToken(decoded.sub);
     setCookie(c, "accessToken", newAccessToken, getCookieSettings("access"));
 
     const newVerified = await verify(newAccessToken, await getJwtSecret());
     const newDecoded = AccessTokenSchema.parse(newVerified);
 
-    // Audit log: token refresh
     const clientInfo = getClientInfo(c);
-    logTokenRefresh(decoded.sub, clientInfo).catch(() => {
-      // Silently fail audit logging to not break auth flow
-    });
+    logTokenRefresh(decoded.sub, clientInfo).catch(() => {});
 
     return newDecoded;
   } catch {
