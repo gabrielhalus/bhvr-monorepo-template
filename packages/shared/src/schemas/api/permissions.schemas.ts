@@ -1,6 +1,11 @@
 import { z } from "zod";
 
 export const PermissionSchema = z.enum([
+  // ApiKeys
+  "apiKey:list",
+  "apiKey:create",
+  "apiKey:revoke",
+
   // UsersModel
   "user:create",
   "user:read",
