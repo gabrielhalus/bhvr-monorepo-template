@@ -58,8 +58,7 @@ export const rolesRoutes = new Hono()
     await Promise.all(
       include.map(async (key) => {
         const loader = roleRelationLoaders[key];
-        if (!loader)
-          throw new Error(`No relation loader defined for "${key}"`);
+        if (!loader) throw new Error(`No relation loader defined for "${key}"`);
 
         const data = await loader(roleIds);
 
@@ -90,8 +89,7 @@ export const rolesRoutes = new Hono()
     await Promise.all(
       include.map(async (key) => {
         const loader = roleRelationCountLoaders[key];
-        if (!loader)
-          throw new Error(`No relation loader defined for "${key}"`);
+        if (!loader) throw new Error(`No relation loader defined for "${key}"`);
 
         const data = await loader(roleIds);
 
@@ -178,8 +176,7 @@ export const rolesRoutes = new Hono()
     await Promise.all(
       include.map(async (key) => {
         const loader = roleRelationLoaders[key];
-        if (!loader)
-          throw new Error(`No relation loader defined for "${key}"`);
+        if (!loader) throw new Error(`No relation loader defined for "${key}"`);
 
         const data = await loader([id]);
 
@@ -211,8 +208,7 @@ export const rolesRoutes = new Hono()
     await Promise.all(
       include.map(async (key) => {
         const loader = roleRelationCountLoaders[key];
-        if (!loader)
-          throw new Error(`No relation loader defined for "${key}"`);
+        if (!loader) throw new Error(`No relation loader defined for "${key}"`);
 
         const data = await loader([id]);
 

@@ -3,6 +3,7 @@ import type { JwtPayload } from "~shared/types/db/tokens.types";
 
 import { sign, verify } from "hono/jwt";
 import { ENV } from "varlock/env";
+
 import { getConfig } from "~shared/queries/configs.queries";
 
 export async function getJwtSecret(): Promise<string> {

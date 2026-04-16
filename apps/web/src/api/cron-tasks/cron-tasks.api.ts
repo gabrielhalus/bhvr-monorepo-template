@@ -16,57 +16,49 @@ export async function fetchPaginatedCronTasks(params: PaginationParams) {
     },
   });
 
-  if (!res.ok)
-    throw new Error("Failed to fetch cron tasks");
+  if (!res.ok) throw new Error("Failed to fetch cron tasks");
   return res.json();
 }
 
 export async function fetchCronTaskStats() {
   const res = await cronApi.stats.$get();
-  if (!res.ok)
-    throw new Error("Failed to fetch cron task stats");
+  if (!res.ok) throw new Error("Failed to fetch cron task stats");
   return res.json();
 }
 
 export async function fetchCronTask(taskId: string) {
   const res = await cronApi[":id{[a-zA-Z0-9-]{21}}"].$get({ param: { id: taskId } });
-  if (!res.ok)
-    throw new Error("Failed to fetch cron task");
+  if (!res.ok) throw new Error("Failed to fetch cron task");
   return res.json();
 }
 
 export async function createCronTaskRequest(data: InsertCronTask) {
   const res = await cronApi.$post({ json: data });
-  if (!res.ok)
-    throw new Error("Failed to create cron task");
+  if (!res.ok) throw new Error("Failed to create cron task");
   return res.json();
 }
 
 export async function updateCronTaskRequest(taskId: string, data: UpdateCronTask) {
   const res = await cronApi[":id{[a-zA-Z0-9-]{21}}"].$put({ param: { id: taskId }, json: data });
-  if (!res.ok)
-    throw new Error("Failed to update cron task");
+  if (!res.ok) throw new Error("Failed to update cron task");
   return res.json();
 }
 
 export async function deleteCronTaskRequest(taskId: string) {
   const res = await cronApi[":id{[a-zA-Z0-9-]{21}}"].$delete({ param: { id: taskId } });
-  if (!res.ok)
-    throw new Error("Failed to delete cron task");
+  if (!res.ok) throw new Error("Failed to delete cron task");
   return res.json();
 }
 
 export async function toggleCronTaskRequest(taskId: string) {
   const res = await cronApi[":id{[a-zA-Z0-9-]{21}}"].toggle.$patch({ param: { id: taskId } });
-  if (!res.ok)
-    throw new Error("Failed to toggle cron task");
+  if (!res.ok) throw new Error("Failed to toggle cron task");
   return res.json();
 }
 
 export async function triggerCronTaskRequest(taskId: string) {
   const res = await cronApi[":id{[a-zA-Z0-9-]{21}}"].trigger.$post({ param: { id: taskId } });
-  if (!res.ok)
-    throw new Error("Failed to trigger cron task");
+  if (!res.ok) throw new Error("Failed to trigger cron task");
   return res.json();
 }
 
@@ -81,28 +73,24 @@ export async function fetchCronTaskRunsPaginated(taskId: string, params: Paginat
       search: params.search,
     },
   });
-  if (!res.ok)
-    throw new Error("Failed to fetch cron task runs");
+  if (!res.ok) throw new Error("Failed to fetch cron task runs");
   return res.json();
 }
 
 export async function fetchCronTaskRecentRuns(taskId: string) {
   const res = await cronApi[":id{[a-zA-Z0-9-]{21}}"].runs.recent.$get({ param: { id: taskId } });
-  if (!res.ok)
-    throw new Error("Failed to fetch recent runs");
+  if (!res.ok) throw new Error("Failed to fetch recent runs");
   return res.json();
 }
 
 export async function fetchCronTaskRunsChart(taskId: string) {
   const res = await cronApi[":id{[a-zA-Z0-9-]{21}}"].runs.chart.$get({ param: { id: taskId } });
-  if (!res.ok)
-    throw new Error("Failed to fetch cron task runs chart data");
+  if (!res.ok) throw new Error("Failed to fetch cron task runs chart data");
   return res.json();
 }
 
 export async function fetchCronTaskRunStats(taskId: string) {
   const res = await cronApi[":id{[a-zA-Z0-9-]{21}}"].stats.$get({ param: { id: taskId } });
-  if (!res.ok)
-    throw new Error("Failed to fetch cron task run stats");
+  if (!res.ok) throw new Error("Failed to fetch cron task run stats");
   return res.json();
 }

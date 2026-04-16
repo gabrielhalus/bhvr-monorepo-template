@@ -17,7 +17,7 @@ export type LogsParams = PaginationParams & {
 };
 
 export async function fetchPaginatedLogs(params: LogsParams) {
-  const res = await api["logs"].$get({
+  const res = await api.logs.$get({
     query: {
       page: String(params.page),
       limit: String(params.limit),

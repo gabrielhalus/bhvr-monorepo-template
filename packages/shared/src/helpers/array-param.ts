@@ -8,10 +8,8 @@ import { z } from "zod";
 export function arrayParam<T extends z.ZodTypeAny>(schema: T) {
   return z.preprocess(
     (val) => {
-      if (Array.isArray(val))
-        return val;
-      if (val !== undefined && val !== null)
-        return [val];
+      if (Array.isArray(val)) return val;
+      if (val !== undefined && val !== null) return [val];
       return undefined;
     },
     z.array(schema),

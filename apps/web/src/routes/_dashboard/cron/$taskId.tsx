@@ -19,8 +19,7 @@ export const Route = createFileRoute("/_dashboard/cron/$taskId")({
   component: CronTaskDetailPage,
   loader: async ({ params, context }) => {
     const data = await context.queryClient.ensureQueryData(cronTaskQueryOptions(params.taskId));
-    if (!data.success)
-      throw notFound();
+    if (!data.success) throw notFound();
     await Promise.all([
       context.queryClient.ensureQueryData(cronTaskRunStatsQueryOptions(params.taskId)),
       context.queryClient.ensureQueryData(cronTaskRunsChartQueryOptions(params.taskId)),

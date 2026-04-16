@@ -28,10 +28,8 @@ function DashboardLayout() {
   const preferences = (session?.user?.preferences ?? null) as UserPreferences;
 
   useEffect(() => {
-    if (preferences?.theme)
-      setTheme(preferences.theme);
-    if (preferences?.locale)
-      i18n.changeLanguage(preferences.locale);
+    if (preferences?.theme) setTheme(preferences.theme);
+    if (preferences?.locale) i18n.changeLanguage(preferences.locale);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

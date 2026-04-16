@@ -10,10 +10,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "~react/components/toolt
 import { formatValue } from "~shared/i18n";
 
 function formatDuration(ms: number | null): string {
-  if (ms === null)
-    return "—";
-  if (ms < 1000)
-    return `${ms}ms`;
+  if (ms === null) return "—";
+  if (ms < 1000) return `${ms}ms`;
   return `${(ms / 1000).toFixed(1)}s`;
 }
 

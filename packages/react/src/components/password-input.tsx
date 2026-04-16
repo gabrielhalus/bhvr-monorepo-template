@@ -18,8 +18,7 @@ export type PasswordInputProps = {
 type RequirementStatus = Record<keyof PasswordRules, boolean>;
 
 function checkRequirements(password: string, checks?: Record<string, (val: string) => boolean>): RequirementStatus {
-  if (!checks)
-    return {} as RequirementStatus;
+  if (!checks) return {} as RequirementStatus;
 
   return Object.fromEntries(
     Object.entries(checks).map(([key, fn]) => [key, fn(password)]),
@@ -31,8 +30,7 @@ const RequirementItem = React.memo<{
   satisfied: boolean;
   show: boolean;
 }>(({ label, satisfied, show }) => {
-  if (!show)
-    return null;
+  if (!show) return null;
 
   return (
     <div
@@ -94,8 +92,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
 
   const requirementLabels = React.useMemo(
     () => {
-      if (!rules)
-        return {};
+      if (!rules) return {};
 
       return {
         minLength: rules.minLength ? t("passwordInput.requirements.rules.minLength", { count: rules.minLength }) : "",

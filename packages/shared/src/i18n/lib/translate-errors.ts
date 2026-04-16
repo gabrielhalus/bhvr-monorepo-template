@@ -22,8 +22,7 @@ export function translateErrors(
   t: TFunction,
 ): Array<{ message?: string } | undefined> {
   return errors.map((error) => {
-    if (!error?.message)
-      return error;
+    if (!error?.message) return error;
     // Check if the message is a translation key (starts with "errors.")
     if (error.message.startsWith("errors.")) {
       return { ...error, message: t(error.message as never) };

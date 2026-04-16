@@ -94,8 +94,7 @@ export function findNodeBySegments(root: Map<string, ConfigNode>, segments: read
       current = current.children?.get(segment);
     }
 
-    if (!current)
-      return null;
+    if (!current) return null;
   }
 
   return current ?? null;

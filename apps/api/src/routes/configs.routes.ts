@@ -1,13 +1,12 @@
-import { randomBytes } from "node:crypto";
-
 import { Hono } from "hono";
+import { randomBytes } from "node:crypto";
 
 import { getClientInfo } from "@/helpers/get-client-info";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { logConfigUpdate } from "~shared/queries/logs.queries";
 import { getConfig, getConfigs, updateConfig } from "~shared/queries/configs.queries";
+import { logConfigUpdate } from "~shared/queries/logs.queries";
 import { UpdateConfigSchema } from "~shared/schemas/api/configs.schemas";
 
 const ROTATABLE_KEYS = new Set(["security.jwt.secret"]);

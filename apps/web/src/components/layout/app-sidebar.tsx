@@ -7,8 +7,8 @@ import { useTranslation } from "react-i18next";
 import { NavMain } from "@/components/layout/nav-main";
 import { NavUser } from "@/components/layout/nav-user";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarTrigger } from "~react/components/sidebar";
-import { authorizeBatchQueryOptions } from "~react/queries/auth";
 import { useBranding } from "~react/providers/branding-provider";
+import { authorizeBatchQueryOptions } from "~react/queries/auth";
 
 import { NavSettings } from "./nav-settings";
 

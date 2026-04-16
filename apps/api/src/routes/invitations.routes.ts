@@ -11,7 +11,6 @@ import { requirePermissionFactory } from "@/middlewares/access-control";
 import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { logInvitationAccept, logInvitationCreate, logInvitationDelete, logInvitationRevoke } from "~shared/queries/logs.queries";
 import {
   createInvitation,
   createInvitationRoles,
@@ -24,6 +23,7 @@ import {
   invitationRelationLoaders,
   updateInvitation,
 } from "~shared/queries/invitations.queries";
+import { logInvitationAccept, logInvitationCreate, logInvitationDelete, logInvitationRevoke } from "~shared/queries/logs.queries";
 import { getDefaultRole } from "~shared/queries/roles.queries";
 import { insertToken } from "~shared/queries/tokens.queries";
 import { createUserRole } from "~shared/queries/user-roles.queries";
@@ -185,8 +185,7 @@ export const invitationsRoutes = new Hono()
     await Promise.all(
       include.map(async (key) => {
         const loader = invitationRelationLoaders[key];
-        if (!loader)
-          throw new Error(`No relation loader defined for "${key}"`);
+        if (!loader) throw new Error(`No relation loader defined for "${key}"`);
 
         const data = await loader(invitationIds);
 
@@ -240,8 +239,7 @@ export const invitationsRoutes = new Hono()
     await Promise.all(
       include.map(async (key) => {
         const loader = invitationRelationLoaders[key];
-        if (!loader)
-          throw new Error(`No relation loader defined for "${key}"`);
+        if (!loader) throw new Error(`No relation loader defined for "${key}"`);
 
         const data = await loader([id]);
 
