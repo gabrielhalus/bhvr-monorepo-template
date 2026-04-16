@@ -11,10 +11,8 @@ import { formatValue } from "~shared/i18n";
 import { StatusBadge } from "./cron-runs.status-badge";
 
 function formatDuration(ms: number | null): string {
-  if (ms === null)
-    return "—";
-  if (ms < 1000)
-    return `${ms}ms`;
+  if (ms === null) return "—";
+  if (ms < 1000) return `${ms}ms`;
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
@@ -57,8 +55,7 @@ export function getCronRunColumns(t: TFunction): ColumnDef<CronTaskRun>[] {
       header: t("pages.cron.runs.columns.output"),
       cell: ({ row }) => {
         const text = row.original.error ?? row.original.output;
-        if (!text)
-          return <span className="text-muted-foreground">—</span>;
+        if (!text) return <span className="text-muted-foreground">—</span>;
         const truncated = text.length > 60 ? `${text.slice(0, 60)}…` : text;
         return (
           <Tooltip>

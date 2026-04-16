@@ -92,8 +92,7 @@ function SecretRevealDialog({ value, onClose }: { value: string; onClose: () => 
     <Dialog
       open
       onOpenChange={(open) => {
-        if (!open)
-          onClose();
+        if (!open) onClose();
       }}
     >
       <DialogContent showCloseButton={false}>
@@ -142,8 +141,7 @@ export function NodeForm({ node, allConfigs }: { node: ConfigNode; allConfigs: C
     rotateConfig.mutate(node.fullKey, {
       onSuccess: (data) => {
         const newValue = (data as { config?: { value?: string | null } }).config?.value;
-        if (newValue)
-          setRevealedValue(newValue);
+        if (newValue) setRevealedValue(newValue);
       },
     });
   }

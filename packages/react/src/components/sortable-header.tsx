@@ -15,10 +15,8 @@ export function SortableHeader<TData>({ column, title, className }: SortableHead
   const sortState = column.getIsSorted() as false | "asc" | "desc";
 
   const getSortIcon = () => {
-    if (sortState === "asc")
-      return <ArrowUpNarrowWide className="ml-2 size-4 text-muted-foreground" />;
-    if (sortState === "desc")
-      return <ArrowDownNarrowWide className="ml-2 size-4 text-muted-foreground" />;
+    if (sortState === "asc") return <ArrowUpNarrowWide className="ml-2 size-4 text-muted-foreground" />;
+    if (sortState === "desc") return <ArrowDownNarrowWide className="ml-2 size-4 text-muted-foreground" />;
     return <ArrowUpDown className="ml-2 size-4 text-muted-foreground" />;
   };
 

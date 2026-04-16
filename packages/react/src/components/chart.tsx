@@ -39,8 +39,7 @@ function useChart() {
 export function ChartStyle({ id, config }: { id: string; config: ChartConfig }) {
   const colorConfig = Object.entries(config).filter(([, cfg]) => cfg.color);
 
-  if (!colorConfig.length)
-    return null;
+  if (!colorConfig.length) return null;
 
   return (
     <style>
@@ -128,8 +127,7 @@ export const ChartTooltipContent = React.forwardRef<
     const { config } = useChart();
 
     const tooltipLabel = React.useMemo(() => {
-      if (hideLabel || !payload?.length)
-        return null;
+      if (hideLabel || !payload?.length) return null;
 
       const [item] = payload;
       const key = `${labelKey ?? item?.dataKey ?? item?.name ?? "value"}`;
@@ -144,14 +142,12 @@ export const ChartTooltipContent = React.forwardRef<
         );
       }
 
-      if (!value)
-        return null;
+      if (!value) return null;
 
       return <div className={cn("font-medium", labelClassName)}>{value}</div>;
     }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
 
-    if (!active || !payload?.length)
-      return null;
+    if (!active || !payload?.length) return null;
 
     const nestLabel = payload.length === 1 && indicator !== "dot";
 
@@ -253,8 +249,7 @@ export const ChartLegendContent = React.forwardRef<
 >(({ className, hideIcon = false, payload, verticalAlign = "bottom", nameKey }, ref) => {
   const { config } = useChart();
 
-  if (!payload?.length)
-    return null;
+  if (!payload?.length) return null;
 
   return (
     <div

@@ -45,8 +45,7 @@ function resolveLocale(locale?: string): string {
 
 // ---- public API ----
 export function formatValue(value: unknown, options: FormatterOptions = {}): string {
-  if (value === null || value === undefined)
-    return "—";
+  if (value === null || value === undefined) return "—";
 
   const locale = resolveLocale(options.locale);
   const format = normalizeFormat(options.format);

@@ -38,8 +38,7 @@ const TimeoutButton = React.forwardRef<HTMLButtonElement, TimeoutButtonProps>(
     const [isRunning, setIsRunning] = React.useState(false);
 
     React.useEffect(() => {
-      if (!isRunning)
-        return;
+      if (!isRunning) return;
 
       const startTime = Date.now();
       const interval = setInterval(() => {

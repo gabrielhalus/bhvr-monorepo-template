@@ -11,30 +11,21 @@ import { Spinner } from "~react/components/spinner";
 import sayno from "~react/lib/sayno";
 
 function getDeviceIcon(userAgent: string | null) {
-  if (!userAgent)
-    return MonitorIcon;
+  if (!userAgent) return MonitorIcon;
   const ua = userAgent.toLowerCase();
-  if (ua.includes("mobile") || ua.includes("android") || ua.includes("iphone"))
-    return SmartphoneIcon;
+  if (ua.includes("mobile") || ua.includes("android") || ua.includes("iphone")) return SmartphoneIcon;
   return MonitorIcon;
 }
 
 function parseDeviceName(userAgent: string | null, fallback: string): string {
-  if (!userAgent)
-    return fallback;
+  if (!userAgent) return fallback;
 
-  if (/iPhone/i.test(userAgent))
-    return "iPhone";
-  if (/iPad/i.test(userAgent))
-    return "iPad";
-  if (/Android/i.test(userAgent))
-    return "Android";
-  if (/Windows/i.test(userAgent))
-    return "Windows";
-  if (/Macintosh/i.test(userAgent))
-    return "Mac";
-  if (/Linux/i.test(userAgent))
-    return "Linux";
+  if (/iPhone/i.test(userAgent)) return "iPhone";
+  if (/iPad/i.test(userAgent)) return "iPad";
+  if (/Android/i.test(userAgent)) return "Android";
+  if (/Windows/i.test(userAgent)) return "Windows";
+  if (/Macintosh/i.test(userAgent)) return "Mac";
+  if (/Linux/i.test(userAgent)) return "Linux";
 
   return fallback;
 }

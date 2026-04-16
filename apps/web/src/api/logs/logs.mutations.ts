@@ -9,7 +9,7 @@ import { logsKeys } from "./logs.keys";
 // ============================================================================
 
 async function clearLogs() {
-  const res = await api["logs"].$delete();
+  const res = await api.logs.$delete();
 
   if (!res.ok) {
     throw new Error("Failed to clear logs");

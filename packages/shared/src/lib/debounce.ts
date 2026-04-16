@@ -3,10 +3,8 @@ export function debounceAsync<F extends (...args: any[]) => Promise<any>>(fn: F,
   let pending: Promise<any> | null;
 
   return (...args: Parameters<F>): Promise<ReturnType<F>> => {
-    if (timer)
-      clearTimeout(timer);
-    if (pending)
-      pending = null;
+    if (timer) clearTimeout(timer);
+    if (pending) pending = null;
 
     return new Promise((resolve) => {
       timer = setTimeout(() => {
@@ -20,8 +18,7 @@ export function debounceSync<F extends (...args: any[]) => any>(fn: F, delay: nu
   let timer: NodeJS.Timeout | null;
 
   return (...args: Parameters<F>): void => {
-    if (timer)
-      clearTimeout(timer);
+    if (timer) clearTimeout(timer);
 
     timer = setTimeout(() => {
       fn(...args);
