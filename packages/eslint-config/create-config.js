@@ -17,6 +17,9 @@ export default function createConfig(options, ...userConfigs) {
     {
       rules: {
         "style/brace-style": ["error", "1tbs", { allowSingleLine: true }],
+        "curly": "off",
+        "antfu/if-newline": "off",
+        "style/nonblock-statement-body-position": ["error", "beside"],
         "ts/consistent-type-definitions": ["error", "type"],
         "no-console": ["warn"],
         "antfu/no-top-level-await": ["off"],
