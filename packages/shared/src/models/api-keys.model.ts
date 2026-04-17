@@ -10,5 +10,6 @@ export const ApiKeysModel = pgTable("api_keys", {
   prefix: varchar("prefix", { length: 16 }).notNull().unique(),
   secretHash: text("secret_hash").notNull(),
   createdAt: timestamp("created_at", { mode: "string", withTimezone: true }).notNull().defaultNow(),
+  lastUsedAt: timestamp("last_used_at", { mode: "string", withTimezone: true }),
   revokedAt: timestamp("revoked_at", { mode: "string", withTimezone: true }),
 });
