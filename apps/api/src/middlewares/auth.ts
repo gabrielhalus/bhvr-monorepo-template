@@ -9,7 +9,7 @@ import { verify } from "hono/jwt";
 import { getClientInfo } from "@/helpers/get-client-info";
 import { createAccessToken, getCookieSettings, getJwtSecret } from "@/lib/jwt";
 import { factory } from "@/utils/hono";
-import { getApiKeyByPrefix } from "~shared/queries/api-key.queries";
+import { getApiKeyByPrefix, recordApiKeyLastUsed } from "~shared/queries/api-key.queries";
 import { logTokenRefresh } from "~shared/queries/logs.queries";
 import { deleteToken, getToken } from "~shared/queries/tokens.queries";
 import { getUser } from "~shared/queries/users.queries";
@@ -130,6 +130,8 @@ async function validateApiKey(rawKey: string): Promise<ApiKey | null> {
   }
 
   const isValid = await password.verify(secret, apiKey.secretHash);
+
+  recordApiKeyLastUsed(apiKey.id);
   return isValid ? apiKey : null;
 }
 
