@@ -33,13 +33,11 @@ export function getLogColumns(t: TFunction): ColumnDef<Log>[] {
         const isImpersonated = !!row.original.impersonatorId;
         return (
           <div className="flex items-center gap-2">
-            <Badge variant={getActionBadgeVariant(action)} className="font-mono text-xs">
-              {action}
-            </Badge>
+            <Badge variant={getActionBadgeVariant(action)} className="font-mono font-medium">{action}</Badge>
             {isImpersonated && (
               <Tooltip>
                 <TooltipTrigger>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline">
                     {t("pages.logs.impersonated")}
                   </Badge>
                 </TooltipTrigger>

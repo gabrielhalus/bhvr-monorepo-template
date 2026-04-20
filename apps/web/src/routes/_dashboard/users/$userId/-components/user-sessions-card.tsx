@@ -61,25 +61,13 @@ export function UserSessionsCard({ userId, userName }: UserSessionsCardProps) {
   const sessions = sessionsQuery.data?.sessions ?? [];
 
   const handleRevoke = async (tokenId: string) => {
-    const confirmed = await sayno.confirm({
-      title: t("pages.users.detail.sessions.revoke"),
-      description: t("pages.users.detail.sessions.revokeConfirm"),
-      variant: "destructive",
-    });
-
-    if (confirmed) {
+    if (await sayno.confirm({ description: t("pages.users.detail.sessions.revokeConfirm"), variant: "destructive" })) {
       revokeSession.mutate(tokenId);
     }
   };
 
   const handleRevokeAll = async () => {
-    const confirmed = await sayno.confirm({
-      title: t("pages.users.detail.sessions.revokeAll"),
-      description: t("pages.users.detail.sessions.revokeAllConfirm", { name: userName }),
-      variant: "destructive",
-    });
-
-    if (confirmed) {
+    if (await sayno.confirm({ description: t("pages.users.detail.sessions.revokeAllConfirm", { name: userName }), variant: "destructive" })) {
       revokeAll.mutate();
     }
   };
@@ -129,11 +117,10 @@ export function UserSessionsCard({ userId, userName }: UserSessionsCardProps) {
                     </div>
                     {canRevoke && (
                       <Button
-                        variant="ghost"
+                        variant="destructive-ghost"
                         size="sm"
                         disabled={revokeSession.isPending}
                         onClick={() => handleRevoke(session.id)}
-                        className="shrink-0 text-destructive hover:text-destructive"
                       >
                         {t("pages.users.detail.sessions.revoke")}
                       </Button>
