@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CalendarIcon, KeyIcon, MailIcon, MonitorIcon, ShieldIcon, UserIcon } from "lucide-react";
+import { CalendarIcon, EarthLockIcon, LockOpenIcon, MailIcon, ShieldIcon, UserIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -20,8 +20,8 @@ type TabId = "profile" | "password" | "sessions";
 
 const tabs: { id: TabId; icon: typeof UserIcon; labelKey: string }[] = [
   { id: "profile", icon: UserIcon, labelKey: "web:pages.account.sections.profile.title" },
-  { id: "password", icon: KeyIcon, labelKey: "web:pages.account.sections.password.title" },
-  { id: "sessions", icon: MonitorIcon, labelKey: "web:pages.account.sections.sessions.title" },
+  { id: "password", icon: LockOpenIcon, labelKey: "web:pages.account.sections.password.title" },
+  { id: "sessions", icon: EarthLockIcon, labelKey: "web:pages.account.sections.sessions.title" },
 ];
 
 function Account() {
