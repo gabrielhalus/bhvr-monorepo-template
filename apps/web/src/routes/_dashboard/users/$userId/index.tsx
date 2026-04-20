@@ -1,7 +1,7 @@
 import type { User as _User } from "~shared/types/db/users.types";
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeftIcon, CalendarIcon, KeyIcon, MailIcon, MonitorIcon, ShieldIcon, UserIcon } from "lucide-react";
+import { ArrowLeftIcon, CalendarIcon, EarthLock, KeyIcon, LockKeyholeOpen, MailIcon, ShieldIcon, UserIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -11,6 +11,7 @@ import { useUser } from "@/hooks/users/use-user";
 import { Button } from "~react/components/button";
 import { formatFullName } from "~react/lib/name-utils";
 
+import { UserApiKeysCard } from "./-components/user-api-keys-card";
 import { UserInformationsForm } from "./-components/user-informations-form";
 import { UserRolesForm } from "./-components/user-roles-form";
 import { UserSecurityActions } from "./-components/user-security-actions";
@@ -22,13 +23,14 @@ export const Route = createFileRoute("/_dashboard/users/$userId/")({
   staticData: { crumb: (data: { user?: _User }) => data.user ? formatFullName(data.user.firstName, data.user.lastName) : undefined },
 });
 
-type TabId = "profile" | "roles" | "security" | "sessions";
+type TabId = "profile" | "roles" | "security" | "sessions" | "api";
 
 const tabs: { id: TabId; icon: typeof UserIcon; labelKey: string }[] = [
   { id: "profile", icon: UserIcon, labelKey: "web:pages.users.detail.sections.edit.title" },
   { id: "roles", icon: ShieldIcon, labelKey: "web:pages.users.detail.sections.roles.title" },
-  { id: "security", icon: KeyIcon, labelKey: "web:pages.users.detail.sections.security.title" },
-  { id: "sessions", icon: MonitorIcon, labelKey: "web:pages.users.detail.sections.sessions.title" },
+  { id: "security", icon: LockKeyholeOpen, labelKey: "web:pages.users.detail.sections.security.title" },
+  { id: "sessions", icon: EarthLock, labelKey: "web:pages.users.detail.sections.sessions.title" },
+  { id: "api", icon: KeyIcon, labelKey: "web:pages.users.detail.sections.api.title" },
 ];
 
 function User() {
@@ -136,6 +138,7 @@ function User() {
           {activeTab === "profile" && <UserInformationsForm userId={userId} />}
           {activeTab === "roles" && <UserRolesForm userId={userId} />}
           {activeTab === "security" && <UserSecurityActions userId={userId} />}
+          {activeTab === "api" && <UserApiKeysCard userId={userId} />}
           {activeTab === "sessions" && <UserSessionsCard userId={userId} userName={userData ? formatFullName(userData.firstName, userData.lastName) : ""} />}
         </div>
       </div>
