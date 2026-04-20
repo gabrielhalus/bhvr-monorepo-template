@@ -92,6 +92,10 @@
             "title": "Sécurité",
             "description": "Gérer les paramètres de sécurité de l'utilisateur."
           },
+          "api": {
+            "title": "API",
+            "description": "Voir et supprimer les clés API actives de cet utilisateur."
+          },
           "sessions": {
             "title": "Sessions",
             "description": "Voir et révoquer les sessions actives de cet utilisateur."
@@ -130,6 +134,23 @@
           "confirmTitle": "Emprunter l'identité",
           "confirmDescription": "Êtes-vous sûr de vouloir emprunter l'identité de {{name}} ? Vous serez connecté en tant que cet utilisateur jusqu'à ce que vous arrêtiez la session.",
           "success": "Session en cours sous l'identité de {{name}}"
+        },
+        "apiKeys": {
+          "added": "Ajoutée le {{date, date}}",
+          "lastUse": "Dernière utilisation {{date, relative}}"
+        },
+        "createApiKey": {
+          "button": "Nouvelle clé API",
+          "success": "Clé API créée avec succès",
+          "successDescription": "La nouvelle clé API a été générée. Assurez-vous de la copier et de la transmettre à l'utilisateur de manière sécurisée. Cette clé ne sera plus affichée par la suite.",
+          "error": "Échec de la création de la clé API",
+          "copied": "Secret copié dans le presse-papiers"
+        },
+        "deleteApiKey": {
+          "button": "Supprimer",
+          "confirm": "Êtes-vous sûr de vouloir supprimer cette clé API ?",
+          "success": "Clé API supprimée avec succès",
+          "error": "Échec de la suppression de la clé API"
         }
       }
     },
@@ -483,6 +504,73 @@
       },
       "actions": {
         "edit": "Modifier le fournisseur de notifications"
+      }
+    },
+    "cron": {
+      "title": "Tâches planifiées",
+      "list": {
+        "subtitle": "Gérez les tâches d'arrière-plan planifiées.",
+        "searchPlaceholder": "Rechercher des tâches..."
+      },
+      "stats": {
+        "totalTasks": "Total des tâches",
+        "activeTasks": "Actives",
+        "successRate": "Taux de réussite (7j)",
+        "runsToday": "Exécutions aujourd'hui"
+      },
+      "columns": {
+        "name": "Nom",
+        "expression": "Expression",
+        "handler": "Handler",
+        "status": "Statut",
+        "lastRun": "Dernière exécution",
+        "nextRun": "Prochaine exécution"
+      },
+      "actions": {
+        "openMenu": "Ouvrir le menu",
+        "trigger": "Exécuter maintenant",
+        "triggerSuccess": "Tâche déclenchée avec succès",
+        "triggerError": "Échec du déclenchement de la tâche",
+        "toggleSuccess": "Statut de la tâche mis à jour",
+        "toggleError": "Échec de la mise à jour du statut de la tâche",
+        "createTask": "Nouvelle tâche",
+        "editTask": "Modifier la tâche",
+        "deleteTask": "Supprimer la tâche",
+        "deleteConfirm": "Êtes-vous sûr ? Tout l'historique d'exécution sera également supprimé.",
+        "deleteSuccess": "Tâche supprimée avec succès",
+        "deleteError": "Échec de la suppression de la tâche",
+        "createSuccess": "Tâche créée avec succès",
+        "createError": "Échec de la création de la tâche",
+        "updateSuccess": "Tâche mise à jour avec succès",
+        "updateError": "Échec de la mise à jour de la tâche"
+      },
+      "detail": {
+        "runsTitle": "Historique d'exécution",
+        "chartTitle": "Exécutions — 30 derniers jours",
+        "timelineTitle": "Exécutions récentes"
+      },
+      "runs": {
+        "columns": {
+          "status": "Statut",
+          "startedAt": "Démarré le",
+          "duration": "Durée",
+          "output": "Sortie / Erreur"
+        },
+        "status": {
+          "running": "En cours",
+          "success": "Succès",
+          "error": "Erreur"
+        }
+      },
+      "form": {
+        "name": "Nom",
+        "namePlaceholder": "Nettoyage quotidien",
+        "description": "Description",
+        "descriptionPlaceholder": "Description optionnelle...",
+        "cronExpression": "Expression cron",
+        "cronExpressionHelp": "ex. 0 * * * * (toutes les heures à la minute 0)",
+        "handler": "Handler",
+        "isEnabled": "Activer immédiatement"
       }
     }
   },

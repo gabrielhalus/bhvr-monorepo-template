@@ -92,6 +92,10 @@
             "title": "Security",
             "description": "Manage user security settings."
           },
+          "api": {
+            "title": "API",
+            "description": "View and delete active API keys for this user."
+          },
           "sessions": {
             "title": "Sessions",
             "description": "View and revoke active sessions for this user."
@@ -104,7 +108,7 @@
         "sessions": {
           "device": "Device",
           "ip": "IP Address",
-          "issuedAt": "Signed in {{date, date}}",
+          "issuedAt": "Signed in {{date, relative}}",
           "expiresAt": "Expires {{date, date}}",
           "revoke": "Revoke",
           "revokeConfirm": "Are you sure you want to revoke this session?",
@@ -130,6 +134,23 @@
           "confirmTitle": "Impersonate User",
           "confirmDescription": "Are you sure you want to impersonate {{name}}? You will be logged in as this user until you stop impersonating.",
           "success": "Now impersonating {{name}}"
+        },
+        "apiKeys": {
+          "added": "Added on {{date, date}}",
+          "lastUse": "Last use {{date, relative}}"
+        },
+        "createApiKey": {
+          "button": "New API key",
+          "success": "API key successfully created",
+          "successDescription": "The new API key has been generated. Make sure to copy it and share it with the user securely. This key will not be shown again.",
+          "error": "Failed to create API key",
+          "copied": "Secret copied to clipboard"
+        },
+        "deleteApiKey": {
+          "button": "Delete",
+          "confirm": "Are you sure you want to delete this API key?",
+          "success": "API key successfully deleted",
+          "error": "Failed to delete API key"
         }
       }
     },
