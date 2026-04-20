@@ -144,7 +144,8 @@
           "success": "API key successfully created",
           "successDescription": "The new API key has been generated. Make sure to copy it and share it with the user securely. This key will not be shown again.",
           "error": "Failed to create API key",
-          "copied": "Secret copied to clipboard"
+          "copied": "Secret copied to clipboard",
+          "close": "Done"
         },
         "deleteApiKey": {
           "button": "Delete",

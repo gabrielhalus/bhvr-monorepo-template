@@ -144,7 +144,8 @@
           "success": "Clé API créée avec succès",
           "successDescription": "La nouvelle clé API a été générée. Assurez-vous de la copier et de la transmettre à l'utilisateur de manière sécurisée. Cette clé ne sera plus affichée par la suite.",
           "error": "Échec de la création de la clé API",
-          "copied": "Secret copié dans le presse-papiers"
+          "copied": "Secret copié dans le presse-papiers",
+          "close": "Fermer"
         },
         "deleteApiKey": {
           "button": "Supprimer",

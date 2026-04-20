@@ -148,8 +148,28 @@ export async function revokeApiKey(id: string): Promise<ApiKey> {
     .returning();
 
   if (!revokedApiKey) {
-    throw new Error("Failed to revoke token");
+    throw new Error("Failed to revoke API key");
   }
 
   return revokedApiKey;
+}
+
+/**
+ * Records the last used timestamp of an API key.
+ * @param id - The ID of the API key to update.
+ * @returns The updated API key with the refreshed lastUsedAt timestamp.
+ * @throws An error if the API key was not found or could not be updated.
+ */
+export async function recordApiKeyLastUsed(id: string): Promise<ApiKey> {
+  const [updatedApiKey] = await drizzle
+    .update(ApiKeysModel)
+    .set({ lastUsedAt: new Date().toISOString() })
+    .where(eq(ApiKeysModel.id, id))
+    .returning();
+
+  if (!updatedApiKey) {
+    throw new Error("Failed to update API key");
+  }
+
+  return updatedApiKey;
 }
