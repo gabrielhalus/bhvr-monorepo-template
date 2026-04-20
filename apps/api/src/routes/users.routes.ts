@@ -410,7 +410,7 @@ export const usersRoutes = new Hono()
         return c.json({ success: false as const, error: "API key not found" }, 404);
       }
 
-      return c.json({ success: true as const, sk: revokedApiKey.id });
+      return c.json({ success: true as const, apiKey: revokedApiKey.id });
     } catch (error) {
       return c.json({ success: false as const, error: error instanceof Error ? error.message : "Unknown error" }, 500);
     }
