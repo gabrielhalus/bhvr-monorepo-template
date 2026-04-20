@@ -205,7 +205,7 @@ export function DataTable<TData, TValue>({
           </Button>
         )}
       </div>
-      <div className="relative border rounded-md overflow-hidden">
+      <div className="relative overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
@@ -215,12 +215,7 @@ export function DataTable<TData, TValue>({
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
-                      className="not-last:border-r"
-                      style={{
-                        width: header.column.columnDef.size !== undefined
-                          ? header.getSize()
-                          : undefined,
-                      }}
+                      style={{ width: header.column.columnDef.size !== undefined ? header.getSize() : undefined }}
                     >
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
@@ -240,10 +235,11 @@ export function DataTable<TData, TValue>({
                       <TableRow
                         key={row.id}
                         data-state={row.getIsSelected() && "selected"}
+                        className="border-none"
                       >
                         {row.getVisibleCells().map(cell => (
                           <TableCell
-                            className="text-foreground not-last:border-r"
+                            className="text-foreground"
                             key={cell.id}
                             style={{
                               width: cell.column.columnDef.size,
