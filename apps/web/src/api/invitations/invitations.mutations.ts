@@ -33,7 +33,7 @@ async function createInvitation(data: CreateInvitationData) {
 }
 
 async function revokeInvitation(id: string) {
-  const res = await api.invitations[":id{[a-zA-Z0-9-]{21}}"].$put({ param: { id } });
+  const res = await api.invitations[":id{[a-zA-Z0-9_-]{21}}"].$put({ param: { id } });
 
   if (!res.ok) {
     throw new Error("Failed to revoke invitation");
@@ -43,7 +43,7 @@ async function revokeInvitation(id: string) {
 }
 
 async function deleteInvitation(id: string) {
-  const res = await api.invitations[":id{[a-zA-Z0-9-]{21}}"].$delete({ param: { id } });
+  const res = await api.invitations[":id{[a-zA-Z0-9_-]{21}}"].$delete({ param: { id } });
 
   if (!res.ok) {
     throw new Error("Failed to delete invitation");

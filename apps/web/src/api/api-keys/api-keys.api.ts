@@ -1,7 +1,7 @@
 import { api } from "~react/lib/http";
 
 export async function fetchUserApiKeys(userId: string) {
-  const res = await api.users[":id{[a-zA-Z0-9-]{21}}"]["api-keys"].$get({
+  const res = await api.users[":id{[a-zA-Z0-9_-]{21}}"]["api-keys"].$get({
     param: { id: userId },
   });
 
@@ -13,7 +13,7 @@ export async function fetchUserApiKeys(userId: string) {
 }
 
 export async function createUserApiKey(userId: string) {
-  const res = await api.users[":id{[a-zA-Z0-9-]{21}}"]["api-keys"].$post({
+  const res = await api.users[":id{[a-zA-Z0-9_-]{21}}"]["api-keys"].$post({
     param: { id: userId },
   });
 
@@ -25,7 +25,7 @@ export async function createUserApiKey(userId: string) {
 }
 
 export async function deleteUserApiKey(userId: string, apiKeyId: string) {
-  const res = await api.users[":id{[a-zA-Z0-9-]{21}}"]["api-keys"][":apiKeyId{[a-zA-Z0-9-]{21}}"].$delete({
+  const res = await api.users[":id{[a-zA-Z0-9_-]{21}}"]["api-keys"][":apiKeyId{[a-zA-Z0-9_-]{21}}"].$delete({
     param: { id: userId, apiKeyId },
   });
 
