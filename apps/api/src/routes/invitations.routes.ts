@@ -208,7 +208,7 @@ export const invitationsRoutes = new Hono()
    * @access protected
    * @permission invitation:read (resource-specific)
    */
-  .get("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), auditRead("invitation:read", "invitation"), async (c) => {
+  .get("/:id{[a-zA-Z0-9_-]{21}}", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), auditRead("invitation:read", "invitation"), async (c) => {
     const id = c.req.param("id");
 
     const invitation = await getInvitation(id);
@@ -230,7 +230,7 @@ export const invitationsRoutes = new Hono()
  * @access protected
  * @permission invitation:read
  */
-  .get("/:id{[a-zA-Z0-9-]{21}}/relations", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", InvitationRelationsQuerySchema), async (c) => {
+  .get("/:id{[a-zA-Z0-9_-]{21}}/relations", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", InvitationRelationsQuerySchema), async (c) => {
     const id = c.req.param("id");
     const { include } = c.req.valid("query");
 
@@ -310,7 +310,7 @@ export const invitationsRoutes = new Hono()
    * @access protected
    * @permission invitation:revoke
    */
-  .put("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("invitation:revoke"), async (c) => {
+  .put("/:id{[a-zA-Z0-9_-]{21}}", requirePermissionFactory("invitation:revoke"), async (c) => {
     const id = c.req.param("id");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
@@ -336,7 +336,7 @@ export const invitationsRoutes = new Hono()
  * @access protected
  * @permission invitation:delete
  */
-  .delete("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("invitation:delete"), async (c) => {
+  .delete("/:id{[a-zA-Z0-9_-]{21}}", requirePermissionFactory("invitation:delete"), async (c) => {
     const id = c.req.param("id");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);

@@ -133,7 +133,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:read (resource-specific)
    */
-  .get("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), auditRead("user:read", "user"), async (c) => {
+  .get("/:id{[a-zA-Z0-9_-]{21}}", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), auditRead("user:read", "user"), async (c) => {
     const id = c.req.param("id");
 
     const user = await getUser(id);
@@ -155,7 +155,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:read
    */
-  .get("/:id{[a-zA-Z0-9-]{21}}/relations", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", UserRelationsQuerySchema), async (c) => {
+  .get("/:id{[a-zA-Z0-9_-]{21}}/relations", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", UserRelationsQuerySchema), async (c) => {
     const id = c.req.param("id");
     const { include } = c.req.valid("query");
 
@@ -189,7 +189,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:read
    */
-  .get("/:id{[a-zA-Z0-9-]{21}}/relations/count", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", UserRelationsQuerySchema), async (c) => {
+  .get("/:id{[a-zA-Z0-9_-]{21}}/relations/count", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", UserRelationsQuerySchema), async (c) => {
     const id = c.req.param("id");
     const { include } = c.req.valid("query");
 
@@ -222,7 +222,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:update (resource-specific)
    */
-  .put("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateUserSchema), async (c) => {
+  .put("/:id{[a-zA-Z0-9_-]{21}}", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), validationMiddleware("json", UpdateUserSchema), async (c) => {
     const id = c.req.param("id");
     const data = c.req.valid("json");
     const sessionContext = c.var.sessionContext;
@@ -249,7 +249,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:update (resource-specific)
    */
-  .post("/:id{[a-zA-Z0-9-]{21}}/reset-password", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), async (c) => {
+  .post("/:id{[a-zA-Z0-9_-]{21}}/reset-password", requirePermissionFactory("user:update", c => ({ id: c.req.param("id") })), async (c) => {
     const id = c.req.param("id");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
@@ -286,7 +286,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission userRole:create
    */
-  .put("/:id{[a-zA-Z0-9-]{21}}/roles", requirePermissionFactory("userRole:create"), validationMiddleware("json", UpdateUserRolesSchema), async (c) => {
+  .put("/:id{[a-zA-Z0-9_-]{21}}/roles", requirePermissionFactory("userRole:create"), validationMiddleware("json", UpdateUserRolesSchema), async (c) => {
     const id = c.req.param("id");
     const { roleIds } = c.req.valid("json");
     const sessionContext = c.var.sessionContext;
@@ -318,7 +318,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission user:delete (resource-specific)
    */
-  .delete("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("user:delete", c => ({ id: c.req.param("id") })), async (c) => {
+  .delete("/:id{[a-zA-Z0-9_-]{21}}", requirePermissionFactory("user:delete", c => ({ id: c.req.param("id") })), async (c) => {
     const id = c.req.param("id");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
@@ -343,7 +343,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission apiKeys:list
    */
-  .get("/:id{[a-zA-Z0-9-]{21}}/api-keys", requirePermissionFactory("apiKey:list"), async (c) => {
+  .get("/:id{[a-zA-Z0-9_-]{21}}/api-keys", requirePermissionFactory("apiKey:list"), async (c) => {
     const id = c.req.param("id");
 
     try {
@@ -368,11 +368,11 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission apiKey:create
    */
-  .post("/:id{[a-zA-Z0-9-]{21}}/api-keys", requirePermissionFactory("apiKey:create"), async (c) => {
+  .post("/:id{[a-zA-Z0-9_-]{21}}/api-keys", requirePermissionFactory("apiKey:create"), async (c) => {
     const id = c.req.param("id");
 
     try {
-      const prefix = nanoid(8);
+      const prefix = nanoid({ symbols: false, size: 8 });
 
       const secret = randomBytes(32).toString("base64url");
       const secretHash = await password.hash(secret);
@@ -400,7 +400,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission apiKey:revoke
    */
-  .delete("/:id{[a-zA-Z0-9-]{21}}/api-keys/:apiKeyId{[a-zA-Z0-9-]{21}}", requirePermissionFactory("apiKey:revoke"), async (c) => {
+  .delete("/:id{[a-zA-Z0-9_-]{21}}/api-keys/:apiKeyId{[a-zA-Z0-9_-]{21}}", requirePermissionFactory("apiKey:revoke"), async (c) => {
     const apiKeyId = c.req.param("apiKeyId");
 
     try {
@@ -425,7 +425,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission session:list
    */
-  .get("/:id{[a-zA-Z0-9-]{21}}/sessions", requirePermissionFactory("session:list"), async (c) => {
+  .get("/:id{[a-zA-Z0-9_-]{21}}/sessions", requirePermissionFactory("session:list"), async (c) => {
     const id = c.req.param("id");
 
     try {
@@ -451,7 +451,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission session:revoke
    */
-  .delete("/:id{[a-zA-Z0-9-]{21}}/sessions/:tokenId", requirePermissionFactory("session:revoke"), async (c) => {
+  .delete("/:id{[a-zA-Z0-9_-]{21}}/sessions/:tokenId", requirePermissionFactory("session:revoke"), async (c) => {
     const id = c.req.param("id");
     const tokenId = c.req.param("tokenId");
     const sessionContext = c.var.sessionContext;
@@ -488,7 +488,7 @@ export const usersRoutes = new Hono()
    * @access protected
    * @permission session:revoke
    */
-  .delete("/:id{[a-zA-Z0-9-]{21}}/sessions", requirePermissionFactory("session:revoke"), async (c) => {
+  .delete("/:id{[a-zA-Z0-9_-]{21}}/sessions", requirePermissionFactory("session:revoke"), async (c) => {
     const id = c.req.param("id");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);

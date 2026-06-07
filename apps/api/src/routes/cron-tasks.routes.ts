@@ -79,7 +79,7 @@ export const cronTasksRoutes = new Hono()
    * Get a single cron task by id
    * @permission cronTask:read
    */
-  .get("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("cronTask:read"), async (c) => {
+  .get("/:id{[a-zA-Z0-9_-]{21}}", requirePermissionFactory("cronTask:read"), async (c) => {
     const id = c.req.param("id");
     const task = await getCronTask(id);
     if (!task) {
@@ -92,7 +92,7 @@ export const cronTasksRoutes = new Hono()
    * Update a cron task
    * @permission cronTask:update
    */
-  .put("/:id{[a-zA-Z0-9-]{21}}", validationMiddleware("json", UpdateCronTaskRouteSchema), requirePermissionFactory("cronTask:update"), async (c) => {
+  .put("/:id{[a-zA-Z0-9_-]{21}}", validationMiddleware("json", UpdateCronTaskRouteSchema), requirePermissionFactory("cronTask:update"), async (c) => {
     const id = c.req.param("id");
     const data = c.req.valid("json");
     const task = await updateCronTask(id, data);
@@ -104,7 +104,7 @@ export const cronTasksRoutes = new Hono()
    * Delete a cron task (also cascade-deletes all runs)
    * @permission cronTask:delete
    */
-  .delete("/:id{[a-zA-Z0-9-]{21}}", requirePermissionFactory("cronTask:delete"), async (c) => {
+  .delete("/:id{[a-zA-Z0-9_-]{21}}", requirePermissionFactory("cronTask:delete"), async (c) => {
     const id = c.req.param("id");
     const task = await deleteCronTask(id);
     cronScheduler.unscheduleTask(id);
@@ -115,7 +115,7 @@ export const cronTasksRoutes = new Hono()
    * Toggle enable/disable state for a cron task
    * @permission cronTask:update
    */
-  .patch("/:id{[a-zA-Z0-9-]{21}}/toggle", requirePermissionFactory("cronTask:update"), async (c) => {
+  .patch("/:id{[a-zA-Z0-9_-]{21}}/toggle", requirePermissionFactory("cronTask:update"), async (c) => {
     const id = c.req.param("id");
     const existing = await getCronTask(id);
     if (!existing) {
@@ -130,7 +130,7 @@ export const cronTasksRoutes = new Hono()
    * Manually trigger a cron task immediately
    * @permission cronTask:trigger
    */
-  .post("/:id{[a-zA-Z0-9-]{21}}/trigger", requirePermissionFactory("cronTask:trigger"), async (c) => {
+  .post("/:id{[a-zA-Z0-9_-]{21}}/trigger", requirePermissionFactory("cronTask:trigger"), async (c) => {
     const id = c.req.param("id");
     const run = await cronScheduler.triggerTask(id);
     return c.json({ success: true as const, run });
@@ -140,7 +140,7 @@ export const cronTasksRoutes = new Hono()
    * Get paginated execution history for a cron task
    * @permission cronTask:read
    */
-  .get("/:id{[a-zA-Z0-9-]{21}}/runs", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("cronTask:read"), async (c) => {
+  .get("/:id{[a-zA-Z0-9_-]{21}}/runs", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("cronTask:read"), async (c) => {
     const id = c.req.param("id");
     const { page, limit, sortBy, sortOrder, search } = c.req.valid("query");
     const result = await getCronTaskRunsPaginated(id, { page, limit, sortBy, sortOrder, search });
@@ -151,7 +151,7 @@ export const cronTasksRoutes = new Hono()
    * Get the last 20 runs for timeline visualization
    * @permission cronTask:read
    */
-  .get("/:id{[a-zA-Z0-9-]{21}}/runs/recent", requirePermissionFactory("cronTask:read"), async (c) => {
+  .get("/:id{[a-zA-Z0-9_-]{21}}/runs/recent", requirePermissionFactory("cronTask:read"), async (c) => {
     const id = c.req.param("id");
     const runs = await getCronTaskRecentRuns(id, 20);
     return c.json({ success: true as const, runs });
@@ -161,7 +161,7 @@ export const cronTasksRoutes = new Hono()
    * Get chart data for runs over the last 30 days (grouped by day)
    * @permission cronTask:read
    */
-  .get("/:id{[a-zA-Z0-9-]{21}}/runs/chart", requirePermissionFactory("cronTask:read"), async (c) => {
+  .get("/:id{[a-zA-Z0-9_-]{21}}/runs/chart", requirePermissionFactory("cronTask:read"), async (c) => {
     const id = c.req.param("id");
     const data = await getCronTaskRunsChart(id);
     return c.json({ success: true as const, data });
@@ -171,7 +171,7 @@ export const cronTasksRoutes = new Hono()
    * Get per-task run stats (total, success rate, avg duration)
    * @permission cronTask:read
    */
-  .get("/:id{[a-zA-Z0-9-]{21}}/stats", requirePermissionFactory("cronTask:read"), async (c) => {
+  .get("/:id{[a-zA-Z0-9_-]{21}}/stats", requirePermissionFactory("cronTask:read"), async (c) => {
     const id = c.req.param("id");
     const stats = await getCronTaskRunStats(id);
     return c.json({ success: true as const, stats });

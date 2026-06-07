@@ -22,7 +22,7 @@ export const configRoutes = new Hono()
 
     return c.json({
       success: true as const,
-      configs: configs.map(c => c.secret ? { ...c, value: null } : c),
+      configs: configs.map(c => c.secret ? { ...c, value: null, isSet: c.value !== null } : c),
     });
   })
 
@@ -44,7 +44,7 @@ export const configRoutes = new Hono()
       return c.json({ success: false as const, error: "Config not found" }, 404);
     }
 
-    return c.json({ success: true as const, value: value.secret ? { ...value, value: null } : value });
+    return c.json({ success: true as const, value: value.secret ? { ...value, value: null, isSet: value.value !== null } : value });
   })
 
   // --- All routes below this point require authentication
@@ -76,7 +76,7 @@ export const configRoutes = new Hono()
       ...clientInfo,
     }, oldValue, value);
 
-    return c.json({ success: true as const, config });
+    return c.json({ success: true as const, config: config.secret ? { ...config, value: null, isSet: true } : config });
   })
 
   /**
