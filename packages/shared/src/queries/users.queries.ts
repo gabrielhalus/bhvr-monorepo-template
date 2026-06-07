@@ -2,7 +2,8 @@ import type { PaginatedResponse, PaginationQuery } from "../schemas/api/paginati
 import type { User, UserRelationKey, UserRelations, UserWithRelations } from "../types/db/users.types";
 import type { z } from "zod";
 
-import { asc, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
+import { asc, count, desc, eq, ilike, inArray, isNotNull, or, sql } from "drizzle-orm";
+import { randomBytes } from "node:crypto";
 
 import { ApiKeysModel } from "~shared/models/api-keys.model";
 import { ApiKeySchema } from "~shared/schemas/db/api-keys.schemas";
@@ -490,6 +491,45 @@ export async function emailExists(email: string): Promise<boolean> {
  * @returns The updated user.
  * @throws An error if the user could not be updated.
  */
+export async function resetSystemPassword(): Promise<{ email: string; password: string } | null> {
+  const [systemUser] = await drizzle
+    .select()
+    .from(UsersModel)
+    .where(isNotNull(sql`metadata->>'system'`))
+    .limit(1);
+
+  if (!systemUser) {
+    return null;
+  }
+
+  const password = randomBytes(6).toString("base64url");
+  const passwordHash = await Bun.password.hash(password);
+
+  await drizzle
+    .update(UsersModel)
+    .set({ password: passwordHash, metadata: { system: true, mustChangePassword: true }, updatedAt: new Date().toISOString() })
+    .where(isNotNull(sql`metadata->>'system'`));
+
+  return { email: systemUser.email, password };
+}
+
+export async function clearMustChangePassword(id: string): Promise<void> {
+  const [user] = await drizzle
+    .select({ metadata: UsersModel.metadata })
+    .from(UsersModel)
+    .where(eq(UsersModel.id, id))
+    .limit(1);
+
+  if (!user) return;
+
+  const { mustChangePassword: _, ...rest } = (user.metadata ?? {}) as Record<string, unknown>;
+
+  await drizzle
+    .update(UsersModel)
+    .set({ metadata: rest, updatedAt: new Date().toISOString() })
+    .where(eq(UsersModel.id, id));
+}
+
 export async function updateUserPassword(id: string, hashedPassword: string): Promise<User> {
   const [updatedUser] = await drizzle
     .update(UsersModel)

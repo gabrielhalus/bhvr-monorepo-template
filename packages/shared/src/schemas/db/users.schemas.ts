@@ -2,6 +2,7 @@ import { createInsertSchema, createSelectSchema, createUpdateSchema } from "driz
 import { z } from "zod";
 
 import { UsersModel } from "~shared/models/users.model";
+import { RANGE_PRESETS } from "~shared/schemas/api/date-range.schemas";
 
 const jsonOverride = z.unknown();
 
@@ -9,9 +10,17 @@ export const UserPreferencesSchema = z.object({
   sidebarOpen: z.boolean().optional(),
   theme: z.enum(["system", "light", "dark"]).optional(),
   locale: z.string().optional(),
+  defaultOrderRange: z.enum(RANGE_PRESETS).optional(),
 }).nullable();
 
 export type UserPreferences = z.infer<typeof UserPreferencesSchema>;
+
+export const UserMetadataSchema = z.object({
+  system: z.boolean().optional(),
+  mustChangePassword: z.boolean().optional(),
+}).nullable();
+
+export type UserMetadata = z.infer<typeof UserMetadataSchema>;
 
 /**
  * Schema for users
@@ -26,7 +35,7 @@ export const UserSchema = createSelectSchema(UsersModel, {
     .min(1)
     .transform(val => val[0]!.toUpperCase() + val.slice(1)),
   preferences: UserPreferencesSchema,
-  metadata: jsonOverride,
+  metadata: UserMetadataSchema,
 });
 
 /**

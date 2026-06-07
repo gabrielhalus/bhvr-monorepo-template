@@ -2,6 +2,7 @@ import type { PasswordRules } from "~shared/types/auth.types";
 
 import { z } from "zod";
 
+import { RANGE_PRESETS } from "~shared/schemas/api/date-range.schemas";
 import { PermissionSchema } from "~shared/schemas/api/permissions.schemas";
 
 export const passwordRules: PasswordRules = {
@@ -68,4 +69,5 @@ export const UpdatePreferencesSchema = z.object({
   sidebarOpen: z.boolean().optional(),
   theme: z.enum(["system", "light", "dark"]).optional(),
   locale: z.string().optional(),
+  defaultOrderRange: z.enum(RANGE_PRESETS).optional(),
 });
