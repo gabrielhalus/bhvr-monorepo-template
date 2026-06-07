@@ -54,13 +54,15 @@ services:
       - "3000"
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
+      SYSTEM_RESET_PASSWORD: ${SYSTEM_RESET_PASSWORD:-false}
+      APP_URL: ${APP_URL}
 
   web:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        BUNSTACK_APP_URL: ${BUNSTACK_APP_URL}
+        APP_URL: ${APP_URL}
     restart: unless-stopped
     depends_on:
       - api

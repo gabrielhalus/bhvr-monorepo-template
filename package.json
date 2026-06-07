@@ -9,6 +9,8 @@
     "lint": "turbo run lint --",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
     "drizzle:generate": "bun --cwd packages/shared drizzle:generate",
     "drizzle:push": "bun --cwd packages/shared drizzle:push",
     "drizzle:studio": "bun --cwd packages/shared drizzle:studio",

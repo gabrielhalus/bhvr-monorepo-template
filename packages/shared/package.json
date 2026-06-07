@@ -7,6 +7,8 @@
     "build": "tsc -b",
     "lint": "eslint .",
     "check-types": "tsc --noEmit",
+    "test": "bun test __tests__ --env-file ../../.env.test",
+    "test:coverage": "bun test __tests__ --coverage --env-file ../../.env.test",
     "drizzle:generate": "drizzle-kit generate --config=drizzle.config.cjs",
     "drizzle:push": "drizzle-kit push --config=drizzle.config.cjs",
     "drizzle:studio": "drizzle-kit studio --config=drizzle.config.cjs",
