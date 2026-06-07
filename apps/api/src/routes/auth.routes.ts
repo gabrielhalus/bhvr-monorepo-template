@@ -23,7 +23,7 @@ import {
 import { getDefaultRole } from "~shared/queries/roles.queries";
 import { deleteToken, getActiveTokensByUserId, insertToken, revokeAllTokensByUserId, revokeAllTokensByUserIdExcept, revokeToken } from "~shared/queries/tokens.queries";
 import { createUserRole } from "~shared/queries/user-roles.queries";
-import { createUser, getUser, signIn, updateUser, updateUserPassword } from "~shared/queries/users.queries";
+import { clearMustChangePassword, createUser, getUser, signIn, updateUser, updateUserPassword } from "~shared/queries/users.queries";
 import { ChangePasswordSchema, isAuthorizedSchema, LoginSchema, RegisterSchema, UpdateAccountSchema, UpdatePreferencesSchema } from "~shared/schemas/api/auth.schemas";
 import { UserPreferencesSchema } from "~shared/schemas/db/users.schemas";
 
@@ -275,6 +275,7 @@ export const authRoutes = new Hono()
 
     const hashedPassword = await password.hash(newPassword);
     await updateUserPassword(sessionContext.user.id, hashedPassword);
+    await clearMustChangePassword(sessionContext.user.id);
 
     // Revoke all sessions except the current one after password change
     const refreshToken = getCookie(c, "refreshToken");
@@ -325,7 +326,7 @@ export const authRoutes = new Hono()
    * @access protected
    * @permission user:impersonate
    */
-  .post("/impersonate/:id{[a-zA-Z0-9-]{21}}", async (c) => {
+  .post("/impersonate/:id{[a-zA-Z0-9_-]{21}}", async (c) => {
     const sessionContext = c.var.sessionContext;
     const targetUserId = c.req.param("id");
 

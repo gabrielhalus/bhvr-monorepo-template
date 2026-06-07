@@ -94,15 +94,16 @@ export async function verifyToken<T extends JwtPayload["ttyp"]>(token: string, t
 export function getCookieSettings(type: CookieType) {
   const isProd = ENV.APP_ENV === "production";
 
-  const isSubdomainDev = !isProd && ENV.APP_HOST?.endsWith(".localhost.dev");
+  const primaryHost = ENV.APP_HOST.split(",")[0]!.trim();
+  const isSubdomainDev = !isProd && primaryHost?.endsWith(".localhost.dev");
 
   const base = {
     httpOnly: true,
     path: "/",
     domain: isProd
-      ? `.${ENV.APP_HOST}` // prod: example.com → .example.com
+      ? `.${primaryHost}` // prod: example.com → .example.com
       : isSubdomainDev
-        ? `.${ENV.APP_HOST}` // dev subdomains → .localhost.dev
+        ? `.${primaryHost}` // dev subdomains → .localhost.dev
         : undefined, // real dev with ports → no domain, host-only
     secure: isProd || isSubdomainDev, // must be true for SameSite=None
     sameSite: isProd || isSubdomainDev ? "none" as const : "lax" as const,
