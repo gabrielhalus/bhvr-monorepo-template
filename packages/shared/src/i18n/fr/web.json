@@ -1,589 +1,797 @@
 {
-  "pages": {
-    "home": {
-      "title": "Tableau de bord"
+  "account": {
+    "photo": {
+      "menuLabel": "Photo de profil",
+      "change": "Changer la photo",
+      "remove": "Retirer la photo",
+      "uploaded": "Photo de profil mise à jour",
+      "removed": "Photo de profil retirée",
+      "uploadError": "Échec de la mise à jour de la photo",
+      "tooLarge": "Image trop volumineuse (max 5 Mo)",
+      "invalidType": "Format d'image non supporté"
     },
-    "users": {
-      "title": "Utilisateurs",
-      "list": {
-        "title": "Utilisateurs",
-        "subtitle": "Gérez vos utilisateurs.",
-        "searchPlaceholder": "Rechercher des utilisateurs..."
-      },
-      "invitations": {
-        "title": "Invitations",
-        "subtitle": "Gérez les invitations en attente et passées.",
-        "searchPlaceholder": "Rechercher des invitations..."
-      },
-      "columns": {
-        "name": "Nom",
-        "roles": "Rôles",
-        "joined": "Inscrit le",
-        "email": "E-mail",
-        "status": "Statut",
-        "invitedBy": "Invité par",
-        "expires": "Expire le",
-        "accepted": "Acceptée le"
-      },
-      "status": {
-        "pending": "En attente",
-        "accepted": "Acceptée",
-        "expired": "Expirée",
-        "revoked": "Révoquée"
-      },
-      "actions": {
-        "openMenu": "Ouvrir le menu",
-        "actionsLabel": "Actions",
-        "copyUserId": "Copier l'ID utilisateur",
-        "deleteUser": "Supprimer l'utilisateur",
-        "deleteUserConfirm": "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.",
-        "deleteUserSuccess": "Utilisateur supprimé avec succès",
-        "deleteUserError": "Échec de la suppression de l'utilisateur",
-        "copyId": "Copier l'ID",
-        "copyInvitationLink": "Copier le lien d'invitation",
-        "revokeInvitation": "Révoquer l'invitation",
-        "revokeInvitationConfirm": "Êtes-vous sûr de vouloir révoquer cette invitation ? L'utilisateur ne pourra plus utiliser ce lien.",
-        "revokeInvitationSuccess": "Invitation révoquée avec succès",
-        "revokeInvitationError": "Échec de la révocation de l'invitation",
-        "deleteInvitation": "Supprimer l'invitation",
-        "deleteInvitationConfirm": "Êtes-vous sûr de vouloir supprimer cette invitation ? L'utilisateur ne pourra plus utiliser ce lien.",
-        "deleteInvitationSuccess": "Invitation supprimée avec succès",
-        "deleteInvitationError": "Échec de la suppression de l'invitation",
-        "invitationLinkCopied": "Lien d'invitation copié dans le presse-papiers"
-      },
-      "invite": {
-        "button": "Inviter un utilisateur",
-        "title": "Inviter un utilisateur",
-        "description": "Envoyez un lien d'invitation à un nouvel utilisateur. L'invitation expirera dans 7 jours.",
-        "emailLabel": "Adresse e-mail",
-        "emailPlaceholder": "utilisateur@exemple.com",
-        "rolesLabel": "Rôles",
-        "rolesPlaceholder": "Sélectionner les rôles...",
-        "noRolesSelected": "Rôle par défaut uniquement",
-        "autoValidateEmail": "Valider l'e-mail automatiquement",
-        "creating": "Création...",
-        "sendInvitation": "Envoyer l'invitation",
-        "success": "Invitation créée",
-        "successDescription": "Le lien a été copié dans votre presse-papiers",
-        "shareDescription": "Partagez ce lien avec l'utilisateur pour qu'il puisse finaliser son inscription",
-        "copied": "Copié",
-        "copy": "Copier",
-        "linkCopied": "Lien copié dans le presse-papiers",
-        "done": "Terminé",
-        "createError": "Échec de la création de l'invitation"
-      },
-      "detail": {
-        "title": "Détails de l'utilisateur",
-        "subtitle": "Afficher et gérer les informations de l'utilisateur.",
-        "joinedAt": "Inscrit le {{date, date}}",
-        "verifiedAt": "{{date, DD/MM/YYYY}}",
-        "sections": {
-          "edit": {
-            "title": "Modifier l'utilisateur",
-            "description": "Mettre à jour les informations de l'utilisateur."
-          },
-          "roles": {
-            "title": "Rôles",
-            "description": "Gérer les rôles de l'utilisateur.",
-            "updateSuccess": "Rôles mis à jour avec succès",
-            "updateError": "Échec de la mise à jour des rôles"
-          },
-          "security": {
-            "title": "Sécurité",
-            "description": "Gérer les paramètres de sécurité de l'utilisateur."
-          },
-          "api": {
-            "title": "API",
-            "description": "Voir et supprimer les clés API actives de cet utilisateur."
-          },
-          "sessions": {
-            "title": "Sessions",
-            "description": "Voir et révoquer les sessions actives de cet utilisateur."
-          }
-        },
-        "fields": {
-          "name": "Nom",
-          "email": "E-mail"
-        },
-        "sessions": {
-          "device": "Appareil",
-          "ip": "Adresse IP",
-          "issuedAt": "Connecté le {{date, date}}",
-          "expiresAt": "Expire le {{date, date}}",
-          "revoke": "Révoquer",
-          "revokeConfirm": "Êtes-vous sûr de vouloir révoquer cette session ?",
-          "revokeSuccess": "Session révoquée avec succès",
-          "revokeError": "Échec de la révocation de la session",
-          "revokeAll": "Révoquer toutes les sessions",
-          "revokeAllConfirm": "Cela déconnectera {{name}} de tous ses appareils immédiatement.",
-          "revokeAllSuccess": "Toutes les sessions révoquées avec succès",
-          "revokeAllError": "Échec de la révocation des sessions",
-          "noSessions": "Aucune session active trouvée",
-          "unknownDevice": "Appareil inconnu"
-        },
-        "resetPassword": {
-          "button": "Réinitialiser le mot de passe",
-          "confirmTitle": "Réinitialiser le mot de passe",
-          "confirmDescription": "Êtes-vous sûr de vouloir réinitialiser le mot de passe de cet utilisateur ? Un nouveau mot de passe aléatoire sera généré.",
-          "successTitle": "Réinitialisation réussie",
-          "successDescription": "Le nouveau mot de passe a été généré. Assurez-vous de le copier et de le transmettre à l'utilisateur de manière sécurisée. Ce mot de passe ne sera plus affiché par la suite.",
-          "copied": "Mot de passe copié dans le presse-papiers"
-        },
-        "impersonate": {
-          "button": "Emprunter l'identité",
-          "confirmTitle": "Emprunter l'identité",
-          "confirmDescription": "Êtes-vous sûr de vouloir emprunter l'identité de {{name}} ? Vous serez connecté en tant que cet utilisateur jusqu'à ce que vous arrêtiez la session.",
-          "success": "Session en cours sous l'identité de {{name}}"
-        },
-        "apiKeys": {
-          "added": "Ajoutée le {{date, date}}",
-          "lastUse": "Dernière utilisation {{date, relative}}"
-        },
-        "createApiKey": {
-          "button": "Nouvelle clé API",
-          "success": "Clé API créée avec succès",
-          "successDescription": "La nouvelle clé API a été générée. Assurez-vous de la copier et de la transmettre à l'utilisateur de manière sécurisée. Cette clé ne sera plus affichée par la suite.",
-          "error": "Échec de la création de la clé API",
-          "copied": "Secret copié dans le presse-papiers",
-          "close": "Fermer"
-        },
-        "deleteApiKey": {
-          "button": "Supprimer",
-          "confirm": "Êtes-vous sûr de vouloir supprimer cette clé API ?",
-          "success": "Clé API supprimée avec succès",
-          "error": "Échec de la suppression de la clé API"
-        }
-      }
+    "changePasswordError": "Échec de la modification du mot de passe",
+    "changePasswordSuccess": "Mot de passe modifié avec succès",
+    "fields": {
+      "confirmPassword": "Confirmer le mot de passe",
+      "currentPassword": "Mot de passe actuel",
+      "email": "E-mail",
+      "name": "Nom",
+      "newPassword": "Nouveau mot de passe",
+      "passwordMismatch": "Les mots de passe ne correspondent pas",
+      "firstName": "Prénom",
+      "lastName": "Nom"
     },
-    "account": {
-      "title": "Compte",
-      "subtitle": "Gérez les paramètres de votre compte.",
-      "joinedAt": "Membre depuis le {{date, date}}",
-      "changePasswordSuccess": "Mot de passe modifié avec succès",
-      "changePasswordError": "Échec de la modification du mot de passe",
-      "sections": {
-        "profile": {
-          "title": "Informations du profil",
-          "description": "Mettez à jour vos informations de profil."
-        },
-        "password": {
-          "title": "Changer le mot de passe",
-          "description": "Mettez à jour le mot de passe de votre compte.",
-          "submit": "Changer le mot de passe"
-        },
-        "sessions": {
-          "title": "Sessions actives",
-          "description": "Gérez les appareils actuellement connectés à votre compte."
-        }
+    "joinedAt": "Membre depuis le {{date, date}}",
+    "sections": {
+      "password": {
+        "description": "Mettez à jour le mot de passe de votre compte.",
+        "submit": "Changer le mot de passe",
+        "title": "Changer le mot de passe",
+        "note": "Vos autres sessions resteront connectées."
       },
-      "fields": {
-        "name": "Nom",
-        "email": "E-mail",
-        "currentPassword": "Mot de passe actuel",
-        "newPassword": "Nouveau mot de passe",
-        "confirmPassword": "Confirmer le mot de passe",
-        "passwordMismatch": "Les mots de passe ne correspondent pas"
+      "profile": {
+        "description": "Mettez à jour vos informations de profil.",
+        "title": "Informations du profil",
+        "note": "Vos identifiants de connexion restent inchangés."
       },
       "sessions": {
-        "current": "Session actuelle",
-        "device": "Appareil",
-        "ip": "Adresse IP",
-        "issuedAt": "Connecté le {{date, date}}",
-        "expiresAt": "Expire le {{date, date}}",
-        "revoke": "Révoquer",
-        "revokeConfirm": "Êtes-vous sûr de vouloir révoquer cette session ? L'appareil sera déconnecté immédiatement.",
-        "revokeSuccess": "Session révoquée avec succès",
-        "revokeError": "Échec de la révocation de la session",
-        "revokeOthers": "Révoquer toutes les autres sessions",
-        "revokeOthersConfirm": "Cela déconnectera tous vos autres appareils. Votre session actuelle restera active.",
-        "revokeAllSuccess": "Toutes les autres sessions révoquées avec succès",
-        "revokeAllError": "Échec de la révocation des sessions",
-        "noSessions": "Aucune session active trouvée",
-        "unknownDevice": "Appareil inconnu"
+        "description": "Gérez les appareils actuellement connectés à votre compte.",
+        "title": "Sessions actives"
       }
     },
-    "nav": {
-      "myAccount": "Mon compte",
-      "toggle": "Basculer"
+    "sessions": {
+      "current": "Session actuelle",
+      "device": "Appareil",
+      "expiresAt": "Expire le {{date, date}}",
+      "ip": "Adresse IP",
+      "issuedAt": "Connecté le {{date, date}}",
+      "noSessions": "Aucune session active trouvée",
+      "revoke": "Révoquer",
+      "revokeAllError": "Échec de la révocation des sessions",
+      "revokeAllSuccess": "Toutes les autres sessions révoquées avec succès",
+      "revokeConfirm": "Êtes-vous sûr de vouloir révoquer cette session ? L'appareil sera déconnecté immédiatement.",
+      "revokeError": "Échec de la révocation de la session",
+      "revokeOthers": "Révoquer toutes les autres sessions",
+      "revokeOthersConfirm": "Cela déconnectera tous vos autres appareils. Votre session actuelle restera active.",
+      "revokeSuccess": "Session révoquée avec succès",
+      "unknownDevice": "Appareil inconnu"
     },
-    "logs": {
-      "title": "Journaux",
-      "subtitle": "Consulter l’activité du système et les actions des utilisateurs.",
-      "searchPlaceholder": "Rechercher dans les journaux...",
-      "impersonated": "Usurpé",
-      "impersonatedBy": "Action effectuée par l’usurpateur : {{id}}",
+    "subtitle": "Gérez les paramètres de votre compte.",
+    "title": "Compte",
+    "updateError": "Échec de la mise à jour du compte",
+    "updateSuccess": "Compte mis à jour avec succès",
+    "verified": "Vérifié",
+    "actions": {
+      "logout": "Se déconnecter"
+    },
+    "emailUnverified": "E-mail non vérifié",
+    "emailVerified": "E-mail vérifié",
+    "security": {
+      "emailUnverified": "E-mail non vérifié",
+      "emailUnverifiedDesc": "Confirmez votre adresse e-mail.",
+      "emailVerified": "E-mail vérifié",
+      "emailVerifiedDesc": "Votre adresse a été confirmée.",
+      "password": "Mot de passe",
+      "passwordDesc": "Choisissez un mot de passe long et unique.",
+      "title": "Sécurité du compte",
+      "twoFactor": "Double authentification",
+      "twoFactorDesc": "Bientôt disponible."
+    },
+    "summary": {
+      "activeSessions": "Sessions actives",
+      "id": "Identifiant",
+      "memberSince": "Membre depuis",
+      "status": "Statut",
+      "title": "Mon compte"
+    }
+  },
+  "actions": {
+    "add": "Ajouter",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "reset": "Réinitialiser",
+    "retry": "Réessayer",
+    "save": "Enregistrer",
+    "submit": "Soumettre"
+  },
+  "app": {
+    "caption": "Kit de démarrage BHVR",
+    "name": "Bunstack."
+  },
+  "backup": {
+    "title": "Sauvegardes",
+    "subtitle": "Déclenchez et restaurez manuellement des sauvegardes de la base de données.",
+    "cancel": "Annuler",
+    "restoreConfirm": "Cette action va écraser la base de données actuelle avec la sauvegarde sélectionnée. Elle est irréversible.",
+    "restoreConfirmAction": "Restaurer",
+    "s3": {
+      "title": "Sauvegardes S3",
+      "subtitle": "Sauvegarde et restauration depuis un stockage compatible S3.",
+      "notConfigured": "La sauvegarde S3 n'est pas configurée. Allez dans Paramètres → Sauvegarde pour la configurer.",
+      "empty": "Aucune sauvegarde trouvée. Déclenchez une sauvegarde pour commencer.",
+      "triggerBackup": "Déclencher une sauvegarde",
+      "triggerSuccess": "Sauvegarde terminée avec succès",
+      "triggerError": "Échec du déclenchement de la sauvegarde",
+      "restore": "Restaurer",
+      "restoreSuccess": "Base de données restaurée depuis la sauvegarde S3",
+      "restoreError": "Échec de la restauration depuis la sauvegarde S3",
+      "delete": "Supprimer",
+      "deleteSuccess": "Sauvegarde S3 supprimée",
+      "deleteError": "Échec de la suppression de la sauvegarde S3"
+    },
+    "local": {
+      "title": "Sauvegarde locale",
+      "subtitle": "Sauvegarde et restauration depuis le système de fichiers du serveur.",
+      "triggerBackup": "Déclencher une sauvegarde locale",
+      "triggerSuccess": "Sauvegarde locale terminée avec succès",
+      "triggerError": "Échec du déclenchement de la sauvegarde locale",
+      "empty": "Aucune sauvegarde locale trouvée.",
+      "restore": "Restaurer",
+      "restoreSuccess": "Base de données restaurée depuis un fichier local",
+      "restoreError": "Échec de la restauration depuis un fichier local",
+      "delete": "Supprimer",
+      "deleteSuccess": "Sauvegarde locale supprimée",
+      "deleteError": "Échec de la suppression de la sauvegarde locale"
+    },
+    "client": {
+      "title": "Sauvegarde client",
+      "subtitle": "Téléchargez un dump de la base de données directement sur votre ordinateur.",
+      "download": "Télécharger une sauvegarde",
+      "downloadSuccess": "Sauvegarde téléchargée avec succès",
+      "downloadError": "Échec de la génération de la sauvegarde"
+    }
+  },
+  "cron": {
+    "actions": {
+      "createError": "Échec de la création de la tâche",
+      "createSuccess": "Tâche créée avec succès",
+      "createTask": "Nouvelle tâche",
+      "deleteConfirm": "Êtes-vous sûr ? Tout l'historique d'exécution sera également supprimé.",
+      "deleteError": "Échec de la suppression de la tâche",
+      "deleteSuccess": "Tâche supprimée avec succès",
+      "deleteTask": "Supprimer la tâche",
+      "editTask": "Modifier la tâche",
+      "openMenu": "Ouvrir le menu",
+      "toggleError": "Échec de la mise à jour du statut de la tâche",
+      "toggleSuccess": "Statut de la tâche mis à jour",
+      "trigger": "Exécuter maintenant",
+      "triggerError": "Échec du déclenchement de la tâche",
+      "triggerSuccess": "Tâche déclenchée avec succès",
+      "updateError": "Échec de la mise à jour de la tâche",
+      "updateSuccess": "Tâche mise à jour avec succès"
+    },
+    "columns": {
+      "expression": "Expression",
+      "handler": "Handler",
+      "lastRun": "Dernière exécution",
+      "name": "Nom",
+      "nextRun": "Prochaine exécution",
+      "status": "Statut"
+    },
+    "detail": {
+      "chartTitle": "Exécutions — 30 derniers jours",
+      "runsTitle": "Historique d'exécution",
+      "timelineTitle": "Exécutions récentes",
+      "avgDuration": "Durée moyenne",
+      "never": "Jamais",
+      "totalRuns": "Exécutions totales"
+    },
+    "form": {
+      "cronExpression": "Expression cron",
+      "cronExpressionHelp": "ex. 0 * * * * (toutes les heures à la minute 0)",
+      "description": "Description",
+      "descriptionPlaceholder": "Description optionnelle...",
+      "handler": "Handler",
+      "isEnabled": "Activer immédiatement",
+      "name": "Nom",
+      "namePlaceholder": "Nettoyage quotidien"
+    },
+    "list": {
+      "searchPlaceholder": "Rechercher des tâches...",
+      "subtitle": "Gérez les tâches d'arrière-plan planifiées."
+    },
+    "runs": {
       "columns": {
-        "action": "Action",
-        "actor": "Auteur",
-        "target": "Cible",
-        "ip": "Adresse IP",
-        "timestamp": "Horodatage"
+        "duration": "Durée",
+        "output": "Sortie / Erreur",
+        "startedAt": "Démarré le",
+        "status": "Statut"
       },
-      "filters": {
-        "actionCategory": "Catégorie d'action",
-        "allActions": "Toutes les actions",
-        "targetType": "Type de cible",
-        "allTargets": "Toutes les cibles",
-        "categories": {
-          "auth": "Authentification",
-          "user": "Gestion des utilisateurs",
-          "account": "Compte",
-          "role": "Gestion des rôles",
-          "invitation": "Invitations",
-          "config": "Configuration",
-          "log": "Journaux",
-          "impersonation": "Usurpation",
-          "permission": "Permissions",
-          "system": "Système"
-        },
-        "targets": {
-          "user": "Utilisateur",
-          "role": "Rôle",
-          "invitation": "Invitation",
-          "config": "Configuration",
-          "log": "Journal",
-          "permission": "Permission",
-          "session": "Session",
-          "system": "Système"
-        }
-      },
-      "actions": {
-        "clearLogs": "Effacer les journaux",
-        "clearLogsConfirm": "Cela supprimera définitivement tous les journaux d'audit. Cette action est irréversible.",
-        "clearLogsSuccess": "Tous les journaux ont été effacés.",
-        "clearLogsError": "Échec de la suppression des journaux."
+      "status": {
+        "error": "Erreur",
+        "running": "En cours",
+        "success": "Succès"
       }
     },
-    "roles": {
-      "names": {
-        "admin": "Admin",
-        "user": "Utilisateur"
-      },
-      "badges": {
-        "default": "Par défaut",
-        "admin": "Admin"
-      }
+    "stats": {
+      "activeTasks": "Actives",
+      "runsToday": "Exécutions aujourd'hui",
+      "successRate": "Taux de réussite (7j)",
+      "totalTasks": "Total des tâches"
     },
-    "settings": {
-      "title": "Paramètres",
-      "actions": {
-        "save": "Enregistrer",
-        "cancel": "Annuler"
-      },
-      "updateSuccess": "Configuration mise à jour",
-      "updateError": "Échec de la mise à jour de la configuration",
-      "rotateSuccess": "Secret régénéré — toutes les sessions actives ont été invalidées",
-      "rotateError": "Échec de la régénération du secret",
-      "secretReveal": {
-        "title": "Secret généré",
-        "description": "Cette valeur ne sera affichée qu'une seule fois. Copiez-la maintenant et conservez-la en sécurité.",
-        "copy": "Copier",
-        "copied": "Copié",
-        "close": "Terminé"
-      },
-      "config": {
-        "security": {
-          "label": "Sécurité",
-          "jwt": {
-            "label": "JWT",
-            "secret": {
-              "label": "Secret JWT",
-              "description": "Clé secrète utilisée pour signer les JSON Web Tokens. La régénération invalidera toutes les sessions actives.",
-              "regenerate": "Régénérer le secret"
-            }
-          }
-        },
-        "authentication": {
-          "label": "Authentification",
-          "register": {
-            "label": "Inscription",
-            "enable": {
-              "label": "Activer l'inscription des utilisateurs",
-              "description": "Permet aux nouveaux utilisateurs de s'inscrire. Les nouveaux comptes peuvent être créés librement, sans invitation."
-            }
-          },
-          "google": {
-            "label": "Google",
-            "enable": {
-              "label": "Activer la connexion via Google",
-              "description": "Active la connexion via Google OAuth. Nécessite un identifiant client et un secret valides depuis la <docLink>Google Cloud Console</docLink>.",
-              "descriptionLink": "https://console.cloud.google.com/apis/credentials"
-            },
-            "clientId": {
-              "label": "Identifiant client Google",
-              "description": "Identifiant client OAuth 2.0 issu de vos identifiants <docLink>Google Cloud Console</docLink>.",
-              "descriptionLink": "https://console.cloud.google.com/apis/credentials"
-            },
-            "clientSecret": {
-              "label": "Secret client Google",
-              "description": "Secret client OAuth 2.0 issu de vos identifiants <docLink>Google Cloud Console</docLink>.",
-              "descriptionLink": "https://console.cloud.google.com/apis/credentials"
-            }
-          }
-        },
-        "branding": {
-          "label": "Apparence",
-          "appName": {
-            "label": "Nom de l'application",
-            "description": "Le nom affiché dans la barre latérale et l'onglet du navigateur."
-          },
-          "appCaption": {
-            "label": "Sous-titre de la barre latérale",
-            "description": "Courte accroche affichée sous le nom de l'application dans la barre latérale."
-          },
-          "logoUrl": {
-            "label": "URL du logo",
-            "description": "URL accessible publiquement vers votre image de logo (PNG/SVG recommandé)."
-          },
-          "faviconUrl": {
-            "label": "URL du favicon",
-            "description": "URL accessible publiquement vers votre favicon (ICO/PNG 16×16 ou 32×32)."
-          },
-          "primaryColor": {
-            "label": "Couleur principale",
-            "description": "Chaîne de couleur OKLCH, ex. oklch(0.61 0.22 42). Remplace la couleur d'accent principale."
-          },
-          "loginHeroTitle": {
-            "label": "Titre de la page de connexion",
-            "description": "Grand titre marketing sur le panneau gauche de la page de connexion."
-          },
-          "loginHeroSubtitle": {
-            "label": "Sous-titre de la page de connexion",
-            "description": "Texte d'accompagnement sous le titre sur la page de connexion."
-          }
-        },
-        "notifications": {
-          "label": "Notifications",
-          "discord": {
-            "label": "Discord",
-            "enable": {
-              "label": "Activer Discord",
-              "description": "Envoie des notifications dans un salon Discord via webhook. Consultez la <docLink>documentation Discord</docLink> pour en créer un.",
-              "descriptionLink": "https://support.discord.com/hc/fr/articles/228383668-Intro-to-Webhooks"
-            },
-            "url": {
-              "label": "URL du Webhook Discord",
-              "description": "URL du webhook entrant depuis les <docLink>paramètres de votre serveur Discord</docLink>.",
-              "descriptionLink": "https://support.discord.com/hc/fr/articles/228383668-Intro-to-Webhooks"
-            }
-          },
-          "smtp": {
-            "label": "SMTP",
-            "enable": {
-              "label": "Activer SMTP",
-              "description": "Envoie des notifications par e-mail via un serveur SMTP."
-            },
-            "host": {
-              "label": "Serveur SMTP",
-              "description": "Nom d'hôte ou adresse IP du serveur SMTP."
-            },
-            "port": {
-              "label": "Port SMTP",
-              "description": "Port utilisé pour se connecter au serveur SMTP (ex. 465, 587)."
-            },
-            "user": {
-              "label": "Nom d'utilisateur",
-              "description": "Nom d'utilisateur pour l'authentification auprès du serveur SMTP."
-            },
-            "password": {
-              "label": "Mot de passe",
-              "description": "Mot de passe pour l'authentification auprès du serveur SMTP."
-            },
-            "fromAddress": {
-              "label": "Adresse d'expédition",
-              "description": "Adresse e-mail affichée comme expéditeur pour les notifications sortantes."
-            }
-          }
-        }
-      }
+    "title": "Tâches planifiées"
+  },
+  "dialog": {
+    "confirmDescription": "Êtes-vous sûr de vouloir continuer ?",
+    "confirmTitle": "Êtes-vous sûr ?"
+  },
+  "errors": {
+    "api": {
+      "fallback": "Une erreur est survenue. Veuillez réessayer.",
+      "forbidden": "Vous n'avez pas l'autorisation d'effectuer cette action.",
+      "notFound": "Élément introuvable.",
+      "rateLimited": "Trop de requêtes. Patientez un instant avant de réessayer.",
+      "server": "Le serveur a rencontré un problème. Réessayez plus tard.",
+      "validation": "Certaines informations sont invalides."
     },
-    "notifications": {
-      "title": "Notifications",
-      "list": {
-        "title": "Notifications",
-        "subtitle": "Gérez vos fournisseurs de notifications.",
-        "searchPlaceholder": "Rechercher des fournisseurs...",
-        "createButton": "Créer une notification"
-      },
-      "create": {
-        "title": "Créer une notification",
-        "providerType": "Type de fournisseur"
-      },
-      "edit": {
-        "title": "Modifier le fournisseur de notifications"
-      },
-      "forms": {
-        "discord": {
-          "name": {
-            "label": "Nom",
-            "placeholder": "Bot Discord"
-          },
-          "webhookUrl": {
-            "label": "URL du Webhook",
-            "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
-          },
-          "decorations": {
-            "label": "Décorations",
-            "description": "Envoie les notifications sous forme de messages 'Embed' Discord."
-          },
-          "testNotification": "Tester la notification",
-          "testing": "Test en cours...",
-          "delete": "Supprimer",
-          "deleting": "Suppression...",
-          "submit": "Enregistrer",
-          "submitting": "Envoi...",
-          "deleteConfirm": {
-            "title": "Supprimer le fournisseur Discord",
-            "description": "Êtes-vous sûr de vouloir supprimer ce fournisseur Discord ?",
-            "confirmText": "Supprimer",
-            "cancelText": "Annuler"
-          },
-          "success": {
-            "created": "Fournisseur Discord créé avec succès",
-            "updated": "Fournisseur Discord mis à jour avec succès",
-            "deleted": "Fournisseur Discord supprimé avec succès",
-            "testSent": "Notification de test envoyée avec succès"
-          },
-          "error": {
-            "create": "Échec de la création du fournisseur Discord",
-            "update": "Échec de la mise à jour du fournisseur Discord",
-            "delete": "Échec de la suppression du fournisseur Discord",
-            "test": "Échec du test de notification"
-          }
-        },
-        "telegram": {
-          "name": {
-            "label": "Nom",
-            "placeholder": "Bot Telegram"
-          },
-          "botToken": {
-            "label": "Token du Bot",
-            "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-          },
-          "chatId": {
-            "label": "ID du Chat",
-            "placeholder": "1234567890"
-          },
-          "threadId": {
-            "label": "ID du fil (Thread ID)",
-            "placeholder": "1234567890",
-            "description": "Optionnel. À utiliser pour envoyer des notifications vers un sujet (topic) spécifique dans un groupe."
-          },
-          "testNotification": "Tester la notification",
-          "testing": "Test en cours...",
-          "delete": "Supprimer",
-          "deleting": "Suppression...",
-          "submit": "Enregistrer",
-          "submitting": "Envoi...",
-          "deleteConfirm": {
-            "title": "Supprimer le fournisseur Telegram",
-            "description": "Êtes-vous sûr de vouloir supprimer ce fournisseur Telegram ?",
-            "confirmText": "Supprimer",
-            "cancelText": "Annuler"
-          },
-          "success": {
-            "created": "Fournisseur Telegram créé avec succès",
-            "updated": "Fournisseur Telegram mis à jour avec succès",
-            "deleted": "Fournisseur Telegram supprimé avec succès",
-            "testSent": "Notification de test envoyée avec succès"
-          },
-          "error": {
-            "create": "Échec de la création du fournisseur Telegram",
-            "update": "Échec de la mise à jour du fournisseur Telegram",
-            "delete": "Échec de la suppression du fournisseur Telegram",
-            "test": "Échec du test de notification"
-          }
-        }
-      },
-      "columns": {
-        "name": "Nom",
-        "type": "Type"
-      },
-      "providers": {
-        "discord": "Discord",
-        "telegram": "Telegram"
-      },
-      "actions": {
-        "edit": "Modifier le fournisseur de notifications"
-      }
+    "boundary": {
+      "description": "Un grain de sable s'est glissé dans les rouages. Rien de cassé : réessayez, ou filez à l'accueil.",
+      "eyebrow": "Erreur inattendue",
+      "home": "Retour à l'accueil",
+      "reload": "Recharger",
+      "retry": "Réessayer",
+      "title": "Oups, ça a déraillé"
     },
-    "cron": {
-      "title": "Tâches planifiées",
-      "list": {
-        "subtitle": "Gérez les tâches d'arrière-plan planifiées.",
-        "searchPlaceholder": "Rechercher des tâches..."
-      },
-      "stats": {
-        "totalTasks": "Total des tâches",
-        "activeTasks": "Actives",
-        "successRate": "Taux de réussite (7j)",
-        "runsToday": "Exécutions aujourd'hui"
-      },
-      "columns": {
-        "name": "Nom",
-        "expression": "Expression",
-        "handler": "Handler",
-        "status": "Statut",
-        "lastRun": "Dernière exécution",
-        "nextRun": "Prochaine exécution"
-      },
-      "actions": {
-        "openMenu": "Ouvrir le menu",
-        "trigger": "Exécuter maintenant",
-        "triggerSuccess": "Tâche déclenchée avec succès",
-        "triggerError": "Échec du déclenchement de la tâche",
-        "toggleSuccess": "Statut de la tâche mis à jour",
-        "toggleError": "Échec de la mise à jour du statut de la tâche",
-        "createTask": "Nouvelle tâche",
-        "editTask": "Modifier la tâche",
-        "deleteTask": "Supprimer la tâche",
-        "deleteConfirm": "Êtes-vous sûr ? Tout l'historique d'exécution sera également supprimé.",
-        "deleteSuccess": "Tâche supprimée avec succès",
-        "deleteError": "Échec de la suppression de la tâche",
-        "createSuccess": "Tâche créée avec succès",
-        "createError": "Échec de la création de la tâche",
-        "updateSuccess": "Tâche mise à jour avec succès",
-        "updateError": "Échec de la mise à jour de la tâche"
-      },
-      "detail": {
-        "runsTitle": "Historique d'exécution",
-        "chartTitle": "Exécutions — 30 derniers jours",
-        "timelineTitle": "Exécutions récentes"
-      },
-      "runs": {
-        "columns": {
-          "status": "Statut",
-          "startedAt": "Démarré le",
-          "duration": "Durée",
-          "output": "Sortie / Erreur"
-        },
-        "status": {
-          "running": "En cours",
-          "success": "Succès",
-          "error": "Erreur"
-        }
-      },
-      "form": {
-        "name": "Nom",
-        "namePlaceholder": "Nettoyage quotidien",
-        "description": "Description",
-        "descriptionPlaceholder": "Description optionnelle...",
-        "cronExpression": "Expression cron",
-        "cronExpressionHelp": "ex. 0 * * * * (toutes les heures à la minute 0)",
-        "handler": "Handler",
-        "isEnabled": "Activer immédiatement"
-      }
+    "email": {
+      "invalidErrorMessage": "Veuillez entrer une adresse e-mail valide."
+    },
+    "notFound": {
+      "description": "Cette page a dû s'égarer entre deux dossiers. On vous raccompagne à l'accueil ?",
+      "eyebrow": "Page introuvable",
+      "home": "Retour à l'accueil",
+      "title": "Rien à cette adresse"
+    },
+    "rateLimited": {
+      "description": "Trop de requêtes en peu de temps. Patientez quelques instants, puis réessayez.",
+      "eyebrow": "Trop de requêtes",
+      "retry": "Réessayer",
+      "title": "On lève le pied un instant"
+    }
+  },
+  "form": {
+    "invalid": "Saisie invalide",
+    "noChanges": "Aucun changement",
+    "optional": "Optionnel",
+    "required": "Ce champ est obligatoire",
+    "saving": "Enregistrement en cours..."
+  },
+  "generic": {
+    "language": "Langue",
+    "no": "Non",
+    "off": "Désactivé",
+    "ok": "OK",
+    "on": "Activé",
+    "theme": "Thème",
+    "themeDark": "Sombre",
+    "themeLight": "Clair",
+    "themeModernMinimalDark": "Moderne Sombre",
+    "themeModernMinimalLight": "Moderne Clair",
+    "themeSystem": "Système",
+    "yes": "Oui",
+    "open": "Ouvrir"
+  },
+  "home": {
+    "greeting": {
+      "afternoon": "Bon après-midi",
+      "evening": "Bonsoir",
+      "morning": "Bonjour"
+    },
+    "manageUsers": "Gérer les utilisateurs",
+    "stats": {
+      "invitations": "Invitations",
+      "sessions": "Vos sessions",
+      "totalUsers": "Utilisateurs"
+    },
+    "subtitle": "Voici un aperçu de votre application. Tous les systèmes fonctionnent normalement.",
+    "title": "Tableau de bord",
+    "shortcuts": {
+      "title": "Accès rapides",
+      "users": "Utilisateurs"
+    },
+    "communications": {
+      "title": "Communications (30 j)",
+      "sent": "envois",
+      "failed": "échecs",
+      "viewAll": "Voir le journal"
     }
   },
   "impersonation": {
     "banner": "{{impersonator}} emprunte actuellement l'identité de {{user}}",
     "stop": "Arrêter l'impersonnalisation",
-    "stopped": "Impersonnalisation arrêtée",
-    "stopError": "Échec de l'arrêt de l'impersonnalisation"
+    "stopError": "Échec de l'arrêt de l'impersonnalisation",
+    "stopped": "Impersonnalisation arrêtée"
   },
-  "errors": {
-    "email": {
-      "invalidErrorMessage": "Veuillez entrer une adresse e-mail valide."
+  "logs": {
+    "actions": {
+      "clearLogs": "Effacer les journaux",
+      "clearLogsConfirm": "Cela supprimera définitivement tous les journaux d'audit. Cette action est irréversible.",
+      "clearLogsError": "Échec de la suppression des journaux.",
+      "clearLogsSuccess": "Tous les journaux ont été effacés."
+    },
+    "columns": {
+      "action": "Action",
+      "actor": "Auteur",
+      "ip": "Adresse IP",
+      "target": "Cible",
+      "timestamp": "Horodatage"
+    },
+    "filters": {
+      "actionCategory": "Catégorie d'action",
+      "allActions": "Toutes les actions",
+      "allTargets": "Toutes les cibles",
+      "categories": {
+        "account": "Compte",
+        "auth": "Authentification",
+        "config": "Configuration",
+        "impersonation": "Usurpation",
+        "invitation": "Invitations",
+        "log": "Journaux",
+        "permission": "Permissions",
+        "role": "Gestion des rôles",
+        "system": "Système",
+        "user": "Gestion des utilisateurs"
+      },
+      "targetType": "Type de cible",
+      "targets": {
+        "config": "Configuration",
+        "invitation": "Invitation",
+        "log": "Journal",
+        "permission": "Permission",
+        "role": "Rôle",
+        "session": "Session",
+        "system": "Système",
+        "user": "Utilisateur"
+      }
+    },
+    "impersonated": "Usurpé",
+    "impersonatedBy": "Action effectuée par l'usurpateur : {{id}}",
+    "searchPlaceholder": "Rechercher dans les journaux...",
+    "subtitle": "Consulter l'activité du système et les actions des utilisateurs.",
+    "title": "Journaux"
+  },
+  "cmdPalette": {
+    "title": "Palette de commandes",
+    "placeholder": "Rechercher ou naviguer…",
+    "navigation": "Navigation",
+    "actions": "Actions rapides",
+    "lastUsed": "Dernière action",
+    "noResults": "Aucun résultat"
+  },
+  "nav": {
+    "administration": "Administration",
+    "collapse": "Réduire",
+    "expand": "Développer",
+    "layout": "Disposition",
+    "layoutNavbar": "Barre du haut",
+    "layoutSidebar": "Barre latérale",
+    "mainNavigation": "Navigation principale",
+    "more": "Plus",
+    "myAccount": "Mon compte",
+    "primaryNavigation": "Navigation primaire",
+    "toggle": "Basculer",
+    "quotes": "Devis"
+  },
+  "navigation": {
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent"
+  },
+  "roles": {
+    "badges": {
+      "admin": "Admin",
+      "default": "Par défaut"
+    },
+    "names": {
+      "admin": "Admin",
+      "user": "Utilisateur"
     }
+  },
+  "settings": {
+    "actions": {
+      "cancel": "Annuler",
+      "save": "Enregistrer"
+    },
+    "config": {
+      "authentication": {
+        "google": {
+          "clientId": {
+            "description": "Identifiant client OAuth 2.0 issu de vos identifiants <docLink>Google Cloud Console</docLink>.",
+            "descriptionLink": "https://console.cloud.google.com/apis/credentials",
+            "label": "Identifiant client Google"
+          },
+          "clientSecret": {
+            "description": "Secret client OAuth 2.0 issu de vos identifiants <docLink>Google Cloud Console</docLink>.",
+            "descriptionLink": "https://console.cloud.google.com/apis/credentials",
+            "label": "Secret client Google"
+          },
+          "enable": {
+            "description": "Active la connexion via Google OAuth. Nécessite un identifiant client et un secret valides depuis la <docLink>Google Cloud Console</docLink>.",
+            "descriptionLink": "https://console.cloud.google.com/apis/credentials",
+            "label": "Activer la connexion via Google"
+          },
+          "label": "Google"
+        },
+        "label": "Authentification",
+        "register": {
+          "enable": {
+            "description": "Permet aux nouveaux utilisateurs de s'inscrire. Les nouveaux comptes peuvent être créés librement, sans invitation.",
+            "label": "Activer l'inscription des utilisateurs"
+          },
+          "label": "Inscription"
+        }
+      },
+      "branding": {
+        "appCaption": {
+          "description": "Courte accroche affichée sous le nom de l'application dans la barre latérale.",
+          "label": "Sous-titre de la barre latérale"
+        },
+        "appName": {
+          "description": "Le nom affiché dans la barre latérale et l'onglet du navigateur.",
+          "label": "Nom de l'application"
+        },
+        "faviconUrl": {
+          "label": "Favicon",
+          "description": "Icône affichée dans l'onglet du navigateur. PNG recommandé (16×16 ou 32×32), max 5 Mo.",
+          "add": "Ajouter une favicon",
+          "change": "Changer la favicon",
+          "remove": "Retirer la favicon",
+          "uploaded": "Favicon mise à jour",
+          "removed": "Favicon supprimée",
+          "uploadError": "Échec de la mise à jour de la favicon",
+          "invalidType": "Format non supporté",
+          "tooLarge": "Image trop volumineuse (max 5 Mo)"
+        },
+        "label": "Apparence",
+        "loginHeroSubtitle": {
+          "description": "Texte d'accompagnement sous le titre sur la page de connexion.",
+          "label": "Sous-titre de la page de connexion"
+        },
+        "loginHeroTitle": {
+          "description": "Grand titre marketing sur le panneau gauche de la page de connexion.",
+          "label": "Titre de la page de connexion"
+        },
+        "logoUrl": {
+          "label": "Logo de l'application",
+          "description": "Logo affiché dans la barre latérale, les pages de connexion et les invitations. PNG ou JPEG, max 5 Mo.",
+          "add": "Ajouter un logo",
+          "change": "Changer le logo",
+          "remove": "Retirer le logo",
+          "uploaded": "Logo mis à jour",
+          "removed": "Logo supprimé",
+          "uploadError": "Échec de la mise à jour du logo",
+          "invalidType": "Format non supporté (PNG ou JPEG uniquement)",
+          "tooLarge": "Image trop volumineuse (max 5 Mo)"
+        },
+        "primaryColor": {
+          "description": "Chaîne de couleur OKLCH, ex. oklch(0.61 0.22 42). Remplace la couleur d'accent principale.",
+          "label": "Couleur principale"
+        }
+      },
+      "notifications": {
+        "discord": {
+          "enable": {
+            "description": "Envoie des notifications dans un salon Discord via webhook. Consultez la <docLink>documentation Discord</docLink> pour en créer un.",
+            "descriptionLink": "https://support.discord.com/hc/fr/articles/228383668-Intro-to-Webhooks",
+            "label": "Activer Discord"
+          },
+          "label": "Discord",
+          "url": {
+            "description": "URL du webhook entrant depuis les <docLink>paramètres de votre serveur Discord</docLink>.",
+            "descriptionLink": "https://support.discord.com/hc/fr/articles/228383668-Intro-to-Webhooks",
+            "label": "URL du Webhook Discord"
+          }
+        },
+        "label": "Notifications",
+        "smtp": {
+          "enable": {
+            "description": "Envoie des notifications par e-mail via un serveur SMTP.",
+            "label": "Activer SMTP"
+          },
+          "fromAddress": {
+            "description": "Adresse e-mail affichée comme expéditeur pour les notifications sortantes.",
+            "label": "Adresse d'expédition"
+          },
+          "host": {
+            "description": "Nom d'hôte ou adresse IP du serveur SMTP.",
+            "label": "Serveur SMTP"
+          },
+          "label": "SMTP",
+          "password": {
+            "description": "Mot de passe pour l'authentification auprès du serveur SMTP.",
+            "label": "Mot de passe"
+          },
+          "port": {
+            "description": "Port utilisé pour se connecter au serveur SMTP (ex. 465, 587).",
+            "label": "Port SMTP"
+          },
+          "user": {
+            "description": "Nom d'utilisateur pour l'authentification auprès du serveur SMTP.",
+            "label": "Nom d'utilisateur"
+          }
+        }
+      },
+      "storage": {
+        "label": "Stockage",
+        "s3": {
+          "label": "Stockage S3",
+          "endpoint": {
+            "label": "Point d'accès S3",
+            "description": "URL du stockage compatible S3 (ex. https://s3.amazonaws.com). Requis pour activer le stockage de documents."
+          },
+          "accessKey": {
+            "label": "Clé d'accès",
+            "description": "Identifiant de clé d'accès S3. Stocké chiffré — ne pas partager."
+          },
+          "secretKey": {
+            "label": "Clé secrète",
+            "description": "Clé secrète d'accès S3. Stockée chiffrée — ne pas partager."
+          },
+          "bucket": {
+            "label": "Bucket",
+            "description": "Nom du bucket S3 où les documents sont stockés."
+          },
+          "region": {
+            "label": "Région",
+            "description": "Région AWS ou équivalent (ex. us-east-1)."
+          }
+        }
+      },
+      "security": {
+        "jwt": {
+          "label": "JWT",
+          "secret": {
+            "description": "Clé secrète utilisée pour signer les JSON Web Tokens. La régénération invalidera toutes les sessions actives.",
+            "label": "Secret JWT",
+            "regenerate": "Régénérer le secret"
+          }
+        },
+        "label": "Sécurité"
+      },
+      "secretField": {
+        "configured": "Configuré — entrez une nouvelle valeur pour remplacer",
+        "notSet": "Non défini"
+      },
+      "email": {
+        "label": "Email",
+        "apiKey": {
+          "label": "Clé API",
+          "description": "Clé API Resend utilisée pour envoyer les emails transactionnels. Stockée chiffrée — ne pas la partager."
+        },
+        "fromAddress": {
+          "label": "Adresse d’expédition",
+          "description": "Adresse email utilisée comme expéditeur des emails transactionnels."
+        },
+        "fromName": {
+          "label": "Nom d’expéditeur",
+          "description": "Nom affiché comme expéditeur des emails transactionnels."
+        }
+      }
+    },
+    "rotateError": "Échec de la régénération du secret",
+    "rotateSuccess": "Secret régénéré — toutes les sessions actives ont été invalidées",
+    "secretReveal": {
+      "close": "Terminé",
+      "copied": "Copié",
+      "copy": "Copier",
+      "description": "Cette valeur ne sera affichée qu'une seule fois. Copiez-la maintenant et conservez-la en sécurité.",
+      "title": "Secret généré"
+    },
+    "subtitle": "Configurez les paramètres d'exécution de votre application.",
+    "title": "Paramètres",
+    "updateError": "Échec de la mise à jour de la configuration",
+    "updateSuccess": "Configuration mise à jour",
+    "fieldDefault": "défaut",
+    "overrides": "{{count}} override(s)",
+    "saveBar": {
+      "cancel": "Annuler",
+      "pending": "{{count}} changement(s) non enregistré(s)",
+      "save": "Sauvegarder",
+      "saved": "Modifications enregistrées"
+    },
+    "sectionsLabel": "Sections",
+    "eyebrow": "Config runtime · sans redéploiement",
+    "rotate": {
+      "confirmTitle": "Régénérer la clé ?",
+      "confirmDescription": "L'ancienne valeur sera immédiatement invalidée. Les intégrations qui l'utilisent devront être mises à jour."
+    }
+  },
+  "status": {
+    "error": "Une erreur s'est produite",
+    "loading": "Chargement...",
+    "noData": "Aucune donnée disponible",
+    "success": "Succès"
+  },
+  "users": {
+    "actions": {
+      "actionsLabel": "Actions",
+      "copyId": "Copier l'ID",
+      "copyInvitationLink": "Copier le lien d'invitation",
+      "copyUserId": "Copier l'ID utilisateur",
+      "deleteInvitation": "Supprimer l'invitation",
+      "deleteInvitationConfirm": "Êtes-vous sûr de vouloir supprimer cette invitation ? L'utilisateur ne pourra plus utiliser ce lien.",
+      "deleteInvitationError": "Échec de la suppression de l'invitation",
+      "deleteInvitationSuccess": "Invitation supprimée avec succès",
+      "deleteUser": "Supprimer l'utilisateur",
+      "deleteUserConfirm": "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.",
+      "deleteUserError": "Échec de la suppression de l'utilisateur",
+      "deleteUserSuccess": "Utilisateur supprimé avec succès",
+      "invitationLinkCopied": "Lien d'invitation copié dans le presse-papiers",
+      "openMenu": "Ouvrir le menu",
+      "revokeInvitation": "Révoquer l'invitation",
+      "revokeInvitationConfirm": "Êtes-vous sûr de vouloir révoquer cette invitation ? L'utilisateur ne pourra plus utiliser ce lien.",
+      "revokeInvitationError": "Échec de la révocation de l'invitation",
+      "revokeInvitationSuccess": "Invitation révoquée avec succès",
+      "updateUserError": "Échec de la mise à jour de l'utilisateur",
+      "updateUserSuccess": "Utilisateur mis à jour avec succès"
+    },
+    "columns": {
+      "accepted": "Acceptée le",
+      "email": "E-mail",
+      "expires": "Expire le",
+      "invitedBy": "Invité par",
+      "joined": "Inscrit le",
+      "name": "Nom",
+      "roles": "Rôles",
+      "status": "Statut"
+    },
+    "detail": {
+      "apiKeys": {
+        "added": "Ajoutée le {{date, date}}",
+        "lastUse": "Dernière utilisation {{date, relative}}"
+      },
+      "createApiKey": {
+        "button": "Nouvelle clé API",
+        "close": "Fermer",
+        "copied": "Secret copié dans le presse-papiers",
+        "error": "Échec de la création de la clé API",
+        "success": "Clé API créée avec succès",
+        "successDescription": "La nouvelle clé API a été générée. Assurez-vous de la copier et de la transmettre à l'utilisateur de manière sécurisée. Cette clé ne sera plus affichée par la suite."
+      },
+      "deleteApiKey": {
+        "button": "Supprimer",
+        "confirm": "Êtes-vous sûr de vouloir supprimer cette clé API ?",
+        "error": "Échec de la suppression de la clé API",
+        "success": "Clé API supprimée avec succès"
+      },
+      "fields": {
+        "email": "E-mail",
+        "name": "Nom",
+        "firstName": "Prénom",
+        "lastName": "Nom"
+      },
+      "impersonate": {
+        "button": "Emprunter l'identité",
+        "confirmDescription": "Êtes-vous sûr de vouloir emprunter l'identité de {{name}} ? Vous serez connecté en tant que cet utilisateur jusqu'à ce que vous arrêtiez la session.",
+        "confirmTitle": "Emprunter l'identité",
+        "error": "Échec de l'usurpation d'identité",
+        "success": "Session en cours sous l'identité de {{name}}"
+      },
+      "joinedAt": "Inscrit le {{date, date}}",
+      "resetPassword": {
+        "button": "Réinitialiser le mot de passe",
+        "confirmDescription": "Êtes-vous sûr de vouloir réinitialiser le mot de passe de cet utilisateur ? Un nouveau mot de passe aléatoire sera généré.",
+        "confirmTitle": "Réinitialiser le mot de passe",
+        "copied": "Mot de passe copié dans le presse-papiers",
+        "error": "Échec de la réinitialisation du mot de passe",
+        "successDescription": "Le nouveau mot de passe a été généré. Assurez-vous de le copier et de le transmettre à l'utilisateur de manière sécurisée. Ce mot de passe ne sera plus affiché par la suite.",
+        "successTitle": "Réinitialisation réussie"
+      },
+      "sections": {
+        "api": {
+          "description": "Voir et supprimer les clés API actives de cet utilisateur.",
+          "title": "API"
+        },
+        "edit": {
+          "description": "Mettre à jour les informations de l'utilisateur.",
+          "title": "Modifier l'utilisateur",
+          "note": "Ces informations sont visibles par l'équipe."
+        },
+        "roles": {
+          "description": "Gérer les rôles de l'utilisateur.",
+          "title": "Rôles",
+          "updateError": "Échec de la mise à jour des rôles",
+          "updateSuccess": "Rôles mis à jour avec succès",
+          "defaultHint": "Le rôle par défaut est toujours attribué et ne peut être retiré.",
+          "pending": "Modifications en attente.",
+          "addRole": "Ajouter un rôle",
+          "defaultBadge": "Par défaut"
+        },
+        "security": {
+          "description": "Gérer les paramètres de sécurité de l'utilisateur.",
+          "title": "Sécurité"
+        },
+        "sessions": {
+          "description": "Voir et révoquer les sessions actives de cet utilisateur.",
+          "title": "Sessions"
+        }
+      },
+      "sessions": {
+        "device": "Appareil",
+        "expiresAt": "Expire le {{date, date}}",
+        "ip": "Adresse IP",
+        "issuedAt": "Connecté le {{date, date}}",
+        "noSessions": "Aucune session active trouvée",
+        "revoke": "Révoquer",
+        "revokeAll": "Révoquer toutes les sessions",
+        "revokeAllConfirm": "Cela déconnectera {{name}} de tous ses appareils immédiatement.",
+        "revokeAllError": "Échec de la révocation des sessions",
+        "revokeAllSuccess": "Toutes les sessions révoquées avec succès",
+        "revokeConfirm": "Êtes-vous sûr de vouloir révoquer cette session ?",
+        "revokeError": "Échec de la révocation de la session",
+        "revokeSuccess": "Session révoquée avec succès",
+        "unknownDevice": "Appareil inconnu"
+      },
+      "subtitle": "Afficher et gérer les informations de l'utilisateur.",
+      "title": "Détails de l'utilisateur",
+      "verifiedAt": "{{date, DD/MM/YYYY}}",
+      "danger": {
+        "delete": "Supprimer l'utilisateur",
+        "description": "La suppression retire définitivement l'utilisateur et révoque tous ses accès. Action irréversible.",
+        "title": "Zone de danger"
+      },
+      "summary": {
+        "apiKeys": "Clés API",
+        "title": "Résumé du compte"
+      }
+    },
+    "invite": {
+      "autoValidateEmail": "Valider l'e-mail automatiquement",
+      "button": "Inviter un utilisateur",
+      "copy": "Copier",
+      "copied": "Copié",
+      "createError": "Échec de la création de l'invitation",
+      "creating": "Création...",
+      "description": "Envoyez un lien d'invitation à un nouvel utilisateur. L'invitation expirera dans 7 jours.",
+      "done": "Terminé",
+      "emailLabel": "Adresse e-mail",
+      "emailPlaceholder": "utilisateur@exemple.com",
+      "linkCopied": "Lien copié dans le presse-papiers",
+      "noRolesSelected": "Rôle par défaut uniquement",
+      "rolesLabel": "Rôles",
+      "rolesPlaceholder": "Sélectionner les rôles...",
+      "sendInvitation": "Envoyer l'invitation",
+      "shareDescription": "Partagez ce lien avec l'utilisateur pour qu'il puisse finaliser son inscription",
+      "success": "Invitation créée",
+      "successDescription": "Le lien a été copié dans votre presse-papiers",
+      "title": "Inviter un utilisateur"
+    },
+    "invitations": {
+      "searchPlaceholder": "Rechercher des invitations...",
+      "subtitle": "Gérez les invitations en attente et passées.",
+      "title": "Invitations"
+    },
+    "list": {
+      "searchPlaceholder": "Rechercher des utilisateurs...",
+      "subtitle": "Gérez vos utilisateurs."
+    },
+    "status": {
+      "accepted": "Acceptée",
+      "expired": "Expirée",
+      "pending": "En attente",
+      "revoked": "Révoquée"
+    },
+    "title": "Utilisateurs",
+    "eyebrow": "{{count}} membres",
+    "stats": {
+      "invitations": "Invitations",
+      "members": "Membres",
+      "roles": "Rôles définis"
+    },
+    "subtitle": "Gérez les comptes et les invitations.",
+    "systemUser": "Utilisateur système",
+    "unverified": "Non vérifié",
+    "verified": "Vérifié"
+  },
+  "imageUpload": {
+    "urlImportTitle": "Importer depuis une URL",
+    "urlImportDescription": "Collez l'URL publique d'une image (PNG, JPEG, WebP…). L'image sera téléchargée et stockée sur nos serveurs.",
+    "urlImportError": "Échec de l'import depuis l'URL",
+    "importButton": "Importer",
+    "importing": "Import en cours…",
+    "urlOption": "Importer via URL"
   }
 }

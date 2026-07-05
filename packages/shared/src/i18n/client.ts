@@ -26,9 +26,9 @@ export function createClientI18n(extra: Partial<InitOptions> = {}): i18n {
 
   instance.init({
     fallbackLng: "en",
-    defaultNS: "common",
+    defaultNS: "web",
     ns: Object.keys(en) as string[],
-    supportedLngs: ["de", "en", "es", "fr", "it", "nl"],
+    supportedLngs: ["en", "fr"],
     resources: bundledResources,
     interpolation: {
       escapeValue: false,

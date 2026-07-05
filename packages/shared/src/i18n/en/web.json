@@ -1,589 +1,797 @@
 {
-  "pages": {
-    "home": {
-      "title": "Dashboard"
+  "account": {
+    "photo": {
+      "menuLabel": "Profile photo",
+      "change": "Change photo",
+      "remove": "Remove photo",
+      "uploaded": "Profile photo updated",
+      "removed": "Profile photo removed",
+      "uploadError": "Failed to update photo",
+      "tooLarge": "Image too large (max 5 MB)",
+      "invalidType": "Unsupported image format"
     },
-    "users": {
-      "title": "Users",
-      "list": {
-        "title": "Users",
-        "subtitle": "Manage your users.",
-        "searchPlaceholder": "Search users..."
-      },
-      "invitations": {
-        "title": "Invitations",
-        "subtitle": "Manage pending and past invitations.",
-        "searchPlaceholder": "Search invitations..."
-      },
-      "columns": {
-        "name": "Name",
-        "roles": "Roles",
-        "joined": "Joined",
-        "email": "Email",
-        "status": "Status",
-        "invitedBy": "Invited By",
-        "expires": "Expires",
-        "accepted": "Accepted"
-      },
-      "status": {
-        "pending": "Pending",
-        "accepted": "Accepted",
-        "expired": "Expired",
-        "revoked": "Revoked"
-      },
-      "actions": {
-        "openMenu": "Open menu",
-        "actionsLabel": "Actions",
-        "copyUserId": "Copy User ID",
-        "deleteUser": "Delete User",
-        "deleteUserConfirm": "Are you sure you want to delete this user? This action cannot be undone.",
-        "deleteUserSuccess": "User deleted successfully",
-        "deleteUserError": "Failed to delete user",
-        "copyId": "Copy ID",
-        "copyInvitationLink": "Copy Invitation Link",
-        "revokeInvitation": "Revoke Invitation",
-        "revokeInvitationConfirm": "Are you sure you want to revoke this invitation? The user will no longer be able to use this link.",
-        "revokeInvitationSuccess": "Invitation revoked successfully",
-        "revokeInvitationError": "Failed to revoke invitation",
-        "deleteInvitation": "Delete Invitation",
-        "deleteInvitationConfirm": "Are you sure you want to delete this invitation? The user will no longer be able to use this link.",
-        "deleteInvitationSuccess": "Invitation deleted successfully",
-        "deleteInvitationError": "Failed to delete invitation",
-        "invitationLinkCopied": "Invitation link copied to clipboard"
-      },
-      "invite": {
-        "button": "Invite user",
-        "title": "Invite User",
-        "description": "Send an invitation link to a new user. The invitation will expire in 7 days.",
-        "emailLabel": "Email Address",
-        "emailPlaceholder": "user@example.com",
-        "rolesLabel": "Roles",
-        "rolesPlaceholder": "Select roles...",
-        "noRolesSelected": "Default role only",
-        "autoValidateEmail": "Auto validate email",
-        "creating": "Creating...",
-        "sendInvitation": "Send Invitation",
-        "success": "Invitation Created",
-        "successDescription": "The link has been copied to your clipboard",
-        "shareDescription": "Share this link with the user to complete their registration",
-        "copied": "Copied",
-        "copy": "Copy",
-        "linkCopied": "Link copied to clipboard",
-        "done": "Done",
-        "createError": "Failed to create invitation"
-      },
-      "detail": {
-        "title": "User Details",
-        "subtitle": "View and manage user information.",
-        "joinedAt": "Joined at {{date, date}}",
-        "verifiedAt": "{{date, YYYY/DD/YYYY}}",
-        "sections": {
-          "edit": {
-            "title": "Edit User",
-            "description": "Update user information."
-          },
-          "roles": {
-            "title": "Roles",
-            "description": "Manage user roles.",
-            "updateSuccess": "Roles updated successfully",
-            "updateError": "Failed to update roles"
-          },
-          "security": {
-            "title": "Security",
-            "description": "Manage user security settings."
-          },
-          "api": {
-            "title": "API",
-            "description": "View and delete active API keys for this user."
-          },
-          "sessions": {
-            "title": "Sessions",
-            "description": "View and revoke active sessions for this user."
-          }
-        },
-        "fields": {
-          "name": "Name",
-          "email": "Email"
-        },
-        "sessions": {
-          "device": "Device",
-          "ip": "IP Address",
-          "issuedAt": "Signed in {{date, relative}}",
-          "expiresAt": "Expires {{date, date}}",
-          "revoke": "Revoke",
-          "revokeConfirm": "Are you sure you want to revoke this session?",
-          "revokeSuccess": "Session revoked successfully",
-          "revokeError": "Failed to revoke session",
-          "revokeAll": "Revoke all sessions",
-          "revokeAllConfirm": "This will sign out {{name}} from all devices immediately.",
-          "revokeAllSuccess": "All sessions revoked successfully",
-          "revokeAllError": "Failed to revoke sessions",
-          "noSessions": "No active sessions found",
-          "unknownDevice": "Unknown device"
-        },
-        "resetPassword": {
-          "button": "Reset Password",
-          "confirmTitle": "Reset Password",
-          "confirmDescription": "Are you sure you want to reset this user's password? A new random password will be generated.",
-          "successTitle": "Password Reset Successful",
-          "successDescription": "The new password has been generated. Make sure to copy it and share it with the user securely. This password will not be shown again.",
-          "copied": "Password copied to clipboard"
-        },
-        "impersonate": {
-          "button": "Impersonate User",
-          "confirmTitle": "Impersonate User",
-          "confirmDescription": "Are you sure you want to impersonate {{name}}? You will be logged in as this user until you stop impersonating.",
-          "success": "Now impersonating {{name}}"
-        },
-        "apiKeys": {
-          "added": "Added on {{date, date}}",
-          "lastUse": "Last use {{date, relative}}"
-        },
-        "createApiKey": {
-          "button": "New API key",
-          "success": "API key successfully created",
-          "successDescription": "The new API key has been generated. Make sure to copy it and share it with the user securely. This key will not be shown again.",
-          "error": "Failed to create API key",
-          "copied": "Secret copied to clipboard",
-          "close": "Done"
-        },
-        "deleteApiKey": {
-          "button": "Delete",
-          "confirm": "Are you sure you want to delete this API key?",
-          "success": "API key successfully deleted",
-          "error": "Failed to delete API key"
-        }
-      }
+    "changePasswordError": "Failed to change password",
+    "changePasswordSuccess": "Password changed successfully",
+    "fields": {
+      "confirmPassword": "Confirm Password",
+      "currentPassword": "Current Password",
+      "email": "Email",
+      "name": "Name",
+      "newPassword": "New Password",
+      "passwordMismatch": "Passwords do not match",
+      "firstName": "First name",
+      "lastName": "Last name"
     },
-    "account": {
-      "title": "Account",
-      "subtitle": "Manage your account settings.",
-      "joinedAt": "Joined at {{date, date}}",
-      "changePasswordSuccess": "Password changed successfully",
-      "changePasswordError": "Failed to change password",
-      "sections": {
-        "profile": {
-          "title": "Profile Information",
-          "description": "Update your profile information."
-        },
-        "password": {
-          "title": "Change Password",
-          "description": "Update your account password.",
-          "submit": "Change Password"
-        },
-        "sessions": {
-          "title": "Active Sessions",
-          "description": "Manage devices currently signed in to your account."
-        }
+    "joinedAt": "Joined at {{date, date}}",
+    "sections": {
+      "password": {
+        "description": "Update your account password.",
+        "submit": "Change Password",
+        "title": "Change Password",
+        "note": "Your other sessions will stay signed in."
       },
-      "fields": {
-        "name": "Name",
-        "email": "Email",
-        "currentPassword": "Current Password",
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm Password",
-        "passwordMismatch": "Passwords do not match"
+      "profile": {
+        "description": "Update your profile information.",
+        "title": "Profile Information",
+        "note": "Your sign-in credentials remain unchanged."
       },
       "sessions": {
-        "current": "Current session",
-        "device": "Device",
-        "ip": "IP Address",
-        "issuedAt": "Signed in {{date, date}}",
-        "expiresAt": "Expires {{date, date}}",
-        "revoke": "Revoke",
-        "revokeConfirm": "Are you sure you want to revoke this session? The device will be signed out immediately.",
-        "revokeSuccess": "Session revoked successfully",
-        "revokeError": "Failed to revoke session",
-        "revokeOthers": "Revoke all other sessions",
-        "revokeOthersConfirm": "This will sign out all other devices. Your current session will remain active.",
-        "revokeAllSuccess": "All other sessions revoked successfully",
-        "revokeAllError": "Failed to revoke sessions",
-        "noSessions": "No active sessions found",
-        "unknownDevice": "Unknown device"
+        "description": "Manage devices currently signed in to your account.",
+        "title": "Active Sessions"
       }
     },
-    "nav": {
-      "myAccount": "My Account",
-      "toggle": "Toggle"
+    "sessions": {
+      "current": "Current session",
+      "device": "Device",
+      "expiresAt": "Expires {{date, date}}",
+      "ip": "IP Address",
+      "issuedAt": "Signed in {{date, date}}",
+      "noSessions": "No active sessions found",
+      "revoke": "Revoke",
+      "revokeAllError": "Failed to revoke sessions",
+      "revokeAllSuccess": "All other sessions revoked successfully",
+      "revokeConfirm": "Are you sure you want to revoke this session? The device will be signed out immediately.",
+      "revokeError": "Failed to revoke session",
+      "revokeOthers": "Revoke all other sessions",
+      "revokeOthersConfirm": "This will sign out all other devices. Your current session will remain active.",
+      "revokeSuccess": "Session revoked successfully",
+      "unknownDevice": "Unknown device"
     },
-    "logs": {
-      "title": "Logs",
-      "subtitle": "View system activity and user actions.",
-      "searchPlaceholder": "Search logs...",
-      "impersonated": "Impersonated",
-      "impersonatedBy": "Action performed by impersonator: {{id}}",
+    "subtitle": "Manage your account settings.",
+    "title": "Account",
+    "updateError": "Failed to update account",
+    "updateSuccess": "Account updated successfully",
+    "verified": "Verified",
+    "actions": {
+      "logout": "Sign out"
+    },
+    "emailUnverified": "Email not verified",
+    "emailVerified": "Email verified",
+    "security": {
+      "emailUnverified": "Email not verified",
+      "emailUnverifiedDesc": "Confirm your email address.",
+      "emailVerified": "Email verified",
+      "emailVerifiedDesc": "Your address has been confirmed.",
+      "password": "Password",
+      "passwordDesc": "Use a long, unique password.",
+      "title": "Account security",
+      "twoFactor": "Two-factor authentication",
+      "twoFactorDesc": "Coming soon."
+    },
+    "summary": {
+      "activeSessions": "Active sessions",
+      "id": "Identifier",
+      "memberSince": "Member since",
+      "status": "Status",
+      "title": "My account"
+    }
+  },
+  "actions": {
+    "add": "Add",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "reset": "Reset",
+    "retry": "Retry",
+    "save": "Save",
+    "submit": "Submit"
+  },
+  "app": {
+    "caption": "BHVR Starter Kit",
+    "name": "Bunstack."
+  },
+  "backup": {
+    "title": "Backups",
+    "subtitle": "Manually trigger and restore database backups.",
+    "cancel": "Cancel",
+    "restoreConfirm": "This will overwrite the current database with the selected backup. This action is irreversible.",
+    "restoreConfirmAction": "Restore",
+    "s3": {
+      "title": "S3 Backups",
+      "subtitle": "Backup and restore from S3-compatible storage.",
+      "notConfigured": "S3 backup is not configured. Go to Settings → Backup to set it up.",
+      "empty": "No backups found. Trigger a backup to get started.",
+      "triggerBackup": "Trigger Backup",
+      "triggerSuccess": "Backup completed successfully",
+      "triggerError": "Failed to trigger backup",
+      "restore": "Restore",
+      "restoreSuccess": "Database restored from S3 backup",
+      "restoreError": "Failed to restore from S3 backup",
+      "delete": "Delete",
+      "deleteSuccess": "S3 backup deleted",
+      "deleteError": "Failed to delete S3 backup"
+    },
+    "local": {
+      "title": "Local Backup",
+      "subtitle": "Backup and restore from the server filesystem.",
+      "triggerBackup": "Trigger Local Backup",
+      "triggerSuccess": "Local backup completed successfully",
+      "triggerError": "Failed to trigger local backup",
+      "empty": "No local backups found.",
+      "restore": "Restore",
+      "restoreSuccess": "Database restored from local file",
+      "restoreError": "Failed to restore from local file",
+      "delete": "Delete",
+      "deleteSuccess": "Local backup deleted",
+      "deleteError": "Failed to delete local backup"
+    },
+    "client": {
+      "title": "Client Backup",
+      "subtitle": "Download a live database dump directly to your computer.",
+      "download": "Download Backup",
+      "downloadSuccess": "Backup downloaded successfully",
+      "downloadError": "Failed to generate backup for download"
+    }
+  },
+  "cron": {
+    "actions": {
+      "createError": "Failed to create task",
+      "createSuccess": "Task created successfully",
+      "createTask": "New Task",
+      "deleteConfirm": "Are you sure? All execution history will also be deleted.",
+      "deleteError": "Failed to delete task",
+      "deleteSuccess": "Task deleted successfully",
+      "deleteTask": "Delete Task",
+      "editTask": "Edit Task",
+      "openMenu": "Open menu",
+      "toggleError": "Failed to update task status",
+      "toggleSuccess": "Task status updated",
+      "trigger": "Run Now",
+      "triggerError": "Failed to trigger task",
+      "triggerSuccess": "Task triggered successfully",
+      "updateError": "Failed to update task",
+      "updateSuccess": "Task updated successfully"
+    },
+    "columns": {
+      "expression": "Expression",
+      "handler": "Handler",
+      "lastRun": "Last Run",
+      "name": "Name",
+      "nextRun": "Next Run",
+      "status": "Status"
+    },
+    "detail": {
+      "chartTitle": "Runs — Last 30 Days",
+      "runsTitle": "Execution History",
+      "timelineTitle": "Recent Runs",
+      "avgDuration": "Avg duration",
+      "never": "Never",
+      "totalRuns": "Total runs"
+    },
+    "form": {
+      "cronExpression": "Cron Expression",
+      "cronExpressionHelp": "e.g. 0 * * * * (every hour at minute 0)",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description...",
+      "handler": "Handler",
+      "isEnabled": "Enable immediately",
+      "name": "Name",
+      "namePlaceholder": "Daily Cleanup"
+    },
+    "list": {
+      "searchPlaceholder": "Search tasks...",
+      "subtitle": "Manage scheduled background tasks."
+    },
+    "runs": {
       "columns": {
-        "action": "Action",
-        "actor": "Actor",
-        "target": "Target",
-        "ip": "IP Address",
-        "timestamp": "Timestamp"
+        "duration": "Duration",
+        "output": "Output / Error",
+        "startedAt": "Started At",
+        "status": "Status"
       },
-      "filters": {
-        "actionCategory": "Action category",
-        "allActions": "All actions",
-        "targetType": "Target type",
-        "allTargets": "All targets",
-        "categories": {
-          "auth": "Authentication",
-          "user": "User management",
-          "account": "Account",
-          "role": "Role management",
-          "invitation": "Invitations",
-          "config": "Configuration",
-          "log": "Logs",
-          "impersonation": "Impersonation",
-          "permission": "Permissions",
-          "system": "System"
-        },
-        "targets": {
-          "user": "User",
-          "role": "Role",
-          "invitation": "Invitation",
-          "config": "Configuration",
-          "log": "Log",
-          "permission": "Permission",
-          "session": "Session",
-          "system": "System"
-        }
-      },
-      "actions": {
-        "clearLogs": "Clear logs",
-        "clearLogsConfirm": "This will permanently delete all audit logs. This action cannot be undone.",
-        "clearLogsSuccess": "All logs have been cleared.",
-        "clearLogsError": "Failed to clear logs."
+      "status": {
+        "error": "Error",
+        "running": "Running",
+        "success": "Success"
       }
     },
-    "roles": {
-      "names": {
-        "admin": "Admin",
-        "user": "User"
-      },
-      "badges": {
-        "default": "Default",
-        "admin": "Admin"
-      }
+    "stats": {
+      "activeTasks": "Active",
+      "runsToday": "Runs Today",
+      "successRate": "Success Rate (7d)",
+      "totalTasks": "Total Tasks"
     },
-    "settings": {
-      "title": "Settings",
-      "actions": {
-        "save": "Save",
-        "cancel": "Cancel"
-      },
-      "updateSuccess": "Configuration updated",
-      "updateError": "Failed to update configuration",
-      "rotateSuccess": "Secret regenerated — all active sessions have been invalidated",
-      "rotateError": "Failed to regenerate secret",
-      "secretReveal": {
-        "title": "Secret generated",
-        "description": "This value will only be shown once. Copy it now and store it securely.",
-        "copy": "Copy",
-        "copied": "Copied",
-        "close": "Done"
-      },
-      "config": {
-        "security": {
-          "label": "Security",
-          "jwt": {
-            "label": "JWT",
-            "secret": {
-              "label": "JWT Secret",
-              "description": "Secret key used to sign JSON Web Tokens. Regenerating will invalidate all active sessions.",
-              "regenerate": "Regenerate secret"
-            }
-          }
-        },
-        "authentication": {
-          "label": "Authentication",
-          "register": {
-            "label": "Register",
-            "enable": {
-              "label": "Enable user registration",
-              "description": "Allows new users to sign up. New accounts can be created freely, without an invitation."
-            }
-          },
-          "google": {
-            "label": "Google",
-            "enable": {
-              "label": "Enable login via Google",
-              "description": "Enables sign-in via Google OAuth. Requires a valid client ID and secret from <docLink>Google Cloud Console</docLink>.",
-              "descriptionLink": "https://console.cloud.google.com/apis/credentials"
-            },
-            "clientId": {
-              "label": "Goole client ID",
-              "description": "OAuth 2.0 client ID from your <docLink>Google Cloud Console</docLink> credentials.",
-              "descriptionLink": "https://console.cloud.google.com/apis/credentials"
-            },
-            "clientSecret": {
-              "label": "Goole client secret",
-              "description": "OAuth 2.0 client secret from your <docLink>Google Cloud Console</docLink> credentials.",
-              "descriptionLink": "https://console.cloud.google.com/apis/credentials"
-            }
-          }
-        },
-        "branding": {
-          "label": "Branding",
-          "appName": {
-            "label": "Application name",
-            "description": "The name displayed in the sidebar and browser tab."
-          },
-          "appCaption": {
-            "label": "Sidebar caption",
-            "description": "Short tagline shown below the app name in the sidebar."
-          },
-          "logoUrl": {
-            "label": "Logo URL",
-            "description": "A publicly accessible URL to your logo image (PNG/SVG recommended)."
-          },
-          "faviconUrl": {
-            "label": "Favicon URL",
-            "description": "A publicly accessible URL to your favicon (16×16 or 32×32 ICO/PNG)."
-          },
-          "primaryColor": {
-            "label": "Primary color",
-            "description": "OKLCH color string, e.g. oklch(0.61 0.22 42). Overrides the brand accent color."
-          },
-          "loginHeroTitle": {
-            "label": "Login page headline",
-            "description": "Large marketing headline on the left panel of the login page."
-          },
-          "loginHeroSubtitle": {
-            "label": "Login page subtext",
-            "description": "Supporting text beneath the headline on the login page."
-          }
-        },
-        "notifications": {
-          "label": "Notifications",
-          "discord": {
-            "label": "Discord",
-            "enable": {
-              "label": "Enable Discord",
-              "description": "Send notifications to a Discord channel via webhook. See <docLink>Discord docs</docLink> to create one.",
-              "descriptionLink": "https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
-            },
-            "url": {
-              "label": "Discord Webhook URL",
-              "description": "Incoming webhook URL from your <docLink>Discord server settings</docLink>.",
-              "descriptionLink": "https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
-            }
-          },
-          "smtp": {
-            "label": "SMTP",
-            "enable": {
-              "label": "Enable SMTP",
-              "description": "Send email notifications via an SMTP server."
-            },
-            "host": {
-              "label": "SMTP Server",
-              "description": "Hostname or IP address of the SMTP server."
-            },
-            "port": {
-              "label": "SMTP Port",
-              "description": "Port used to connect to the SMTP server (e.g. 465, 587)."
-            },
-            "user": {
-              "label": "Username",
-              "description": "Username for authenticating with the SMTP server."
-            },
-            "password": {
-              "label": "Password",
-              "description": "Password for authenticating with the SMTP server."
-            },
-            "fromAddress": {
-              "label": "From Address",
-              "description": "Email address that appears as the sender for outgoing notifications."
-            }
-          }
-        }
-      }
+    "title": "Cron Tasks"
+  },
+  "dialog": {
+    "confirmDescription": "Are you sure you want to continue?",
+    "confirmTitle": "Are you sure?"
+  },
+  "errors": {
+    "api": {
+      "fallback": "Something went wrong. Please try again.",
+      "forbidden": "You don't have permission to do that.",
+      "notFound": "We couldn't find what you were looking for.",
+      "rateLimited": "Too many requests. Hold on a moment before retrying.",
+      "server": "The server ran into a problem. Please try again later.",
+      "validation": "Some of the information is invalid."
     },
-    "notifications": {
-      "title": "Notifications",
-      "list": {
-        "title": "Notifications",
-        "subtitle": "Manage your notification providers.",
-        "searchPlaceholder": "Search providers...",
-        "createButton": "Create Notification"
-      },
-      "create": {
-        "title": "Create Notification",
-        "providerType": "Provider Type"
-      },
-      "edit": {
-        "title": "Edit Notification Provider"
-      },
-      "forms": {
-        "discord": {
-          "name": {
-            "label": "Name",
-            "placeholder": "Discord Bot"
-          },
-          "webhookUrl": {
-            "label": "Webhook URL",
-            "placeholder": "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
-          },
-          "decorations": {
-            "label": "Decorations",
-            "description": "Sends notifications as Discord embedded messages."
-          },
-          "testNotification": "Test Notification",
-          "testing": "Testing...",
-          "delete": "Delete",
-          "deleting": "Deleting...",
-          "submit": "Submit",
-          "submitting": "Submitting...",
-          "deleteConfirm": {
-            "title": "Delete Discord Provider",
-            "description": "Are you sure you want to delete this discord provider?",
-            "confirmText": "Delete",
-            "cancelText": "Cancel"
-          },
-          "success": {
-            "created": "Discord provider created successfully",
-            "updated": "Discord provider updated successfully",
-            "deleted": "Discord provider deleted successfully",
-            "testSent": "Notification sent successfully"
-          },
-          "error": {
-            "create": "Failed to create discord provider",
-            "update": "Failed to update discord provider",
-            "delete": "Failed to delete discord provider",
-            "test": "Failed to test notification"
-          }
-        },
-        "telegram": {
-          "name": {
-            "label": "Name",
-            "placeholder": "Telegram Bot"
-          },
-          "botToken": {
-            "label": "Bot Token",
-            "placeholder": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-          },
-          "chatId": {
-            "label": "Chat ID",
-            "placeholder": "1234567890"
-          },
-          "threadId": {
-            "label": "Message Thread ID",
-            "placeholder": "1234567890",
-            "description": "Optional. Use it when you want to send notifications to a specific topic in a group."
-          },
-          "testNotification": "Test Notification",
-          "testing": "Testing...",
-          "delete": "Delete",
-          "deleting": "Deleting...",
-          "submit": "Submit",
-          "submitting": "Submitting...",
-          "deleteConfirm": {
-            "title": "Delete Telegram Provider",
-            "description": "Are you sure you want to delete this telegram provider?",
-            "confirmText": "Delete",
-            "cancelText": "Cancel"
-          },
-          "success": {
-            "created": "Telegram provider created successfully",
-            "updated": "Telegram provider updated successfully",
-            "deleted": "Telegram provider deleted successfully",
-            "testSent": "Notification sent successfully"
-          },
-          "error": {
-            "create": "Failed to create telegram provider",
-            "update": "Failed to update telegram provider",
-            "delete": "Failed to delete telegram provider",
-            "test": "Failed to test notification"
-          }
-        }
-      },
-      "columns": {
-        "name": "Name",
-        "type": "Type"
-      },
-      "providers": {
-        "discord": "Discord",
-        "telegram": "Telegram"
-      },
-      "actions": {
-        "edit": "Edit notification provider"
-      }
+    "boundary": {
+      "description": "A grain of sand slipped into the gears. Nothing's broken — give it another try, or head back home.",
+      "eyebrow": "Unexpected error",
+      "home": "Back to home",
+      "reload": "Reload",
+      "retry": "Try again",
+      "title": "Oops, that derailed"
     },
-    "cron": {
-      "title": "Cron Tasks",
-      "list": {
-        "subtitle": "Manage scheduled background tasks.",
-        "searchPlaceholder": "Search tasks..."
-      },
-      "stats": {
-        "totalTasks": "Total Tasks",
-        "activeTasks": "Active",
-        "successRate": "Success Rate (7d)",
-        "runsToday": "Runs Today"
-      },
-      "columns": {
-        "name": "Name",
-        "expression": "Expression",
-        "handler": "Handler",
-        "status": "Status",
-        "lastRun": "Last Run",
-        "nextRun": "Next Run"
-      },
-      "actions": {
-        "openMenu": "Open menu",
-        "trigger": "Run Now",
-        "triggerSuccess": "Task triggered successfully",
-        "triggerError": "Failed to trigger task",
-        "toggleSuccess": "Task status updated",
-        "toggleError": "Failed to update task status",
-        "createTask": "New Task",
-        "editTask": "Edit Task",
-        "deleteTask": "Delete Task",
-        "deleteConfirm": "Are you sure? All execution history will also be deleted.",
-        "deleteSuccess": "Task deleted successfully",
-        "deleteError": "Failed to delete task",
-        "createSuccess": "Task created successfully",
-        "createError": "Failed to create task",
-        "updateSuccess": "Task updated successfully",
-        "updateError": "Failed to update task"
-      },
-      "detail": {
-        "runsTitle": "Execution History",
-        "chartTitle": "Runs — Last 30 Days",
-        "timelineTitle": "Recent Runs"
-      },
-      "runs": {
-        "columns": {
-          "status": "Status",
-          "startedAt": "Started At",
-          "duration": "Duration",
-          "output": "Output / Error"
-        },
-        "status": {
-          "running": "Running",
-          "success": "Success",
-          "error": "Error"
-        }
-      },
-      "form": {
-        "name": "Name",
-        "namePlaceholder": "Daily Cleanup",
-        "description": "Description",
-        "descriptionPlaceholder": "Optional description...",
-        "cronExpression": "Cron Expression",
-        "cronExpressionHelp": "e.g. 0 * * * * (every hour at minute 0)",
-        "handler": "Handler",
-        "isEnabled": "Enable immediately"
-      }
+    "email": {
+      "invalidErrorMessage": "Please enter a valid email address."
+    },
+    "notFound": {
+      "description": "This page must have wandered off between two folders. Shall we walk you back home?",
+      "eyebrow": "Page not found",
+      "home": "Back to home",
+      "title": "Nothing at this address"
+    },
+    "rateLimited": {
+      "description": "Too many requests in a short time. Give it a few seconds, then try again.",
+      "eyebrow": "Too many requests",
+      "retry": "Try again",
+      "title": "Let's ease off for a moment"
+    }
+  },
+  "form": {
+    "invalid": "Invalid input",
+    "noChanges": "No changes",
+    "optional": "Optional",
+    "required": "This field is required",
+    "saving": "Saving..."
+  },
+  "generic": {
+    "language": "Language",
+    "no": "No",
+    "off": "Off",
+    "ok": "OK",
+    "on": "On",
+    "theme": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light",
+    "themeModernMinimalDark": "Modern Dark",
+    "themeModernMinimalLight": "Modern Light",
+    "themeSystem": "System",
+    "yes": "Yes",
+    "open": "Open"
+  },
+  "home": {
+    "greeting": {
+      "afternoon": "Good afternoon",
+      "evening": "Good evening",
+      "morning": "Good morning"
+    },
+    "manageUsers": "Manage Users",
+    "stats": {
+      "invitations": "Invitations",
+      "sessions": "Your Sessions",
+      "totalUsers": "Total Users"
+    },
+    "subtitle": "Here's an overview of your application. All systems are running normally.",
+    "title": "Dashboard",
+    "shortcuts": {
+      "title": "Quick access",
+      "users": "Users"
+    },
+    "communications": {
+      "title": "Communications (30 d)",
+      "sent": "sent",
+      "failed": "failures",
+      "viewAll": "View journal"
     }
   },
   "impersonation": {
     "banner": "{{impersonator}} is impersonating {{user}}",
     "stop": "Stop Impersonating",
-    "stopped": "Impersonation stopped",
-    "stopError": "Failed to stop impersonation"
+    "stopError": "Failed to stop impersonation",
+    "stopped": "Impersonation stopped"
   },
-  "errors": {
-    "email": {
-      "invalidErrorMessage": "Please enter a valid email address."
+  "logs": {
+    "actions": {
+      "clearLogs": "Clear logs",
+      "clearLogsConfirm": "This will permanently delete all audit logs. This action cannot be undone.",
+      "clearLogsError": "Failed to clear logs.",
+      "clearLogsSuccess": "All logs have been cleared."
+    },
+    "columns": {
+      "action": "Action",
+      "actor": "Actor",
+      "ip": "IP Address",
+      "target": "Target",
+      "timestamp": "Timestamp"
+    },
+    "filters": {
+      "actionCategory": "Action category",
+      "allActions": "All actions",
+      "allTargets": "All targets",
+      "categories": {
+        "account": "Account",
+        "auth": "Authentication",
+        "config": "Configuration",
+        "impersonation": "Impersonation",
+        "invitation": "Invitations",
+        "log": "Logs",
+        "permission": "Permissions",
+        "role": "Role management",
+        "system": "System",
+        "user": "User management"
+      },
+      "targetType": "Target type",
+      "targets": {
+        "config": "Configuration",
+        "invitation": "Invitation",
+        "log": "Log",
+        "permission": "Permission",
+        "role": "Role",
+        "session": "Session",
+        "system": "System",
+        "user": "User"
+      }
+    },
+    "impersonated": "Impersonated",
+    "impersonatedBy": "Action performed by impersonator: {{id}}",
+    "searchPlaceholder": "Search logs...",
+    "subtitle": "View system activity and user actions.",
+    "title": "Logs"
+  },
+  "cmdPalette": {
+    "title": "Command palette",
+    "placeholder": "Search or navigate…",
+    "navigation": "Navigation",
+    "actions": "Quick actions",
+    "lastUsed": "Last used",
+    "noResults": "No results"
+  },
+  "nav": {
+    "administration": "Administration",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "layout": "Layout",
+    "layoutNavbar": "Top bar",
+    "layoutSidebar": "Sidebar",
+    "mainNavigation": "Main navigation",
+    "more": "More",
+    "myAccount": "My Account",
+    "primaryNavigation": "Primary navigation",
+    "toggle": "Toggle",
+    "quotes": "Quotes"
+  },
+  "navigation": {
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "roles": {
+    "badges": {
+      "admin": "Admin",
+      "default": "Default"
+    },
+    "names": {
+      "admin": "Admin",
+      "user": "User"
     }
+  },
+  "settings": {
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "config": {
+      "authentication": {
+        "google": {
+          "clientId": {
+            "description": "OAuth 2.0 client ID from your <docLink>Google Cloud Console</docLink> credentials.",
+            "descriptionLink": "https://console.cloud.google.com/apis/credentials",
+            "label": "Google client ID"
+          },
+          "clientSecret": {
+            "description": "OAuth 2.0 client secret from your <docLink>Google Cloud Console</docLink> credentials.",
+            "descriptionLink": "https://console.cloud.google.com/apis/credentials",
+            "label": "Google client secret"
+          },
+          "enable": {
+            "description": "Enables sign-in via Google OAuth. Requires a valid client ID and secret from <docLink>Google Cloud Console</docLink>.",
+            "descriptionLink": "https://console.cloud.google.com/apis/credentials",
+            "label": "Enable login via Google"
+          },
+          "label": "Google"
+        },
+        "label": "Authentication",
+        "register": {
+          "enable": {
+            "description": "Allows new users to sign up. New accounts can be created freely, without an invitation.",
+            "label": "Enable user registration"
+          },
+          "label": "Register"
+        }
+      },
+      "branding": {
+        "appCaption": {
+          "description": "Short tagline shown below the app name in the sidebar.",
+          "label": "Sidebar caption"
+        },
+        "appName": {
+          "description": "The name displayed in the sidebar and browser tab.",
+          "label": "Application name"
+        },
+        "faviconUrl": {
+          "label": "Favicon",
+          "description": "Icon shown in the browser tab. PNG recommended (16×16 or 32×32), max 5 MB.",
+          "add": "Add favicon",
+          "change": "Change favicon",
+          "remove": "Remove favicon",
+          "uploaded": "Favicon updated",
+          "removed": "Favicon removed",
+          "uploadError": "Failed to update favicon",
+          "invalidType": "Unsupported format",
+          "tooLarge": "Image too large (max 5 MB)"
+        },
+        "label": "Branding",
+        "loginHeroSubtitle": {
+          "description": "Supporting text beneath the headline on the login page.",
+          "label": "Login page subtext"
+        },
+        "loginHeroTitle": {
+          "description": "Large marketing headline on the left panel of the login page.",
+          "label": "Login page headline"
+        },
+        "logoUrl": {
+          "label": "App logo",
+          "description": "Logo shown in the sidebar, login pages and invitations. PNG or JPEG, max 5 MB.",
+          "add": "Add logo",
+          "change": "Change logo",
+          "remove": "Remove logo",
+          "uploaded": "Logo updated",
+          "removed": "Logo removed",
+          "uploadError": "Failed to update logo",
+          "invalidType": "Unsupported format (PNG or JPEG only)",
+          "tooLarge": "Image too large (max 5 MB)"
+        },
+        "primaryColor": {
+          "description": "OKLCH color string, e.g. oklch(0.61 0.22 42). Overrides the brand accent color.",
+          "label": "Primary color"
+        }
+      },
+      "notifications": {
+        "discord": {
+          "enable": {
+            "description": "Send notifications to a Discord channel via webhook. See <docLink>Discord docs</docLink> to create one.",
+            "descriptionLink": "https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks",
+            "label": "Enable Discord"
+          },
+          "label": "Discord",
+          "url": {
+            "description": "Incoming webhook URL from your <docLink>Discord server settings</docLink>.",
+            "descriptionLink": "https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks",
+            "label": "Discord Webhook URL"
+          }
+        },
+        "label": "Notifications",
+        "smtp": {
+          "enable": {
+            "description": "Send email notifications via an SMTP server.",
+            "label": "Enable SMTP"
+          },
+          "fromAddress": {
+            "description": "Email address that appears as the sender for outgoing notifications.",
+            "label": "From Address"
+          },
+          "host": {
+            "description": "Hostname or IP address of the SMTP server.",
+            "label": "SMTP Server"
+          },
+          "label": "SMTP",
+          "password": {
+            "description": "Password for authenticating with the SMTP server.",
+            "label": "Password"
+          },
+          "port": {
+            "description": "Port used to connect to the SMTP server (e.g. 465, 587).",
+            "label": "SMTP Port"
+          },
+          "user": {
+            "description": "Username for authenticating with the SMTP server.",
+            "label": "Username"
+          }
+        }
+      },
+      "storage": {
+        "label": "Storage",
+        "s3": {
+          "label": "S3 Storage",
+          "endpoint": {
+            "label": "S3 Endpoint",
+            "description": "URL of the S3-compatible storage endpoint (e.g. https://s3.amazonaws.com). Required to enable document storage."
+          },
+          "accessKey": {
+            "label": "Access Key",
+            "description": "S3 access key ID. Stored encrypted — do not share it."
+          },
+          "secretKey": {
+            "label": "Secret Key",
+            "description": "S3 secret access key. Stored encrypted — do not share it."
+          },
+          "bucket": {
+            "label": "Bucket",
+            "description": "Name of the S3 bucket where documents are stored."
+          },
+          "region": {
+            "label": "Region",
+            "description": "AWS region or equivalent (e.g. us-east-1)."
+          }
+        }
+      },
+      "security": {
+        "jwt": {
+          "label": "JWT",
+          "secret": {
+            "description": "Secret key used to sign JSON Web Tokens. Regenerating will invalidate all active sessions.",
+            "label": "JWT Secret",
+            "regenerate": "Regenerate secret"
+          }
+        },
+        "label": "Security"
+      },
+      "secretField": {
+        "configured": "Configured — enter a new value to replace",
+        "notSet": "Not set"
+      },
+      "email": {
+        "label": "Email",
+        "apiKey": {
+          "label": "API Key",
+          "description": "Resend API key used to send transactional emails. Stored encrypted — do not share it."
+        },
+        "fromAddress": {
+          "label": "Sender address",
+          "description": "Email address used as the sender of transactional emails."
+        },
+        "fromName": {
+          "label": "Sender name",
+          "description": "Display name shown as the sender of transactional emails."
+        }
+      }
+    },
+    "rotateError": "Failed to regenerate secret",
+    "rotateSuccess": "Secret regenerated — all active sessions have been invalidated",
+    "secretReveal": {
+      "close": "Done",
+      "copied": "Copied",
+      "copy": "Copy",
+      "description": "This value will only be shown once. Copy it now and store it securely.",
+      "title": "Secret generated"
+    },
+    "subtitle": "Configure your application runtime settings.",
+    "title": "Settings",
+    "updateError": "Failed to update configuration",
+    "updateSuccess": "Configuration updated",
+    "fieldDefault": "default",
+    "overrides": "{{count}} override(s)",
+    "saveBar": {
+      "cancel": "Cancel",
+      "pending": "{{count}} unsaved change(s)",
+      "save": "Save",
+      "saved": "Changes saved"
+    },
+    "sectionsLabel": "Sections",
+    "eyebrow": "Runtime config · no redeploy",
+    "rotate": {
+      "confirmTitle": "Regenerate key?",
+      "confirmDescription": "The previous value will be invalidated immediately. Any integrations using it will need to be updated."
+    }
+  },
+  "status": {
+    "error": "An error occurred",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "success": "Success"
+  },
+  "users": {
+    "actions": {
+      "actionsLabel": "Actions",
+      "copyId": "Copy ID",
+      "copyInvitationLink": "Copy Invitation Link",
+      "copyUserId": "Copy User ID",
+      "deleteInvitation": "Delete Invitation",
+      "deleteInvitationConfirm": "Are you sure you want to delete this invitation? The user will no longer be able to use this link.",
+      "deleteInvitationError": "Failed to delete invitation",
+      "deleteInvitationSuccess": "Invitation deleted successfully",
+      "deleteUser": "Delete User",
+      "deleteUserConfirm": "Are you sure you want to delete this user? This action cannot be undone.",
+      "deleteUserError": "Failed to delete user",
+      "deleteUserSuccess": "User deleted successfully",
+      "invitationLinkCopied": "Invitation link copied to clipboard",
+      "openMenu": "Open menu",
+      "revokeInvitation": "Revoke Invitation",
+      "revokeInvitationConfirm": "Are you sure you want to revoke this invitation? The user will no longer be able to use this link.",
+      "revokeInvitationError": "Failed to revoke invitation",
+      "revokeInvitationSuccess": "Invitation revoked successfully",
+      "updateUserError": "Failed to update user",
+      "updateUserSuccess": "User updated successfully"
+    },
+    "columns": {
+      "accepted": "Accepted",
+      "email": "Email",
+      "expires": "Expires",
+      "invitedBy": "Invited By",
+      "joined": "Joined",
+      "name": "Name",
+      "roles": "Roles",
+      "status": "Status"
+    },
+    "detail": {
+      "apiKeys": {
+        "added": "Added on {{date, date}}",
+        "lastUse": "Last use {{date, relative}}"
+      },
+      "createApiKey": {
+        "button": "New API key",
+        "close": "Done",
+        "copied": "Secret copied to clipboard",
+        "error": "Failed to create API key",
+        "success": "API key successfully created",
+        "successDescription": "The new API key has been generated. Make sure to copy it and share it with the user securely. This key will not be shown again."
+      },
+      "deleteApiKey": {
+        "button": "Delete",
+        "confirm": "Are you sure you want to delete this API key?",
+        "error": "Failed to delete API key",
+        "success": "API key successfully deleted"
+      },
+      "fields": {
+        "email": "Email",
+        "name": "Name",
+        "firstName": "First name",
+        "lastName": "Last name"
+      },
+      "impersonate": {
+        "button": "Impersonate User",
+        "confirmDescription": "Are you sure you want to impersonate {{name}}? You will be logged in as this user until you stop impersonating.",
+        "confirmTitle": "Impersonate User",
+        "error": "Failed to impersonate user",
+        "success": "Now impersonating {{name}}"
+      },
+      "joinedAt": "Joined at {{date, date}}",
+      "resetPassword": {
+        "button": "Reset Password",
+        "confirmDescription": "Are you sure you want to reset this user's password? A new random password will be generated.",
+        "confirmTitle": "Reset Password",
+        "copied": "Password copied to clipboard",
+        "error": "Failed to reset password",
+        "successDescription": "The new password has been generated. Make sure to copy it and share it with the user securely. This password will not be shown again.",
+        "successTitle": "Password Reset Successful"
+      },
+      "sections": {
+        "api": {
+          "description": "View and delete active API keys for this user.",
+          "title": "API"
+        },
+        "edit": {
+          "description": "Update user information.",
+          "title": "Edit User",
+          "note": "These details are visible to the team."
+        },
+        "roles": {
+          "description": "Manage user roles.",
+          "title": "Roles",
+          "updateError": "Failed to update roles",
+          "updateSuccess": "Roles updated successfully",
+          "defaultHint": "The default role is always assigned and cannot be removed.",
+          "pending": "Pending changes.",
+          "addRole": "Add a role",
+          "defaultBadge": "Default"
+        },
+        "security": {
+          "description": "Manage user security settings.",
+          "title": "Security"
+        },
+        "sessions": {
+          "description": "View and revoke active sessions for this user.",
+          "title": "Sessions"
+        }
+      },
+      "sessions": {
+        "device": "Device",
+        "expiresAt": "Expires {{date, date}}",
+        "ip": "IP Address",
+        "issuedAt": "Signed in {{date, relative}}",
+        "noSessions": "No active sessions found",
+        "revoke": "Revoke",
+        "revokeAll": "Revoke all sessions",
+        "revokeAllConfirm": "This will sign out {{name}} from all devices immediately.",
+        "revokeAllError": "Failed to revoke sessions",
+        "revokeAllSuccess": "All sessions revoked successfully",
+        "revokeConfirm": "Are you sure you want to revoke this session?",
+        "revokeError": "Failed to revoke session",
+        "revokeSuccess": "Session revoked successfully",
+        "unknownDevice": "Unknown device"
+      },
+      "subtitle": "View and manage user information.",
+      "title": "User Details",
+      "verifiedAt": "{{date, YYYY/DD/YYYY}}",
+      "danger": {
+        "delete": "Delete user",
+        "description": "Deletion permanently removes the user and revokes all their access. This action is irreversible.",
+        "title": "Danger zone"
+      },
+      "summary": {
+        "apiKeys": "API keys",
+        "title": "Account summary"
+      }
+    },
+    "invite": {
+      "autoValidateEmail": "Auto validate email",
+      "button": "Invite user",
+      "copy": "Copy",
+      "copied": "Copied",
+      "createError": "Failed to create invitation",
+      "creating": "Creating...",
+      "description": "Send an invitation link to a new user. The invitation will expire in 7 days.",
+      "done": "Done",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "user@example.com",
+      "linkCopied": "Link copied to clipboard",
+      "noRolesSelected": "Default role only",
+      "rolesLabel": "Roles",
+      "rolesPlaceholder": "Select roles...",
+      "sendInvitation": "Send Invitation",
+      "shareDescription": "Share this link with the user to complete their registration",
+      "success": "Invitation Created",
+      "successDescription": "The link has been copied to your clipboard",
+      "title": "Invite User"
+    },
+    "invitations": {
+      "searchPlaceholder": "Search invitations...",
+      "subtitle": "Manage pending and past invitations.",
+      "title": "Invitations"
+    },
+    "list": {
+      "searchPlaceholder": "Search users...",
+      "subtitle": "Manage your users."
+    },
+    "status": {
+      "accepted": "Accepted",
+      "expired": "Expired",
+      "pending": "Pending",
+      "revoked": "Revoked"
+    },
+    "title": "Users",
+    "eyebrow": "{{count}} members",
+    "stats": {
+      "invitations": "Invitations",
+      "members": "Members",
+      "roles": "Roles defined"
+    },
+    "subtitle": "Manage accounts and invitations.",
+    "systemUser": "System user",
+    "unverified": "Not verified",
+    "verified": "Verified"
+  },
+  "imageUpload": {
+    "urlImportTitle": "Import from URL",
+    "urlImportDescription": "Paste the public URL of an image (PNG, JPEG, WebP…). The image will be downloaded and stored on our servers.",
+    "urlImportError": "Failed to import from URL",
+    "importButton": "Import",
+    "importing": "Importing…",
+    "urlOption": "Import from URL"
   }
 }
