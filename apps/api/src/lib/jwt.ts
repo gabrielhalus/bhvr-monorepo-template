@@ -7,7 +7,7 @@ import { ENV } from "varlock/env";
 import { getConfig } from "~shared/queries/configs.queries";
 
 export async function getJwtSecret(): Promise<string> {
-  const config = await getConfig("security.jwt.secret");
+  const config = await getConfig("authentication.jwt.secret");
   if (config?.value) return config.value;
   throw new Error("JWT secret is not configured. Run bootstrap to initialize it.");
 }

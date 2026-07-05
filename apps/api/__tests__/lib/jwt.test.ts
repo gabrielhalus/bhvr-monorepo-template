@@ -53,7 +53,7 @@ describe("getJwtSecret", () => {
   it("calls getConfig with the correct key", async () => {
     mockGetConfig.mockResolvedValue({ value: "secret" });
     await getJwtSecret();
-    expect(mockGetConfig).toHaveBeenCalledWith("security.jwt.secret");
+    expect(mockGetConfig).toHaveBeenCalledWith("authentication.jwt.secret");
   });
 });
 

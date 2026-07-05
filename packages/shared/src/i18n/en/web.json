@@ -453,6 +453,14 @@
           },
           "label": "Google"
         },
+        "jwt": {
+          "label": "JWT",
+          "secret": {
+            "description": "Secret key used to sign JSON Web Tokens. Regenerating will invalidate all active sessions.",
+            "label": "JWT Secret",
+            "regenerate": "Regenerate secret"
+          }
+        },
         "label": "Authentication",
         "register": {
           "enable": {
@@ -608,17 +616,6 @@
             "description": "AWS region or equivalent (e.g. us-east-1)."
           }
         }
-      },
-      "security": {
-        "jwt": {
-          "label": "JWT",
-          "secret": {
-            "description": "Secret key used to sign JSON Web Tokens. Regenerating will invalidate all active sessions.",
-            "label": "JWT Secret",
-            "regenerate": "Regenerate secret"
-          }
-        },
-        "label": "Security"
       },
       "secretField": {
         "configured": "Configured — enter a new value to replace",

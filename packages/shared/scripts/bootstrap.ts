@@ -37,7 +37,7 @@ await drizzle
 // Seed JWT secret on first bootstrap only — not overwritten on re-runs
 await drizzle
   .insert(ConfigModel)
-  .values({ configKey: "security.jwt.secret", value: randomBytes(32).toString("base64") })
+  .values({ configKey: "authentication.jwt.secret", value: randomBytes(32).toString("base64") })
   .onConflictDoNothing();
 
 // ============================================================================

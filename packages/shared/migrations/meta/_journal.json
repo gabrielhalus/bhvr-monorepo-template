@@ -22,6 +22,13 @@
       "when": 1783244469151,
       "tag": "0002_chilly_bishop",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783255632783,
+      "tag": "0003_move-jwt-config-under-authentication",
+      "breakpoints": true
     }
   ]
 }

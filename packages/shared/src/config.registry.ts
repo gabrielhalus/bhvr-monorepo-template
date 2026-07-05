@@ -12,17 +12,14 @@ export type ConfigRegistryEntry = {
 };
 
 export const CONFIG_REGISTRY: ConfigRegistryEntry[] = [
-  // ── Security ──────────────────────────────────────────────────────────────
-  { key: "security", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
-  { key: "security.jwt", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
-  { key: "security.jwt.secret", type: "string", defaultValue: null, nullable: false, multiline: false, secret: true, rotatable: true, options: null, disabledWhen: null, order: 0 },
-
   // ── Authentication ─────────────────────────────────────────────────────────
   { key: "authentication", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 1 },
   { key: "authentication.register", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
   { key: "authentication.google", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 1 },
   { key: "authentication.github", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 2 },
   { key: "authentication.sso", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 3 },
+  { key: "authentication.jwt", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 4 },
+  { key: "authentication.jwt.secret", type: "string", defaultValue: null, nullable: false, multiline: false, secret: true, rotatable: true, options: null, disabledWhen: null, order: 0 },
   { key: "authentication.register.enable", type: "boolean", defaultValue: "false", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
   { key: "authentication.google.enable", type: "boolean", defaultValue: "false", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
   { key: "authentication.google.clientId", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.google.enable!=true", order: 1 },
