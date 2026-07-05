@@ -1,13 +1,20 @@
 import { password } from "bun";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
+import { randomBytes } from "node:crypto";
+import { ENV } from "varlock/env";
 
 import { getClientInfo } from "@/helpers/get-client-info";
+import { wrapEmailHtml } from "@/lib/email-template";
+import { fetchImageFromUrl, ImageFetchError } from "@/lib/fetch-image-url";
 import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN_EXPIRATION_SECONDS, verifyToken } from "@/lib/jwt";
+import { contentTypeFromKey, deleteObject, getObject, imageExtFromContentType, objectKeys, uploadImage } from "@/lib/s3/storage";
 import { getSessionContext } from "@/middlewares/auth";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { validationMiddleware } from "@/middlewares/validation";
+import { isEmailProviderConfigured, sendEmail } from "@/services/email";
 import { isAuthorized, isAuthorizedBatch } from "~shared/auth";
+import { getConfig } from "~shared/queries/configs.queries";
 import {
   logAccountPasswordChange,
   logAccountUpdate,
@@ -20,16 +27,39 @@ import {
   logSessionRevokeAll,
   logTokenRevoke,
 } from "~shared/queries/logs.queries";
-import { getDefaultRole } from "~shared/queries/roles.queries";
+import { createPasswordResetToken, getValidPasswordResetToken, markPasswordResetTokenUsed } from "~shared/queries/password-reset-tokens.queries";
+import { getDefaultRole, getRoleByName } from "~shared/queries/roles.queries";
 import { deleteToken, getActiveTokensByUserId, insertToken, revokeAllTokensByUserId, revokeAllTokensByUserIdExcept, revokeToken } from "~shared/queries/tokens.queries";
 import { createUserRole } from "~shared/queries/user-roles.queries";
-import { clearMustChangePassword, createUser, getUser, signIn, updateUser, updateUserPassword } from "~shared/queries/users.queries";
-import { ChangePasswordSchema, isAuthorizedSchema, LoginSchema, RegisterSchema, UpdateAccountSchema, UpdatePreferencesSchema } from "~shared/schemas/api/auth.schemas";
+import { clearMustChangePassword, countUsers, createUser, getUser, getUserByEmail, signIn, updateUser, updateUserPassword } from "~shared/queries/users.queries";
+import { ChangePasswordSchema, ForgotPasswordSchema, isAuthorizedSchema, LoginSchema, RegisterSchema, ResetPasswordSchema, UpdateAccountSchema, UpdatePreferencesSchema } from "~shared/schemas/api/auth.schemas";
 import { UserPreferencesSchema } from "~shared/schemas/db/users.schemas";
+
+const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
+const PASSWORD_RESET_EXPIRATION_MS = 60 * 60 * 1000; // 1 hour
 
 export const authRoutes = new Hono()
   /**
+   * Report whether the instance still needs its initial setup
+   *
+   * When no user exists yet, the app serves the registration screen so the
+   * first account can bootstrap the instance as the system administrator.
+   *
+   * @param c - The Hono context object
+   * @returns JSON response with a `needsSetup` flag
+   * @access public
+   */
+  .get("/setup", async (c) => {
+    const needsSetup = (await countUsers()) === 0;
+    return c.json({ success: true as const, needsSetup });
+  })
+
+  /**
    * Register a new user
+   *
+   * The very first account to register bootstraps the instance: it receives the
+   * `admin` role and is flagged as a system user (`metadata.system`). Every
+   * subsequent registration receives the default role.
    *
    * @param c - The Hono context object
    * @returns JSON response indicating success or failure of user registration
@@ -43,11 +73,19 @@ export const authRoutes = new Hono()
     const clientInfo = getClientInfo(c);
 
     try {
-      const insertedUser = await createUser({ ...user, password: hashedPassword });
+      const isFirstUser = (await countUsers()) === 0;
 
-      const defaultRole = await getDefaultRole();
-      if (defaultRole) {
-        await createUserRole({ userId: insertedUser.id, roleId: defaultRole.id });
+      const insertedUser = await createUser({
+        ...user,
+        password: hashedPassword,
+        ...(isFirstUser && { metadata: { system: true } }),
+      });
+
+      // The first user bootstraps the instance as the system administrator;
+      // everyone after them gets the configured default role.
+      const role = isFirstUser ? await getRoleByName("admin") : await getDefaultRole();
+      if (role) {
+        await createUserRole({ userId: insertedUser.id, roleId: role.id });
       }
 
       const insertedToken = await insertToken({
@@ -186,6 +224,92 @@ export const authRoutes = new Hono()
     return c.json({ success: true as const });
   })
 
+  /**
+   * Request a password reset link
+   *
+   * Always responds with success to avoid leaking which emails are registered.
+   * When a mail provider is configured the reset link is emailed; otherwise the
+   * message and link are logged server-side so the operator can relay them.
+   *
+   * @param c - The Hono context object
+   * @returns JSON response always indicating success
+   * @access public
+   */
+  .post("/forgot-password", rateLimiter(rateLimitPresets.forgotPassword), validationMiddleware("json", ForgotPasswordSchema), async (c) => {
+    const { email } = c.req.valid("json");
+
+    const user = await getUserByEmail(email);
+
+    if (user) {
+      const token = randomBytes(32).toString("base64url");
+      const expiresAt = new Date(Date.now() + PASSWORD_RESET_EXPIRATION_MS);
+      await createPasswordResetToken(user.id, token, expiresAt);
+
+      const resetUrl = `${ENV.APP_URL.replace(/\/$/, "")}/reset-password?token=${token}`;
+
+      const businessName = (await getConfig("branding.appName"))?.value ?? undefined;
+      const subject = "Réinitialisation de votre mot de passe";
+      const text = `Bonjour,\n\nVous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le lien ci-dessous pour en choisir un nouveau :\n\n${resetUrl}\n\nCe lien expire dans 1 heure. Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.`;
+
+      if (await isEmailProviderConfigured()) {
+        const result = await sendEmail({ to: user.email, subject, text, html: wrapEmailHtml(text, businessName) });
+        if (result.error) {
+          console.error(`[Password reset] Failed to send email to ${user.email}: ${result.error}`);
+          console.warn(`[Password reset] Reset link for ${user.email}: ${resetUrl}`);
+        }
+      } else {
+        console.warn(`[Password reset] No mail provider configured. Reset link for ${user.email}: ${resetUrl}`);
+      }
+    }
+
+    return c.json({ success: true as const });
+  })
+
+  /**
+   * Validate a password reset token
+   *
+   * @param c - The Hono context object
+   * @returns JSON response with a `valid` flag
+   * @access public
+   */
+  .get("/reset-password/validate", validationMiddleware("query", ResetPasswordSchema.pick({ token: true })), async (c) => {
+    const { token } = c.req.valid("query");
+    const record = await getValidPasswordResetToken(token);
+    return c.json({ success: true as const, valid: Boolean(record) });
+  })
+
+  /**
+   * Reset a password using a valid reset token
+   *
+   * Consumes the token, updates the password and revokes all existing sessions.
+   *
+   * @param c - The Hono context object
+   * @returns JSON response indicating success or failure
+   * @throws {400} If the token is invalid, expired, or already used
+   * @access public
+   */
+  .post("/reset-password", rateLimiter(rateLimitPresets.resetPassword), validationMiddleware("json", ResetPasswordSchema), async (c) => {
+    const { token, password: newPassword } = c.req.valid("json");
+    const clientInfo = getClientInfo(c);
+
+    const record = await getValidPasswordResetToken(token);
+    if (!record) {
+      return c.json({ success: false as const, error: "Invalid or expired token" }, 400);
+    }
+
+    const hashedPassword = await password.hash(newPassword);
+    await updateUserPassword(record.userId, hashedPassword);
+    await clearMustChangePassword(record.userId);
+    await markPasswordResetTokenUsed(record.id);
+
+    // Revoke every existing session — the reset invalidates prior credentials.
+    await revokeAllTokensByUserId(record.userId);
+
+    await logAccountPasswordChange({ actorId: record.userId, ...clientInfo });
+
+    return c.json({ success: true as const });
+  })
+
   // --- All routes below this point require authentication
   .use(getSessionContext)
 
@@ -313,6 +437,113 @@ export const authRoutes = new Hono()
     const results = await isAuthorizedBatch(checks, sessionContext.user);
 
     return c.json({ success: true as const, results });
+  })
+
+  /**
+   * Upload (or replace) the authenticated user's profile photo.
+   *
+   * Accepts a multipart `file` field, stores it in object storage and persists
+   * the object key on the user. The previous avatar object is best-effort deleted.
+   *
+   * @param c - The Hono context object with the multipart body
+   * @returns JSON response with the updated user
+   * @throws {400} If no file, a non-image type, or a file over the size limit
+   * @access protected
+   */
+  .post("/avatar", async (c) => {
+    const { user } = c.var.sessionContext;
+
+    let bytes: Uint8Array;
+    let contentType: string;
+    let ext: string;
+
+    const ct = c.req.header("content-type") ?? "";
+    if (ct.includes("application/json")) {
+      const body = await c.req.json() as Record<string, unknown>;
+      const url = typeof body.url === "string" ? body.url : null;
+      if (!url) {
+        return c.json({ success: false as const, error: "Champ url manquant" }, 400);
+      }
+      try {
+        ({ bytes, contentType, ext } = await fetchImageFromUrl(url, { maxBytes: MAX_AVATAR_BYTES }));
+      } catch (err) {
+        return c.json({ success: false as const, error: err instanceof ImageFetchError ? err.message : "Échec du téléchargement" }, 400);
+      }
+    } else {
+      const body = await c.req.parseBody();
+      const file = body.file;
+      if (!(file instanceof File)) {
+        return c.json({ success: false as const, error: "No file provided" }, 400);
+      }
+      const fileExt = imageExtFromContentType(file.type);
+      if (!fileExt) {
+        return c.json({ success: false as const, error: "Unsupported image type" }, 400);
+      }
+      if (file.size > MAX_AVATAR_BYTES) {
+        return c.json({ success: false as const, error: "Image too large" }, 400);
+      }
+      ext = fileExt;
+      contentType = file.type;
+      bytes = new Uint8Array(await file.arrayBuffer());
+    }
+
+    const key = objectKeys.userAvatar(user.id, ext);
+    await uploadImage(key, bytes, contentType);
+
+    // Best-effort cleanup of a previous avatar stored under a different extension.
+    if (user.avatar && user.avatar !== key) {
+      try {
+        await deleteObject(user.avatar);
+      } catch {
+        // ignore — orphaned object, not worth failing the upload
+      }
+    }
+
+    const updated = await updateUser(user.id, { avatar: key });
+    return c.json({ success: true as const, user: updated });
+  })
+
+  /**
+   * Stream the authenticated user's profile photo from object storage.
+   *
+   * @param c - The Hono context object with session context
+   * @returns The raw image bytes with its content type
+   * @throws {404} If the user has no avatar
+   * @access protected
+   */
+  .get("/avatar", async (c) => {
+    const { user } = c.var.sessionContext;
+    if (!user.avatar) {
+      return c.json({ success: false as const, error: "Not Found" }, 404);
+    }
+
+    const { bytes, contentType } = await getObject(user.avatar);
+
+    return c.newResponse(bytes, 200, {
+      "Content-Type": contentType || contentTypeFromKey(user.avatar),
+      "Cache-Control": "private, max-age=300",
+    });
+  })
+
+  /**
+   * Remove the authenticated user's profile photo.
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response with the updated user
+   * @access protected
+   */
+  .delete("/avatar", async (c) => {
+    const { user } = c.var.sessionContext;
+    if (user.avatar) {
+      try {
+        await deleteObject(user.avatar);
+      } catch {
+        // ignore — storage may be unconfigured or object already gone
+      }
+    }
+
+    const updated = await updateUser(user.id, { avatar: null });
+    return c.json({ success: true as const, user: updated });
   })
 
   /**
