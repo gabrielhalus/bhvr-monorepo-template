@@ -5,8 +5,10 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Trans, useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
+import { OAuthButtons } from "@/components/oauth-buttons";
 import { PasswordInput } from "@/components/password-input";
 import { api } from "@/lib/http";
+import { setLastAuthMethod } from "@/lib/last-auth-method";
 import { Button } from "~orbit/components/ui/Button";
 import { Loader2 } from "~orbit/components/ui/icons";
 import { Field, Input } from "~orbit/components/ui/Input";
@@ -54,6 +56,7 @@ export function RegisterForm({ className, needsSetup = false, ...props }: Regist
       const json = await res.json();
 
       if (json.success) {
+        setLastAuthMethod("password");
         return navigate({ href: redirectTo, replace: true });
       }
 
@@ -72,6 +75,7 @@ export function RegisterForm({ className, needsSetup = false, ...props }: Regist
         <h1 className="text-2xl font-bold tracking-tight text-ink">{needsSetup ? t("register.setup.title") : t("register.title")}</h1>
         <p className="mt-1 text-sm text-muted">{needsSetup ? t("register.setup.subtitle") : t("register.subtitle")}</p>
       </div>
+      {!needsSetup && <OAuthButtons redirectTo={redirectTo} />}
       <form
         className="flex flex-col gap-5"
         onSubmit={handleSubmit}

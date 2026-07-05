@@ -3,12 +3,16 @@ import type { FormEvent } from "react";
 import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { configQueryOptions } from "@/api/configs/configs.queries";
+import { OAUTH_ERROR_CODES, OAuthButtons } from "@/components/oauth-buttons";
 import { PasswordInput } from "@/components/password-input";
 import { api } from "@/lib/http";
+import { getLastAuthMethod, rollbackAuthMethod, setLastAuthMethod } from "@/lib/last-auth-method";
+import { Badge } from "~orbit/components/ui/Badge";
 import { Button } from "~orbit/components/ui/Button";
 import { Loader2 } from "~orbit/components/ui/icons";
 import { Field, Input } from "~orbit/components/ui/Input";
@@ -26,6 +30,25 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
   const location = useRouterState({ select: s => s.location });
   const searchParams = new URLSearchParams(location.searchStr);
   const redirectTo = searchParams.get("redirect") ?? "/";
+  const oauthError = searchParams.get("oauthError");
+
+  const lastMethod = getLastAuthMethod();
+
+  // Surface OAuth callback errors once, then strip the param from the URL.
+  useEffect(() => {
+    if (!oauthError) return;
+
+    // The provider button optimistically recorded itself as last method.
+    rollbackAuthMethod();
+
+    const code = OAUTH_ERROR_CODES.includes(oauthError) ? oauthError : "oauth_failed";
+    toast.error(t(`oauth.errors.${code}` as never));
+
+    const params = new URLSearchParams(location.searchStr);
+    params.delete("oauthError");
+    navigate({ href: `/login${params.size ? `?${params}` : ""}`, replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [oauthError]);
 
   const form = useForm({
     validators: { onSubmit: LoginSchema },
@@ -38,6 +61,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
       const json = await res.json();
 
       if (json.success) {
+        setLastAuthMethod("password");
         return navigate({ href: redirectTo, replace: true });
       }
 
@@ -56,6 +80,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
         <h1 className="text-2xl font-bold tracking-tight text-ink">{t("login.title")}</h1>
         <p className="mt-1 text-sm text-muted">{t("login.subtitle")}</p>
       </div>
+      <OAuthButtons redirectTo={redirectTo} />
       <form
         className="flex flex-col gap-5"
         onSubmit={handleSubmit}
@@ -113,6 +138,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                     </>
                   )
                 : t("login.submit")}
+              {lastMethod === "password" && !isSubmitting && (
+                <Badge tone="accent" className="absolute -right-2 -top-2 ring-2 ring-paper">{t("login.lastUsed")}</Badge>
+              )}
             </Button>
           )}
         />

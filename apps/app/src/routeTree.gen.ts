@@ -25,6 +25,7 @@ import { Route as DashboardAccountIndexRouteImport } from './routes/_dashboard/a
 import { Route as AuthResetPasswordIndexRouteImport } from './routes/_auth/reset-password/index'
 import { Route as AuthRegisterIndexRouteImport } from './routes/_auth/register/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
+import { Route as AuthLinkAccountIndexRouteImport } from './routes/_auth/link-account/index'
 import { Route as AuthForgotPasswordIndexRouteImport } from './routes/_auth/forgot-password/index'
 import { Route as DashboardSettingsSplatRouteImport } from './routes/_dashboard/settings/$'
 import { Route as DashboardCronTaskIdRouteImport } from './routes/_dashboard/cron/$taskId'
@@ -108,6 +109,11 @@ const AuthLoginIndexRoute = AuthLoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AuthLinkAccountIndexRoute = AuthLinkAccountIndexRouteImport.update({
+  id: '/link-account/',
+  path: '/link-account/',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 const AuthForgotPasswordIndexRoute = AuthForgotPasswordIndexRouteImport.update({
   id: '/forgot-password/',
   path: '/forgot-password/',
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/cron/$taskId': typeof DashboardCronTaskIdRoute
   '/settings/$': typeof DashboardSettingsSplatRoute
   '/forgot-password/': typeof AuthForgotPasswordIndexRoute
+  '/link-account/': typeof AuthLinkAccountIndexRoute
   '/login/': typeof AuthLoginIndexRoute
   '/register/': typeof AuthRegisterIndexRoute
   '/reset-password/': typeof AuthResetPasswordIndexRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/cron/$taskId': typeof DashboardCronTaskIdRoute
   '/settings/$': typeof DashboardSettingsSplatRoute
   '/forgot-password': typeof AuthForgotPasswordIndexRoute
+  '/link-account': typeof AuthLinkAccountIndexRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
   '/reset-password': typeof AuthResetPasswordIndexRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/_dashboard/cron/$taskId': typeof DashboardCronTaskIdRoute
   '/_dashboard/settings/$': typeof DashboardSettingsSplatRoute
   '/_auth/forgot-password/': typeof AuthForgotPasswordIndexRoute
+  '/_auth/link-account/': typeof AuthLinkAccountIndexRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/register/': typeof AuthRegisterIndexRoute
   '/_auth/reset-password/': typeof AuthResetPasswordIndexRoute
@@ -203,6 +212,7 @@ export interface FileRouteTypes {
     | '/cron/$taskId'
     | '/settings/$'
     | '/forgot-password/'
+    | '/link-account/'
     | '/login/'
     | '/register/'
     | '/reset-password/'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/cron/$taskId'
     | '/settings/$'
     | '/forgot-password'
+    | '/link-account'
     | '/login'
     | '/register'
     | '/reset-password'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/_dashboard/cron/$taskId'
     | '/_dashboard/settings/$'
     | '/_auth/forgot-password/'
+    | '/_auth/link-account/'
     | '/_auth/login/'
     | '/_auth/register/'
     | '/_auth/reset-password/'
@@ -372,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/_auth/link-account/': {
+      id: '/_auth/link-account/'
+      path: '/link-account'
+      fullPath: '/link-account/'
+      preLoaderRoute: typeof AuthLinkAccountIndexRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
     '/_auth/forgot-password/': {
       id: '/_auth/forgot-password/'
       path: '/forgot-password'
@@ -405,6 +424,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteRouteChildren {
   AuthForgotPasswordIndexRoute: typeof AuthForgotPasswordIndexRoute
+  AuthLinkAccountIndexRoute: typeof AuthLinkAccountIndexRoute
   AuthLoginIndexRoute: typeof AuthLoginIndexRoute
   AuthRegisterIndexRoute: typeof AuthRegisterIndexRoute
   AuthResetPasswordIndexRoute: typeof AuthResetPasswordIndexRoute
@@ -412,6 +432,7 @@ interface AuthRouteRouteChildren {
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthForgotPasswordIndexRoute: AuthForgotPasswordIndexRoute,
+  AuthLinkAccountIndexRoute: AuthLinkAccountIndexRoute,
   AuthLoginIndexRoute: AuthLoginIndexRoute,
   AuthRegisterIndexRoute: AuthRegisterIndexRoute,
   AuthResetPasswordIndexRoute: AuthResetPasswordIndexRoute,

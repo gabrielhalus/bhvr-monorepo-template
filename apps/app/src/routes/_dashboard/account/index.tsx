@@ -1,6 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { z } from "zod";
 
 import { FormLayout, FormSide, FormStack, SideCard, SideStats } from "@/components/detail-kit";
 import { useMySessions } from "@/hooks/sessions/use-my-sessions";
@@ -17,11 +20,18 @@ import { cn } from "~orbit/lib/utils";
 import { formatValue } from "~shared/i18n";
 
 import { AvatarUploader } from "./-components/avatar-uploader";
+import { LinkedAccountsCard } from "./-components/linked-accounts-card";
 import { PasswordForm } from "./-components/password-form";
 import { SessionsCard } from "./-components/sessions-card";
 import { UserInformationsForm } from "./-components/user-informations-form";
 
+const searchSchema = z.object({
+  linked: z.string().optional(),
+  oauthError: z.string().optional(),
+});
+
 export const Route = createFileRoute("/_dashboard/account/")({
+  validateSearch: searchSchema,
   component: Account,
   staticData: { crumb: "account.title" },
 });
@@ -34,6 +44,21 @@ function Account() {
   const { user } = useAuth();
   const fullName = formatFullName(user.firstName, user.lastName);
   const verified = Boolean(user.verifiedAt);
+
+  // Feedback from a settings-initiated OAuth link roundtrip, then strip params.
+  const { linked, oauthError } = Route.useSearch();
+  useEffect(() => {
+    if (!linked && !oauthError) return;
+
+    if (linked) {
+      toast.success(t("account.linkedAccounts.linkSuccess"));
+    } else if (oauthError) {
+      toast.error(t(`account.linkedAccounts.errors.${oauthError === "account_taken" || oauthError === "provider_already_linked" ? oauthError : "oauth_failed"}` as never));
+    }
+
+    navigate({ to: "/account", search: {}, replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linked, oauthError]);
 
   const sessionsQuery = useMySessions();
   const sessionsCount = sessionsQuery.data?.sessions?.length ?? 0;
@@ -106,6 +131,7 @@ function Account() {
         <FormStack>
           <UserInformationsForm userId={user.id} />
           <PasswordForm userId={user.id} />
+          <LinkedAccountsCard />
           <SessionsCard />
         </FormStack>
 
