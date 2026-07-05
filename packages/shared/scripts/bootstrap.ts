@@ -1,12 +1,11 @@
-import { eq, isNotNull, sql } from "drizzle-orm";
+import { isNull, notInArray, or } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
 
 const { drizzle } = await import("../src/drizzle");
+const { CONFIG_REGISTRY } = await import("../src/config.registry");
 const { PoliciesModel } = await import("../src/models/policies.model");
 const { RolesModel } = await import("../src/models/roles.model");
 const { ConfigModel } = await import("../src/models/configs.model");
-const { UserRolesModel } = await import("../src/models/user-roles.model");
-const { UsersModel } = await import("../src/models/users.model");
 
 // ============================================================================
 // Roles
@@ -24,51 +23,22 @@ await drizzle
 // Runtime configs
 // ============================================================================
 
+// Config metadata lives in the registry (src/config.registry.ts); the DB only
+// stores overrides. Remove rows that can never be legit overrides: keys that
+// left the registry, and null-valued rows left over from the old seeding.
+const registryKeys = CONFIG_REGISTRY.map(e => e.key);
+await drizzle
+  .delete(ConfigModel)
+  .where(or(
+    notInArray(ConfigModel.configKey, registryKeys),
+    isNull(ConfigModel.value),
+  ));
+
+// Seed JWT secret on first bootstrap only — not overwritten on re-runs
 await drizzle
   .insert(ConfigModel)
-  .values([
-    // Nodes
-    { configKey: "security", type: "node", nullable: false, order: 0 },
-    { configKey: "security.jwt", type: "node", nullable: false, order: 0 },
-    { configKey: "authentication", type: "node", nullable: false, order: 1 },
-    { configKey: "authentication.register", type: "node", nullable: false, order: 0 },
-    { configKey: "authentication.google", type: "node", nullable: false, order: 1 },
-    { configKey: "notifications", type: "node", nullable: false, order: 2 },
-    { configKey: "notifications.discord", type: "node", nullable: false, order: 0 },
-    { configKey: "notifications.smtp", type: "node", nullable: false, order: 1 },
-    { configKey: "branding", type: "node", nullable: false, order: 3 },
-    // Leaves
-    { configKey: "security.jwt.secret", value: randomBytes(2).toString("base64"), type: "string", nullable: false, order: 0, secret: true },
-    { configKey: "authentication.register.enable", value: "false", type: "boolean", nullable: false, order: 0 },
-    { configKey: "authentication.google.enable", value: "false", type: "boolean", nullable: false, order: 0 },
-    { configKey: "authentication.google.clientId", value: null, type: "string", nullable: true, order: 1, disabledWhen: "authentication.google.enable!=true" },
-    { configKey: "authentication.google.clientSecret", value: null, type: "string", nullable: true, order: 2, disabledWhen: "authentication.google.enable!=true" },
-    { configKey: "notifications.discord.enable", value: "false", type: "boolean", nullable: false, order: 0 },
-    { configKey: "notifications.discord.url", value: null, type: "string", nullable: true, order: 1, disabledWhen: "notifications.discord.enable!=true" },
-    { configKey: "notifications.smtp.enable", value: "false", type: "boolean", nullable: false, order: 0 },
-    { configKey: "notifications.smtp.host", value: null, type: "string", nullable: true, order: 1, disabledWhen: "notifications.smtp.enable!=true" },
-    { configKey: "notifications.smtp.port", value: null, type: "number", nullable: true, order: 2, disabledWhen: "notifications.smtp.enable!=true" },
-    { configKey: "notifications.smtp.user", value: null, type: "string", nullable: true, order: 3, disabledWhen: "notifications.smtp.enable!=true" },
-    { configKey: "notifications.smtp.password", value: null, type: "string", nullable: true, order: 4, disabledWhen: "notifications.smtp.enable!=true" },
-    { configKey: "notifications.smtp.fromAddress", value: null, type: "string", nullable: true, order: 5, disabledWhen: "notifications.smtp.enable!=true" },
-    { configKey: "branding.appName", value: "Bunstack.", type: "string", nullable: false, order: 0 },
-    { configKey: "branding.appCaption", value: null, type: "string", nullable: true, order: 1 },
-    { configKey: "branding.logoUrl", value: null, type: "string", nullable: true, order: 2 },
-    { configKey: "branding.faviconUrl", value: null, type: "string", nullable: true, order: 3 },
-    { configKey: "branding.primaryColor", value: null, type: "string", nullable: true, order: 4 },
-    { configKey: "branding.loginHeroTitle", value: null, type: "string", nullable: true, order: 5 },
-    { configKey: "branding.loginHeroSubtitle", value: null, type: "string", nullable: true, order: 6 },
-  ])
-  .onConflictDoUpdate({
-    target: ConfigModel.configKey,
-    set: {
-      type: sql`excluded.type`,
-      nullable: sql`excluded.nullable`,
-      order: sql`excluded.order`,
-      options: sql`excluded.options`,
-      disabledWhen: sql`excluded.disabled_when`,
-    },
-  });
+  .values({ configKey: "security.jwt.secret", value: randomBytes(32).toString("base64") })
+  .onConflictDoNothing();
 
 // ============================================================================
 // Policies
@@ -94,50 +64,10 @@ await drizzle
 // Admin user
 // ============================================================================
 
-const [existingSystemUser] = await drizzle
-  .select()
-  .from(UsersModel)
-  .where(isNotNull(sql`metadata->>'system'`))
-  .limit(1);
-
-if (existingSystemUser) {
-  // eslint-disable-next-line no-console
-  console.info("Bootstrap: system admin already exists, skipping admin creation.");
-} else {
-  const password = randomBytes(6).toString("base64url");
-  const passwordHash = await Bun.password.hash(password);
-
-  const [insertedAdmin] = await drizzle
-    .insert(UsersModel)
-    .values({
-      firstName: "System",
-      lastName: "Administrator",
-      email: "admin",
-      password: passwordHash,
-      metadata: { system: true },
-    })
-    .onConflictDoNothing()
-    .returning();
-
-  if (insertedAdmin) {
-    const [adminRole] = await drizzle
-      .select()
-      .from(RolesModel)
-      .where(eq(RolesModel.name, "admin"));
-
-    if (adminRole) {
-      await drizzle
-        .insert(UserRolesModel)
-        .values({ userId: insertedAdmin.id, roleId: adminRole.id })
-        .onConflictDoNothing();
-    }
-
-    // eslint-disable-next-line no-console
-    console.info(`Bootstrap admin credentials: admin → ${password}`);
-    // eslint-disable-next-line no-console
-    console.info("Store the password securely and change it after first login.");
-  }
-}
+// No admin is seeded here. When the instance has no users, the app serves the
+// registration screen and the first account to register is promoted to the
+// system administrator (admin role + `metadata.system`). See the `/register`
+// handler in apps/api/src/routes/auth.routes.ts.
 
 // eslint-disable-next-line no-console
 console.log("Bootstrap complete.");

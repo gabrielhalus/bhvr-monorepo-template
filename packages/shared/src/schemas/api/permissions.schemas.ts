@@ -1,12 +1,69 @@
 import { z } from "zod";
 
 export const PermissionSchema = z.enum([
-  // ApiKeys
+  /**
+   * Backup
+   */
+  "backup:list",
+  "backup:create",
+  "backup:restore",
+
+  /**
+   * API key
+   */
   "apiKey:list",
   "apiKey:create",
   "apiKey:revoke",
 
-  // UsersModel
+  /**
+   * Config
+   */
+  "config:list",
+  "config:update",
+
+  /**
+   * Cron Task
+   */
+  "cronTask:list",
+  "cronTask:read",
+  "cronTask:create",
+  "cronTask:update",
+  "cronTask:delete",
+  "cronTask:trigger",
+
+  /**
+   * Invitation
+   */
+  "invitation:create",
+  "invitation:read",
+  "invitation:list",
+  "invitation:revoke",
+  "invitation:delete",
+
+  /**
+   * Log
+   */
+  "log:list",
+  "log:delete",
+
+  /**
+   * Role
+   */
+  "role:create",
+  "role:read",
+  "role:list",
+  "role:update",
+  "role:delete",
+
+  /**
+   * Session
+   */
+  "session:list",
+  "session:revoke",
+
+  /**
+   * User
+   */
   "user:create",
   "user:read",
   "user:list",
@@ -14,41 +71,9 @@ export const PermissionSchema = z.enum([
   "user:delete",
   "user:impersonate",
 
-  // RolesModel
-  "role:create",
-  "role:read",
-  "role:list",
-  "role:update",
-  "role:delete",
-
-  // User-roles
+  /**
+   * User role
+   */
   "userRole:create",
   "userRole:delete",
-
-  // Config
-  "config:list",
-  "config:update",
-
-  // Invitations
-  "invitation:create",
-  "invitation:read",
-  "invitation:list",
-  "invitation:revoke",
-  "invitation:delete",
-
-  // Logs
-  "log:list",
-  "log:delete",
-
-  // Sessions
-  "session:list",
-  "session:revoke",
-
-  // Cron Tasks
-  "cronTask:list",
-  "cronTask:read",
-  "cronTask:create",
-  "cronTask:update",
-  "cronTask:delete",
-  "cronTask:trigger",
 ]);

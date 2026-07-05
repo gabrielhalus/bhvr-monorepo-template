@@ -8,6 +8,7 @@ const jsonOverride = z.unknown();
 
 export const UserPreferencesSchema = z.object({
   sidebarOpen: z.boolean().optional(),
+  navLayout: z.enum(["sidebar", "navbar"]).optional(),
   theme: z.enum(["system", "light", "dark"]).optional(),
   locale: z.string().optional(),
   defaultOrderRange: z.enum(RANGE_PRESETS).optional(),

@@ -485,11 +485,20 @@ export async function emailExists(email: string): Promise<boolean> {
 }
 
 /**
- * Update a user's password.
- * @param id - The user id.
- * @param hashedPassword - The hashed password to set.
- * @returns The updated user.
- * @throws An error if the user could not be updated.
+ * Count the total number of users.
+ * @returns The number of users in the database.
+ */
+export async function countUsers(): Promise<number> {
+  const [result] = await drizzle
+    .select({ count: count() })
+    .from(UsersModel);
+
+  return result?.count ?? 0;
+}
+
+/**
+ * Reset the system account's password to a fresh random value.
+ * @returns The system account email and new password, or null if no system user exists.
  */
 export async function resetSystemPassword(): Promise<{ email: string; password: string } | null> {
   const [systemUser] = await drizzle

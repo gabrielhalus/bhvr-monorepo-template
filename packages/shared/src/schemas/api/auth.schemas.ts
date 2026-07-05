@@ -42,6 +42,15 @@ export const LoginSchema = z.object({
   password: z.string().min(1, "requiredErrorMessage"),
 });
 
+export const ForgotPasswordSchema = z.object({
+  email: z.string().toLowerCase().trim().pipe(z.email("invalidErrorMessage")),
+});
+
+export const ResetPasswordSchema = z.object({
+  token: z.string().min(1, "requiredErrorMessage"),
+  password: PasswordSchema,
+});
+
 export const isAuthorizedSchema = z.object({
   checks: z
     .array(
@@ -67,6 +76,7 @@ export const ChangePasswordSchema = z.object({
 
 export const UpdatePreferencesSchema = z.object({
   sidebarOpen: z.boolean().optional(),
+  navLayout: z.enum(["sidebar", "navbar"]).optional(),
   theme: z.enum(["system", "light", "dark"]).optional(),
   locale: z.string().optional(),
   defaultOrderRange: z.enum(RANGE_PRESETS).optional(),
