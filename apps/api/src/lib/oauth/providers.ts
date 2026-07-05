@@ -1,11 +1,13 @@
 import type { OAuthProviderId } from "~shared/types/db/oauth-accounts.types";
 import type { OAuth2Tokens } from "arctic";
 
-import { decodeIdToken, generateCodeVerifier, generateState, GitHub, Google } from "arctic";
+import { CodeChallengeMethod, decodeIdToken, generateCodeVerifier, generateState, GitHub, Google, OAuth2Client } from "arctic";
 import { ENV } from "varlock/env";
 
 import { getConfig } from "~shared/queries/configs.queries";
 import { OAUTH_PROVIDER_IDS } from "~shared/schemas/api/oauth.schemas";
+
+import { getDiscoveryDocument } from "./oidc-discovery";
 
 export { generateCodeVerifier, generateState };
 export { OAuth2RequestError } from "arctic";
@@ -23,7 +25,7 @@ export type NormalizedProfile = {
 type OAuthProviderDef = {
   id: OAuthProviderId;
   usesPKCE: boolean;
-  createAuthorizationURL: (clientId: string, clientSecret: string, state: string, codeVerifier: string | null) => URL;
+  createAuthorizationURL: (clientId: string, clientSecret: string, state: string, codeVerifier: string | null) => URL | Promise<URL>;
   validateCode: (clientId: string, clientSecret: string, code: string, codeVerifier: string | null) => Promise<OAuth2Tokens>;
   fetchProfile: (tokens: OAuth2Tokens) => Promise<NormalizedProfile>;
 };
@@ -75,6 +77,57 @@ function GITHUB_API_HEADERS(accessToken: string) {
     "Authorization": `Bearer ${accessToken}`,
     "Accept": "application/vnd.github+json",
     "User-Agent": "bunstack",
+  };
+}
+
+type OIDCClaims = {
+  sub: string;
+  email?: string;
+  email_verified?: boolean;
+  given_name?: string;
+  family_name?: string;
+  name?: string;
+  preferred_username?: string;
+  picture?: string;
+};
+
+/** Read the admin-configured issuer and scopes of the generic SSO provider. */
+async function getSsoSettings(): Promise<{ issuerUrl: string; scopes: string[] }> {
+  const [issuerUrl, scopes] = await Promise.all([
+    getConfig("authentication.sso.issuerUrl"),
+    getConfig("authentication.sso.scopes"),
+  ]);
+
+  if (!issuerUrl?.value) {
+    throw new Error("SSO issuer URL is not configured");
+  }
+
+  const parsed = (scopes?.value ?? "").split(/\s+/).filter(Boolean);
+  if (!parsed.includes("openid")) {
+    parsed.unshift("openid");
+  }
+
+  return { issuerUrl: issuerUrl.value, scopes: parsed };
+}
+
+/** Normalize userinfo/id_token claims into the shared profile shape. */
+function normalizeOIDCClaims(claims: OIDCClaims): NormalizedProfile {
+  if (!claims.email) {
+    throw new OAuthProfileError("email_missing");
+  }
+
+  const email = claims.email.toLowerCase();
+  const name = claims.name ?? [claims.given_name, claims.family_name].filter(Boolean).join(" ");
+
+  return {
+    providerAccountId: claims.sub,
+    email,
+    // Enterprise IdPs (Azure AD notably) often omit the claim entirely; the
+    // IdP is the source of truth, so only an explicit `false` marks the email
+    // as unverified.
+    emailVerified: claims.email_verified !== false,
+    ...splitName(name, claims.preferred_username ?? email.split("@")[0] ?? "user"),
+    avatarUrl: claims.picture ?? null,
   };
 }
 
@@ -148,6 +201,46 @@ const PROVIDERS: Record<OAuthProviderId, OAuthProviderDef> = {
       };
     },
   },
+  sso: {
+    id: "sso",
+    usesPKCE: true,
+    createAuthorizationURL: async (clientId, clientSecret, state, codeVerifier) => {
+      const { issuerUrl, scopes } = await getSsoSettings();
+      const doc = await getDiscoveryDocument(issuerUrl);
+      const client = new OAuth2Client(clientId, clientSecret, redirectUri("sso"));
+      return client.createAuthorizationURLWithPKCE(doc.authorization_endpoint, state, CodeChallengeMethod.S256, codeVerifier ?? "", scopes);
+    },
+    validateCode: async (clientId, clientSecret, code, codeVerifier) => {
+      const { issuerUrl } = await getSsoSettings();
+      const doc = await getDiscoveryDocument(issuerUrl);
+      const client = new OAuth2Client(clientId, clientSecret, redirectUri("sso"));
+      return client.validateAuthorizationCode(doc.token_endpoint, code, codeVerifier ?? "");
+    },
+    fetchProfile: async (tokens) => {
+      const { issuerUrl } = await getSsoSettings();
+      const doc = await getDiscoveryDocument(issuerUrl);
+
+      if (doc.userinfo_endpoint) {
+        const res = await fetch(doc.userinfo_endpoint, {
+          headers: { Authorization: `Bearer ${tokens.accessToken()}` },
+        });
+        // A JWT-encoded userinfo response (signed_response_alg configured on
+        // the IdP) is not parseable as JSON — fall back to the id_token.
+        if (res.ok && !res.headers.get("content-type")?.includes("application/jwt")) {
+          return normalizeOIDCClaims(await res.json() as OIDCClaims);
+        }
+      }
+
+      try {
+        return normalizeOIDCClaims(decodeIdToken(tokens.idToken()) as OIDCClaims);
+      } catch (error) {
+        if (error instanceof OAuthProfileError) {
+          throw error;
+        }
+        throw new OAuthProfileError("oauth_failed");
+      }
+    },
+  },
 };
 
 /** Raised when a provider profile cannot be normalized into a usable identity. */
@@ -164,13 +257,18 @@ export class OAuthProfileError extends Error {
  * disabled or not fully configured.
  */
 export async function getConfiguredProvider(id: OAuthProviderId) {
-  const [enable, clientId, clientSecret] = await Promise.all([
+  const [enable, clientId, clientSecret, issuerUrl] = await Promise.all([
     getConfig(`authentication.${id}.enable`),
     getConfig(`authentication.${id}.clientId`),
     getConfig(`authentication.${id}.clientSecret`),
+    id === "sso" ? getConfig("authentication.sso.issuerUrl") : Promise.resolve(null),
   ]);
 
   if (enable?.value !== "true" || !clientId?.value || !clientSecret?.value) {
+    return null;
+  }
+
+  if (id === "sso" && !issuerUrl?.value) {
     return null;
   }
 
@@ -191,4 +289,35 @@ export async function getEnabledProviders(): Promise<OAuthProviderId[]> {
   );
 
   return results.filter((id): id is OAuthProviderId => id !== null);
+}
+
+const PROVIDER_LABELS: Record<Exclude<OAuthProviderId, "sso">, string> = {
+  google: "Google",
+  github: "GitHub",
+};
+
+/**
+ * Build the public payload of the providers endpoint: enabled providers with
+ * their display label, plus the SSO auto-login flag.
+ * @returns The providers usable for sign-in and whether the login page should
+ * redirect to the SSO provider automatically.
+ */
+export async function getProvidersPayload() {
+  const enabled = await getEnabledProviders();
+
+  const providers = await Promise.all(enabled.map(async (id) => {
+    if (id === "sso") {
+      const label = await getConfig("authentication.sso.buttonLabel");
+      return { id, label: label?.value || "SSO" };
+    }
+    return { id, label: PROVIDER_LABELS[id] };
+  }));
+
+  let autoLogin = false;
+  if (enabled.includes("sso")) {
+    const config = await getConfig("authentication.sso.autoLogin");
+    autoLogin = config?.value === "true";
+  }
+
+  return { providers, autoLogin };
 }

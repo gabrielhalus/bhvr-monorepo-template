@@ -12,7 +12,7 @@ import { getClientInfo } from "@/helpers/get-client-info";
 import { issueSession } from "@/helpers/issue-session";
 import { fetchImageFromUrl } from "@/lib/fetch-image-url";
 import { getCookieSettings, verifyToken } from "@/lib/jwt";
-import { generateCodeVerifier, generateState, getConfiguredProvider, getEnabledProviders, OAuthProfileError } from "@/lib/oauth/providers";
+import { generateCodeVerifier, generateState, getConfiguredProvider, getProvidersPayload, OAuthProfileError } from "@/lib/oauth/providers";
 import { objectKeys, uploadImage } from "@/lib/s3/storage";
 import { getSessionContext } from "@/middlewares/auth";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
@@ -105,12 +105,13 @@ export const oauthRoutes = new Hono()
    * List the OAuth providers that are enabled and fully configured
    *
    * @param c - The Hono context object
-   * @returns JSON response with the provider ids usable for sign-in
+   * @returns JSON response with the providers usable for sign-in (id and
+   * display label) and the SSO auto-login flag
    * @access public
    */
   .get("/providers", async (c) => {
-    const providers = await getEnabledProviders();
-    return c.json({ success: true as const, providers });
+    const { providers, autoLogin } = await getProvidersPayload();
+    return c.json({ success: true as const, providers, autoLogin });
   })
 
   /**
@@ -273,7 +274,9 @@ export const oauthRoutes = new Hono()
 
     const configured = await getConfiguredProvider(provider);
     if (!configured) {
-      return c.json({ success: false as const, error: "Provider not available" }, 404);
+      // Browser navigation, never JSON — e.g. a login page rendered before
+      // the admin disabled the provider.
+      return appRedirect(c, "/login?oauthError=oauth_failed");
     }
 
     let mode: OAuthFlow["mode"] = "login";
@@ -290,6 +293,15 @@ export const oauthRoutes = new Hono()
     const state = generateState();
     const codeVerifier = configured.def.usesPKCE ? generateCodeVerifier() : undefined;
 
+    // SSO runs OIDC discovery here, which can fail on a wrong issuer URL or
+    // an unreachable IdP — surface it as a login error instead of a 500.
+    let url: URL;
+    try {
+      url = await configured.def.createAuthorizationURL(configured.clientId, configured.clientSecret, state, codeVerifier ?? null);
+    } catch {
+      return appRedirect(c, "/login?oauthError=oauth_failed");
+    }
+
     const flow: OAuthFlow = {
       provider,
       state,
@@ -300,7 +312,6 @@ export const oauthRoutes = new Hono()
     };
     setCookie(c, OAUTH_FLOW_COOKIE, JSON.stringify(flow), getCookieSettings("oauth"));
 
-    const url = configured.def.createAuthorizationURL(configured.clientId, configured.clientSecret, state, codeVerifier ?? null);
     return c.redirect(url.toString());
   })
 
@@ -450,10 +461,11 @@ export const oauthRoutes = new Hono()
     }
 
     // Flow A: unknown email → OAuth signup, honoring the registration policy.
+    // SSO bypasses it: the IdP is the source of truth for who may sign in.
     const isFirstUser = (await countUsers()) === 0;
     const registerConfig = await getConfig("authentication.register.enable");
 
-    if (registerConfig?.value !== "true" && !isFirstUser) {
+    if (provider !== "sso" && registerConfig?.value !== "true" && !isFirstUser) {
       return appRedirect(c, "/login?oauthError=registration_disabled");
     }
 
