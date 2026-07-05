@@ -7,10 +7,10 @@ This is a **bunstack** monorepo template using Bun, Turbo, TypeScript, Hono (API
 ```
 ├── apps/
 │   ├── api/          # Hono REST API server
-│   └── web/          # React + TanStack Router dashboard
+│   └── app/          # React + TanStack Router dashboard (Orbit design system)
 ├── packages/
 │   ├── shared/       # Core domain logic, DB models, queries, schemas
-│   ├── react/        # Reusable UI component library
+│   ├── orbit/        # Orbit design system (UI component library)
 │   ├── typescript-config/
 │   └── eslint-config/
 ```
@@ -56,13 +56,13 @@ This is a **bunstack** monorepo template using Bun, Turbo, TypeScript, Hono (API
 ### Import Order (auto-sorted by ESLint)
 1. Type imports (`import type ...`)
 2. External packages
-3. Internal aliases (`@/`, `~shared/`, `~react/`)
+3. Internal aliases (`@/`, `~shared/`, `~orbit/`)
 4. Relative imports
 
 ### Path Aliases
 - `@/*` → local app `./src/*`
 - `~shared/*` → `packages/shared/src/*`
-- `~react/*` → `packages/react/src/*`
+- `~orbit/*` → `packages/orbit/src/*`
 
 ## API Patterns
 
@@ -93,7 +93,7 @@ The web app uses a layered architecture for data fetching with TanStack Query.
 ### File Structure (per resource)
 
 ```
-apps/web/src/
+apps/app/src/
 ├── api/{resource}/
 │   ├── {resource}.keys.ts       # Query key factories
 │   ├── {resource}.api.ts        # Fetch functions
@@ -123,7 +123,7 @@ export const usersKeys = {
 ### 2. API Functions (`{resource}.api.ts`)
 
 ```typescript
-import { api } from "~react/lib/http";
+import { api } from "@/lib/http";
 
 export async function fetchPaginatedUsers(params: PaginationParams) {
   const res = await api.users.$get({ query: { ... } });
@@ -188,10 +188,10 @@ export function useUpdateUser() {
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: usersKeys.byId(variables.id) });
       queryClient.invalidateQueries({ queryKey: usersKeys.paginated });
-      toast.success(t("pages.users.actions.updateUserSuccess"));
+      toast.success(t("users.actions.updateUserSuccess"));
     },
     onError: () => {
-      toast.error(t("pages.users.actions.updateUserError"));
+      toast.error(t("users.actions.updateUserError"));
     },
   });
 }
@@ -252,9 +252,9 @@ action(scope): short message
 
 ### Scopes
 - `api` - apps/api changes
-- `web` - apps/web changes
+- `app` - apps/app changes
 - `shared` - packages/shared changes
-- `react` - packages/react changes
+- `orbit` - packages/orbit changes
 - `repo` - root-level/monorepo config changes
 
 ### Examples
@@ -275,7 +275,7 @@ feat(react): add MultiSelect component
 ### Commit Message Generation Rules
 
 1. **Analyze all changes** made during the task
-2. **Group changes by scope** (api, web, shared, react, repo)
+2. **Group changes by scope** (api, app, shared, orbit, repo)
 3. **Generate separate commit messages** for each scope with changes
 4. **Format**: `action(scope): short descriptive message`
 
