@@ -5,14 +5,16 @@ import { randomBytes } from "node:crypto";
 import { ENV } from "varlock/env";
 
 import { getClientInfo } from "@/helpers/get-client-info";
+import { issueSession } from "@/helpers/issue-session";
 import { wrapEmailHtml } from "@/lib/email-template";
 import { fetchImageFromUrl, ImageFetchError } from "@/lib/fetch-image-url";
-import { createAccessToken, createRefreshToken, getCookieSettings, REFRESH_TOKEN_EXPIRATION_SECONDS, verifyToken } from "@/lib/jwt";
+import { createAccessToken, getCookieSettings, verifyToken } from "@/lib/jwt";
 import { contentTypeFromKey, deleteObject, getObject, imageExtFromContentType, objectKeys, uploadImage } from "@/lib/s3/storage";
 import { getSessionContext } from "@/middlewares/auth";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { validationMiddleware } from "@/middlewares/validation";
 import { isEmailProviderConfigured, sendEmail } from "@/services/email";
+import { provisionUser } from "@/services/user-provisioning";
 import { isAuthorized, isAuthorizedBatch } from "~shared/auth";
 import { getConfig } from "~shared/queries/configs.queries";
 import {
@@ -28,10 +30,8 @@ import {
   logTokenRevoke,
 } from "~shared/queries/logs.queries";
 import { createPasswordResetToken, getValidPasswordResetToken, markPasswordResetTokenUsed } from "~shared/queries/password-reset-tokens.queries";
-import { getDefaultRole, getRoleByName } from "~shared/queries/roles.queries";
-import { deleteToken, getActiveTokensByUserId, insertToken, revokeAllTokensByUserId, revokeAllTokensByUserIdExcept, revokeToken } from "~shared/queries/tokens.queries";
-import { createUserRole } from "~shared/queries/user-roles.queries";
-import { clearMustChangePassword, countUsers, createUser, getUser, getUserByEmail, signIn, updateUser, updateUserPassword } from "~shared/queries/users.queries";
+import { deleteToken, getActiveTokensByUserId, revokeAllTokensByUserId, revokeAllTokensByUserIdExcept, revokeToken } from "~shared/queries/tokens.queries";
+import { clearMustChangePassword, countUsers, getUser, getUserByEmail, signIn, updateUser, updateUserPassword } from "~shared/queries/users.queries";
 import { ChangePasswordSchema, ForgotPasswordSchema, isAuthorizedSchema, LoginSchema, RegisterSchema, ResetPasswordSchema, UpdateAccountSchema, UpdatePreferencesSchema } from "~shared/schemas/api/auth.schemas";
 import { UserPreferencesSchema } from "~shared/schemas/db/users.schemas";
 
@@ -73,33 +73,9 @@ export const authRoutes = new Hono()
     const clientInfo = getClientInfo(c);
 
     try {
-      const isFirstUser = (await countUsers()) === 0;
+      const insertedUser = await provisionUser({ ...user, password: hashedPassword });
 
-      const insertedUser = await createUser({
-        ...user,
-        password: hashedPassword,
-        ...(isFirstUser && { metadata: { system: true } }),
-      });
-
-      // The first user bootstraps the instance as the system administrator;
-      // everyone after them gets the configured default role.
-      const role = isFirstUser ? await getRoleByName("admin") : await getDefaultRole();
-      if (role) {
-        await createUserRole({ userId: insertedUser.id, roleId: role.id });
-      }
-
-      const insertedToken = await insertToken({
-        userId: insertedUser.id,
-        issuedAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_SECONDS * 1000).toISOString(),
-        ...clientInfo,
-      });
-
-      const accessToken = await createAccessToken(insertedUser.id);
-      setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
-
-      const refreshToken = await createRefreshToken(insertedUser.id, insertedToken.id);
-      setCookie(c, "refreshToken", refreshToken, getCookieSettings("refresh"));
+      await issueSession(c, insertedUser.id);
 
       // Audit log: user registration
       await logRegister(insertedUser.id, clientInfo);
@@ -138,23 +114,7 @@ export const authRoutes = new Hono()
     if (!userId) {
       await logLoginFailed(email, clientInfo);
     } else {
-      const insertedToken = await insertToken({
-        userId,
-        issuedAt: new Date().toISOString(),
-        expiresAt: new Date(
-          Date.now() + REFRESH_TOKEN_EXPIRATION_SECONDS * 1000,
-        ).toISOString(),
-        ...clientInfo,
-      });
-
-      const accessToken = await createAccessToken(userId);
-      setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
-
-      const refreshToken = await createRefreshToken(
-        userId,
-        insertedToken.id,
-      );
-      setCookie(c, "refreshToken", refreshToken, getCookieSettings("refresh"));
+      await issueSession(c, userId);
 
       await logLogin(userId, clientInfo);
 
