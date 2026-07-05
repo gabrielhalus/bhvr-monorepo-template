@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ShellHeader } from "@/components/shell-header";
@@ -7,11 +6,8 @@ import { usePaginatedInvitations } from "@/hooks/invitations/use-paginated-invit
 import { useRoles } from "@/hooks/roles/use-roles";
 import { usePaginatedUsers } from "@/hooks/users/use-paginated-users";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "~orbit/components/ui/Breadcrumb";
-import { Button } from "~orbit/components/ui/Button";
-import { UserPlus } from "~orbit/components/ui/icons";
 
 import { InvitationsDataTable } from "./-components/invitations/invitations.data-table";
-import { InviteUserDialog } from "./-components/invitations/invite-user-dialog";
 import { UsersDataTable } from "./-components/users/users.data-table";
 
 export const Route = createFileRoute("/_dashboard/users/")({
@@ -20,8 +16,6 @@ export const Route = createFileRoute("/_dashboard/users/")({
 
 function Users() {
   const { t } = useTranslation("web");
-
-  const [inviteOpen, setInviteOpen] = useState(false);
 
   const usersQuery = usePaginatedUsers();
   const invitationsQuery = usePaginatedInvitations();
@@ -53,18 +47,10 @@ function Users() {
           { label: t("users.stats.invitations"), value: String(invitationsTotal) },
           { label: t("users.stats.roles"), value: String(rolesTotal) },
         ]}
-        actions={(
-          <Button onClick={() => setInviteOpen(true)}>
-            <UserPlus className="size-4" />
-            {t("users.invite.button")}
-          </Button>
-        )}
       />
 
       <UsersDataTable />
       <InvitationsDataTable />
-
-      <InviteUserDialog open={inviteOpen} onOpenChange={setInviteOpen} />
     </div>
   );
 }

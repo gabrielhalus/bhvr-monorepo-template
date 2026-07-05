@@ -1,23 +1,20 @@
 import type { Invitation } from "~shared/types/db/invitations.types";
 import type { User } from "~shared/types/db/users.types";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { DataTable } from "@/components/data-table";
 import { useInvitationsRelations } from "@/hooks/invitations/use-invitations-relations";
 import { usePaginatedInvitations } from "@/hooks/invitations/use-paginated-invitations";
-import { Send } from "~orbit/components/ui/icons";
 
 import { getInvitationColumns } from "./invitation.columns";
-import { InviteUserDialog } from "./invite-user-dialog";
+import { InviteUserForm } from "./invite-user-form";
 
 export type InvitationRow = Invitation & { invitedBy?: User };
 
 export function InvitationsDataTable() {
   const { t } = useTranslation("web");
-
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   const columns = useMemo(() => getInvitationColumns(t), [t]);
 
@@ -43,7 +40,7 @@ export function InvitationsDataTable() {
         <h2 className="text-[15px] font-semibold tracking-tight text-ink">{t("users.invitations.title")}</h2>
         <p className="mt-0.5 text-[13px] text-muted">{t("users.invitations.subtitle")}</p>
       </div>
-      <InviteUserDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      <InviteUserForm />
       <DataTable
         columns={columns}
         data={rows}
@@ -59,10 +56,6 @@ export function InvitationsDataTable() {
         onSortingChange={invitationsQuery.onSortingChange}
         searchValue={invitationsQuery.searchValue}
         onSearchChange={invitationsQuery.onSearchChange}
-        // Add item props
-        addItemLabel={t("users.invite.button")}
-        addItemIcon={Send}
-        onAddItem={() => setDialogOpen(true)}
       />
     </div>
   );
