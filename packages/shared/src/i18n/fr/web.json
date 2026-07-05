@@ -460,6 +460,37 @@
             "label": "Activer l'inscription des utilisateurs"
           },
           "label": "Inscription"
+        },
+        "sso": {
+          "autoLogin": {
+            "description": "Redirige automatiquement les visiteurs de la page de connexion vers le fournisseur SSO, sans afficher le formulaire. La connexion locale reste accessible via /login?manual=1.",
+            "label": "Connexion automatique"
+          },
+          "buttonLabel": {
+            "description": "Texte affiché sur le bouton de connexion SSO de la page de connexion.",
+            "label": "Libellé du bouton"
+          },
+          "clientId": {
+            "description": "Identifiant client de l'application enregistrée auprès de votre fournisseur d'identité.",
+            "label": "Identifiant client SSO"
+          },
+          "clientSecret": {
+            "description": "Secret client de l'application enregistrée auprès de votre fournisseur d'identité.",
+            "label": "Secret client SSO"
+          },
+          "enable": {
+            "description": "Active la connexion via un fournisseur d'identité OpenID Connect (Keycloak, Azure AD, Okta, Authentik…). Les utilisateurs authentifiés par le fournisseur sont créés automatiquement, même si l'inscription est désactivée.",
+            "label": "Activer la connexion via SSO"
+          },
+          "issuerUrl": {
+            "description": "URL de base de l'émetteur OpenID Connect, sans le suffixe /.well-known/openid-configuration. Déclarez {API_URL}/auth/oauth/sso/callback comme redirect URI côté fournisseur.",
+            "label": "URL de l'émetteur"
+          },
+          "label": "SSO (OpenID Connect)",
+          "scopes": {
+            "description": "Scopes OpenID Connect demandés au fournisseur, séparés par des espaces. Le scope openid est toujours inclus.",
+            "label": "Scopes"
+          }
         }
       },
       "branding": {

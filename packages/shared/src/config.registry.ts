@@ -22,6 +22,7 @@ export const CONFIG_REGISTRY: ConfigRegistryEntry[] = [
   { key: "authentication.register", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
   { key: "authentication.google", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 1 },
   { key: "authentication.github", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 2 },
+  { key: "authentication.sso", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 3 },
   { key: "authentication.register.enable", type: "boolean", defaultValue: "false", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
   { key: "authentication.google.enable", type: "boolean", defaultValue: "false", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
   { key: "authentication.google.clientId", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.google.enable!=true", order: 1 },
@@ -29,6 +30,13 @@ export const CONFIG_REGISTRY: ConfigRegistryEntry[] = [
   { key: "authentication.github.enable", type: "boolean", defaultValue: "false", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
   { key: "authentication.github.clientId", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.github.enable!=true", order: 1 },
   { key: "authentication.github.clientSecret", type: "string", defaultValue: null, nullable: true, multiline: false, secret: true, rotatable: false, options: null, disabledWhen: "authentication.github.enable!=true", order: 2 },
+  { key: "authentication.sso.enable", type: "boolean", defaultValue: "false", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
+  { key: "authentication.sso.issuerUrl", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 1 },
+  { key: "authentication.sso.clientId", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 2 },
+  { key: "authentication.sso.clientSecret", type: "string", defaultValue: null, nullable: true, multiline: false, secret: true, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 3 },
+  { key: "authentication.sso.scopes", type: "string", defaultValue: "openid profile email", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 4 },
+  { key: "authentication.sso.buttonLabel", type: "string", defaultValue: "SSO", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 5 },
+  { key: "authentication.sso.autoLogin", type: "boolean", defaultValue: "false", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 6 },
 
   // ── Branding ───────────────────────────────────────────────────────────────
   { key: "branding", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 2 },

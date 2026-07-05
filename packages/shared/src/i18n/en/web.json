@@ -460,6 +460,37 @@
             "label": "Enable user registration"
           },
           "label": "Register"
+        },
+        "sso": {
+          "autoLogin": {
+            "description": "Automatically redirects visitors of the login page to the SSO provider, without showing the form. Local sign-in stays reachable at /login?manual=1.",
+            "label": "Automatic sign-in"
+          },
+          "buttonLabel": {
+            "description": "Text displayed on the SSO sign-in button of the login page.",
+            "label": "Button label"
+          },
+          "clientId": {
+            "description": "Client ID of the application registered with your identity provider.",
+            "label": "SSO client ID"
+          },
+          "clientSecret": {
+            "description": "Client secret of the application registered with your identity provider.",
+            "label": "SSO client secret"
+          },
+          "enable": {
+            "description": "Enables sign-in via an OpenID Connect identity provider (Keycloak, Azure AD, Okta, Authentik…). Users authenticated by the provider are created automatically, even when registration is disabled.",
+            "label": "Enable login via SSO"
+          },
+          "issuerUrl": {
+            "description": "Base URL of the OpenID Connect issuer, without the /.well-known/openid-configuration suffix. Register {API_URL}/auth/oauth/sso/callback as the redirect URI on the provider side.",
+            "label": "Issuer URL"
+          },
+          "label": "SSO (OpenID Connect)",
+          "scopes": {
+            "description": "Space-separated OpenID Connect scopes requested from the provider. The openid scope is always included.",
+            "label": "Scopes"
+          }
         }
       },
       "branding": {
