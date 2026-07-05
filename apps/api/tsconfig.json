@@ -5,7 +5,6 @@
     "rootDir": "src",
     "paths": {
       "@/*": ["./src/*"],
-      "~react/*": ["../../packages/react/src/*"],
       "~shared/*": ["../../packages/shared/src/*"],
       "~seeds": ["../../packages/shared/seeds"]
     },
