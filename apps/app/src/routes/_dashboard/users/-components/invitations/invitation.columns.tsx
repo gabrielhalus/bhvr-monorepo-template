@@ -107,7 +107,7 @@ export function getInvitationColumns(t: TFunction<"web">): ColumnDef<InvitationR
         return (
           <div
             className={cn(
-              "flex items-center gap-1.5",
+              "flex items-center gap-1.5 whitespace-nowrap",
               isExpired && "text-coral-deep",
               isExpiringSoon && !isExpired && "text-amber-deep",
               !isExpired && !isExpiringSoon && "text-muted",
@@ -128,7 +128,7 @@ export function getInvitationColumns(t: TFunction<"web">): ColumnDef<InvitationR
         const acceptedAt = new Date(row.original.acceptedAt ?? "");
         const dateString = formatValue(acceptedAt, { locale: i18n.language, format: "datetime" });
         return (
-          <div className="flex items-center gap-1.5 text-muted">
+          <div className="flex items-center gap-1.5 whitespace-nowrap text-muted">
             <Clock className="size-3.5" />
             <span>{dateString}</span>
           </div>

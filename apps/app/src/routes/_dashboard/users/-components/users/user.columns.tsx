@@ -94,7 +94,7 @@ export function getUserColumns(t: TFunction<"web">, canDeleteMap: Record<string,
       cell: ({ row }) => {
         const dateString = formatValue(new Date(row.original.createdAt), { locale: i18n.language, format: "date" });
         return (
-          <div className="flex items-center gap-1.5 text-muted">
+          <div className="flex items-center gap-1.5 whitespace-nowrap text-muted">
             <Calendar className="size-3.5" />
             <span>{dateString}</span>
           </div>
