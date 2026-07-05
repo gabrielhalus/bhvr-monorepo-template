@@ -26,9 +26,13 @@ export function LinkedAccountsCard() {
 
   // Enabled providers plus anything linked while a provider was still enabled.
   const providers = [...new Set<OAuthProviderId>([
-    ...enabledProviders,
+    ...enabledProviders.map(provider => provider.id),
     ...accounts.map(account => account.provider as OAuthProviderId).filter(provider => provider in OAUTH_PROVIDER_META),
   ])];
+
+  // Server label wins (custom SSO label); META covers disabled-since providers.
+  const providerLabel = (provider: OAuthProviderId) =>
+    enabledProviders.find(p => p.id === provider)?.label ?? OAUTH_PROVIDER_META[provider].label;
 
   const isLoading = providersQuery.isLoading || accountsQuery.isLoading;
 
@@ -39,7 +43,7 @@ export function LinkedAccountsCard() {
   const handleUnlink = async (provider: OAuthProviderId) => {
     const confirmed = await sayno.confirm({
       title: t("account.linkedAccounts.unlink"),
-      description: t("account.linkedAccounts.unlinkConfirm", { provider: OAUTH_PROVIDER_META[provider].label }),
+      description: t("account.linkedAccounts.unlinkConfirm", { provider: providerLabel(provider) }),
       variant: "destructive",
     });
 
@@ -64,8 +68,7 @@ export function LinkedAccountsCard() {
       {!isLoading && (
         <div className="divide-y divide-line">
           {providers.map((provider) => {
-            const meta = OAUTH_PROVIDER_META[provider];
-            const Icon = meta.icon;
+            const Icon = OAUTH_PROVIDER_META[provider].icon;
             const account = accounts.find(a => a.provider === provider);
             const isLastAuthMethod = !hasPassword && accounts.length <= 1;
 
@@ -76,7 +79,7 @@ export function LinkedAccountsCard() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 text-[13px] font-semibold tracking-tight text-ink">
-                    {meta.label}
+                    {providerLabel(provider)}
                     {account && <Badge tone="sage" dot>{t("account.linkedAccounts.linked")}</Badge>}
                   </div>
                   <div className="mt-0.5 text-[11px] text-muted">

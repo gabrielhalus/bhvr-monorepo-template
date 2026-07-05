@@ -55,7 +55,8 @@ export function AccountMenuItems() {
       return true;
     },
     onSuccess: (loggedOut) => {
-      if (loggedOut) navigate({ to: "/login", replace: true });
+      // `manual` keeps SSO auto-login from signing the user right back in.
+      if (loggedOut) navigate({ to: "/login", search: { manual: true }, replace: true });
     },
     onError: () => toast.error(tAuth("logout.error")),
   });

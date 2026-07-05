@@ -46,7 +46,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 
     const params = new URLSearchParams(location.searchStr);
     params.delete("oauthError");
-    navigate({ href: `/login${params.size ? `?${params}` : ""}`, replace: true });
+    // Stay in manual mode: without it, SSO auto-login would immediately
+    // bounce the visitor back to the IdP they just failed at.
+    params.set("manual", "1");
+    navigate({ href: `/login?${params}`, replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [oauthError]);
 

@@ -76,7 +76,7 @@ export function LinkAccountForm({ token, error, className, ...props }: LinkAccou
           <p className="text-sm text-muted">{t("linkAccount.invalid.description")}</p>
         </div>
         <Button asChild className="w-full">
-          <Link to="/login">{t("linkAccount.backToLogin")}</Link>
+          <Link to="/login" search={{ manual: true }}>{t("linkAccount.backToLogin")}</Link>
         </Button>
       </div>
     );
@@ -171,7 +171,7 @@ export function LinkAccountForm({ token, error, className, ...props }: LinkAccou
           )}
 
       <div className="text-center text-sm">
-        <Link to="/login" className="inline-flex items-center gap-1 font-medium text-muted underline-offset-4 hover:text-ink hover:underline">
+        <Link to="/login" search={{ manual: true }} className="inline-flex items-center gap-1 font-medium text-muted underline-offset-4 hover:text-ink hover:underline">
           <ArrowLeft className="size-3.5" />
           {t("linkAccount.backToLogin")}
         </Link>

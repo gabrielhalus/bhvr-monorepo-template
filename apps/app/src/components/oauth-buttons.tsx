@@ -7,11 +7,13 @@ import { useOAuthProviders } from "@/hooks/oauth/use-oauth-providers";
 import { getLastAuthMethod, setOptimisticAuthMethod } from "@/lib/last-auth-method";
 import { Badge } from "~orbit/components/ui/Badge";
 import { Button } from "~orbit/components/ui/Button";
-import { Github, Google } from "~orbit/components/ui/icons";
+import { Github, Google, KeyRound } from "~orbit/components/ui/icons";
 
+/** Static provider metadata; the label is a fallback — the server payload wins. */
 export const OAUTH_PROVIDER_META: Record<OAuthProviderId, { label: string; icon: React.ComponentType<{ className?: string }> }> = {
   google: { label: "Google", icon: Google },
   github: { label: "GitHub", icon: Github },
+  sso: { label: "SSO", icon: KeyRound },
 };
 
 /** Error codes the OAuth callback may append to the redirect URL. */
@@ -49,20 +51,19 @@ export function OAuthButtons({ redirectTo }: OAuthButtonsProps) {
   return (
     <div data-slot="oauth-buttons" className="flex flex-col gap-3">
       {providers.map((provider) => {
-        const meta = OAUTH_PROVIDER_META[provider];
-        const Icon = meta.icon;
+        const Icon = OAUTH_PROVIDER_META[provider.id].icon;
 
         return (
           <Button
-            key={provider}
+            key={provider.id}
             type="button"
             variant="outline"
             className="w-full"
-            onClick={() => handleStart(provider)}
+            onClick={() => handleStart(provider.id)}
           >
             <Icon className="size-4" />
-            {t("oauth.continueWith", { provider: meta.label })}
-            {lastMethod === provider && (
+            {t("oauth.continueWith", { provider: provider.label })}
+            {lastMethod === provider.id && (
               <Badge tone="accent" className="absolute -right-2 -top-2 ring-2 ring-paper">{t("login.lastUsed")}</Badge>
             )}
           </Button>

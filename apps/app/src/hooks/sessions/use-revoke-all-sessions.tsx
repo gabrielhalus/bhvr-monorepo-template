@@ -13,7 +13,8 @@ export function useRevokeAllSessions() {
     ...revokeAllMySessionsMutationOptions(queryClient),
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: ["auth"] });
-      navigate({ to: "/login", replace: true });
+      // `manual` keeps SSO auto-login from signing the user right back in.
+      navigate({ to: "/login", search: { manual: true }, replace: true });
     },
     meta: { errorMessage: t("account.sessions.revokeAllError") },
   });

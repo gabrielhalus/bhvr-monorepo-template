@@ -1,19 +1,44 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { z } from "zod";
 
+import { oauthStartUrl } from "@/api/oauth/oauth.api";
+import { oauthProvidersQueryOptions } from "@/api/oauth/oauth.queries";
+import { setOptimisticAuthMethod } from "@/lib/last-auth-method";
 import { useBranding } from "@/providers/branding-provider";
 import { setupStatusQueryOptions } from "@/queries/auth";
 import { Sparkle } from "~orbit/components/ui/Sparkle";
 
 import { LoginForm } from "./-components/form";
 
+const searchSchema = z.object({
+  redirect: z.string().optional(),
+  oauthError: z.string().optional(),
+  manual: z.boolean().optional(),
+});
+
 export const Route = createFileRoute("/_auth/login/")({
+  validateSearch: searchSchema,
   component: Login,
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, search }) => {
     // No user yet → send the visitor to the registration screen to bootstrap
     // the instance's first (system administrator) account.
     const { needsSetup } = await context.queryClient.ensureQueryData(setupStatusQueryOptions);
     if (needsSetup) {
       throw redirect({ to: "/register", replace: true });
+    }
+
+    // SSO auto-login: hand the visitor to the identity provider without
+    // showing the form. `manual` (escape hatch, also set after a logout) and
+    // `oauthError` (failed flow) keep the form reachable and loop-free.
+    if (!search.manual && !search.oauthError) {
+      const { providers, autoLogin } = await context.queryClient.ensureQueryData(oauthProvidersQueryOptions);
+      if (autoLogin && providers.some(provider => provider.id === "sso")) {
+        setOptimisticAuthMethod("sso");
+        window.location.assign(oauthStartUrl("sso", { redirect: search.redirect }));
+        // Full browser navigation is underway — keep the router pending so
+        // the form never flashes.
+        await new Promise(() => {});
+      }
     }
   },
 });
