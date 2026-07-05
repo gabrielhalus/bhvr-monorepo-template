@@ -15,6 +15,7 @@ export async function getJwtSecret(): Promise<string> {
 export const ACCESS_TOKEN_EXPIRATION_SECONDS = 60 * 15; // 15 minutes
 export const REFRESH_TOKEN_EXPIRATION_SECONDS = 60 * 60 * 24 * 30; // 30 days
 export const VERIFICATION_TOKEN_EXPIRATION_SECONDS = 60 * 60 * 24; // 1 day
+export const OAUTH_FLOW_EXPIRATION_SECONDS = 60 * 10; // 10 minutes
 
 /**
  * Create an access token.
@@ -114,6 +115,8 @@ export function getCookieSettings(type: CookieType) {
       return { ...base, maxAge: Number(ACCESS_TOKEN_EXPIRATION_SECONDS) };
     case "refresh":
       return { ...base, maxAge: Number(REFRESH_TOKEN_EXPIRATION_SECONDS) };
+    case "oauth":
+      return { ...base, maxAge: Number(OAUTH_FLOW_EXPIRATION_SECONDS) };
     case "clear":
       return { ...base, maxAge: 0, expires: new Date(0) };
     default:

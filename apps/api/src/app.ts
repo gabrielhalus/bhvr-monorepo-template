@@ -11,6 +11,7 @@ import { configRoutes } from "@/routes/configs.routes";
 import { cronTasksRoutes } from "@/routes/cron-tasks.routes";
 import { invitationsRoutes } from "@/routes/invitations.routes";
 import { logsRoutes } from "@/routes/logs.routes";
+import { oauthRoutes } from "@/routes/oauth.routes";
 import { rolesRoutes } from "@/routes/roles.routes";
 import { usersRoutes } from "@/routes/users.routes";
 import { logSystemError } from "~shared/queries/logs.queries";
@@ -60,6 +61,7 @@ app.use(rateLimiter(rateLimitPresets.api));
 // -------------------
 const _api = app
   .route("/branding", brandingRoutes)
+  .route("/auth/oauth", oauthRoutes)
   .route("/auth", authRoutes)
   .route("/backups", backupRoutes)
   .route("/config", configRoutes)

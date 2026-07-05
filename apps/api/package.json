@@ -14,6 +14,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1065.0",
     "@hono/zod-validator": "^0.7.0",
+    "arctic": "^3.7.0",
     "croner": "^10.0.1",
     "hono": "4.11.3",
     "react": "^19.1.1",

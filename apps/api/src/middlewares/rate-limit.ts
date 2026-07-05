@@ -106,5 +106,6 @@ export const rateLimitPresets = {
   register: { limit: 5, windowMs: 60 * 60 * 1000 },
   forgotPassword: { limit: 10, windowMs: 60 * 60 * 1000 },
   resetPassword: { limit: 15, windowMs: 60 * 60 * 1000 },
+  oauthStart: { limit: 20, windowMs: 15 * 60 * 1000 },
   api: { limit: 300, windowMs: 60 * 1000 },
 } as const;
