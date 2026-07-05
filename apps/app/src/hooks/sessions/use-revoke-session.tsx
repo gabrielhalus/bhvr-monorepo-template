@@ -1,0 +1,20 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+
+import { sessionsKeys } from "@/api/sessions/sessions.keys";
+import { revokeSessionMutationOptions } from "@/api/sessions/sessions.mutations";
+
+export function useRevokeSession() {
+  const { t } = useTranslation("web");
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...revokeSessionMutationOptions(queryClient),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: sessionsKeys.mine });
+      toast.success(t("account.sessions.revokeSuccess"));
+    },
+    meta: { errorMessage: t("account.sessions.revokeError") },
+  });
+}

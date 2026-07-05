@@ -1,0 +1,41 @@
+import type { PaginationParams } from "@/query/paginated/types";
+
+import { api, ApiError } from "@/lib/http";
+
+export type LogFilters = {
+  actionCategory?: string;
+  targetType?: string;
+};
+
+export type LogsParams = PaginationParams & {
+  action?: string;
+  actionCategory?: string;
+  actorId?: string;
+  targetId?: string;
+  targetType?: string;
+  includeImpersonated?: boolean;
+};
+
+export async function fetchPaginatedLogs(params: LogsParams) {
+  const res = await api.logs.$get({
+    query: {
+      page: String(params.page),
+      limit: String(params.limit),
+      sortBy: params.sortBy,
+      sortOrder: params.sortOrder,
+      search: params.search,
+      action: params.action,
+      actionCategory: params.actionCategory,
+      actorId: params.actorId,
+      targetId: params.targetId,
+      targetType: params.targetType,
+      includeImpersonated: params.includeImpersonated ? "true" : undefined,
+    },
+  });
+
+  if (!res.ok) {
+    throw await ApiError.fromResponse(res);
+  }
+
+  return res.json();
+}

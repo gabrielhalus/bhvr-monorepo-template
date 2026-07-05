@@ -1,0 +1,64 @@
+/* ============================================================
+   apps/app — Orbit design system entry
+   ------------------------------------------------------------
+   Orbit provides the Tailwind import, @theme tokens, @source
+   scanning and base layer. The whole app is built on Orbit
+   primitives — no legacy "Cochon'ou" / shadcn token shim
+   remains. Only a couple of app-local extras live here:
+   the selection colour, the error-scene keyframes and the
+   `text-sheen` effect used on the dark auth shells.
+   ============================================================ */
+@import "../../../packages/orbit/src/styles.css";
+
+@import "tw-animate-css";
+
+@layer base {
+  /* The page scrolls inside AppShellMain (not the document), so the scrollbar
+     gutter is reserved there — keeping the nav rail flush to the viewport edge. */
+
+  *::selection {
+    @apply bg-accent/20 text-ink;
+  }
+}
+
+/* ---- Keyframes for the error / not-found scenes ---- */
+@keyframes error-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-6deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-3deg);
+  }
+}
+@keyframes error-halo {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.08);
+  }
+}
+@keyframes error-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Sheen text on dark (ink) panels — used by the auth shells ---- */
+@layer utilities {
+  .text-sheen {
+    background: linear-gradient(180deg, #ffffff 0%, #c7c7be 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
