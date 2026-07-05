@@ -16,6 +16,8 @@ export function validationMiddleware<T extends z.ZodSchema, U extends keyof Vali
         success: false as const,
         error: {
           message: result.error.issues[0]?.message,
+          code: result.error.issues[0]?.code,
+          path: result.error.issues[0]?.path,
           innerError: {
             timestamp: new Date(Date.now()),
           },

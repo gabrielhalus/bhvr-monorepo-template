@@ -102,7 +102,9 @@ function defaultKeyGenerator(c: Context): string {
  * Rate limit configuration presets
  */
 export const rateLimitPresets = {
-  login: { limit: 5, windowMs: 15 * 60 * 1000 },
-  register: { limit: 3, windowMs: 60 * 60 * 1000 },
-  api: { limit: 100, windowMs: 60 * 1000 },
+  login: { limit: 10, windowMs: 15 * 60 * 1000 },
+  register: { limit: 5, windowMs: 60 * 60 * 1000 },
+  forgotPassword: { limit: 10, windowMs: 60 * 60 * 1000 },
+  resetPassword: { limit: 15, windowMs: 60 * 60 * 1000 },
+  api: { limit: 300, windowMs: 60 * 1000 },
 } as const;

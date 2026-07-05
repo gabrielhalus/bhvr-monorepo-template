@@ -94,7 +94,7 @@ export async function verifyToken<T extends JwtPayload["ttyp"]>(token: string, t
 export function getCookieSettings(type: CookieType) {
   const isProd = ENV.APP_ENV === "production";
 
-  const primaryHost = ENV.APP_HOST.split(",")[0]!.trim();
+  const primaryHost = (ENV.APP_HOST.split(",")[0] ?? ENV.APP_HOST).trim();
   const isSubdomainDev = !isProd && primaryHost?.endsWith(".localhost.dev");
 
   const base = {

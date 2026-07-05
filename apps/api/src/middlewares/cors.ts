@@ -8,6 +8,8 @@ import { ENV } from "varlock/env";
  * @returns The CORS middleware.
  */
 export default function (): MiddlewareHandler {
+  const hosts = ENV.APP_HOST.split(",").map(h => h.trim());
+
   return cors({
     origin: (originHeader) => {
       if (!originHeader) {
@@ -15,7 +17,10 @@ export default function (): MiddlewareHandler {
       }
 
       const url = new URL(originHeader);
-      return url.hostname === ENV.APP_HOST || url.hostname.endsWith(`.${ENV.APP_HOST}`) ? originHeader : null;
+      const isAllowed = hosts.some(
+        host => url.hostname === host || url.hostname.endsWith(`.${host}`),
+      );
+      return isAllowed ? originHeader : null;
     },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
