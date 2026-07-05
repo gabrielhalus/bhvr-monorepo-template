@@ -12,6 +12,7 @@
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
     "drizzle:generate": "bun --cwd packages/shared drizzle:generate",
+    "drizzle:migrate": "bun --cwd packages/shared drizzle:migrate",
     "drizzle:push": "bun --cwd packages/shared drizzle:push",
     "drizzle:studio": "bun --cwd packages/shared drizzle:studio",
     "bootstrap": "bun --cwd packages/shared bootstrap",

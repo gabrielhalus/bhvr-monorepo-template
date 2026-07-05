@@ -10,6 +10,7 @@
     "test": "bun test __tests__ --env-file ../../.env.test",
     "test:coverage": "bun test __tests__ --coverage --env-file ../../.env.test",
     "drizzle:generate": "drizzle-kit generate --config=drizzle.config.cjs",
+    "drizzle:migrate": "drizzle-kit migrate --config=drizzle.config.cjs",
     "drizzle:push": "drizzle-kit push --config=drizzle.config.cjs",
     "drizzle:studio": "drizzle-kit studio --config=drizzle.config.cjs",
     "bootstrap": "bun run scripts/bootstrap.ts",
