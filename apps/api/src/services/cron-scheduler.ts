@@ -17,6 +17,17 @@ const HANDLERS: Record<string, HandlerFn> = {
     return "No-op handler executed successfully";
   },
 
+  "daily-db-backup": async () => {
+    const { isS3BackupConfigured, runDatabaseBackup } = await import("@/services/db-backup");
+    if (!await isS3BackupConfigured()) return "S3 backup not configured — skipping";
+    return runDatabaseBackup();
+  },
+
+  "local-db-backup": async () => {
+    const { backupToLocal } = await import("@/services/db-backup");
+    return backupToLocal();
+  },
+
   "cleanup-expired-invitations": async () => {
     const { expireInvitations } = await import("~shared/queries/invitations.queries");
     const count = await expireInvitations();

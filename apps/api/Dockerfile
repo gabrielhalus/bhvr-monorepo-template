@@ -28,6 +28,14 @@ RUN bun run build --filter=api...
 # -----------------------------
 FROM base AS release
 
+# Install PostgreSQL client tools (pg_dump / pg_restore) for DB backups.
+# Uses the base distro package (oven/bun:1 is Debian trixie → client 17), which
+# dumps/restores a PostgreSQL 16 server fine — avoids the PGDG repo + GPG key
+# dance that breaks when the base image's Debian codename changes.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy built files
 COPY --from=install /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/apps ./apps

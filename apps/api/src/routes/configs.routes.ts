@@ -5,11 +5,10 @@ import { getClientInfo } from "@/helpers/get-client-info";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
+import { CONFIG_REGISTRY_MAP } from "~shared/config.registry";
 import { getConfig, getConfigs, updateConfig } from "~shared/queries/configs.queries";
 import { logConfigUpdate } from "~shared/queries/logs.queries";
 import { UpdateConfigSchema } from "~shared/schemas/api/configs.schemas";
-
-const ROTATABLE_KEYS = new Set(["security.jwt.secret"]);
 
 export const configRoutes = new Hono()
   /**
@@ -22,7 +21,7 @@ export const configRoutes = new Hono()
 
     return c.json({
       success: true as const,
-      configs: configs.map(c => c.secret ? { ...c, value: null, isSet: c.value !== null } : c),
+      configs: configs.map(c => c.secret ? { ...c, value: null } : c),
     });
   })
 
@@ -44,7 +43,7 @@ export const configRoutes = new Hono()
       return c.json({ success: false as const, error: "Config not found" }, 404);
     }
 
-    return c.json({ success: true as const, value: value.secret ? { ...value, value: null, isSet: value.value !== null } : value });
+    return c.json({ success: true as const, value: value.secret ? { ...value, value: null } : value });
   })
 
   // --- All routes below this point require authentication
@@ -92,14 +91,15 @@ export const configRoutes = new Hono()
   .post("/:key/rotate", requirePermissionFactory("config:update", c => ({ key: c.req.param("key") })), async (c) => {
     const key = c.req.param("key");
 
-    if (!ROTATABLE_KEYS.has(key)) {
+    const registryEntry = CONFIG_REGISTRY_MAP.get(key);
+    if (!registryEntry) {
+      return c.json({ success: false as const, error: "Config not found" }, 404);
+    }
+    if (!registryEntry.rotatable) {
       return c.json({ success: false as const, error: "This configuration key does not support rotation" }, 400);
     }
 
     const existing = await getConfig(key);
-    if (!existing) {
-      return c.json({ success: false as const, error: "Config not found" }, 404);
-    }
 
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
@@ -111,7 +111,7 @@ export const configRoutes = new Hono()
       actorId: sessionContext.user.id,
       impersonatorId: sessionContext.impersonator?.id,
       ...clientInfo,
-    }, existing.value, newValue);
+    }, existing?.value ?? null, newValue);
 
     return c.json({ success: true as const, config });
   });

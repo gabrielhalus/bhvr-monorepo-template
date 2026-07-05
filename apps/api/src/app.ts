@@ -5,6 +5,8 @@ import { getClientInfo } from "@/helpers/get-client-info";
 import cors from "@/middlewares/cors";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { authRoutes } from "@/routes/auth.routes";
+import { backupRoutes } from "@/routes/backup.routes";
+import { brandingRoutes } from "@/routes/branding.routes";
 import { configRoutes } from "@/routes/configs.routes";
 import { cronTasksRoutes } from "@/routes/cron-tasks.routes";
 import { invitationsRoutes } from "@/routes/invitations.routes";
@@ -57,12 +59,14 @@ app.use(rateLimiter(rateLimitPresets.api));
 // API (Hono @ port 5173)
 // -------------------
 const _api = app
-  .route("/logs", logsRoutes)
+  .route("/branding", brandingRoutes)
   .route("/auth", authRoutes)
+  .route("/backups", backupRoutes)
+  .route("/config", configRoutes)
   .route("/cron-tasks", cronTasksRoutes)
   .route("/invitations", invitationsRoutes)
+  .route("/logs", logsRoutes)
   .route("/roles", rolesRoutes)
-  .route("/config", configRoutes)
   .route("/users", usersRoutes);
 
 export default app;
