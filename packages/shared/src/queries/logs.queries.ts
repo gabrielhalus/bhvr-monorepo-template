@@ -192,6 +192,44 @@ export async function logLogout(ctx: LogContext): Promise<Log> {
 }
 
 /**
+ * Log the linking of an OAuth provider to a user account.
+ */
+export async function logOAuthLink(
+  userId: string,
+  provider: string,
+  ctx: Omit<LogContext, "actorId">,
+): Promise<Log> {
+  return createLog({
+    action: "auth:oauth-link",
+    actorId: userId,
+    targetId: userId,
+    targetType: "user",
+    metadata: JSON.stringify({ provider }),
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
+ * Log the unlinking of an OAuth provider from a user account.
+ */
+export async function logOAuthUnlink(
+  userId: string,
+  provider: string,
+  ctx: Omit<LogContext, "actorId">,
+): Promise<Log> {
+  return createLog({
+    action: "auth:oauth-unlink",
+    actorId: userId,
+    targetId: userId,
+    targetType: "user",
+    metadata: JSON.stringify({ provider }),
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+  });
+}
+
+/**
  * Log impersonation start.
  */
 export async function logImpersonationStart(

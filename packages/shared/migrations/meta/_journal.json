@@ -15,6 +15,13 @@
       "when": 1783072816110,
       "tag": "0001_abnormal_weapon_omega",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783244469151,
+      "tag": "0002_chilly_bishop",
+      "breakpoints": true
     }
   ]
 }

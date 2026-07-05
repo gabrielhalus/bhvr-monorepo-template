@@ -62,7 +62,8 @@ export const InsertUserSchema = createInsertSchema(UsersModel, {
   password: z
     .string()
     .min(8)
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).+$/),
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).+$/)
+    .optional(),
   verifiedAt: z
     .string()
     .optional()

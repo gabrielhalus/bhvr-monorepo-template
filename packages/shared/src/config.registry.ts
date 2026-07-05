@@ -21,10 +21,14 @@ export const CONFIG_REGISTRY: ConfigRegistryEntry[] = [
   { key: "authentication", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 1 },
   { key: "authentication.register", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
   { key: "authentication.google", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 1 },
+  { key: "authentication.github", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 2 },
   { key: "authentication.register.enable", type: "boolean", defaultValue: "false", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
   { key: "authentication.google.enable", type: "boolean", defaultValue: "false", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
   { key: "authentication.google.clientId", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.google.enable!=true", order: 1 },
-  { key: "authentication.google.clientSecret", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.google.enable!=true", order: 2 },
+  { key: "authentication.google.clientSecret", type: "string", defaultValue: null, nullable: true, multiline: false, secret: true, rotatable: false, options: null, disabledWhen: "authentication.google.enable!=true", order: 2 },
+  { key: "authentication.github.enable", type: "boolean", defaultValue: "false", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 0 },
+  { key: "authentication.github.clientId", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.github.enable!=true", order: 1 },
+  { key: "authentication.github.clientSecret", type: "string", defaultValue: null, nullable: true, multiline: false, secret: true, rotatable: false, options: null, disabledWhen: "authentication.github.enable!=true", order: 2 },
 
   // ── Branding ───────────────────────────────────────────────────────────────
   { key: "branding", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 2 },

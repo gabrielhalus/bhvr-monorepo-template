@@ -38,6 +38,10 @@
       "sessions": {
         "description": "Manage devices currently signed in to your account.",
         "title": "Active Sessions"
+      },
+      "linkedAccounts": {
+        "title": "Linked Accounts",
+        "description": "Sign-in methods connected to your account."
       }
     },
     "sessions": {
@@ -84,6 +88,22 @@
       "memberSince": "Member since",
       "status": "Status",
       "title": "My account"
+    },
+    "linkedAccounts": {
+      "linked": "Linked",
+      "notLinked": "Not linked",
+      "link": "Link",
+      "unlink": "Unlink",
+      "unlinkConfirm": "You will no longer be able to sign in with {{provider}}.",
+      "unlinkSuccess": "Account unlinked.",
+      "unlinkError": "Failed to unlink the account.",
+      "lastMethodTooltip": "This is your only sign-in method. Set a password first.",
+      "linkSuccess": "Account linked.",
+      "errors": {
+        "oauth_failed": "Linking failed. Please try again.",
+        "account_taken": "This provider account is already linked to another user.",
+        "provider_already_linked": "This provider is already linked to your account."
+      }
     }
   },
   "actions": {
@@ -397,6 +417,24 @@
     },
     "config": {
       "authentication": {
+        "github": {
+          "clientId": {
+            "description": "Client ID of your OAuth App from <docLink>GitHub Developer settings</docLink>.",
+            "descriptionLink": "https://github.com/settings/developers",
+            "label": "GitHub client ID"
+          },
+          "clientSecret": {
+            "description": "Client secret of your OAuth App from <docLink>GitHub Developer settings</docLink>.",
+            "descriptionLink": "https://github.com/settings/developers",
+            "label": "GitHub client secret"
+          },
+          "enable": {
+            "description": "Enables sign-in via GitHub OAuth. Requires a valid client ID and secret from <docLink>GitHub Developer settings</docLink>.",
+            "descriptionLink": "https://github.com/settings/developers",
+            "label": "Enable login via GitHub"
+          },
+          "label": "GitHub"
+        },
         "google": {
           "clientId": {
             "description": "OAuth 2.0 client ID from your <docLink>Google Cloud Console</docLink> credentials.",

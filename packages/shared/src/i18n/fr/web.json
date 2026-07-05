@@ -38,6 +38,10 @@
       "sessions": {
         "description": "Gérez les appareils actuellement connectés à votre compte.",
         "title": "Sessions actives"
+      },
+      "linkedAccounts": {
+        "title": "Comptes liés",
+        "description": "Méthodes de connexion associées à votre compte."
       }
     },
     "sessions": {
@@ -84,6 +88,22 @@
       "memberSince": "Membre depuis",
       "status": "Statut",
       "title": "Mon compte"
+    },
+    "linkedAccounts": {
+      "linked": "Lié",
+      "notLinked": "Non lié",
+      "link": "Lier",
+      "unlink": "Délier",
+      "unlinkConfirm": "Vous ne pourrez plus vous connecter avec {{provider}}.",
+      "unlinkSuccess": "Compte délié.",
+      "unlinkError": "Impossible de délier le compte.",
+      "lastMethodTooltip": "C'est votre seule méthode de connexion. Définissez d'abord un mot de passe.",
+      "linkSuccess": "Compte lié.",
+      "errors": {
+        "oauth_failed": "La liaison a échoué. Veuillez réessayer.",
+        "account_taken": "Ce compte fournisseur est déjà lié à un autre utilisateur.",
+        "provider_already_linked": "Ce fournisseur est déjà lié à votre compte."
+      }
     }
   },
   "actions": {
@@ -397,6 +417,24 @@
     },
     "config": {
       "authentication": {
+        "github": {
+          "clientId": {
+            "description": "Identifiant client de votre OAuth App depuis les <docLink>paramètres développeur GitHub</docLink>.",
+            "descriptionLink": "https://github.com/settings/developers",
+            "label": "Identifiant client GitHub"
+          },
+          "clientSecret": {
+            "description": "Secret client de votre OAuth App depuis les <docLink>paramètres développeur GitHub</docLink>.",
+            "descriptionLink": "https://github.com/settings/developers",
+            "label": "Secret client GitHub"
+          },
+          "enable": {
+            "description": "Active la connexion via GitHub OAuth. Nécessite un identifiant client et un secret valides depuis les <docLink>paramètres développeur GitHub</docLink>.",
+            "descriptionLink": "https://github.com/settings/developers",
+            "label": "Activer la connexion via GitHub"
+          },
+          "label": "GitHub"
+        },
         "google": {
           "clientId": {
             "description": "Identifiant client OAuth 2.0 issu de vos identifiants <docLink>Google Cloud Console</docLink>.",
