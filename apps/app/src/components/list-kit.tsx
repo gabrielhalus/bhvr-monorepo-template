@@ -45,20 +45,20 @@ export function StatStrip({ cells, className }: { cells: StatStripCell[]; classN
  */
 export function Pager({ page, pageCount, onPage }: { page: number; pageCount: number; onPage: (p: number) => void }) {
   if (pageCount <= 1) return null;
-  const pages: (number | "…")[] = [];
+  const pages: { key: string; page?: number }[] = [];
   for (let i = 1; i <= pageCount; i++) {
-    if (i === 1 || i === pageCount || Math.abs(i - page) <= 1) pages.push(i);
-    else if (pages[pages.length - 1] !== "…") pages.push("…");
+    if (i === 1 || i === pageCount || Math.abs(i - page) <= 1) pages.push({ key: `page-${i}`, page: i });
+    else if (pages[pages.length - 1]?.page !== undefined) pages.push({ key: `gap-${i}` });
   }
   const pg = "grid size-[26px] place-items-center rounded-md border border-transparent text-xs font-medium text-muted transition-colors hover:border-line hover:bg-surface hover:text-ink disabled:pointer-events-none disabled:opacity-40";
   return (
     <div className="flex gap-1">
       <button type="button" className={pg} disabled={page <= 1} onClick={() => onPage(page - 1)}>‹</button>
-      {pages.map((p, i) =>
-        p === "…"
-          ? <button type="button" key={`gap-${i}`} className={pg} disabled>…</button>
-          : <button type="button" key={p} className={cn(pg, p === page && "border-transparent! bg-ink! text-white!")} onClick={() => onPage(p)}>{p}</button>,
-      )}
+      {pages.map((p) => {
+        if (p.page === undefined) return <button type="button" key={p.key} className={pg} disabled>…</button>;
+        const n = p.page;
+        return <button type="button" key={p.key} className={cn(pg, n === page && "border-transparent! bg-ink! text-white!")} onClick={() => onPage(n)}>{n}</button>;
+      })}
       <button type="button" className={pg} disabled={page >= pageCount} onClick={() => onPage(page + 1)}>›</button>
     </div>
   );

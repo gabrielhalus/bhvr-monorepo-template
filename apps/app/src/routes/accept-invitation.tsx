@@ -9,7 +9,7 @@ import { validateInvitationQueryOptions } from "@/api/invitations/invitations.qu
 import { Fg, FieldGrid } from "@/components/form-kit";
 import { PasswordInput } from "@/components/password-input";
 import { useAcceptInvitation } from "@/hooks/invitations/use-accept-invitation";
-import { useBranding } from "@/providers/branding-provider";
+import { useBranding } from "@/hooks/use-branding";
 import { Button } from "~orbit/components/ui/Button";
 import { Box, Link as LinkIcon, Loader2, TriangleAlert, UserPlus } from "~orbit/components/ui/icons";
 import { Input } from "~orbit/components/ui/Input";

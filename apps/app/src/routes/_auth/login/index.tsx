@@ -3,8 +3,8 @@ import { z } from "zod";
 
 import { oauthStartUrl } from "@/api/oauth/oauth.api";
 import { oauthProvidersQueryOptions } from "@/api/oauth/oauth.queries";
+import { useBranding } from "@/hooks/use-branding";
 import { setOptimisticAuthMethod } from "@/lib/last-auth-method";
-import { useBranding } from "@/providers/branding-provider";
 import { setupStatusQueryOptions } from "@/queries/auth";
 import { Sparkle } from "~orbit/components/ui/Sparkle";
 

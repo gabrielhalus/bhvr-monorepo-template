@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { userAvatarUrl } from "@/api/account/account.api";
 import { useAuth } from "@/hooks/use-auth";
-import { useBranding } from "@/providers/branding-provider";
+import { useBranding } from "@/hooks/use-branding";
 import { Avatar } from "~orbit/components/ui/Avatar";
 import { Badge } from "~orbit/components/ui/Badge";
 import {

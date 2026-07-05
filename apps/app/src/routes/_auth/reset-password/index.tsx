@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
-import { useBranding } from "@/providers/branding-provider";
+import { useBranding } from "@/hooks/use-branding";
 import { Sparkle } from "~orbit/components/ui/Sparkle";
 
 import { ResetPasswordForm } from "./-components/form";

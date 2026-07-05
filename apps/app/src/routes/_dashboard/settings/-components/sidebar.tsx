@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { configsQueryOptions } from "@/api/configs/configs.queries";
-import { useBranding } from "@/providers/branding-provider";
+import { useBranding } from "@/hooks/use-branding";
 import { buildConfigTree } from "~shared/helpers/config-tree";
 
 import { ConfigSection } from "./config-section";

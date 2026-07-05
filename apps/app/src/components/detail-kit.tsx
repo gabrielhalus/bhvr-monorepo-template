@@ -34,13 +34,13 @@ export function SideCard({ icon, title, tone = "default", className, children }:
   );
 }
 
-export type SideStat = { k: React.ReactNode; v: React.ReactNode; mono?: boolean; tone?: "green" };
+export type SideStat = { k: string; v: React.ReactNode; mono?: boolean; tone?: "green" };
 
 export function SideStats({ rows }: { rows: SideStat[] }) {
   return (
     <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2.5 text-xs">
-      {rows.map((r, i) => (
-        <Fragment key={i}>
+      {rows.map(r => (
+        <Fragment key={r.k}>
           <dt className="text-muted">{r.k}</dt>
           <dd className={cn("min-w-0 truncate text-right font-medium text-ink", r.mono && "font-mono text-[11px] tracking-normal", r.tone === "green" && "text-sage")}>{r.v}</dd>
         </Fragment>

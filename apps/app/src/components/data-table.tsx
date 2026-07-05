@@ -79,13 +79,16 @@ type DataTableProps<TData, TValue> = {
   renderGroupRow?: (key: string, colSpan: number) => React.ReactNode;
 };
 
+const SKELETON_ROW_KEYS = ["row-1", "row-2", "row-3", "row-4", "row-5"];
+
 function TableSkeleton({ columns }: { columns: ColumnDef<any, any>[] }) {
+  const cellKeys = Array.from({ length: columns.length }, (_, index) => `cell-${index}`);
   return (
     <>
-      {Array.from({ length: 5 }).map((_, rowIndex) => (
-        <tr key={rowIndex} className="border-t border-line">
-          {columns.map((_, colIndex) => (
-            <td key={colIndex} className="px-4 py-3"><Skeleton className="h-4 w-full" /></td>
+      {SKELETON_ROW_KEYS.map(rowKey => (
+        <tr key={rowKey} className="border-t border-line">
+          {cellKeys.map(cellKey => (
+            <td key={cellKey} className="px-4 py-3"><Skeleton className="h-4 w-full" /></td>
           ))}
         </tr>
       ))}
@@ -133,9 +136,10 @@ export function DataTable<TData, TValue>({
 
   React.useEffect(() => {
     if (isLoading || (!isLoading && searchValue)) {
-      setTimeout(() => searchInputRef.current?.focus(), 0);
+      const timeout = setTimeout(() => searchInputRef.current?.focus(), 0);
+      return () => clearTimeout(timeout);
     }
-  }, [isLoading, searchValue]);
+  }, [isLoading, searchValue, searchInputRef]);
 
   const currentPagination = externalPagination ?? internalPagination;
   const currentSorting = externalSorting ?? sorting;
@@ -174,11 +178,16 @@ export function DataTable<TData, TValue>({
     state: { sorting: currentSorting, columnFilters, columnVisibility, rowSelection, pagination: currentPagination },
   });
 
+  // Keep the callback in a ref so the effect below only fires on selection
+  // changes, even when callers pass an inline (unstable) callback.
+  const onSelectionChangeRef = React.useRef(onSelectionChange);
   React.useEffect(() => {
-    if (onSelectionChange) {
-      onSelectionChange(table.getFilteredSelectedRowModel().rows.map(r => r.original));
-    }
-  }, [rowSelection]);
+    onSelectionChangeRef.current = onSelectionChange;
+  }, [onSelectionChange]);
+
+  React.useEffect(() => {
+    onSelectionChangeRef.current?.(table.getFilteredSelectedRowModel().rows.map(r => r.original));
+  }, [rowSelection, table]);
 
   return (
     <div className="w-full overflow-hidden rounded-xl border border-line bg-surface shadow-soft">

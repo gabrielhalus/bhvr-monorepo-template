@@ -8,10 +8,11 @@ import { Trans, useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { configQueryOptions } from "@/api/configs/configs.queries";
-import { OAUTH_ERROR_CODES, OAuthButtons } from "@/components/oauth-buttons";
+import { OAuthButtons } from "@/components/oauth-buttons";
 import { PasswordInput } from "@/components/password-input";
 import { api } from "@/lib/http";
 import { getLastAuthMethod, rollbackAuthMethod, setLastAuthMethod } from "@/lib/last-auth-method";
+import { OAUTH_ERROR_CODES } from "@/lib/oauth-meta";
 import { Badge } from "~orbit/components/ui/Badge";
 import { Button } from "~orbit/components/ui/Button";
 import { Loader2 } from "~orbit/components/ui/icons";

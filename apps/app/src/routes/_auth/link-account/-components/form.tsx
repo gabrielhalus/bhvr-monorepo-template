@@ -10,10 +10,10 @@ import { toast } from "sonner";
 
 import { oauthStartUrl } from "@/api/oauth/oauth.api";
 import { pendingLinkQueryOptions } from "@/api/oauth/oauth.queries";
-import { OAUTH_PROVIDER_META } from "@/components/oauth-buttons";
 import { PasswordInput } from "@/components/password-input";
 import { useCompletePendingLink } from "@/hooks/oauth/use-complete-pending-link";
 import { rollbackAuthMethod, setLastAuthMethod, setOptimisticAuthMethod } from "@/lib/last-auth-method";
+import { OAUTH_PROVIDER_META } from "@/lib/oauth-meta";
 import { Button } from "~orbit/components/ui/Button";
 import { ArrowLeft, Link as LinkIcon, Loader2, TriangleAlert } from "~orbit/components/ui/icons";
 import { Field } from "~orbit/components/ui/Input";

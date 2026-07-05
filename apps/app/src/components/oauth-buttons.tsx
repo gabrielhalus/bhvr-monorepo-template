@@ -5,28 +5,9 @@ import { useTranslation } from "react-i18next";
 import { oauthStartUrl } from "@/api/oauth/oauth.api";
 import { useOAuthProviders } from "@/hooks/oauth/use-oauth-providers";
 import { getLastAuthMethod, setOptimisticAuthMethod } from "@/lib/last-auth-method";
+import { OAUTH_PROVIDER_META } from "@/lib/oauth-meta";
 import { Badge } from "~orbit/components/ui/Badge";
 import { Button } from "~orbit/components/ui/Button";
-import { Github, Google, KeyRound } from "~orbit/components/ui/icons";
-
-/** Static provider metadata; the label is a fallback — the server payload wins. */
-export const OAUTH_PROVIDER_META: Record<OAuthProviderId, { label: string; icon: React.ComponentType<{ className?: string }> }> = {
-  google: { label: "Google", icon: Google },
-  github: { label: "GitHub", icon: Github },
-  sso: { label: "SSO", icon: KeyRound },
-};
-
-/** Error codes the OAuth callback may append to the redirect URL. */
-export const OAUTH_ERROR_CODES: string[] = [
-  "oauth_failed",
-  "registration_disabled",
-  "email_missing",
-  "email_unverified",
-  "account_taken",
-  "provider_already_linked",
-  "invalid_token",
-  "confirm_failed",
-];
 
 type OAuthButtonsProps = {
   redirectTo?: string;

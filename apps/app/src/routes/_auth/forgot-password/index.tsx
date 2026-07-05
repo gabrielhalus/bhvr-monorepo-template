@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
-import { useBranding } from "@/providers/branding-provider";
+import { useBranding } from "@/hooks/use-branding";
 import { Sparkle } from "~orbit/components/ui/Sparkle";
 
 import { ForgotPasswordForm } from "./-components/form";

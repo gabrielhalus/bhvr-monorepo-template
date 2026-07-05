@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 import { configQueryOptions } from "@/api/configs/configs.queries";
-import { useBranding } from "@/providers/branding-provider";
+import { useBranding } from "@/hooks/use-branding";
 import { setupStatusQueryOptions } from "@/queries/auth";
 import { Sparkle } from "~orbit/components/ui/Sparkle";
 import { inferConfigValue } from "~shared/helpers/infer-config-value";

@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 
 import { oauthStartUrl } from "@/api/oauth/oauth.api";
 import { FormSection } from "@/components/form-kit";
-import { OAUTH_PROVIDER_META } from "@/components/oauth-buttons";
 import { useLinkedAccounts } from "@/hooks/oauth/use-linked-accounts";
 import { useOAuthProviders } from "@/hooks/oauth/use-oauth-providers";
 import { useUnlinkAccount } from "@/hooks/oauth/use-unlink-account";
+import { OAUTH_PROVIDER_META } from "@/lib/oauth-meta";
 import sayno from "@/lib/sayno";
 import { Badge } from "~orbit/components/ui/Badge";
 import { Button } from "~orbit/components/ui/Button";
