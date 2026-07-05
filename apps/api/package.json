@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "concurrently \"bun run --watch src/index.ts\" \"tsc --watch\"",
     "build": "tsc -b",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "start": "bun run src/index.ts",
     "check-types": "tsc --noEmit",
     "test": "bun test __tests__ --env-file ../../.env.test",
