@@ -71,7 +71,7 @@ export const cronTasksRoutes = new Hono()
   .post("/", validationMiddleware("json", InsertCronTaskRouteSchema), requirePermissionFactory("cronTask:create"), async (c) => {
     const data = c.req.valid("json");
     const task = await createCronTask(data);
-    cronScheduler.scheduleTask(task);
+    await cronScheduler.scheduleTask(task);
     return c.json({ success: true as const, task }, 201);
   })
 
@@ -107,7 +107,7 @@ export const cronTasksRoutes = new Hono()
   .delete("/:id{[a-zA-Z0-9_-]{21}}", requirePermissionFactory("cronTask:delete"), async (c) => {
     const id = c.req.param("id");
     const task = await deleteCronTask(id);
-    cronScheduler.unscheduleTask(id);
+    await cronScheduler.unscheduleTask(id);
     return c.json({ success: true as const, task });
   })
 

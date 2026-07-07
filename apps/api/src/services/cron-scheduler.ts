@@ -1,79 +1,159 @@
+import type { CronJobData } from "@/queues/cron.queue";
+import type { CronTaskRun } from "~shared/queries/cron-task-runs.queries";
 import type { CronTask } from "~shared/queries/cron-tasks.queries";
+import type { Worker } from "bullmq";
 
 import { Cron } from "croner";
 
-import { completeCronTaskRun, createCronTaskRun, markStalledRunsAsFailed } from "~shared/queries/cron-task-runs.queries";
+import { getRedisUrl } from "@/lib/redis";
+import { getCronQueue } from "@/queues/cron.queue";
+import { startCronWorker } from "@/queues/cron.worker";
+import { executeCronTask, hasCronHandler } from "@/services/cron-handlers";
+import { markStalledRunsAsFailed } from "~shared/queries/cron-task-runs.queries";
 import { getCronTask, getEnabledCronTasks, setTaskRunTimestamps } from "~shared/queries/cron-tasks.queries";
 
-// ============================================================================
-// Handler Registry
-// ============================================================================
-
-type HandlerFn = () => Promise<string | void>;
-
-const HANDLERS: Record<string, HandlerFn> = {
-  "noop": async () => {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    return "No-op handler executed successfully";
-  },
-
-  "daily-db-backup": async () => {
-    const { isS3BackupConfigured, runDatabaseBackup } = await import("@/services/db-backup");
-    if (!await isS3BackupConfigured()) return "S3 backup not configured — skipping";
-    return runDatabaseBackup();
-  },
-
-  "local-db-backup": async () => {
-    const { backupToLocal } = await import("@/services/db-backup");
-    return backupToLocal();
-  },
-
-  "cleanup-expired-invitations": async () => {
-    const { expireInvitations } = await import("~shared/queries/invitations.queries");
-    const count = await expireInvitations();
-    return `Expired ${count} pending invitation(s)`;
-  },
+export type CronScheduler = {
+  /** Start the scheduler: clean up stalled runs, then schedule all enabled tasks. */
+  start: () => Promise<void>;
+  /** Schedule a cron task. Replaces any existing schedule for the same task id. */
+  scheduleTask: (task: CronTask) => Promise<void>;
+  /** Unschedule a cron task by id. */
+  unscheduleTask: (taskId: string) => Promise<void>;
+  /** Reload a task: re-fetch from DB and reschedule or unschedule based on isEnabled. */
+  reload: (taskId: string) => Promise<void>;
+  /** Trigger a task immediately (manual run), bypassing the schedule. */
+  triggerTask: (taskId: string) => Promise<CronTaskRun>;
+  /** Stop the scheduler. */
+  stop: () => Promise<void>;
 };
 
-export const AVAILABLE_HANDLERS = Object.keys(HANDLERS);
+// ============================================================================
+// BullMQ implementation — used when Redis is configured. Schedules live in
+// Redis job schedulers, so tasks run exactly once across API instances.
+// ============================================================================
+
+export class BullMqCronScheduler implements CronScheduler {
+  private worker: Worker<CronJobData> | null = null;
+
+  async start(): Promise<void> {
+    await markStalledRunsAsFailed();
+
+    const queue = getCronQueue();
+    if (!queue) {
+      throw new Error("Cron queue unavailable — is REDIS_URL set?");
+    }
+
+    const tasks = await getEnabledCronTasks();
+
+    // Reconcile: drop schedulers whose task was deleted or disabled while the API was down
+    const enabledIds = new Set(tasks.map(task => task.id));
+    const schedulers = await queue.getJobSchedulers(0, -1);
+    for (const scheduler of schedulers) {
+      if (!enabledIds.has(scheduler.key)) {
+        await queue.removeJobScheduler(scheduler.key);
+      }
+    }
+
+    for (const task of tasks) {
+      await this.scheduleTask(task);
+    }
+
+    this.worker = startCronWorker();
+
+    // eslint-disable-next-line no-console
+    console.log(`[Scheduler] BullMQ scheduler started with ${tasks.length} task(s)`);
+  }
+
+  async scheduleTask(task: CronTask): Promise<void> {
+    if (!hasCronHandler(task.handler)) {
+      console.warn(`[Scheduler] Unknown handler "${task.handler}" for task "${task.name}" — skipping`);
+      return;
+    }
+
+    const queue = getCronQueue();
+    if (!queue) return;
+
+    try {
+      await queue.upsertJobScheduler(
+        task.id,
+        { pattern: task.cronExpression, tz: "UTC" },
+        { name: task.handler, data: { taskId: task.id } },
+      );
+
+      const scheduler = await queue.getJobScheduler(task.id);
+      const nextRunAt = scheduler?.next ? new Date(scheduler.next).toISOString() : null;
+      setTaskRunTimestamps(task.id, task.lastRunAt ?? new Date().toISOString(), nextRunAt).catch(() => {});
+    } catch (err) {
+      console.error(`[Scheduler] Failed to schedule task "${task.name}":`, err);
+    }
+  }
+
+  async unscheduleTask(taskId: string): Promise<void> {
+    await getCronQueue()?.removeJobScheduler(taskId).catch(() => {});
+  }
+
+  async reload(taskId: string): Promise<void> {
+    const task = await getCronTask(taskId);
+    if (task?.isEnabled) {
+      await this.scheduleTask(task);
+    } else {
+      await this.unscheduleTask(taskId);
+    }
+  }
+
+  async triggerTask(taskId: string): Promise<CronTaskRun> {
+    const task = await getCronTask(taskId);
+    if (!task) {
+      throw new Error(`Task "${taskId}" not found`);
+    }
+
+    // Runs inline (not through the queue) so the completed run is returned to the caller
+    const run = await executeCronTask(task.id, task.handler);
+
+    const scheduler = await getCronQueue()?.getJobScheduler(task.id).catch(() => null);
+    const nextRunAt = scheduler?.next ? new Date(scheduler.next).toISOString() : null;
+    setTaskRunTimestamps(task.id, run.completedAt ?? new Date().toISOString(), nextRunAt).catch(() => {});
+
+    return run;
+  }
+
+  async stop(): Promise<void> {
+    await this.worker?.close();
+    this.worker = null;
+  }
+}
 
 // ============================================================================
-// Scheduler
+// Croner implementation — in-process fallback when Redis is not configured.
+// With multiple API instances, every instance runs every task.
 // ============================================================================
 
-class CronScheduler {
+export class CronerCronScheduler implements CronScheduler {
   private jobs = new Map<string, Cron>();
 
-  /**
-   * Start the scheduler: clean up stalled runs, then schedule all enabled tasks.
-   */
   async start(): Promise<void> {
     await markStalledRunsAsFailed();
 
     const tasks = await getEnabledCronTasks();
     for (const task of tasks) {
-      this.scheduleTask(task);
+      await this.scheduleTask(task);
     }
 
     // eslint-disable-next-line no-console
-    console.log(`[Scheduler] Started with ${tasks.length} task(s)`);
+    console.log(`[Scheduler] In-process scheduler started with ${tasks.length} task(s)`);
   }
 
-  /**
-   * Schedule a cron task. Replaces any existing job for the same task id.
-   */
-  scheduleTask(task: CronTask): void {
-    this.unscheduleTask(task.id);
+  async scheduleTask(task: CronTask): Promise<void> {
+    await this.unscheduleTask(task.id);
 
-    const handler = HANDLERS[task.handler];
-    if (!handler) {
+    if (!hasCronHandler(task.handler)) {
       console.warn(`[Scheduler] Unknown handler "${task.handler}" for task "${task.name}" — skipping`);
       return;
     }
 
     try {
       const job = new Cron(task.cronExpression, { timezone: "UTC", protect: true }, async () => {
-        await this.executeTask(task.id, handler);
+        await this.runTask(task.id, task.handler);
       });
 
       this.jobs.set(task.id, job);
@@ -85,10 +165,7 @@ class CronScheduler {
     }
   }
 
-  /**
-   * Unschedule a cron task by id.
-   */
-  unscheduleTask(taskId: string): void {
+  async unscheduleTask(taskId: string): Promise<void> {
     const job = this.jobs.get(taskId);
     if (job) {
       job.stop();
@@ -96,87 +173,40 @@ class CronScheduler {
     }
   }
 
-  /**
-   * Reload a task: re-fetch from DB and reschedule or unschedule based on isEnabled.
-   */
   async reload(taskId: string): Promise<void> {
     const task = await getCronTask(taskId);
-    if (!task) {
-      this.unscheduleTask(taskId);
-      return;
-    }
-
-    if (task.isEnabled) {
-      this.scheduleTask(task);
+    if (task?.isEnabled) {
+      await this.scheduleTask(task);
     } else {
-      this.unscheduleTask(taskId);
+      await this.unscheduleTask(taskId);
     }
   }
 
-  /**
-   * Trigger a task immediately (manual run), bypassing the schedule.
-   * @param taskId - The task id.
-   * @returns The completed run record.
-   */
-  async triggerTask(taskId: string): Promise<ReturnType<typeof completeCronTaskRun>> {
+  async triggerTask(taskId: string): Promise<CronTaskRun> {
     const task = await getCronTask(taskId);
     if (!task) {
       throw new Error(`Task "${taskId}" not found`);
     }
 
-    const handler = HANDLERS[task.handler];
-    if (!handler) {
-      throw new Error(`Handler "${task.handler}" not registered`);
-    }
-
-    return this.executeTask(taskId, handler);
+    return this.runTask(task.id, task.handler);
   }
 
-  /**
-   * Stop all scheduled jobs.
-   */
-  stop(): void {
+  async stop(): Promise<void> {
     for (const job of this.jobs.values()) {
       job.stop();
     }
     this.jobs.clear();
   }
 
-  // ============================================================================
-  // Private
-  // ============================================================================
+  private async runTask(taskId: string, handlerName: string): Promise<CronTaskRun> {
+    const run = await executeCronTask(taskId, handlerName);
 
-  private async executeTask(taskId: string, handler: HandlerFn): Promise<ReturnType<typeof completeCronTaskRun>> {
-    const run = await createCronTaskRun(taskId);
+    const job = this.jobs.get(taskId);
+    const nextRunAt = job?.nextRun()?.toISOString() ?? null;
+    setTaskRunTimestamps(taskId, run.completedAt ?? new Date().toISOString(), nextRunAt).catch(() => {});
 
-    const start = Date.now();
-
-    try {
-      const output = await handler();
-      const completedAt = new Date().toISOString();
-
-      const completedRun = await completeCronTaskRun(run.id, "success", String(output ?? ""));
-
-      const job = this.jobs.get(taskId);
-      const nextRunAt = job?.nextRun()?.toISOString() ?? null;
-      setTaskRunTimestamps(taskId, completedAt, nextRunAt).catch(() => {});
-
-      return completedRun;
-    } catch (err) {
-      const completedAt = new Date().toISOString();
-      const errorMsg = err instanceof Error ? err.message : String(err);
-
-      console.error(`[Scheduler] Task ${taskId} failed after ${Date.now() - start}ms:`, err);
-
-      const completedRun = await completeCronTaskRun(run.id, "error", undefined, errorMsg);
-
-      const job = this.jobs.get(taskId);
-      const nextRunAt = job?.nextRun()?.toISOString() ?? null;
-      setTaskRunTimestamps(taskId, completedAt, nextRunAt).catch(() => {});
-
-      return completedRun;
-    }
+    return run;
   }
 }
 
-export const cronScheduler = new CronScheduler();
+export const cronScheduler: CronScheduler = getRedisUrl() ? new BullMqCronScheduler() : new CronerCronScheduler();
