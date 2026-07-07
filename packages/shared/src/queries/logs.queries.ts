@@ -6,6 +6,8 @@ import type { z } from "zod";
 import { and, asc, count, desc, eq, ilike, isNotNull, or } from "drizzle-orm";
 
 import { drizzle } from "../drizzle";
+import { nanoid } from "../lib/nanoid";
+import { getLogBufferAdapter } from "../log-buffer";
 import { LogsModel } from "../models/logs.model";
 import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
 
@@ -15,10 +17,37 @@ import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
 
 /**
  * Create an audit log entry.
+ * When a log buffer adapter is registered, the fully-built entry (id and
+ * createdAt included) is pushed to the buffer for batched insertion instead
+ * of being written directly; buffer failures fall back to a direct insert.
  * @param log - The audit log data to insert.
  * @returns The created audit log.
  */
 export async function createLog(log: z.infer<typeof InsertLogSchema>): Promise<Log> {
+  const buffer = getLogBufferAdapter();
+
+  if (buffer) {
+    const entry: Log = {
+      id: log.id ?? nanoid(),
+      action: log.action,
+      actorId: log.actorId,
+      impersonatorId: log.impersonatorId ?? null,
+      targetId: log.targetId ?? null,
+      targetType: log.targetType ?? null,
+      metadata: log.metadata ?? null,
+      ip: log.ip ?? null,
+      userAgent: log.userAgent ?? null,
+      createdAt: log.createdAt ?? new Date().toISOString(),
+    };
+
+    try {
+      await buffer.push(JSON.stringify(entry));
+      return entry;
+    } catch {
+      // Buffer unavailable — fall through to a direct insert
+    }
+  }
+
   const [insertedLog] = await drizzle
     .insert(LogsModel)
     .values(log)
@@ -29,6 +58,20 @@ export async function createLog(log: z.infer<typeof InsertLogSchema>): Promise<L
   }
 
   return insertedLog;
+}
+
+/**
+ * Bulk-insert fully-built audit log entries drained from the log buffer.
+ * Idempotent on id, so a batch can be retried after a partial failure.
+ * @param logs - The complete log rows to insert.
+ */
+export async function createLogs(logs: Log[]): Promise<void> {
+  if (logs.length === 0) return;
+
+  await drizzle
+    .insert(LogsModel)
+    .values(logs)
+    .onConflictDoNothing({ target: LogsModel.id });
 }
 
 /**
