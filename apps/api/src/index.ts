@@ -38,6 +38,13 @@ if (registerTokenCache()) {
   console.log("⚡ Session token cache enabled (Redis)");
 }
 
+const { registerAuditLogBuffer, startAuditLogFlusher } = await import("@/services/audit-log-flusher");
+
+if (registerAuditLogBuffer()) {
+  startAuditLogFlusher();
+  console.log("⚡ Audit log batching enabled (Redis)");
+}
+
 const { default: app } = await import("@/app");
 const { cronScheduler } = await import("@/services/cron-scheduler");
 const { startEmailWorker } = await import("@/queues/email.worker");
