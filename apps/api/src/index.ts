@@ -28,6 +28,12 @@ if (ENV.SYSTEM_RESET_PASSWORD) {
   }
 }
 
+const { registerConfigCache } = await import("@/lib/config-cache");
+
+if (registerConfigCache()) {
+  console.log("⚡ Config cache enabled (Redis)");
+}
+
 const { default: app } = await import("@/app");
 const { cronScheduler } = await import("@/services/cron-scheduler");
 const { startEmailWorker } = await import("@/queues/email.worker");
