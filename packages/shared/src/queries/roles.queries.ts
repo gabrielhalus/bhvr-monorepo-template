@@ -15,6 +15,7 @@ import { RolePermissionsModel } from "../models/role-permissions.model";
 import { RolesModel } from "../models/roles.model";
 import { UserRolesModel } from "../models/user-roles.model";
 import { UsersModel } from "../models/users.model";
+import { getRoleCacheAdapter } from "../role-cache";
 import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
 import { PolicySchema } from "../schemas/db/policies.schemas";
 import { RoleSchema } from "../schemas/db/roles.schemas";
@@ -355,6 +356,9 @@ export async function deleteRole(id: number): Promise<Role> {
   if (!deletedRole) {
     throw new Error("Failed to delete role");
   }
+
+  // Drop the role's cached auth data; on failure the entry expires via TTL
+  await getRoleCacheAdapter()?.remove([id]).catch(() => {});
 
   return RoleSchema.parse(deletedRole);
 }
