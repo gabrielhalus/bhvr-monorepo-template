@@ -6,6 +6,22 @@ import { and, eq, gt, isNull, ne } from "drizzle-orm";
 
 import { drizzle } from "../drizzle";
 import { TokensModel } from "../models/tokens.model";
+import { getTokenCacheAdapter, TOKEN_CACHE_TTL_SECONDS } from "../token-cache";
+
+/**
+ * Drop token records from the cache after a mutation. If the cache is
+ * unreachable, stale entries survive at most TOKEN_CACHE_TTL_SECONDS.
+ */
+async function invalidateTokenCache(ids: string[]): Promise<void> {
+  const cache = getTokenCacheAdapter();
+  if (!cache || ids.length === 0) return;
+
+  try {
+    await cache.remove(ids);
+  } catch (err) {
+    console.error(`[Token cache] Failed to invalidate ${ids.length} token(s) — stale for up to ${TOKEN_CACHE_TTL_SECONDS}s:`, err);
+  }
+}
 
 // ============================================================================
 // Core CRUD Operations
@@ -23,10 +39,25 @@ export async function getTokens(): Promise<Token[]> {
 
 /**
  * Get a token by its id.
+ * Served from the token cache when an adapter is registered; only existing
+ * tokens are cached, and every mutation invalidates the affected ids.
  * @param id - The id of the token.
  * @returns The token.
  */
 export async function getToken(id: string): Promise<Token | null> {
+  const cache = getTokenCacheAdapter();
+
+  if (cache) {
+    try {
+      const cached = await cache.get(id);
+      if (cached !== null) {
+        return JSON.parse(cached) as Token;
+      }
+    } catch {
+      // Cache unavailable or corrupt entry — fall back to the database
+    }
+  }
+
   const [token] = await drizzle
     .select()
     .from(TokensModel)
@@ -35,6 +66,10 @@ export async function getToken(id: string): Promise<Token | null> {
 
   if (!token) {
     return null;
+  }
+
+  if (cache) {
+    cache.set(id, JSON.stringify(token), TOKEN_CACHE_TTL_SECONDS).catch(() => {});
   }
 
   return token;
@@ -77,6 +112,8 @@ export async function updateToken(id: string, token: z.infer<typeof UpdateTokenS
     throw new Error("Failed to update token");
   }
 
+  await invalidateTokenCache([id]);
+
   return updatedToken;
 }
 
@@ -92,6 +129,8 @@ export async function deleteToken(id: string): Promise<Token> {
   if (!deletedToken) {
     throw new Error("Failed to delete token");
   }
+
+  await invalidateTokenCache([id]);
 
   return deletedToken;
 }
@@ -110,6 +149,8 @@ export async function deleteAllTokens(): Promise<Token[]> {
   if (!deletedTokens) {
     throw new Error("Failed to delete all tokens");
   }
+
+  await invalidateTokenCache(deletedTokens.map(t => t.id));
 
   return deletedTokens;
 }
@@ -154,6 +195,8 @@ export async function revokeToken(id: string): Promise<Token> {
     throw new Error("Failed to revoke token");
   }
 
+  await invalidateTokenCache([id]);
+
   return revokedToken;
 }
 
@@ -163,10 +206,14 @@ export async function revokeToken(id: string): Promise<Token> {
  * @returns The deleted tokens.
  */
 export async function revokeAllTokensByUserId(userId: string): Promise<Token[]> {
-  return drizzle
+  const deletedTokens = await drizzle
     .delete(TokensModel)
     .where(eq(TokensModel.userId, userId))
     .returning();
+
+  await invalidateTokenCache(deletedTokens.map(t => t.id));
+
+  return deletedTokens;
 }
 
 /**
@@ -176,7 +223,7 @@ export async function revokeAllTokensByUserId(userId: string): Promise<Token[]> 
  * @returns The deleted tokens.
  */
 export async function revokeAllTokensByUserIdExcept(userId: string, exceptTokenId: string): Promise<Token[]> {
-  return drizzle
+  const deletedTokens = await drizzle
     .delete(TokensModel)
     .where(
       and(
@@ -185,4 +232,8 @@ export async function revokeAllTokensByUserIdExcept(userId: string, exceptTokenI
       ),
     )
     .returning();
+
+  await invalidateTokenCache(deletedTokens.map(t => t.id));
+
+  return deletedTokens;
 }
