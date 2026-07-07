@@ -30,12 +30,16 @@ if (ENV.SYSTEM_RESET_PASSWORD) {
 
 const { registerConfigCache } = await import("@/lib/config-cache");
 const { registerTokenCache } = await import("@/lib/token-cache");
+const { registerRoleCache } = await import("@/lib/role-cache");
 
 if (registerConfigCache()) {
   console.log("⚡ Config cache enabled (Redis)");
 }
 if (registerTokenCache()) {
   console.log("⚡ Session token cache enabled (Redis)");
+}
+if (registerRoleCache()) {
+  console.log("⚡ Role permission cache enabled (Redis)");
 }
 
 const { registerAuditLogBuffer, startAuditLogFlusher } = await import("@/services/audit-log-flusher");
