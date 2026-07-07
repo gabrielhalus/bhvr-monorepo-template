@@ -3,7 +3,7 @@ import { ENV } from "varlock/env";
 
 let client: Redis | null | undefined;
 
-function getRedisUrl(): string | undefined {
+export function getRedisUrl(): string | undefined {
   try {
     return ENV.REDIS_URL;
   } catch {

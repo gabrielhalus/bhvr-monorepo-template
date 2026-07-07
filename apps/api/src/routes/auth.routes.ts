@@ -13,7 +13,8 @@ import { contentTypeFromKey, deleteObject, getObject, imageExtFromContentType, o
 import { getSessionContext } from "@/middlewares/auth";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { validationMiddleware } from "@/middlewares/validation";
-import { isEmailProviderConfigured, sendEmail } from "@/services/email";
+import { enqueueEmail } from "@/queues/email.queue";
+import { isEmailProviderConfigured } from "@/services/email";
 import { provisionUser } from "@/services/user-provisioning";
 import { isAuthorized, isAuthorizedBatch } from "~shared/auth";
 import { getConfig } from "~shared/queries/configs.queries";
@@ -212,8 +213,8 @@ export const authRoutes = new Hono()
       const text = `Bonjour,\n\nVous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le lien ci-dessous pour en choisir un nouveau :\n\n${resetUrl}\n\nCe lien expire dans 1 heure. Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.`;
 
       if (await isEmailProviderConfigured()) {
-        const result = await sendEmail({ to: user.email, subject, text, html: wrapEmailHtml(text, businessName) });
-        if (result.error) {
+        const result = await enqueueEmail({ to: user.email, subject, text, html: wrapEmailHtml(text, businessName) });
+        if (result.error !== undefined) {
           console.error(`[Password reset] Failed to send email to ${user.email}: ${result.error}`);
           console.warn(`[Password reset] Reset link for ${user.email}: ${resetUrl}`);
         }

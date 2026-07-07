@@ -2,7 +2,7 @@ import { ENV } from "varlock/env";
 
 import { getConfigs } from "~shared/queries/configs.queries";
 
-type SendEmailResult = { messageId: string; error?: never } | { error: string; messageId?: never };
+export type SendEmailResult = { messageId: string; error?: never } | { error: string; messageId?: never };
 
 /**
  * Whether a mail provider is fully configured (Resend API key + sender address).

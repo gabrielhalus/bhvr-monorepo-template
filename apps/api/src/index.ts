@@ -30,8 +30,13 @@ if (ENV.SYSTEM_RESET_PASSWORD) {
 
 const { default: app } = await import("@/app");
 const { cronScheduler } = await import("@/services/cron-scheduler");
+const { startEmailWorker } = await import("@/queues/email.worker");
 
 await cronScheduler.start();
+
+if (startEmailWorker()) {
+  console.log("📬 Email worker started");
+}
 
 console.log(`🚀 Server is running on port ${ENV.APP_PORT}`);
 
