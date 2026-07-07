@@ -29,9 +29,13 @@ if (ENV.SYSTEM_RESET_PASSWORD) {
 }
 
 const { registerConfigCache } = await import("@/lib/config-cache");
+const { registerTokenCache } = await import("@/lib/token-cache");
 
 if (registerConfigCache()) {
   console.log("⚡ Config cache enabled (Redis)");
+}
+if (registerTokenCache()) {
+  console.log("⚡ Session token cache enabled (Redis)");
 }
 
 const { default: app } = await import("@/app");
