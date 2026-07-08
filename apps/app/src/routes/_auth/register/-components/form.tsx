@@ -14,7 +14,7 @@ import { Loader2 } from "~orbit/components/ui/icons";
 import { Field, Input } from "~orbit/components/ui/Input";
 import { cn } from "~orbit/lib/utils";
 import { debounceAsync } from "~shared/lib/debounce";
-import { passwordChecks, passwordRules, RegisterSchema } from "~shared/schemas/api/auth.schemas";
+import { passwordChecks, passwordRules, RegisterFormSchema } from "~shared/schemas/api/auth.schemas";
 
 const checkEmail = debounceAsync(async (email: string): Promise<string | void> => {
   const res = await api.users["check-email"].$get({ query: { email } });
@@ -44,15 +44,18 @@ export function RegisterForm({ className, needsSetup = false, ...props }: Regist
   const redirectTo = searchParams.get("redirect") ?? "/";
 
   const form = useForm({
-    validators: { onSubmit: RegisterSchema },
+    validators: { onSubmit: RegisterFormSchema },
     defaultValues: {
       firstName: "",
       lastName: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
     onSubmit: async ({ value }) => {
-      const res = await api.auth.register.$post({ json: value });
+      // The confirmation is a client-side check only
+      const { confirmPassword: _, ...payload } = value;
+      const res = await api.auth.register.$post({ json: payload });
       const json = await res.json();
 
       if (json.success) {
@@ -157,6 +160,30 @@ export function RegisterForm({ className, needsSetup = false, ...props }: Regist
                 checks={passwordChecks}
                 showRequirements
               />
+            </Field>
+          )}
+        />
+        <form.Field
+          name="confirmPassword"
+          validators={{
+            // Re-validate when either field changes so the mismatch clears live
+            onChangeListenTo: ["password"],
+            onChange: ({ value, fieldApi }) =>
+              value && value !== fieldApi.form.getFieldValue("password")
+                ? { message: "mismatchErrorMessage" }
+                : undefined,
+          }}
+          children={field => (
+            <Field label={t("fields.confirmPassword")} htmlFor={field.name}>
+              <PasswordInput
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={e => field.handleChange(e.target.value)}
+              />
+              {field.state.meta.isTouched && !field.state.meta.isValid && field.state.meta.errors[0]?.message && (
+                <p className="text-xs text-coral-deep">{t(`errors.${field.name}.${field.state.meta.errors[0]?.message}` as never)}</p>
+              )}
             </Field>
           )}
         />
