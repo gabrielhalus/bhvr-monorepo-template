@@ -32,6 +32,13 @@ export const PermissionSchema = z.enum([
   "cronTask:trigger",
 
   /**
+   * Domain
+   */
+  "domain:list",
+  "domain:create",
+  "domain:delete",
+
+  /**
    * Invitation
    */
   "invitation:create",
@@ -47,6 +54,11 @@ export const PermissionSchema = z.enum([
   "log:delete",
 
   /**
+   * Organization
+   */
+  "organization:update",
+
+  /**
    * Role
    */
   "role:create",
@@ -54,6 +66,11 @@ export const PermissionSchema = z.enum([
   "role:list",
   "role:update",
   "role:delete",
+
+  /**
+   * Translation
+   */
+  "translation:update",
 
   /**
    * Session
@@ -76,4 +93,31 @@ export const PermissionSchema = z.enum([
    */
   "userRole:create",
   "userRole:delete",
+]);
+
+/**
+ * Platform-level permissions, checked against platform roles
+ * (roles with organizationId NULL) on the /admin surface. Kept as a separate
+ * enum so they never appear in org role management UIs.
+ */
+export const PlatformPermissionSchema = z.enum([
+  "platform:organization:list",
+  "platform:organization:read",
+  "platform:organization:create",
+  "platform:organization:update",
+  "platform:organization:delete",
+  "platform:user:list",
+  "platform:user:read",
+  "platform:user:update",
+  "platform:user:delete",
+  "platform:role:list",
+  "platform:role:manage",
+  "platform:config:list",
+  "platform:config:update",
+  "platform:flag:list",
+  "platform:flag:update",
+  "platform:log:list",
+  "platform:backup:manage",
+  "platform:cron:manage",
+  "platform:impersonate",
 ]);

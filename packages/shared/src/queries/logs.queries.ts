@@ -1,6 +1,7 @@
 import type { PaginatedResponse, PaginationQuery } from "../schemas/api/pagination.schemas";
 import type { InsertLogSchema } from "../schemas/db/logs.schemas";
 import type { Log, LogAction, LogTargetType } from "../types/db/logs.types";
+import type { OrgId } from "../types/org.types";
 import type { z } from "zod";
 
 import { and, asc, count, desc, eq, ilike, isNotNull, or } from "drizzle-orm";
@@ -10,6 +11,7 @@ import { nanoid } from "../lib/nanoid";
 import { getLogBufferAdapter } from "../log-buffer";
 import { LogsModel } from "../models/logs.model";
 import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
+import { orgScope } from "./scope";
 
 // ============================================================================
 // Core CRUD Operations
@@ -29,6 +31,7 @@ export async function createLog(log: z.infer<typeof InsertLogSchema>): Promise<L
   if (buffer) {
     const entry: Log = {
       id: log.id ?? nanoid(),
+      organizationId: log.organizationId ?? null,
       action: log.action,
       actorId: log.actorId,
       impersonatorId: log.impersonatorId ?? null,
@@ -158,6 +161,8 @@ export type LogContext = {
   actorId: string;
   /** If impersonating, the real admin user's ID */
   impersonatorId?: string;
+  /** The organization the action happened under (null = platform event) */
+  organizationId?: string | null;
   /** Client IP address */
   ip?: string;
   /** Client user agent */
@@ -176,6 +181,7 @@ export async function logRegister(
   ctx: Omit<LogContext, "actorId">,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "auth:register",
     actorId: userId,
     targetId: userId,
@@ -193,6 +199,7 @@ export async function logLogin(
   ctx: Omit<LogContext, "actorId">,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "auth:login",
     actorId: userId,
     targetId: userId,
@@ -210,6 +217,7 @@ export async function logLoginFailed(
   ctx: Omit<LogContext, "actorId">,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "auth:login_failed",
     actorId: "anonymous",
     targetType: "user",
@@ -224,6 +232,7 @@ export async function logLoginFailed(
  */
 export async function logLogout(ctx: LogContext): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "auth:logout",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -243,6 +252,7 @@ export async function logOAuthLink(
   ctx: Omit<LogContext, "actorId">,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "auth:oauth-link",
     actorId: userId,
     targetId: userId,
@@ -262,6 +272,7 @@ export async function logOAuthUnlink(
   ctx: Omit<LogContext, "actorId">,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "auth:oauth-unlink",
     actorId: userId,
     targetId: userId,
@@ -281,6 +292,7 @@ export async function logImpersonationStart(
   ctx: Omit<LogContext, "actorId" | "impersonatorId">,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "impersonation:start",
     actorId: impersonatorId,
     targetId: targetUserId,
@@ -299,6 +311,7 @@ export async function logImpersonationStop(
   ctx: Omit<LogContext, "actorId" | "impersonatorId">,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "impersonation:stop",
     actorId: impersonatorId,
     targetId: impersonatedUserId,
@@ -316,6 +329,7 @@ export async function logAccountUpdate(
   changes?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "account:update",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -336,6 +350,7 @@ export async function logUserUpdate(
   changes?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "user:update",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -355,6 +370,7 @@ export async function logUserDelete(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "user:delete",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -375,6 +391,7 @@ export async function logUserRolesUpdate(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "user:roles_update",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -394,6 +411,7 @@ export async function logPasswordReset(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "user:password_reset",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -413,6 +431,7 @@ export async function logRoleUpdate(
   changes?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "role:update",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -432,6 +451,7 @@ export async function logRoleDelete(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "role:delete",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -451,6 +471,7 @@ export async function logRoleMembersAdd(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "role:members_add",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -471,6 +492,7 @@ export async function logRoleMembersRemove(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "role:members_remove",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -491,6 +513,7 @@ export async function logInvitationCreate(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "invitation:create",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -511,6 +534,7 @@ export async function logInvitationAccept(
   ctx: Omit<LogContext, "actorId">,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "invitation:accept",
     actorId: userId,
     targetId: invitationId,
@@ -528,6 +552,7 @@ export async function logInvitationRevoke(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "invitation:revoke",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -546,6 +571,7 @@ export async function logInvitationDelete(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "invitation:delete",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -566,6 +592,7 @@ export async function logConfigUpdate(
   newValue?: unknown,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "config:update",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -585,6 +612,7 @@ export async function logTokenRefresh(
   ctx: Omit<LogContext, "actorId">,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "auth:token_refresh",
     actorId: userId,
     targetId: userId,
@@ -601,6 +629,7 @@ export async function logAccountPasswordChange(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "account:password_change",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -620,6 +649,7 @@ export async function logRoleCreate(
   roleName?: string,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "role:create",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -640,6 +670,7 @@ export async function logSystemError(
   metadata?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "system:error",
     actorId: ctx.actorId ?? "system",
     impersonatorId: ctx.impersonatorId,
@@ -674,6 +705,7 @@ export async function logAction({
   metadata,
 }: LogActionParams): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action,
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -694,6 +726,7 @@ export async function logUserCreate(
   metadata?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "user:create",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -714,6 +747,7 @@ export async function logPermissionDenied(
   resource?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "permission:denied",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -734,6 +768,7 @@ export async function logPermissionCheck(
   resource?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "permission:check",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -752,6 +787,7 @@ export async function logUserList(
   filters?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "user:list",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -770,6 +806,7 @@ export async function logRoleList(
   filters?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "role:list",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -788,6 +825,7 @@ export async function logInvitationList(
   filters?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "invitation:list",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -806,6 +844,7 @@ export async function logLogList(
   filters?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "log:list",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -824,6 +863,7 @@ export async function logInvitationResend(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "invitation:resend",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -842,6 +882,7 @@ export async function logTokenRevoke(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "auth:token_revoke",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -862,6 +903,7 @@ export async function logSessionRevokeAll(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "auth:session_revoke_all",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -880,6 +922,7 @@ export async function logUserRead(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "user:read",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -898,6 +941,7 @@ export async function logRoleRead(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "role:read",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -916,6 +960,7 @@ export async function logInvitationRead(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "invitation:read",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -934,6 +979,7 @@ export async function logConfigRead(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "config:read",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -951,6 +997,7 @@ export async function logConfigList(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "config:list",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -968,6 +1015,7 @@ export async function logUserExport(
   filters?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "user:export",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -986,6 +1034,7 @@ export async function logLogExport(
   filters?: Record<string, unknown>,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "log:export",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -1003,6 +1052,7 @@ export async function logAccountDelete(
   ctx: LogContext,
 ): Promise<Log> {
   return createLog({
+    organizationId: ctx.organizationId,
     action: "account:delete",
     actorId: ctx.actorId,
     impersonatorId: ctx.impersonatorId,
@@ -1021,6 +1071,14 @@ export async function deleteAllLogs(): Promise<void> {
   await drizzle.delete(LogsModel);
 }
 
+/**
+ * Delete all audit logs of an organization.
+ * @param orgId - The organization id.
+ */
+export async function deleteOrgLogs(orgId: OrgId): Promise<void> {
+  await drizzle.delete(LogsModel).where(orgScope(LogsModel, orgId));
+}
+
 // ============================================================================
 // Paginated Queries
 // ============================================================================
@@ -1035,9 +1093,13 @@ export type LogsPaginatedQuery = PaginationQuery & {
 };
 
 /**
- * Get paginated audit logs with filtering options.
+ * Get paginated audit logs, with filtering options.
+ * @param orgId - The organization whose logs to list, or null for the
+ * platform view (every org plus platform events).
+ * @param query - Pagination and filter parameters.
  */
 export async function getLogsPaginated(
+  orgId: OrgId | null,
   query: LogsPaginatedQuery,
 ): Promise<PaginatedResponse<Log>> {
   const {
@@ -1100,7 +1162,9 @@ export async function getLogsPaginated(
     );
   }
 
-  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+  const whereClause = orgId
+    ? orgScope(LogsModel, orgId, ...conditions)
+    : conditions.length > 0 ? and(...conditions) : undefined;
 
   const sortColumn = sortBy && sortableColumns[sortBy as keyof typeof sortableColumns]
     ? sortableColumns[sortBy as keyof typeof sortableColumns]

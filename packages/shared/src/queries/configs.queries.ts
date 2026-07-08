@@ -16,6 +16,7 @@ function mergeConfig(entry: ConfigRegistryEntry, override?: DbOverride): Config 
     value: override !== undefined ? override.value : entry.defaultValue,
     defaultValue: entry.defaultValue,
     isOverridden: override !== undefined,
+    scope: entry.scope,
     type: entry.type,
     nullable: entry.nullable,
     multiline: entry.multiline,

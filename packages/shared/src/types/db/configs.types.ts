@@ -5,6 +5,7 @@ export type Config = {
   value: string | null;
   defaultValue: string | null;
   isOverridden: boolean;
+  scope: "platform" | "organization";
   type: "string" | "number" | "boolean" | "list" | "node" | "image";
   nullable: boolean;
   multiline: boolean;

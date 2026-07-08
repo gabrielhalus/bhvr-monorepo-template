@@ -1,5 +1,6 @@
 import type { PaginatedResponse, PaginationQuery } from "../schemas/api/pagination.schemas";
 import type { Invitation, InvitationRelationKey, InvitationRelations, InvitationWithRelations } from "../types/db/invitations.types";
+import type { OrgId } from "../types/org.types";
 import type { z } from "zod";
 
 import { and, asc, count, desc, eq, ilike, inArray, lt, or } from "drizzle-orm";
@@ -15,6 +16,7 @@ import { RolesModel } from "../models/roles.model";
 import { UsersModel } from "../models/users.model";
 import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
 import { InsertInvitationSchema, InvitationSchema, UpdateInvitationSchema } from "../schemas/db/invitations.schemas";
+import { orgScope } from "./scope";
 
 // ============================================================================
 // Relation Loaders
@@ -79,37 +81,41 @@ export const invitationRelationLoaders: { [K in keyof InvitationRelations]: (inv
 // ============================================================================
 
 /**
- * Get all invitations with optional relations.
+ * Get all invitations of an organization with optional relations.
+ * @param orgId - The organization id.
  * @param includes - The relations to include.
  * @returns The invitations with relations.
  */
-export async function getInvitations<T extends InvitationRelationKey[]>(includes?: T): Promise<InvitationWithRelations<T>[]> {
+export async function getInvitations<T extends InvitationRelationKey[]>(orgId: OrgId, includes?: T): Promise<InvitationWithRelations<T>[]> {
   const invitations = await drizzle
     .select()
-    .from(InvitationsModel);
+    .from(InvitationsModel)
+    .where(orgScope(InvitationsModel, orgId));
 
   const parsedInvitations = invitations.map(i => InvitationSchema.parse(i));
   return hydrateInvitations(parsedInvitations, includes);
 }
 
 /**
- * Get paginated invitations with optional relations.
+ * Get paginated invitations of an organization with optional relations.
+ * @param orgId - The organization id.
  * @param pagination - Pagination parameters (page, limit, sortBy, sortOrder, search).
  * @param includes - The relations to include.
  * @returns Paginated invitations with relations.
  */
 export async function getInvitationsPaginated<T extends InvitationRelationKey[]>(
+  orgId: OrgId,
   pagination: PaginationQuery,
   includes?: T,
 ): Promise<PaginatedResponse<InvitationWithRelations<T>>> {
   const { page, limit, sortBy, sortOrder, search } = pagination;
   const offset = (page - 1) * limit;
 
-  const searchCondition = search
+  const searchCondition = orgScope(InvitationsModel, orgId, search
     ? or(
         ilike(InvitationsModel.email, `%${search}%`),
       )
-    : undefined;
+    : undefined);
 
   const sortableColumns: Record<string, typeof InvitationsModel.id | typeof InvitationsModel.email | typeof InvitationsModel.status | typeof InvitationsModel.createdAt | typeof InvitationsModel.expiresAt> = {
     id: InvitationsModel.id,
@@ -155,16 +161,17 @@ export async function getInvitationsPaginated<T extends InvitationRelationKey[]>
 }
 
 /**
- * Get an invitation by id with optional relations.
+ * Get an invitation by id within an organization, with optional relations.
+ * @param orgId - The organization id.
  * @param id - The invitation id.
  * @param includes - The relations to include.
  * @returns The invitation with relations.
  */
-export async function getInvitation<T extends InvitationRelationKey[]>(id: string, includes?: T): Promise<InvitationWithRelations<T> | null> {
+export async function getInvitation<T extends InvitationRelationKey[]>(orgId: OrgId, id: string, includes?: T): Promise<InvitationWithRelations<T> | null> {
   const [invitation] = await drizzle
     .select()
     .from(InvitationsModel)
-    .where(eq(InvitationsModel.id, id));
+    .where(orgScope(InvitationsModel, orgId, eq(InvitationsModel.id, id)));
 
   if (!invitation) {
     return null;
@@ -288,15 +295,18 @@ export async function getInvitationByToken(token: string): Promise<Invitation | 
 }
 
 /**
- * Get a pending invitation by email.
+ * Get a pending invitation by email within an organization.
+ * @param orgId - The organization id.
  * @param email - The email address.
  * @returns The pending invitation or null if not found.
  */
-export async function getPendingInvitationByEmail(email: string): Promise<Invitation | null> {
+export async function getPendingInvitationByEmail(orgId: OrgId, email: string): Promise<Invitation | null> {
   const [invitation] = await drizzle
     .select()
     .from(InvitationsModel)
-    .where(and(
+    .where(orgScope(
+      InvitationsModel,
+      orgId,
       eq(InvitationsModel.email, email.toLowerCase()),
       eq(InvitationsModel.status, "pending"),
     ));

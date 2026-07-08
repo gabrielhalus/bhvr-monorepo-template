@@ -45,6 +45,16 @@ export type LogAction
     | "invitation:revoke"
     | "invitation:delete"
     | "invitation:resend"
+  // Organization actions
+    | "organization:create"
+    | "organization:update"
+    | "organization:delete"
+  // Domain actions
+    | "domain:list"
+    | "domain:create"
+    | "domain:delete"
+  // Translation actions
+    | "translation:update"
   // Config actions
     | "config:read"
     | "config:list"
@@ -66,6 +76,9 @@ export type LogTargetType
   = | "user"
     | "role"
     | "invitation"
+    | "organization"
+    | "domain"
+    | "translation"
     | "config"
     | "log"
     | "permission"

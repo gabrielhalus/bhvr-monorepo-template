@@ -1,10 +1,12 @@
 import { boolean, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
 import { nanoid } from "~shared/lib/nanoid";
+import { OrganizationsModel } from "~shared/models/organizations.model";
 import { UsersModel } from "~shared/models/users.model";
 
 export const InvitationsModel = pgTable("invitations", {
   id: varchar("id", { length: 21 }).primaryKey().$defaultFn(() => nanoid()),
+  organizationId: varchar("organization_id", { length: 21 }).notNull().references(() => OrganizationsModel.id, { onDelete: "cascade", onUpdate: "cascade" }),
   email: text("email").notNull(),
   token: varchar("token", { length: 64 }).notNull().unique(),
   status: varchar("status", { length: 20 }).notNull().default("pending").$type<"pending" | "accepted" | "expired" | "revoked">(),

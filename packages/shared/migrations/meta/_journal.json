@@ -29,6 +29,20 @@
       "when": 1783255632783,
       "tag": "0003_move-jwt-config-under-authentication",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783500662788,
+      "tag": "0004_multi_tenant_foundations",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783504040468,
+      "tag": "0005_convert_enable_configs_to_flags",
+      "breakpoints": true
     }
   ]
 }

@@ -1,8 +1,10 @@
 import type { PaginatedResponse, PaginationQuery } from "../schemas/api/pagination.schemas";
+import type { Role } from "../types/db/roles.types";
 import type { User, UserRelationKey, UserRelations, UserWithRelations } from "../types/db/users.types";
+import type { OrgId } from "../types/org.types";
 import type { z } from "zod";
 
-import { asc, count, desc, eq, ilike, inArray, isNotNull, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
 
 import { ApiKeysModel } from "~shared/models/api-keys.model";
@@ -10,6 +12,7 @@ import { ApiKeySchema } from "~shared/schemas/db/api-keys.schemas";
 
 import { drizzle } from "../drizzle";
 import { attachRelation } from "../helpers";
+import { OrganizationMembersModel } from "../models/organization-members.model";
 import { RolesModel } from "../models/roles.model";
 import { TokensModel } from "../models/tokens.model";
 import { UserRolesModel } from "../models/user-roles.model";
@@ -18,12 +21,13 @@ import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
 import { RoleSchema } from "../schemas/db/roles.schemas";
 import { TokenSchema } from "../schemas/db/tokens.schemas";
 import { InsertUserSchema, UpdateUserSchema, UserSchema } from "../schemas/db/users.schemas";
+import { orgScope } from "./scope";
 
 // ============================================================================
 // Relation Loaders
 // ============================================================================
 
-export const userRelationLoaders: { [K in keyof UserRelations]: (userIds: string[]) => Promise<Record<string, UserRelations[K]>> } = {
+export const userRelationLoaders: { [K in keyof UserRelations]: (userIds: string[], orgId?: OrgId) => Promise<Record<string, UserRelations[K]>> } = {
   apiKeys: async (userIds) => {
     const result: Record<string, UserRelations["apiKeys"]> = {};
 
@@ -50,7 +54,7 @@ export const userRelationLoaders: { [K in keyof UserRelations]: (userIds: string
     return result;
   },
 
-  roles: async (userIds) => {
+  roles: async (userIds, orgId) => {
     const result: Record<string, UserRelations["roles"]> = {};
 
     if (!userIds?.length) {
@@ -59,6 +63,8 @@ export const userRelationLoaders: { [K in keyof UserRelations]: (userIds: string
 
     userIds.forEach(id => (result[id] = []));
 
+    // Scoped to the org when provided (explicit org roles + the org's implicit
+    // default role); otherwise explicit assignments across all scopes.
     const [userRolesRows, defaultRolesRows] = await Promise.all([
       drizzle
         .select({
@@ -67,11 +73,15 @@ export const userRelationLoaders: { [K in keyof UserRelations]: (userIds: string
         })
         .from(UserRolesModel)
         .innerJoin(RolesModel, eq(UserRolesModel.roleId, RolesModel.id))
-        .where(inArray(UserRolesModel.userId, userIds)),
-      drizzle
-        .select()
-        .from(RolesModel)
-        .where(eq(RolesModel.isDefault, true)),
+        .where(orgId
+          ? and(inArray(UserRolesModel.userId, userIds), orgScope(RolesModel, orgId))
+          : inArray(UserRolesModel.userId, userIds)),
+      orgId
+        ? drizzle
+            .select()
+            .from(RolesModel)
+            .where(orgScope(RolesModel, orgId, eq(RolesModel.isDefault, true)))
+        : Promise.resolve([]),
     ]);
 
     for (const row of userRolesRows) {
@@ -118,7 +128,7 @@ export const userRelationLoaders: { [K in keyof UserRelations]: (userIds: string
   },
 };
 
-export const userRelationCountLoaders: { [K in keyof UserRelations]: (userIds: string[]) => Promise<Record<string, number>>; } = {
+export const userRelationCountLoaders: { [K in keyof UserRelations]: (userIds: string[], orgId?: OrgId) => Promise<Record<string, number>>; } = {
   apiKeys: async (userIds) => {
     const result: Record<string, number> = {};
 
@@ -144,7 +154,7 @@ export const userRelationCountLoaders: { [K in keyof UserRelations]: (userIds: s
     return result;
   },
 
-  roles: async (userIds) => {
+  roles: async (userIds, orgId) => {
     const result: Record<string, number> = {};
 
     if (!userIds?.length) {
@@ -161,14 +171,18 @@ export const userRelationCountLoaders: { [K in keyof UserRelations]: (userIds: s
         })
         .from(UserRolesModel)
         .innerJoin(RolesModel, eq(UserRolesModel.roleId, RolesModel.id))
-        .where(inArray(UserRolesModel.userId, userIds))
+        .where(orgId
+          ? and(inArray(UserRolesModel.userId, userIds), orgScope(RolesModel, orgId))
+          : inArray(UserRolesModel.userId, userIds))
         .groupBy(UserRolesModel.userId),
-      drizzle
-        .select({
-          count: count(RolesModel.id),
-        })
-        .from(RolesModel)
-        .where(eq(RolesModel.isDefault, true)),
+      orgId
+        ? drizzle
+            .select({
+              count: count(RolesModel.id),
+            })
+            .from(RolesModel)
+            .where(orgScope(RolesModel, orgId, eq(RolesModel.isDefault, true)))
+        : Promise.resolve([]),
     ]);
 
     for (const row of userRolesRows) {
@@ -321,9 +335,10 @@ export async function getUser<T extends UserRelationKey[]>(id: string, includes?
  * Hydrate users with additional relations
  * @param users - The users to hydrate
  * @param includes - The relations to include
+ * @param orgId - When provided, org-dependent relations (roles) are scoped to it
  * @returns The users with added relations
  */
-export async function hydrateUsers<T extends UserRelationKey[]>(users: User[], includes?: T): Promise<UserWithRelations<T>[]> {
+export async function hydrateUsers<T extends UserRelationKey[]>(users: User[], includes?: T, orgId?: OrgId): Promise<UserWithRelations<T>[]> {
   if (!includes?.length) {
     return users.map(u => ({ ...u })) as UserWithRelations<T>[];
   }
@@ -338,7 +353,7 @@ export async function hydrateUsers<T extends UserRelationKey[]>(users: User[], i
         throw new Error(`No relation loader defined for "${key}"`);
       }
 
-      const data = await loader(userIds);
+      const data = await loader(userIds, orgId);
       return [key, data] as const;
     }),
   );
@@ -411,6 +426,117 @@ export async function deleteUser(id: string): Promise<User> {
   }
 
   return UserSchema.parse(deletedUser);
+}
+
+// ============================================================================
+// Org-Scoped Queries
+// ============================================================================
+
+/**
+ * Get a user's roles within an organization: explicit assignments plus the
+ * organization's implicit default role. This is what the session context
+ * carries on the org surface.
+ *
+ * Callers must verify membership first (`getMember`/`isOrgMember`) — the
+ * implicit default role is returned for any user id, member or not.
+ * @param orgId - The organization id.
+ * @param userId - The user id.
+ * @returns The user's org roles.
+ */
+export async function getUserOrgRoles(orgId: OrgId, userId: string): Promise<Role[]> {
+  const rolesByUser = await userRelationLoaders.roles([userId], orgId);
+  return rolesByUser[userId] ?? [];
+}
+
+/**
+ * Get a user's platform roles (roles with organizationId IS NULL).
+ * @param userId - The user id.
+ * @returns The user's platform roles.
+ */
+export async function getUserPlatformRoles(userId: string): Promise<Role[]> {
+  const rows = await drizzle
+    .select({ role: RolesModel })
+    .from(UserRolesModel)
+    .innerJoin(RolesModel, eq(UserRolesModel.roleId, RolesModel.id))
+    .where(and(eq(UserRolesModel.userId, userId), isNull(RolesModel.organizationId)));
+
+  return rows.map(r => RoleSchema.parse(r.role));
+}
+
+/**
+ * Get paginated members of an organization with optional relations.
+ * @param orgId - The organization id.
+ * @param pagination - Pagination parameters (page, limit, sortBy, sortOrder, search).
+ * @param includes - The relations to include (org-scoped where applicable).
+ * @returns Paginated users with relations.
+ */
+export async function getOrgUsersPaginated<T extends UserRelationKey[]>(
+  orgId: OrgId,
+  pagination: PaginationQuery,
+  includes?: T,
+): Promise<PaginatedResponse<UserWithRelations<T>>> {
+  const { page, limit, sortBy, sortOrder, search } = pagination;
+  const offset = (page - 1) * limit;
+
+  const membershipCondition = orgScope(OrganizationMembersModel, orgId);
+
+  const searchCondition = search
+    ? or(
+        ilike(UsersModel.firstName, `%${search}%`),
+        ilike(UsersModel.lastName, `%${search}%`),
+        ilike(UsersModel.email, `%${search}%`),
+      )
+    : undefined;
+
+  const whereClause = and(membershipCondition, searchCondition);
+
+  const sortableColumns: Record<string, typeof UsersModel.id | typeof UsersModel.firstName | typeof UsersModel.lastName | typeof UsersModel.email | typeof UsersModel.createdAt> = {
+    id: UsersModel.id,
+    firstName: UsersModel.firstName,
+    lastName: UsersModel.lastName,
+    email: UsersModel.email,
+    createdAt: UsersModel.createdAt,
+  };
+
+  const [countResult] = await drizzle
+    .select({ count: count() })
+    .from(OrganizationMembersModel)
+    .innerJoin(UsersModel, eq(OrganizationMembersModel.userId, UsersModel.id))
+    .where(whereClause);
+
+  const total = countResult?.count ?? 0;
+
+  const sortColumn = sortBy && sortableColumns[sortBy] ? sortableColumns[sortBy] : UsersModel.createdAt;
+
+  const rows = await drizzle
+    .select({ user: UsersModel })
+    .from(OrganizationMembersModel)
+    .innerJoin(UsersModel, eq(OrganizationMembersModel.userId, UsersModel.id))
+    .where(whereClause)
+    .orderBy(sortOrder === "asc" ? asc(sortColumn) : desc(sortColumn))
+    .limit(limit)
+    .offset(offset);
+
+  const parsedUsers = rows.map(r => UserSchema.parse(r.user));
+  const hydratedUsers = await hydrateUsers(parsedUsers, includes, orgId);
+
+  return createPaginatedResponse(hydratedUsers, total, page, limit);
+}
+
+/**
+ * Check whether a user is a member of an organization.
+ * @param orgId - The organization id.
+ * @param userId - The user id.
+ * @returns True if the user is a member.
+ */
+export async function isOrgMember(orgId: OrgId, userId: string): Promise<boolean> {
+  const [row] = await drizzle
+    .select({ userId: OrganizationMembersModel.userId })
+    .from(OrganizationMembersModel)
+    .where(orgScope(OrganizationMembersModel, orgId, eq(OrganizationMembersModel.userId, userId)))
+    .limit(1);
+
+  return !!row;
 }
 
 // ============================================================================

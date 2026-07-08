@@ -33,6 +33,9 @@ const baseUser: User = {
 function makeRole(overrides: Partial<Role> = {}): Role {
   return {
     id: 1,
+    // Fixtures are platform-scoped: the super-admin bypass only applies to
+    // roles with organizationId null.
+    organizationId: null,
     name: "member",
     index: 0,
     isDefault: false,

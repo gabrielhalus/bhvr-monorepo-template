@@ -61,7 +61,9 @@ async function hydrateRolesCached(roles: Role[]): Promise<AuthRole[]> {
  * @returns True if the user has the permission, false otherwise
  */
 export async function isAuthorized(permission: Permission, user: UserWithRelations<["roles"]>, resource?: Record<string, unknown>): Promise<boolean> {
-  if (user.roles.some(role => role.isSuperAdmin)) {
+  // The super-admin bypass is platform-only: org roles always go through
+  // explicit permissions and policies.
+  if (user.roles.some(role => role.isSuperAdmin && role.organizationId === null)) {
     return true;
   }
 
@@ -100,7 +102,7 @@ export async function isAuthorizedBatch(
   checks: Array<{ permission: Permission; resource?: Record<string, unknown> }>,
   user: UserWithRelations<["roles"]>,
 ): Promise<boolean[]> {
-  if (user.roles.some(role => role.isSuperAdmin)) {
+  if (user.roles.some(role => role.isSuperAdmin && role.organizationId === null)) {
     return checks.map(() => true);
   }
 

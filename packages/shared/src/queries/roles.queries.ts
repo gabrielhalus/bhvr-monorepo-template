@@ -2,9 +2,10 @@ import type { WithRelations } from "../lib/type-utils";
 import type { PaginatedResponse, PaginationQuery } from "../schemas/api/pagination.schemas";
 import type { InsertRoleSchema } from "../schemas/db/roles.schemas";
 import type { Role, RoleRelationKeys, RoleRelations, RoleWithRelations } from "../types/db/roles.types";
+import type { OrgId } from "../types/org.types";
 import type { z } from "zod";
 
-import { asc, count, desc, eq, ilike, inArray } from "drizzle-orm";
+import { asc, count, desc, eq, ilike, inArray, isNull } from "drizzle-orm";
 
 import { PermissionSchema } from "~shared/schemas/api/permissions.schemas";
 
@@ -20,6 +21,7 @@ import { createPaginatedResponse } from "../schemas/api/pagination.schemas";
 import { PolicySchema } from "../schemas/db/policies.schemas";
 import { RoleSchema } from "../schemas/db/roles.schemas";
 import { UserSchema } from "../schemas/db/users.schemas";
+import { orgScope } from "./scope";
 
 // ============================================================================
 // Relation Loaders
@@ -192,15 +194,17 @@ export const roleRelationCountLoaders: { [K in keyof RoleRelations]: (roleIds: n
 // ============================================================================
 
 /**
- * Get all roles with optional relations.
+ * Get all roles of an organization with optional relations.
+ * @param orgId - The organization id.
  * @param includes - The relations to include.
  * @returns The roles with relations.
  * @throws An error if a loader is not defined for a relation.
  */
-export async function getRoles<T extends RoleRelationKeys>(includes?: T): Promise<RoleWithRelations<T>[]> {
+export async function getRoles<T extends RoleRelationKeys>(orgId: OrgId, includes?: T): Promise<RoleWithRelations<T>[]> {
   const roles = await drizzle
     .select()
     .from(RolesModel)
+    .where(orgScope(RolesModel, orgId))
     .orderBy(desc(RolesModel.index));
 
   const parsedRoles = roles.map(r => RoleSchema.parse(r));
@@ -208,21 +212,39 @@ export async function getRoles<T extends RoleRelationKeys>(includes?: T): Promis
 }
 
 /**
- * Get paginated roles with optional relations.
+ * Get all platform roles (organizationId IS NULL) with optional relations.
+ * @param includes - The relations to include.
+ * @returns The platform roles with relations.
+ */
+export async function getPlatformRoles<T extends RoleRelationKeys>(includes?: T): Promise<RoleWithRelations<T>[]> {
+  const roles = await drizzle
+    .select()
+    .from(RolesModel)
+    .where(isNull(RolesModel.organizationId))
+    .orderBy(desc(RolesModel.index));
+
+  const parsedRoles = roles.map(r => RoleSchema.parse(r));
+  return hydrateRoles(parsedRoles, includes);
+}
+
+/**
+ * Get paginated roles of an organization with optional relations.
+ * @param orgId - The organization id.
  * @param pagination - Pagination parameters (page, limit, sortBy, sortOrder, search).
  * @param includes - The relations to include.
  * @returns Paginated roles with relations.
  */
 export async function getRolesPaginated<T extends RoleRelationKeys>(
+  orgId: OrgId,
   pagination: PaginationQuery,
   includes?: T,
 ): Promise<PaginatedResponse<RoleWithRelations<T>>> {
   const { page, limit, sortBy, sortOrder, search } = pagination;
   const offset = (page - 1) * limit;
 
-  const searchCondition = search
+  const searchCondition = orgScope(RolesModel, orgId, search
     ? ilike(RolesModel.name, `%${search}%`)
-    : undefined;
+    : undefined);
 
   const sortableColumns: Record<string, typeof RolesModel.id | typeof RolesModel.name | typeof RolesModel.index> = {
     id: RolesModel.id,
@@ -232,22 +254,17 @@ export async function getRolesPaginated<T extends RoleRelationKeys>(
 
   const countQuery = drizzle
     .select({ count: count() })
-    .from(RolesModel);
-
-  if (searchCondition) {
-    countQuery.where(searchCondition);
-  }
+    .from(RolesModel)
+    .where(searchCondition);
 
   const [countResult] = await countQuery;
   const total = countResult?.count ?? 0;
 
   const dataQuery = drizzle
     .select()
-    .from(RolesModel);
-
-  if (searchCondition) {
-    dataQuery.where(searchCondition);
-  }
+    .from(RolesModel)
+    .where(searchCondition)
+    .$dynamic();
 
   const sortColumn = sortBy && sortableColumns[sortBy] ? sortableColumns[sortBy] : RolesModel.index;
   if (sortOrder === "asc") {
@@ -266,14 +283,17 @@ export async function getRolesPaginated<T extends RoleRelationKeys>(
 }
 
 /**
- * Get a role by id with optional relations.
+ * Get a role by id within an organization, with optional relations.
+ * The org filter doubles as an IDOR guard: a role id from another
+ * organization resolves to null.
+ * @param orgId - The organization id.
  * @param id - The role id.
  * @param includes - The relations to include.
  * @returns The role with relations.
  * @throws An error if a loader is not defined for a relation.
  */
-export async function getRole<T extends RoleRelationKeys>(id: number, includes?: T): Promise<RoleWithRelations<T> | null> {
-  const [role] = await drizzle.select().from(RolesModel).where(eq(RolesModel.id, id));
+export async function getRole<T extends RoleRelationKeys>(orgId: OrgId, id: number, includes?: T): Promise<RoleWithRelations<T> | null> {
+  const [role] = await drizzle.select().from(RolesModel).where(orgScope(RolesModel, orgId, eq(RolesModel.id, id)));
 
   if (!role) {
     return null;
@@ -323,15 +343,16 @@ export async function hydrateRoles<T extends RoleRelationKeys>(roles: Role[], in
 }
 
 /**
- * Create a new role.
+ * Create a new role in an organization.
+ * @param orgId - The organization id.
  * @param role - The role to create.
  * @returns The created role.
  * @throws An error if the role could not be created.
  */
-export async function createRole(role: z.infer<typeof InsertRoleSchema>): Promise<Role> {
+export async function createRole(orgId: OrgId, role: Omit<z.infer<typeof InsertRoleSchema>, "organizationId">): Promise<Role> {
   const [createdRole] = await drizzle
     .insert(RolesModel)
-    .values(role)
+    .values({ ...role, organizationId: orgId, isSuperAdmin: false })
     .returning();
 
   if (!createdRole) {
@@ -342,15 +363,16 @@ export async function createRole(role: z.infer<typeof InsertRoleSchema>): Promis
 }
 
 /**
- * Delete a role.
+ * Delete a role of an organization.
+ * @param orgId - The organization id.
  * @param id - The role id.
  * @returns The deleted role.
  * @throws An error if the role could not be deleted.
  */
-export async function deleteRole(id: number): Promise<Role> {
+export async function deleteRole(orgId: OrgId, id: number): Promise<Role> {
   const [deletedRole] = await drizzle
     .delete(RolesModel)
-    .where(eq(RolesModel.id, id))
+    .where(orgScope(RolesModel, orgId, eq(RolesModel.id, id)))
     .returning();
 
   if (!deletedRole) {
@@ -368,14 +390,15 @@ export async function deleteRole(id: number): Promise<Role> {
 // ============================================================================
 
 /**
- * Get a role by name with optional relations.
+ * Get a role by name within an organization, with optional relations.
+ * @param orgId - The organization id.
  * @param name - The role name.
  * @param includes - The relations to include.
  * @returns The role with relations.
  * @throws An error if a loader is not defined for a relation.
  */
-export async function getRoleByName<T extends RoleRelationKeys>(name: string, includes?: T): Promise<WithRelations<Role, RoleRelations, T> | null> {
-  const [role] = await drizzle.select().from(RolesModel).where(eq(RolesModel.name, name)).limit(1);
+export async function getRoleByName<T extends RoleRelationKeys>(orgId: OrgId, name: string, includes?: T): Promise<WithRelations<Role, RoleRelations, T> | null> {
+  const [role] = await drizzle.select().from(RolesModel).where(orgScope(RolesModel, orgId, eq(RolesModel.name, name))).limit(1);
 
   if (!role) {
     return null;
@@ -388,11 +411,12 @@ export async function getRoleByName<T extends RoleRelationKeys>(name: string, in
 }
 
 /**
- * Get the default role (where isDefault is true).
+ * Get the default role of an organization (where isDefault is true).
+ * @param orgId - The organization id.
  * @returns The default role, or null if none is set.
  */
-export async function getDefaultRole(): Promise<Role | null> {
-  const [role] = await drizzle.select().from(RolesModel).where(eq(RolesModel.isDefault, true)).limit(1);
+export async function getDefaultRole(orgId: OrgId): Promise<Role | null> {
+  const [role] = await drizzle.select().from(RolesModel).where(orgScope(RolesModel, orgId, eq(RolesModel.isDefault, true))).limit(1);
 
   if (!role) {
     return null;
