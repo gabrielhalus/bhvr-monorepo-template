@@ -37,6 +37,17 @@ export const RegisterSchema = z.object({
   password: PasswordSchema,
 });
 
+/**
+ * Registration form variant: the confirmation field is a client-side check
+ * only — the API payload stays RegisterSchema.
+ */
+export const RegisterFormSchema = RegisterSchema.extend({
+  confirmPassword: z.string().min(1, "requiredErrorMessage"),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "mismatchErrorMessage",
+  path: ["confirmPassword"],
+});
+
 export const LoginSchema = z.object({
   email: z.string().toLowerCase().trim(),
   password: z.string().min(1, "requiredErrorMessage"),
