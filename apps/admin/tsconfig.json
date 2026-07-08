@@ -1,0 +1,19 @@
+{
+  "extends": "typescript-config/react.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "~api/*": ["../../apps/api/src/*"],
+      "~app-core/*": ["../../packages/app-core/src/*"],
+      "~orbit/*": ["../../packages/orbit/src/*"],
+      "~shared/*": ["../../packages/shared/src/*"]
+    },
+    "outDir": "dist"
+  },
+  "references": [
+    { "path": "../api" },
+    { "path": "../../packages/shared" }
+  ],
+  "include": ["src", "vite.config.ts", "./env.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,19 @@
+import pluginQuery from "@tanstack/eslint-plugin-query";
+import createConfig from "eslint-config/create-config";
+
+export default createConfig({
+  react: true,
+  tailwind: true,
+  ignores: ["src/routeTree.gen.ts", "env.d.ts"],
+}, {
+  plugins: {
+    "@tanstack/query": pluginQuery,
+  },
+  rules: {
+    "@tanstack/query/exhaustive-deps": "error",
+    "unicorn/filename-case": ["error", {
+      case: "kebabCase",
+      ignore: ["README.md", "~__root.tsx", /^\$[a-z]/i, /^organizations\./],
+    }],
+  },
+});
