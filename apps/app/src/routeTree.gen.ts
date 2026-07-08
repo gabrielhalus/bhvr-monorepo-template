@@ -13,6 +13,7 @@ import { Route as AcceptInvitationRouteImport } from './routes/accept-invitation
 import { Route as DashboardRouteRouteImport } from './routes/_dashboard/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
+import { Route as DashboardWordingRouteImport } from './routes/_dashboard/wording'
 import { Route as DashboardUsersRouteRouteImport } from './routes/_dashboard/users/route'
 import { Route as DashboardSettingsRouteRouteImport } from './routes/_dashboard/settings/route'
 import { Route as DashboardLogsRouteRouteImport } from './routes/_dashboard/logs/route'
@@ -47,6 +48,11 @@ const AuthRouteRoute = AuthRouteRouteImport.update({
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardWordingRoute = DashboardWordingRouteImport.update({
+  id: '/wording',
+  path: '/wording',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardUsersRouteRoute = DashboardUsersRouteRouteImport.update({
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/logs': typeof DashboardLogsRouteRoute
   '/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/users': typeof DashboardUsersRouteRouteWithChildren
+  '/wording': typeof DashboardWordingRoute
   '/cron/$taskId': typeof DashboardCronTaskIdRoute
   '/settings/$': typeof DashboardSettingsSplatRoute
   '/forgot-password/': typeof AuthForgotPasswordIndexRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/accept-invitation': typeof AcceptInvitationRoute
   '/logs': typeof DashboardLogsRouteRoute
   '/settings': typeof DashboardSettingsRouteRouteWithChildren
+  '/wording': typeof DashboardWordingRoute
   '/cron/$taskId': typeof DashboardCronTaskIdRoute
   '/settings/$': typeof DashboardSettingsSplatRoute
   '/forgot-password': typeof AuthForgotPasswordIndexRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/_dashboard/logs': typeof DashboardLogsRouteRoute
   '/_dashboard/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/_dashboard/users': typeof DashboardUsersRouteRouteWithChildren
+  '/_dashboard/wording': typeof DashboardWordingRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/cron/$taskId': typeof DashboardCronTaskIdRoute
   '/_dashboard/settings/$': typeof DashboardSettingsSplatRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/logs'
     | '/settings'
     | '/users'
+    | '/wording'
     | '/cron/$taskId'
     | '/settings/$'
     | '/forgot-password/'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/accept-invitation'
     | '/logs'
     | '/settings'
+    | '/wording'
     | '/cron/$taskId'
     | '/settings/$'
     | '/forgot-password'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/_dashboard/logs'
     | '/_dashboard/settings'
     | '/_dashboard/users'
+    | '/_dashboard/wording'
     | '/_dashboard/'
     | '/_dashboard/cron/$taskId'
     | '/_dashboard/settings/$'
@@ -298,6 +310,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/_dashboard/wording': {
+      id: '/_dashboard/wording'
+      path: '/wording'
+      fullPath: '/wording'
+      preLoaderRoute: typeof DashboardWordingRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/_dashboard/users': {
@@ -499,6 +518,7 @@ interface DashboardRouteRouteChildren {
   DashboardLogsRouteRoute: typeof DashboardLogsRouteRoute
   DashboardSettingsRouteRoute: typeof DashboardSettingsRouteRouteWithChildren
   DashboardUsersRouteRoute: typeof DashboardUsersRouteRouteWithChildren
+  DashboardWordingRoute: typeof DashboardWordingRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardAccountIndexRoute: typeof DashboardAccountIndexRoute
 }
@@ -509,6 +529,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardLogsRouteRoute: DashboardLogsRouteRoute,
   DashboardSettingsRouteRoute: DashboardSettingsRouteRouteWithChildren,
   DashboardUsersRouteRoute: DashboardUsersRouteRouteWithChildren,
+  DashboardWordingRoute: DashboardWordingRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardAccountIndexRoute: DashboardAccountIndexRoute,
 }

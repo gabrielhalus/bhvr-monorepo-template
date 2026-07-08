@@ -4,6 +4,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "~api/*": ["../../apps/api/src/*"],
+      "~app-core/*": ["../../packages/app-core/src/*"],
       "~orbit/*": ["../../packages/orbit/src/*"],
       "~shared/*": ["../../packages/shared/src/*"]
     },

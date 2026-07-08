@@ -18,6 +18,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@varlock/vite-integration": "^0.2.7",
     "api": "workspace:*",
+    "app-core": "workspace:*",
     "cmdk": "^1.1.1",
     "hono": "4.11.3",
     "i18next-browser-languagedetector": "^8.2.0",

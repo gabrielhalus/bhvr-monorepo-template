@@ -1,3 +1,6 @@
-import { createAuth } from "@/lib/create-auth";
+import { createAuth } from "~app-core/index";
 
-export const auth = createAuth();
+import { authQueryOptions } from "../queries/auth";
+import { queryClient } from "./query-client";
+
+export const auth = createAuth({ queryClient, authQueryOptions });

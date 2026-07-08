@@ -9,7 +9,7 @@ import { AppErrorBoundary } from "@/components/app-error-boundary";
 import { NotFound, RouteError } from "@/components/route-error";
 import { Sayno } from "@/components/sayno";
 import { Toaster } from "@/components/toaster";
-import i18n from "@/i18n";
+import i18n, { applyOrgWordingOverrides } from "@/i18n";
 import { queryClient } from "@/lib/query-client";
 import { setErrorTranslator } from "@/lib/report-error";
 import { AuthProvider } from "@/providers/auth-provider";
@@ -42,6 +42,13 @@ declare module "@tanstack/react-router" {
 
 async function bootstrap() {
   await i18n.init();
+
+  // Per-organization wording: overrides fetched from the API are layered onto
+  // the bundled defaults, now and on every language switch.
+  await applyOrgWordingOverrides(i18n.resolvedLanguage ?? i18n.language);
+  i18n.on("languageChanged", (lng) => {
+    applyOrgWordingOverrides(lng);
+  });
 
   // Let the centralized error handlers (mutation toasts, boundaries) localize.
   setErrorTranslator(key => i18n.t(key));

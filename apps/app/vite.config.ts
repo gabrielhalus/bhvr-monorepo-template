@@ -18,6 +18,7 @@ export default defineConfig(() => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
       "~api": path.resolve(__dirname, "../../apps/api/src"),
+      "~app-core": path.resolve(__dirname, "../../packages/app-core/src"),
       "~auth": path.resolve(__dirname, "../../packages/auth/src"),
       "~db": path.resolve(__dirname, "../../packages/db/src"),
       "~env": path.resolve(__dirname, "../../packages/env/src"),
@@ -28,10 +29,13 @@ export default defineConfig(() => ({
   },
   server: {
     host: true,
+    // Tenant domains in dev: {slug}.lvh.me / {slug}.localhost resolve to 127.0.0.1
+    allowedHosts: [".lvh.me", ".localhost"],
     proxy: {
       "/api": {
+        // Keep the original Host header — the API resolves the organization from it
         target: "http://localhost:3000",
-        changeOrigin: true,
+        changeOrigin: false,
         rewrite: path => path.replace(/^\/api/, ""),
       },
     },
