@@ -1,0 +1,11 @@
+{
+  "extends": "typescript-config/react.json",
+  "compilerOptions": {
+    "paths": {
+      "~shared/*": ["../shared/src/*"]
+    },
+    "outDir": "dist"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

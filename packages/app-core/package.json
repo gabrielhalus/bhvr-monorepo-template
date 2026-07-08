@@ -1,0 +1,20 @@
+{
+  "name": "app-core",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.80.6",
+    "@tanstack/react-router": "^1.120.18",
+    "hono": "4.11.3",
+    "shared": "workspace:*"
+  },
+  "devDependencies": {
+    "eslint-config": "workspace:*",
+    "typescript-config": "workspace:*"
+  }
+}
