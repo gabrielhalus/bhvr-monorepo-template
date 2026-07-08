@@ -10,8 +10,13 @@ node_modules/
 # ============================================
 # Environment Variables
 # ============================================
+# Local values only — schemas and test env stay tracked
+.env
 .env.local
 .env.*.local
+!.env.schema
+!.env.*.schema
+!.env.test
 
 
 # ============================================
