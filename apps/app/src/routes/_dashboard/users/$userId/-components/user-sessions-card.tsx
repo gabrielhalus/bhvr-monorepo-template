@@ -8,35 +8,16 @@ import { useRevokeAllUserSessions } from "@/hooks/sessions/use-revoke-all-user-s
 import { useRevokeUserSession } from "@/hooks/sessions/use-revoke-user-session";
 import { useUserSessions } from "@/hooks/sessions/use-user-sessions";
 import sayno from "@/lib/sayno";
+import { formatDeviceName, getDeviceIcon } from "@/lib/user-agent";
 import { authorizeBatchQueryOptions } from "@/queries/auth";
 import { Badge } from "~orbit/components/ui/Badge";
 import { Button } from "~orbit/components/ui/Button";
-import { Globe, Loader2, Monitor, Smartphone, Trash2 } from "~orbit/components/ui/icons";
+import { Globe, Loader2, Trash2 } from "~orbit/components/ui/icons";
 
 type UserSessionsCardProps = {
   userId: string;
   userName: string;
 };
-
-function getDeviceIcon(userAgent: string | null) {
-  if (!userAgent) return Monitor;
-  const ua = userAgent.toLowerCase();
-  if (ua.includes("mobile") || ua.includes("android") || ua.includes("iphone")) return Smartphone;
-  return Monitor;
-}
-
-function parseDeviceName(userAgent: string | null, fallback: string): string {
-  if (!userAgent) return fallback;
-
-  if (/iPhone/i.test(userAgent)) return "iPhone";
-  if (/iPad/i.test(userAgent)) return "iPad";
-  if (/Android/i.test(userAgent)) return "Android";
-  if (/Windows/i.test(userAgent)) return "Windows";
-  if (/Macintosh/i.test(userAgent)) return "Mac";
-  if (/Linux/i.test(userAgent)) return "Linux";
-
-  return fallback;
-}
 
 export function UserSessionsCard({ userId, userName }: UserSessionsCardProps) {
   const { t } = useTranslation("web");
@@ -104,7 +85,7 @@ export function UserSessionsCard({ userId, userName }: UserSessionsCardProps) {
         <div className="divide-y divide-line">
           {sessions.map((session: Token) => {
             const DeviceIcon = getDeviceIcon(session.userAgent);
-            const deviceName = parseDeviceName(session.userAgent, t("users.detail.sessions.unknownDevice"));
+            const deviceName = formatDeviceName(session.userAgent, t("users.detail.sessions.unknownDevice"));
 
             return (
               <div key={session.id} className="flex items-center gap-3.5 px-5 py-3.5">
