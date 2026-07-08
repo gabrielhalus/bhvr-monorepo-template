@@ -5,7 +5,8 @@ import { requirePermissionFactory } from "@/middlewares/access-control";
 import { auditList } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
-import { deleteAllLogs, getLogsPaginated } from "~shared/queries/logs.queries";
+import { requireOrg } from "@/utils/hono";
+import { deleteOrgLogs, getLogsPaginated } from "~shared/queries/logs.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
 
 const LogsQuerySchema = PaginationQuerySchema.extend({
@@ -33,7 +34,7 @@ export const logsRoutes = new Hono()
   .get("/", validationMiddleware("query", LogsQuerySchema), requirePermissionFactory("log:list"), auditList("log:list", "log"), async (c) => {
     const { page, limit, sortBy, sortOrder, search, action, actionCategory, actorId, targetId, targetType, includeImpersonated } = c.req.valid("query");
 
-    const result = await getLogsPaginated({
+    const result = await getLogsPaginated(requireOrg(c), {
       page,
       limit,
       sortBy,
@@ -60,6 +61,6 @@ export const logsRoutes = new Hono()
    * @permission log:delete
    */
   .delete("/", requirePermissionFactory("log:delete"), async (c) => {
-    await deleteAllLogs();
+    await deleteOrgLogs(requireOrg(c));
     return c.json({ success: true as const });
   });

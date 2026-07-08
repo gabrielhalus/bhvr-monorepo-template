@@ -31,6 +31,9 @@ if (ENV.SYSTEM_RESET_PASSWORD) {
 const { registerConfigCache } = await import("@/lib/config-cache");
 const { registerTokenCache } = await import("@/lib/token-cache");
 const { registerRoleCache } = await import("@/lib/role-cache");
+const { registerOrgCache } = await import("@/lib/org-cache");
+const { registerFeatureFlagCache } = await import("@/lib/feature-flag-cache");
+const { registerTranslationCache } = await import("@/lib/translation-cache");
 
 if (registerConfigCache()) {
   console.log("⚡ Config cache enabled (Redis)");
@@ -40,6 +43,15 @@ if (registerTokenCache()) {
 }
 if (registerRoleCache()) {
   console.log("⚡ Role permission cache enabled (Redis)");
+}
+if (registerOrgCache()) {
+  console.log("⚡ Org resolution cache enabled (Redis)");
+}
+if (registerFeatureFlagCache()) {
+  console.log("⚡ Feature flag cache enabled (Redis)");
+}
+if (registerTranslationCache()) {
+  console.log("⚡ Translation override cache enabled (Redis)");
 }
 
 const { registerAuditLogBuffer, startAuditLogFlusher } = await import("@/services/audit-log-flusher");

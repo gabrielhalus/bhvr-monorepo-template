@@ -11,12 +11,14 @@ import { requirePermissionFactory } from "@/middlewares/access-control";
 import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
+import { requireOrg } from "@/utils/hono";
 import { nanoid } from "~shared/lib/nanoid";
 import { getActiveApiKeysByUserId, insertApiKey, revokeApiKey } from "~shared/queries/api-key.queries";
 import { logPasswordReset, logSessionRevokeAll, logTokenRevoke, logUserDelete, logUserRolesUpdate, logUserUpdate } from "~shared/queries/logs.queries";
+import { removeMember } from "~shared/queries/organization-members.queries";
 import { getActiveTokensByUserId, revokeAllTokensByUserId, revokeToken } from "~shared/queries/tokens.queries";
 import { getUserRoleIds, updateUserRoles } from "~shared/queries/user-roles.queries";
-import { deleteUser, emailExists, getUser, getUsersPaginated, updateUser, updateUserPassword, userRelationCountLoaders, userRelationLoaders } from "~shared/queries/users.queries";
+import { emailExists, getOrgUsersPaginated, getUser, isOrgMember, updateUser, updateUserPassword, userRelationCountLoaders, userRelationLoaders } from "~shared/queries/users.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
 import { UpdateUserRolesSchema, UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
 import { UpdateUserSchema } from "~shared/schemas/db/users.schemas";
@@ -52,7 +54,7 @@ export const usersRoutes = new Hono()
   .get("/", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("user:list"), auditList("user:list", "user"), async (c) => {
     const { page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
-    const result = await getUsersPaginated({ page, limit, sortBy, sortOrder, search });
+    const result = await getOrgUsersPaginated(requireOrg(c), { page, limit, sortBy, sortOrder, search });
 
     return c.json({ success: true as const, ...result });
   })
@@ -68,9 +70,14 @@ export const usersRoutes = new Hono()
    */
   .get("/relations", validationMiddleware("query", UserRelationsQuerySchema), requirePermissionFactory("user:list"), async (c) => {
     const { userIds = [], include } = c.req.valid("query");
+    const orgId = requireOrg(c);
+
+    // Only resolve relations for members of the current organization
+    const memberships = await Promise.all(userIds.map(id => isOrgMember(orgId, id)));
+    const scopedUserIds = userIds.filter((_, i) => memberships[i]);
 
     const relations: Record<string, Partial<UserRelations>> = {};
-    userIds.forEach(id => (relations[id] = {}));
+    scopedUserIds.forEach(id => (relations[id] = {}));
 
     await Promise.all(
       include.map(async (key) => {
@@ -79,7 +86,7 @@ export const usersRoutes = new Hono()
           throw new Error(`No relation loader defined for "${key}"`);
         }
 
-        const data = await loader(userIds);
+        const data = await loader(scopedUserIds, orgId);
 
         for (const [userId, items] of Object.entries(data)) {
           relations[userId]![key] = items;
@@ -101,9 +108,14 @@ export const usersRoutes = new Hono()
    */
   .get("/relations/count", validationMiddleware("query", UserRelationsQuerySchema), requirePermissionFactory("user:list"), async (c) => {
     const { userIds = [], include } = c.req.valid("query");
+    const orgId = requireOrg(c);
+
+    // Only resolve relations for members of the current organization
+    const memberships = await Promise.all(userIds.map(id => isOrgMember(orgId, id)));
+    const scopedUserIds = userIds.filter((_, i) => memberships[i]);
 
     const relations: Record<string, Record<string, number>> = {};
-    userIds.forEach(id => (relations[id] = {}));
+    scopedUserIds.forEach(id => (relations[id] = {}));
 
     await Promise.all(
       include.map(async (key) => {
@@ -112,7 +124,7 @@ export const usersRoutes = new Hono()
           throw new Error(`No relation loader defined for "${key}"`);
         }
 
-        const data = await loader(userIds);
+        const data = await loader(scopedUserIds, orgId);
 
         for (const [userId, items] of Object.entries(data)) {
           relations[userId]![key] = items;
@@ -136,7 +148,7 @@ export const usersRoutes = new Hono()
   .get("/:id{[a-zA-Z0-9_-]{21}}", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), auditRead("user:read", "user"), async (c) => {
     const id = c.req.param("id");
 
-    const user = await getUser(id);
+    const user = await isOrgMember(requireOrg(c), id) ? await getUser(id) : null;
 
     if (!user) {
       return c.json({ success: false, error: "Not Found" }, 404);
@@ -158,6 +170,11 @@ export const usersRoutes = new Hono()
   .get("/:id{[a-zA-Z0-9_-]{21}}/relations", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", UserRelationsQuerySchema), async (c) => {
     const id = c.req.param("id");
     const { include } = c.req.valid("query");
+    const orgId = requireOrg(c);
+
+    if (!await isOrgMember(orgId, id)) {
+      return c.json({ success: false as const, error: "Not Found" }, 404);
+    }
 
     const relations: Record<string, Partial<UserRelations>> = {};
 
@@ -168,7 +185,7 @@ export const usersRoutes = new Hono()
           throw new Error(`No relation loader defined for "${key}"`);
         }
 
-        const data = await loader([id]);
+        const data = await loader([id], orgId);
 
         for (const [_, items] of Object.entries(data)) {
           relations[key] = items as Partial<UserRelations>;
@@ -192,6 +209,11 @@ export const usersRoutes = new Hono()
   .get("/:id{[a-zA-Z0-9_-]{21}}/relations/count", requirePermissionFactory("user:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", UserRelationsQuerySchema), async (c) => {
     const id = c.req.param("id");
     const { include } = c.req.valid("query");
+    const orgId = requireOrg(c);
+
+    if (!await isOrgMember(orgId, id)) {
+      return c.json({ success: false as const, error: "Not Found" }, 404);
+    }
 
     const relations: Record<string, number> = {};
 
@@ -202,7 +224,7 @@ export const usersRoutes = new Hono()
           throw new Error(`No relation loader defined for "${key}"`);
         }
 
-        const data = await loader([id]);
+        const data = await loader([id], orgId);
 
         for (const [_, items] of Object.entries(data)) {
           relations[key] = items;
@@ -227,6 +249,10 @@ export const usersRoutes = new Hono()
     const data = c.req.valid("json");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
+
+    if (!await isOrgMember(requireOrg(c), id)) {
+      return c.json({ success: false as const, error: "Not Found" }, 404);
+    }
 
     const user = await updateUser(id, data);
 
@@ -254,7 +280,7 @@ export const usersRoutes = new Hono()
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    const user = await getUser(id);
+    const user = await isOrgMember(requireOrg(c), id) ? await getUser(id) : null;
     if (!user) {
       return c.json({ success: false as const, error: "User not found" }, 404);
     }
@@ -292,13 +318,14 @@ export const usersRoutes = new Hono()
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    const user = await getUser(id);
+    const orgId = requireOrg(c);
+    const user = await isOrgMember(orgId, id) ? await getUser(id) : null;
     if (!user) {
       return c.json({ success: false as const, error: "User not found" }, 404);
     }
 
     const previousRoleIds = await getUserRoleIds(id);
-    await updateUserRoles(id, roleIds);
+    await updateUserRoles(orgId, id, roleIds);
 
     await logUserRolesUpdate(id, roleIds, previousRoleIds, {
       actorId: sessionContext.user.id,
@@ -322,8 +349,17 @@ export const usersRoutes = new Hono()
     const id = c.req.param("id");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
+    const orgId = requireOrg(c);
 
-    const user = await deleteUser(id);
+    const user = await isOrgMember(orgId, id) ? await getUser(id) : null;
+    if (!user) {
+      return c.json({ success: false as const, error: "Not Found" }, 404);
+    }
+
+    // Removing a "user" on the org surface removes their membership and org
+    // roles; the account itself is global and never deleted here.
+    await updateUserRoles(orgId, id, []);
+    await removeMember(orgId, id);
 
     await logUserDelete(id, {
       actorId: sessionContext.user.id,
@@ -347,7 +383,7 @@ export const usersRoutes = new Hono()
     const id = c.req.param("id");
 
     try {
-      const user = await getUser(id);
+      const user = await isOrgMember(requireOrg(c), id) ? await getUser(id) : null;
       if (!user) {
         return c.json({ success: false as const, error: "User not found" }, 404);
       }
@@ -370,6 +406,11 @@ export const usersRoutes = new Hono()
    */
   .post("/:id{[a-zA-Z0-9_-]{21}}/api-keys", requirePermissionFactory("apiKey:create"), async (c) => {
     const id = c.req.param("id");
+    const orgId = requireOrg(c);
+
+    if (!await isOrgMember(orgId, id)) {
+      return c.json({ success: false as const, error: "User not found" }, 404);
+    }
 
     try {
       const prefix = nanoid({ symbols: false, size: 8 });
@@ -377,10 +418,12 @@ export const usersRoutes = new Hono()
       const secret = randomBytes(32).toString("base64url");
       const secretHash = await password.hash(secret);
 
+      // Keys created on the org surface are locked to that org
       await insertApiKey({
         prefix,
         secretHash,
         userId: id,
+        organizationId: orgId,
       });
 
       const apiKey = `sk_live_${prefix}.${secret}`;

@@ -1,10 +1,13 @@
+import type { FeatureFlagKey } from "~shared/feature-flags.registry";
 import type { OAuthProviderId } from "~shared/types/db/oauth-accounts.types";
+import type { OrgId } from "~shared/types/org.types";
 import type { OAuth2Tokens } from "arctic";
 
 import { CodeChallengeMethod, decodeIdToken, generateCodeVerifier, generateState, GitHub, Google, OAuth2Client } from "arctic";
 import { ENV } from "varlock/env";
 
 import { getConfig } from "~shared/queries/configs.queries";
+import { isFeatureEnabled } from "~shared/queries/feature-flags.queries";
 import { OAUTH_PROVIDER_IDS } from "~shared/schemas/api/oauth.schemas";
 
 import { getDiscoveryDocument } from "./oidc-discovery";
@@ -250,21 +253,31 @@ export class OAuthProfileError extends Error {
   }
 }
 
+/** Feature flag gating each sign-in method (credentials stay platform configs). */
+const PROVIDER_FLAGS = {
+  google: "oauth-google",
+  github: "oauth-github",
+  sso: "sso",
+} as const satisfies Record<OAuthProviderId, FeatureFlagKey>;
+
 /**
  * Get a provider definition together with its configured credentials.
+ * Availability is a per-organization feature flag; the credentials are
+ * platform configs.
  * @param id - The provider id.
+ * @param orgId - The organization the request runs under (null = platform).
  * @returns The definition and credentials, or null when the provider is
  * disabled or not fully configured.
  */
-export async function getConfiguredProvider(id: OAuthProviderId) {
-  const [enable, clientId, clientSecret, issuerUrl] = await Promise.all([
-    getConfig(`authentication.${id}.enable`),
+export async function getConfiguredProvider(id: OAuthProviderId, orgId: OrgId | null) {
+  const [enabled, clientId, clientSecret, issuerUrl] = await Promise.all([
+    isFeatureEnabled(PROVIDER_FLAGS[id], orgId),
     getConfig(`authentication.${id}.clientId`),
     getConfig(`authentication.${id}.clientSecret`),
     id === "sso" ? getConfig("authentication.sso.issuerUrl") : Promise.resolve(null),
   ]);
 
-  if (enable?.value !== "true" || !clientId?.value || !clientSecret?.value) {
+  if (!enabled || !clientId?.value || !clientSecret?.value) {
     return null;
   }
 
@@ -281,11 +294,12 @@ export async function getConfiguredProvider(id: OAuthProviderId) {
 
 /**
  * List the providers that are enabled and fully configured.
+ * @param orgId - The organization the request runs under (null = platform).
  * @returns The provider ids usable for sign-in.
  */
-export async function getEnabledProviders(): Promise<OAuthProviderId[]> {
+export async function getEnabledProviders(orgId: OrgId | null): Promise<OAuthProviderId[]> {
   const results = await Promise.all(
-    OAUTH_PROVIDER_IDS.map(async id => ((await getConfiguredProvider(id)) ? id : null)),
+    OAUTH_PROVIDER_IDS.map(async id => ((await getConfiguredProvider(id, orgId)) ? id : null)),
   );
 
   return results.filter((id): id is OAuthProviderId => id !== null);
@@ -299,11 +313,12 @@ const PROVIDER_LABELS: Record<Exclude<OAuthProviderId, "sso">, string> = {
 /**
  * Build the public payload of the providers endpoint: enabled providers with
  * their display label, plus the SSO auto-login flag.
+ * @param orgId - The organization the request runs under (null = platform).
  * @returns The providers usable for sign-in and whether the login page should
  * redirect to the SSO provider automatically.
  */
-export async function getProvidersPayload() {
-  const enabled = await getEnabledProviders();
+export async function getProvidersPayload(orgId: OrgId | null) {
+  const enabled = await getEnabledProviders(orgId);
 
   const providers = await Promise.all(enabled.map(async (id) => {
     if (id === "sso") {

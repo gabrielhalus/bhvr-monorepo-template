@@ -236,8 +236,8 @@ describe("getCookieSettings", () => {
       expect(getCookieSettings("access").sameSite).toBe("none");
     });
 
-    it("sets domain with leading dot", () => {
-      expect(getCookieSettings("access").domain).toBe(".example.com");
+    it("sets domain to undefined (host-only — sessions never span org domains)", () => {
+      expect(getCookieSettings("access").domain).toBeUndefined();
     });
   });
 
@@ -266,16 +266,11 @@ describe("getCookieSettings", () => {
       mockEnv.APP_HOST = "api.localhost.dev";
     });
 
-    it("sets secure to true for subdomain dev", () => {
-      expect(getCookieSettings("access").secure).toBe(true);
-    });
-
-    it("sets sameSite to 'none' for subdomain dev", () => {
-      expect(getCookieSettings("access").sameSite).toBe("none");
-    });
-
-    it("sets domain with leading dot for subdomain dev", () => {
-      expect(getCookieSettings("access").domain).toBe(".api.localhost.dev");
+    it("keeps dev cookie settings (host-only, lax, not secure)", () => {
+      const settings = getCookieSettings("access");
+      expect(settings.secure).toBe(false);
+      expect(settings.sameSite).toBe("lax");
+      expect(settings.domain).toBeUndefined();
     });
   });
 });

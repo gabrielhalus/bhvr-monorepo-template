@@ -95,19 +95,15 @@ export async function verifyToken<T extends JwtPayload["ttyp"]>(token: string, t
 export function getCookieSettings(type: CookieType) {
   const isProd = ENV.APP_ENV === "production";
 
-  const primaryHost = (ENV.APP_HOST.split(",")[0] ?? ENV.APP_HOST).trim();
-  const isSubdomainDev = !isProd && primaryHost?.endsWith(".localhost.dev");
-
   const base = {
     httpOnly: true,
     path: "/",
-    domain: isProd
-      ? `.${primaryHost}` // prod: example.com → .example.com
-      : isSubdomainDev
-        ? `.${primaryHost}` // dev subdomains → .localhost.dev
-        : undefined, // real dev with ports → no domain, host-only
-    secure: isProd || isSubdomainDev, // must be true for SameSite=None
-    sameSite: isProd || isSubdomainDev ? "none" as const : "lax" as const,
+    // Host-only, always: a parent-domain cookie would share the session
+    // across every organization's subdomain. Each org domain (subdomain or
+    // custom) carries its own session; cross-org SSO is intentionally absent.
+    domain: undefined,
+    secure: isProd, // must be true for SameSite=None
+    sameSite: isProd ? "none" as const : "lax" as const,
   };
 
   switch (type) {

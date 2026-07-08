@@ -1,3 +1,5 @@
+import type { OrgId } from "~shared/types/org.types";
+
 import { Hono } from "hono";
 import { randomBytes } from "node:crypto";
 
@@ -5,9 +7,11 @@ import { getClientInfo } from "@/helpers/get-client-info";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
+import { getOrgContext } from "@/utils/hono";
 import { CONFIG_REGISTRY_MAP } from "~shared/config.registry";
 import { getConfig, getConfigs, updateConfig } from "~shared/queries/configs.queries";
 import { logConfigUpdate } from "~shared/queries/logs.queries";
+import { getOrgConfig, getOrgConfigs, updateOrgConfig } from "~shared/queries/org-configs.queries";
 import { UpdateConfigSchema } from "~shared/schemas/api/configs.schemas";
 
 export const configRoutes = new Hono()
@@ -17,7 +21,8 @@ export const configRoutes = new Hono()
    * @access public
    */
   .get("/", async (c) => {
-    const configs = await getConfigs();
+    const orgContext = getOrgContext(c);
+    const configs = orgContext ? await getOrgConfigs(orgContext.org.id as OrgId) : await getConfigs();
 
     return c.json({
       success: true as const,
@@ -36,8 +41,9 @@ export const configRoutes = new Hono()
    */
   .get("/:key", async (c) => {
     const key = c.req.param("key");
+    const orgContext = getOrgContext(c);
 
-    const value = await getConfig(key);
+    const value = orgContext ? await getOrgConfig(orgContext.org.id as OrgId, key) : await getConfig(key);
 
     if (!value) {
       return c.json({ success: false as const, error: "Config not found" }, 404);
@@ -63,11 +69,25 @@ export const configRoutes = new Hono()
     const { value } = c.req.valid("json");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
+    const orgContext = getOrgContext(c);
 
-    const oldConfig = await getConfig(key);
+    const registryEntry = CONFIG_REGISTRY_MAP.get(key);
+    if (!registryEntry) {
+      return c.json({ success: false as const, error: "Config not found" }, 404);
+    }
+
+    // Platform keys are edited from the admin app only; org surfaces write
+    // their own override of organization-scoped keys.
+    if (orgContext && registryEntry.scope !== "organization") {
+      return c.json({ success: false as const, error: "This configuration is managed by the platform" }, 403);
+    }
+
+    const oldConfig = orgContext ? await getOrgConfig(orgContext.org.id as OrgId, key) : await getConfig(key);
     const oldValue = oldConfig?.value;
 
-    const config = await updateConfig(key, value, sessionContext.user.id);
+    const config = orgContext
+      ? await updateOrgConfig(orgContext.org.id as OrgId, key, value, sessionContext.user.id)
+      : await updateConfig(key, value, sessionContext.user.id);
 
     await logConfigUpdate(key, {
       actorId: sessionContext.user.id,
@@ -97,6 +117,9 @@ export const configRoutes = new Hono()
     }
     if (!registryEntry.rotatable) {
       return c.json({ success: false as const, error: "This configuration key does not support rotation" }, 400);
+    }
+    if (getOrgContext(c) && registryEntry.scope !== "organization") {
+      return c.json({ success: false as const, error: "This configuration is managed by the platform" }, 403);
     }
 
     const existing = await getConfig(key);

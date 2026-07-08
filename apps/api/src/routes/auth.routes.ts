@@ -1,3 +1,5 @@
+import type { OrgContext } from "@/middlewares/org-context";
+
 import { password } from "bun";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
@@ -16,8 +18,10 @@ import { validationMiddleware } from "@/middlewares/validation";
 import { enqueueEmail } from "@/queues/email.queue";
 import { isEmailProviderConfigured } from "@/services/email";
 import { provisionUser } from "@/services/user-provisioning";
+import { requireOrg } from "@/utils/hono";
 import { isAuthorized, isAuthorizedBatch } from "~shared/auth";
 import { getConfig } from "~shared/queries/configs.queries";
+import { isFeatureEnabled } from "~shared/queries/feature-flags.queries";
 import {
   logAccountPasswordChange,
   logAccountUpdate,
@@ -30,6 +34,7 @@ import {
   logSessionRevokeAll,
   logTokenRevoke,
 } from "~shared/queries/logs.queries";
+import { getUserOrganizations } from "~shared/queries/organization-members.queries";
 import { createPasswordResetToken, getValidPasswordResetToken, markPasswordResetTokenUsed } from "~shared/queries/password-reset-tokens.queries";
 import { deleteToken, getActiveTokensByUserId, revokeAllTokensByUserId, revokeAllTokensByUserIdExcept, revokeToken } from "~shared/queries/tokens.queries";
 import { clearMustChangePassword, countUsers, getUser, getUserByEmail, signIn, updateUser, updateUserPassword } from "~shared/queries/users.queries";
@@ -73,8 +78,15 @@ export const authRoutes = new Hono()
     const hashedPassword = await password.hash(user.password);
     const clientInfo = getClientInfo(c);
 
+    // The first account bootstraps the instance; afterwards self-registration
+    // is gated by the org's `registration` feature flag.
+    const isFirstUser = (await countUsers()) === 0;
+    if (!isFirstUser && !await isFeatureEnabled("registration", requireOrg(c))) {
+      return c.json({ success: false as const, error: "Registration is disabled" }, 403);
+    }
+
     try {
-      const insertedUser = await provisionUser({ ...user, password: hashedPassword });
+      const insertedUser = await provisionUser(requireOrg(c), { ...user, password: hashedPassword });
 
       await issueSession(c, insertedUser.id);
 
@@ -283,9 +295,14 @@ export const authRoutes = new Hono()
    */
   .get("/", async (c) => {
     const sessionContext = c.var.sessionContext;
+    const orgContext = c.get("orgContext") as OrgContext;
+    const organizations = await getUserOrganizations(sessionContext.user.id);
+
     return c.json({
       success: true as const,
       user: sessionContext.user,
+      organizations,
+      ...(orgContext && { organization: orgContext.org }),
       ...(sessionContext.impersonator && { impersonator: sessionContext.impersonator }),
     });
   })

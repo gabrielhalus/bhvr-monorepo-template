@@ -6,8 +6,9 @@ import { getClientInfo } from "@/helpers/get-client-info";
 import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
+import { requireOrg } from "@/utils/hono";
 import { logRoleCreate, logRoleDelete, logRoleMembersAdd, logRoleMembersRemove } from "~shared/queries/logs.queries";
-import { createRole, deleteRole, getRole, getRoleByName, getRolesPaginated, roleRelationCountLoaders, roleRelationLoaders } from "~shared/queries/roles.queries";
+import { createRole, deleteRole, getRole, getRoleByName, getRoles, getRolesPaginated, roleRelationCountLoaders, roleRelationLoaders } from "~shared/queries/roles.queries";
 import { createUserRole, deleteUserRole } from "~shared/queries/user-roles.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
 import { CreateRoleSchema, RoleRelationsQuerySchema } from "~shared/schemas/api/roles.schemas";
@@ -32,7 +33,7 @@ export const rolesRoutes = new Hono()
     const { page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
     try {
-      const result = await getRolesPaginated({ page, limit, sortBy, sortOrder, search });
+      const result = await getRolesPaginated(requireOrg(c), { page, limit, sortBy, sortOrder, search });
 
       return c.json({ success: true as const, ...result });
     } catch (error) {
@@ -52,15 +53,19 @@ export const rolesRoutes = new Hono()
   .get("/relations", validationMiddleware("query", RoleRelationsQuerySchema), requirePermissionFactory("role:list"), async (c) => {
     const { roleIds = [], include } = c.req.valid("query");
 
+    // Only resolve relations for roles of the current organization
+    const orgRoleIds = new Set((await getRoles(requireOrg(c))).map(r => r.id));
+    const scopedRoleIds = roleIds.filter(id => orgRoleIds.has(id));
+
     const relations: Record<string, Partial<RoleRelations>> = {};
-    roleIds.forEach(id => (relations[id] = {}));
+    scopedRoleIds.forEach(id => (relations[id] = {}));
 
     await Promise.all(
       include.map(async (key) => {
         const loader = roleRelationLoaders[key];
         if (!loader) throw new Error(`No relation loader defined for "${key}"`);
 
-        const data = await loader(roleIds);
+        const data = await loader(scopedRoleIds);
 
         for (const [roleId, items] of Object.entries(data)) {
           relations[roleId]![key] = items;
@@ -83,15 +88,19 @@ export const rolesRoutes = new Hono()
   .get("/relations/count", validationMiddleware("query", RoleRelationsQuerySchema), requirePermissionFactory("role:list"), async (c) => {
     const { roleIds = [], include } = c.req.valid("query");
 
+    // Only resolve relations for roles of the current organization
+    const orgRoleIds = new Set((await getRoles(requireOrg(c))).map(r => r.id));
+    const scopedRoleIds = roleIds.filter(id => orgRoleIds.has(id));
+
     const relations: Record<string, Record<string, number>> = {};
-    roleIds.forEach(id => (relations[id] = {}));
+    scopedRoleIds.forEach(id => (relations[id] = {}));
 
     await Promise.all(
       include.map(async (key) => {
         const loader = roleRelationCountLoaders[key];
         if (!loader) throw new Error(`No relation loader defined for "${key}"`);
 
-        const data = await loader(roleIds);
+        const data = await loader(scopedRoleIds);
 
         for (const [roleId, items] of Object.entries(data)) {
           relations[roleId]![key] = items;
@@ -118,7 +127,7 @@ export const rolesRoutes = new Hono()
     const data = c.req.valid("json");
 
     try {
-      const role = await createRole(data);
+      const role = await createRole(requireOrg(c), data);
 
       await logRoleCreate(String(role.id), {
         actorId: sessionContext.user.id,
@@ -148,7 +157,7 @@ export const rolesRoutes = new Hono()
   .get("/:id{[0-9]+}", requirePermissionFactory("role:read"), auditRead("role:read", "role"), async (c) => {
     const id = Number(c.req.param("id"));
 
-    const role = await getRole(id);
+    const role = await getRole(requireOrg(c), id);
 
     if (!role) {
       return c.json({ success: false as const, error: "Role not found" }, 404);
@@ -170,6 +179,10 @@ export const rolesRoutes = new Hono()
   .get("/:id{[0-9]+}/relations", requirePermissionFactory("role:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", RoleRelationsQuerySchema), async (c) => {
     const id = Number(c.req.param("id"));
     const { include } = c.req.valid("query");
+
+    if (!await getRole(requireOrg(c), id)) {
+      return c.json({ success: false as const, error: "Role not found" }, 404);
+    }
 
     const relations: Record<string, Partial<RoleRelations>> = {};
 
@@ -203,6 +216,10 @@ export const rolesRoutes = new Hono()
     const id = Number(c.req.param("id"));
     const { include } = c.req.valid("query");
 
+    if (!await getRole(requireOrg(c), id)) {
+      return c.json({ success: false as const, error: "Role not found" }, 404);
+    }
+
     const relations: Record<string, number> = {};
 
     await Promise.all(
@@ -234,7 +251,7 @@ export const rolesRoutes = new Hono()
   .get("/:name", requirePermissionFactory("role:read"), async (c) => {
     const name = c.req.param("name");
 
-    const role = await getRoleByName(name);
+    const role = await getRoleByName(requireOrg(c), name);
 
     if (!role) {
       return c.json({ success: false as const, error: "Role not found" }, 404);
@@ -257,7 +274,7 @@ export const rolesRoutes = new Hono()
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
-    const role = await deleteRole(id);
+    const role = await deleteRole(requireOrg(c), id);
 
     await logRoleDelete(String(id), {
       actorId: sessionContext.user.id,
@@ -282,6 +299,10 @@ export const rolesRoutes = new Hono()
     const { userIds } = c.req.valid("json");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
+
+    if (!await getRole(requireOrg(c), id)) {
+      return c.json({ success: false as const, error: "Role not found" }, 404);
+    }
 
     for (const userId of userIds) {
       await createUserRole({ userId, roleId: id });
@@ -310,6 +331,10 @@ export const rolesRoutes = new Hono()
     const { userIds } = c.req.valid("json");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
+
+    if (!await getRole(requireOrg(c), id)) {
+      return c.json({ success: false as const, error: "Role not found" }, 404);
+    }
 
     for (const userId of userIds) {
       await deleteUserRole({ userId, roleId: id });

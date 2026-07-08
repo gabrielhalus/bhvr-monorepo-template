@@ -11,6 +11,7 @@ import { requirePermissionFactory } from "@/middlewares/access-control";
 import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
+import { requireOrg } from "@/utils/hono";
 import {
   createInvitation,
   createInvitationRoles,
@@ -18,18 +19,21 @@ import {
   getInvitation,
   getInvitationByToken,
   getInvitationRoleIds,
+  getInvitations,
   getInvitationsPaginated,
   getPendingInvitationByEmail,
   invitationRelationLoaders,
   updateInvitation,
 } from "~shared/queries/invitations.queries";
 import { logInvitationAccept, logInvitationCreate, logInvitationDelete, logInvitationRevoke } from "~shared/queries/logs.queries";
+import { addMember } from "~shared/queries/organization-members.queries";
 import { getDefaultRole } from "~shared/queries/roles.queries";
 import { insertToken } from "~shared/queries/tokens.queries";
 import { createUserRole } from "~shared/queries/user-roles.queries";
 import { createUser, emailExists } from "~shared/queries/users.queries";
 import { AcceptInvitationSchema, CreateInvitationSchema, InvitationRelationsQuerySchema, ValidateInvitationSchema } from "~shared/schemas/api/invitations.schemas";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
+import { asOrgId } from "~shared/types/org.types";
 
 const INVITATION_EXPIRATION_DAYS = 7;
 
@@ -74,6 +78,9 @@ export const invitationsRoutes = new Hono()
       verifiedAt: invitation.autoValidateEmail ? new Date().toISOString() : null,
     });
 
+    const invitationOrgId = asOrgId(invitation.organizationId);
+    await addMember(invitationOrgId, insertedUser.id, invitation.invitedById);
+
     const invitationRoleIds = await getInvitationRoleIds(invitation.id);
 
     if (invitationRoleIds.length > 0) {
@@ -81,7 +88,7 @@ export const invitationsRoutes = new Hono()
         await createUserRole({ userId: insertedUser.id, roleId });
       }
     } else {
-      const defaultRole = await getDefaultRole();
+      const defaultRole = await getDefaultRole(invitationOrgId);
       if (defaultRole) {
         await createUserRole({ userId: insertedUser.id, roleId: defaultRole.id });
       }
@@ -163,7 +170,7 @@ export const invitationsRoutes = new Hono()
   .get("/", validationMiddleware("query", PaginationQuerySchema), requirePermissionFactory("invitation:list"), auditList("invitation:list", "invitation"), async (c) => {
     const { page, limit, sortBy, sortOrder, search } = c.req.valid("query");
 
-    const result = await getInvitationsPaginated({ page, limit, sortBy, sortOrder, search });
+    const result = await getInvitationsPaginated(requireOrg(c), { page, limit, sortBy, sortOrder, search });
     return c.json({ success: true as const, ...result });
   })
 
@@ -179,15 +186,19 @@ export const invitationsRoutes = new Hono()
   .get("/relations", validationMiddleware("query", InvitationRelationsQuerySchema), requirePermissionFactory("invitation:list"), async (c) => {
     const { invitationIds = [], include } = c.req.valid("query");
 
+    // Only resolve relations for invitations of the current organization
+    const orgInvitationIds = new Set((await getInvitations(requireOrg(c))).map(i => i.id));
+    const scopedInvitationIds = invitationIds.filter(id => orgInvitationIds.has(id));
+
     const relations: Record<string, Partial<InvitationRelations>> = {};
-    invitationIds.forEach(id => (relations[id] = {}));
+    scopedInvitationIds.forEach(id => (relations[id] = {}));
 
     await Promise.all(
       include.map(async (key) => {
         const loader = invitationRelationLoaders[key];
         if (!loader) throw new Error(`No relation loader defined for "${key}"`);
 
-        const data = await loader(invitationIds);
+        const data = await loader(scopedInvitationIds);
 
         for (const [invitationId, items] of Object.entries(data)) {
           relations[invitationId]![key] = items;
@@ -211,7 +222,7 @@ export const invitationsRoutes = new Hono()
   .get("/:id{[a-zA-Z0-9_-]{21}}", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), auditRead("invitation:read", "invitation"), async (c) => {
     const id = c.req.param("id");
 
-    const invitation = await getInvitation(id);
+    const invitation = await getInvitation(requireOrg(c), id);
 
     if (!invitation) {
       return c.json({ success: false, error: "Not Found" }, 404);
@@ -233,6 +244,10 @@ export const invitationsRoutes = new Hono()
   .get("/:id{[a-zA-Z0-9_-]{21}}/relations", requirePermissionFactory("invitation:read", c => ({ id: c.req.param("id") })), validationMiddleware("query", InvitationRelationsQuerySchema), async (c) => {
     const id = c.req.param("id");
     const { include } = c.req.valid("query");
+
+    if (!await getInvitation(requireOrg(c), id)) {
+      return c.json({ success: false as const, error: "Not Found" }, 404);
+    }
 
     const relations: Record<string, Partial<InvitationRelations>> = {};
 
@@ -271,7 +286,7 @@ export const invitationsRoutes = new Hono()
       return c.json({ success: false as const, error: "Email is already registered" }, 400);
     }
 
-    const existingInvitation = await getPendingInvitationByEmail(email);
+    const existingInvitation = await getPendingInvitationByEmail(requireOrg(c), email);
     if (existingInvitation) {
       return c.json({ success: false as const, error: "A pending invitation already exists for this email" }, 400);
     }
@@ -280,6 +295,7 @@ export const invitationsRoutes = new Hono()
     const expiresAt = new Date(Date.now() + INVITATION_EXPIRATION_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
     const invitation = await createInvitation({
+      organizationId: requireOrg(c),
       email,
       token,
       expiresAt,
@@ -315,6 +331,10 @@ export const invitationsRoutes = new Hono()
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
 
+    if (!await getInvitation(requireOrg(c), id)) {
+      return c.json({ success: false as const, error: "Not Found" }, 404);
+    }
+
     const invitation = await updateInvitation(id, { status: "revoked" });
 
     // Audit log: invitation revoked (tracks impersonation if active)
@@ -340,6 +360,10 @@ export const invitationsRoutes = new Hono()
     const id = c.req.param("id");
     const sessionContext = c.var.sessionContext;
     const clientInfo = getClientInfo(c);
+
+    if (!await getInvitation(requireOrg(c), id)) {
+      return c.json({ success: false as const, error: "Not Found" }, 404);
+    }
 
     const invitation = await deleteInvitation(id);
 

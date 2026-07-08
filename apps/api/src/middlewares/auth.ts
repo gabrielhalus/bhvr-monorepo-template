@@ -1,6 +1,7 @@
-import type { AppContext } from "@/utils/hono";
+import type { AppContext, AppEnv } from "@/utils/hono";
 import type { ApiKey } from "~shared/types/db/api-keys.types";
 import type { AccessToken } from "~shared/types/db/tokens.types";
+import type { OrgId } from "~shared/types/org.types";
 
 import { password } from "bun";
 import { getCookie, setCookie } from "hono/cookie";
@@ -11,10 +12,52 @@ import { createAccessToken, getCookieSettings, getJwtSecret } from "@/lib/jwt";
 import { factory } from "@/utils/hono";
 import { getApiKeyByPrefix, recordApiKeyLastUsed } from "~shared/queries/api-key.queries";
 import { logTokenRefresh } from "~shared/queries/logs.queries";
+import { getMember } from "~shared/queries/organization-members.queries";
+import { getOrganization } from "~shared/queries/organizations.queries";
 import { deleteToken, getToken } from "~shared/queries/tokens.queries";
-import { getUser } from "~shared/queries/users.queries";
+import { getUser, getUserOrgRoles, getUserPlatformRoles } from "~shared/queries/users.queries";
 import { apiKeySchema } from "~shared/schemas/api/api-keys.schemas";
 import { AccessTokenSchema, RefreshTokenSchema } from "~shared/schemas/api/tokens.schemas";
+
+type SessionUser = AppEnv["Variables"]["sessionContext"]["user"];
+type SessionMembership = AppEnv["Variables"]["sessionContext"]["membership"];
+
+/**
+ * Load a user with the roles that apply to the current surface:
+ * - Org surface: the user's roles in that org (incl. the implicit default
+ *   role) plus their platform roles. Non-members are rejected unless they
+ *   hold a platform super-admin role (support access).
+ * - Platform surface: platform roles only.
+ * @returns The session user and membership, "not-member" when the user is
+ * authenticated but may not access this organization, or null if the user
+ * does not exist.
+ */
+async function buildSessionUser(c: AppContext, userId: string): Promise<{ user: SessionUser; membership?: SessionMembership } | "not-member" | null> {
+  const orgContext = c.get("orgContext");
+
+  const user = await getUser(userId);
+  if (!user) {
+    return null;
+  }
+
+  const platformRoles = await getUserPlatformRoles(userId);
+
+  if (!orgContext) {
+    return { user: { ...user, roles: platformRoles } };
+  }
+
+  const orgId = orgContext.org.id as OrgId;
+  const membership = await getMember(orgId, userId) ?? undefined;
+  const isPlatformSuperAdmin = platformRoles.some(role => role.isSuperAdmin);
+
+  if (!membership && !isPlatformSuperAdmin) {
+    return "not-member";
+  }
+
+  const orgRoles = membership ? await getUserOrgRoles(orgId, userId) : [];
+
+  return { user: { ...user, roles: [...orgRoles, ...platformRoles] }, membership };
+}
 
 /**
  * Get the user from the JWT token and set the session context
@@ -37,13 +80,29 @@ export const getSessionContext = factory.createMiddleware(async (c, next) => {
       return c.json({ error: "Unauthorized" }, 401);
     }
 
-    const user = await getUser(apiKeyCtx.userId, ["roles"]);
+    // A key bound to an organization decides the org context — not the
+    // caller's domain. Platform keys (organizationId null) keep the
+    // domain-based resolution.
+    if (apiKeyCtx.organizationId) {
+      const keyOrg = await getOrganization(apiKeyCtx.organizationId);
+      if (!keyOrg) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+      c.set("orgContext", { org: keyOrg, domain: "api-key" });
+    }
 
-    if (!user) {
+    const session = await buildSessionUser(c, apiKeyCtx.userId);
+
+    if (!session) {
       return c.json({ error: "Unauthorized" }, 401);
     }
 
-    c.set("sessionContext", { user, impersonator: undefined });
+    if (session === "not-member") {
+      // Authenticated but not a member of this organization — don't reveal it
+      return c.json({ error: "Not Found" }, 404);
+    }
+
+    c.set("sessionContext", { user: session.user, membership: session.membership, impersonator: undefined });
 
     return next();
   }
@@ -88,21 +147,26 @@ export const getSessionContext = factory.createMiddleware(async (c, next) => {
     return c.json({ error: "Unauthorized" }, 401);
   }
 
-  const user = await getUser(decoded.sub, ["roles"]);
+  const session = await buildSessionUser(c, decoded.sub);
 
-  if (!user) {
+  if (!session) {
     setCookie(c, "accessToken", "", getCookieSettings("clear"));
     setCookie(c, "refreshToken", "", getCookieSettings("clear"));
     return c.json({ error: "Unauthorized" }, 401);
   }
 
-  let impersonator: typeof user | undefined;
-  if (decoded.impersonatorId) {
-    const impersonatorUser = await getUser(decoded.impersonatorId, ["roles"]);
-    impersonator = impersonatorUser ?? undefined;
+  if (session === "not-member") {
+    // Authenticated but not a member of this organization — don't reveal it
+    return c.json({ error: "Not Found" }, 404);
   }
 
-  c.set("sessionContext", { user, impersonator });
+  let impersonator: SessionUser | undefined;
+  if (decoded.impersonatorId) {
+    const impersonatorSession = await buildSessionUser(c, decoded.impersonatorId);
+    impersonator = typeof impersonatorSession === "object" && impersonatorSession !== null ? impersonatorSession.user : undefined;
+  }
+
+  c.set("sessionContext", { user: session.user, membership: session.membership, impersonator });
 
   await next();
 });

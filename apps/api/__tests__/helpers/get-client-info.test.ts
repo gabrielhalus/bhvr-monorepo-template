@@ -13,6 +13,8 @@ function makeContext(headers: Record<string, string | null>): Context {
         },
       },
     },
+    // No org resolved in these unit tests — getClientInfo stamps null
+    get: () => null,
   } as unknown as Context;
 }
 
@@ -62,12 +64,12 @@ describe("getClientInfo", () => {
     });
   });
 
-  it("returns both ip and userAgent together", () => {
+  it("returns ip, userAgent and the resolved org together", () => {
     const ctx = makeContext({
       "x-forwarded-for": "1.2.3.4",
       "user-agent": "TestAgent/2.0",
     });
     const info = getClientInfo(ctx);
-    expect(info).toEqual({ ip: "1.2.3.4", userAgent: "TestAgent/2.0" });
+    expect(info).toEqual({ ip: "1.2.3.4", userAgent: "TestAgent/2.0", organizationId: null });
   });
 });

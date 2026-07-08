@@ -1,5 +1,7 @@
 import type { NormalizedProfile } from "@/lib/oauth/providers";
+import type { AppContext } from "@/utils/hono";
 import type { OAuthProviderId } from "~shared/types/db/oauth-accounts.types";
+import type { OrgId } from "~shared/types/org.types";
 import type { Context } from "hono";
 
 import { password } from "bun";
@@ -15,13 +17,16 @@ import { getCookieSettings, verifyToken } from "@/lib/jwt";
 import { generateCodeVerifier, generateState, getConfiguredProvider, getProvidersPayload, OAuthProfileError } from "@/lib/oauth/providers";
 import { objectKeys, uploadImage } from "@/lib/s3/storage";
 import { getSessionContext } from "@/middlewares/auth";
+import { classifyHostname } from "@/middlewares/org-context";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { validationMiddleware } from "@/middlewares/validation";
 import { provisionUser } from "@/services/user-provisioning";
-import { getConfig } from "~shared/queries/configs.queries";
+import { getOrgContext, requireOrg } from "@/utils/hono";
+import { isFeatureEnabled } from "~shared/queries/feature-flags.queries";
 import { logLogin, logOAuthLink, logOAuthUnlink, logRegister } from "~shared/queries/logs.queries";
 import { countOAuthAccountsByUserId, createOAuthAccount, deleteOAuthAccount, getOAuthAccountByProvider, getOAuthAccountsByUserId } from "~shared/queries/oauth-accounts.queries";
 import { createOAuthLinkToken, getValidOAuthLinkToken, markOAuthLinkTokenUsed } from "~shared/queries/oauth-link-tokens.queries";
+import { getOrganization } from "~shared/queries/organizations.queries";
 import { getToken } from "~shared/queries/tokens.queries";
 import { countUsers, getUser, getUserByEmail, updateUser } from "~shared/queries/users.queries";
 import { CompletePendingLinkSchema, OAuthProfileSchema, OAuthProviderParamSchema, OAuthStartQuerySchema, PendingLinkQuerySchema } from "~shared/schemas/api/oauth.schemas";
@@ -36,6 +41,10 @@ type OAuthFlow = {
   codeVerifier?: string;
   mode: "login" | "link" | "confirm-link";
   redirectTo: string;
+  /** Validated origin (org domain or platform app) the flow returns to */
+  returnOrigin: string;
+  /** Organization the flow started on — decides where signups are provisioned */
+  organizationId: string | null;
   linkToken?: string;
 };
 
@@ -47,9 +56,64 @@ function sanitizeRedirect(raw: string | undefined): string {
   return raw && /^\/(?!\/)/.test(raw) ? raw : "/";
 }
 
-/** Redirect to a path on the frontend origin. */
-function appRedirect(c: Context, path: string) {
-  return c.redirect(`${ENV.APP_URL}${path}`);
+/** Redirect to a path on the given (already validated) frontend origin. */
+function appRedirect(c: Context, path: string, origin: string = ENV.APP_URL) {
+  return c.redirect(`${origin}${path}`);
+}
+
+/**
+ * Determine where the flow should return to, and under which organization.
+ * The candidate origin (Origin, else Referer, else the resolved org context)
+ * is only trusted when its hostname classifies as a known org domain or the
+ * platform surface — anything else falls back to APP_URL, so a provider
+ * callback can never be turned into an open redirect onto a foreign host.
+ */
+async function resolveReturnContext(c: Context): Promise<{ returnOrigin: string; organizationId: string | null }> {
+  const orgContext = getOrgContext(c);
+  const fallback = { returnOrigin: ENV.APP_URL, organizationId: orgContext?.org.id ?? null };
+
+  const candidate = c.req.header("origin") ?? (() => {
+    const referer = c.req.header("referer");
+    try {
+      return referer ? new URL(referer).origin : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  if (!candidate) {
+    return orgContext
+      ? { returnOrigin: originForDomain(c, orgContext.domain), organizationId: orgContext.org.id }
+      : fallback;
+  }
+
+  let url: URL;
+  try {
+    url = new URL(candidate);
+  } catch {
+    return fallback;
+  }
+
+  const classified = await classifyHostname(url.hostname.toLowerCase());
+  if (classified === "platform") {
+    return { returnOrigin: url.origin, organizationId: orgContext?.org.id ?? null };
+  }
+  if (classified) {
+    return { returnOrigin: url.origin, organizationId: classified.id };
+  }
+
+  return fallback;
+}
+
+/** Rebuild a browser origin for a resolved org domain, keeping the app's scheme/port. */
+function originForDomain(c: Context, domain: string): string {
+  try {
+    const appUrl = new URL(ENV.APP_URL);
+    const port = appUrl.port ? `:${appUrl.port}` : "";
+    return `${appUrl.protocol}//${domain}${port}`;
+  } catch {
+    return ENV.APP_URL;
+  }
 }
 
 /** Mask an email for display during the link challenge (g•••@example.com). */
@@ -110,7 +174,8 @@ export const oauthRoutes = new Hono()
    * @access public
    */
   .get("/providers", async (c) => {
-    const { providers, autoLogin } = await getProvidersPayload();
+    const orgContext = getOrgContext(c);
+    const { providers, autoLogin } = await getProvidersPayload((orgContext?.org.id ?? null) as OrgId | null);
     return c.json({ success: true as const, providers, autoLogin });
   })
 
@@ -272,18 +337,20 @@ export const oauthRoutes = new Hono()
     const { provider } = c.req.valid("param");
     const { redirect, linkToken } = c.req.valid("query");
 
-    const configured = await getConfiguredProvider(provider);
+    const { returnOrigin, organizationId } = await resolveReturnContext(c);
+
+    const configured = await getConfiguredProvider(provider, (organizationId ?? null) as OrgId | null);
     if (!configured) {
       // Browser navigation, never JSON — e.g. a login page rendered before
       // the admin disabled the provider.
-      return appRedirect(c, "/login?oauthError=oauth_failed");
+      return appRedirect(c, "/login?oauthError=oauth_failed", returnOrigin);
     }
 
     let mode: OAuthFlow["mode"] = "login";
     if (linkToken) {
       const pending = await getValidOAuthLinkToken(linkToken);
       if (!pending) {
-        return appRedirect(c, "/login?oauthError=invalid_token");
+        return appRedirect(c, "/login?oauthError=invalid_token", returnOrigin);
       }
       mode = "confirm-link";
     } else if (await peekSessionUserId(c)) {
@@ -299,7 +366,7 @@ export const oauthRoutes = new Hono()
     try {
       url = await configured.def.createAuthorizationURL(configured.clientId, configured.clientSecret, state, codeVerifier ?? null);
     } catch {
-      return appRedirect(c, "/login?oauthError=oauth_failed");
+      return appRedirect(c, "/login?oauthError=oauth_failed", returnOrigin);
     }
 
     const flow: OAuthFlow = {
@@ -308,6 +375,8 @@ export const oauthRoutes = new Hono()
       codeVerifier,
       mode,
       redirectTo: sanitizeRedirect(redirect),
+      returnOrigin,
+      organizationId,
       linkToken,
     };
     setCookie(c, OAUTH_FLOW_COOKIE, JSON.stringify(flow), getCookieSettings("oauth"));
@@ -349,9 +418,33 @@ export const oauthRoutes = new Hono()
       return appRedirect(c, "/login?oauthError=oauth_failed");
     }
 
-    const configured = await getConfiguredProvider(provider);
+    // Re-validate the stored return origin — the cookie could predate a
+    // domain removal or a code change.
+    const returnTo = await (async () => {
+      try {
+        const url = new URL(flow.returnOrigin);
+        if (await classifyHostname(url.hostname.toLowerCase())) {
+          return url.origin;
+        }
+      } catch {
+        // Malformed origin — fall back below
+      }
+      return ENV.APP_URL;
+    })();
+
+    // Restore the organization the flow started on: the callback lands on the
+    // API origin, so the domain-based context can't know it.
+    if (flow.organizationId) {
+      const flowOrg = await getOrganization(flow.organizationId);
+      if (!flowOrg) {
+        return appRedirect(c, "/login?oauthError=oauth_failed", returnTo);
+      }
+      (c as unknown as AppContext).set("orgContext", { org: flowOrg, domain: new URL(returnTo).hostname });
+    }
+
+    const configured = await getConfiguredProvider(provider, (flow.organizationId ?? null) as OrgId | null);
     if (!configured) {
-      return appRedirect(c, "/login?oauthError=oauth_failed");
+      return appRedirect(c, "/login?oauthError=oauth_failed", returnTo);
     }
 
     // Re-validate: the cookie could predate a code change.
@@ -363,7 +456,7 @@ export const oauthRoutes = new Hono()
       profile = await configured.def.fetchProfile(tokens);
     } catch (error) {
       const errorCode = error instanceof OAuthProfileError ? error.code : "oauth_failed";
-      return appRedirect(c, `/login?oauthError=${errorCode}`);
+      return appRedirect(c, `/login?oauthError=${errorCode}`, returnTo);
     }
 
     const linkedAccount = await getOAuthAccountByProvider(provider, profile.providerAccountId);
@@ -375,19 +468,19 @@ export const oauthRoutes = new Hono()
       if (sessionUserId) {
         if (linkedAccount) {
           return linkedAccount.userId === sessionUserId
-            ? appRedirect(c, "/account?linked=already")
-            : appRedirect(c, "/account?oauthError=account_taken");
+            ? appRedirect(c, "/account?linked=already", returnTo)
+            : appRedirect(c, "/account?oauthError=account_taken", returnTo);
         }
 
         const existing = await getOAuthAccountsByUserId(sessionUserId);
         if (existing.some(account => account.provider === provider)) {
-          return appRedirect(c, "/account?oauthError=provider_already_linked");
+          return appRedirect(c, "/account?oauthError=provider_already_linked", returnTo);
         }
 
         await createOAuthAccount({ userId: sessionUserId, provider, providerAccountId: profile.providerAccountId, email: profile.email });
         await logOAuthLink(sessionUserId, provider, clientInfo);
 
-        return appRedirect(c, `/account?linked=${provider}`);
+        return appRedirect(c, `/account?linked=${provider}`, returnTo);
       }
       // Session expired mid-flow — fall through to login handling.
     }
@@ -396,13 +489,13 @@ export const oauthRoutes = new Hono()
     if (flow.mode === "confirm-link" && flow.linkToken) {
       const pending = await getValidOAuthLinkToken(flow.linkToken);
       if (!pending) {
-        return appRedirect(c, "/login?oauthError=invalid_token");
+        return appRedirect(c, "/login?oauthError=invalid_token", returnTo);
       }
 
       // The just-authenticated provider identity must already belong to the
       // target account — that is the proof of ownership.
       if (!linkedAccount || linkedAccount.userId !== pending.userId) {
-        return appRedirect(c, `/link-account?token=${pending.token}&error=confirm_failed`);
+        return appRedirect(c, `/link-account?token=${pending.token}&error=confirm_failed`, returnTo);
       }
 
       const pendingProfile = OAuthProfileSchema.parse(pending.profile);
@@ -420,7 +513,7 @@ export const oauthRoutes = new Hono()
       await logOAuthLink(pending.userId, pending.provider, clientInfo);
       await logLogin(pending.userId, clientInfo);
 
-      return appRedirect(c, redirectTo);
+      return appRedirect(c, redirectTo, returnTo);
     }
 
     // ── Login mode ───────────────────────────────────────────────────────────
@@ -430,7 +523,7 @@ export const oauthRoutes = new Hono()
       await issueSession(c, linkedAccount.userId);
       await logLogin(linkedAccount.userId, clientInfo);
 
-      return appRedirect(c, redirectTo);
+      return appRedirect(c, redirectTo, returnTo);
     }
 
     const existingUser = await getUserByEmail(profile.email);
@@ -438,7 +531,7 @@ export const oauthRoutes = new Hono()
     // Flow C: the email belongs to an existing account → challenge, no session.
     if (existingUser) {
       if (!profile.emailVerified) {
-        return appRedirect(c, "/login?oauthError=email_unverified");
+        return appRedirect(c, "/login?oauthError=email_unverified", returnTo);
       }
 
       const token = randomBytes(32).toString("base64url");
@@ -457,19 +550,19 @@ export const oauthRoutes = new Hono()
         expiresAt: new Date(Date.now() + PENDING_LINK_EXPIRATION_MS),
       });
 
-      return appRedirect(c, `/link-account?token=${token}`);
+      return appRedirect(c, `/link-account?token=${token}`, returnTo);
     }
 
     // Flow A: unknown email → OAuth signup, honoring the registration policy.
     // SSO bypasses it: the IdP is the source of truth for who may sign in.
     const isFirstUser = (await countUsers()) === 0;
-    const registerConfig = await getConfig("authentication.register.enable");
+    const registrationEnabled = await isFeatureEnabled("registration", (flow.organizationId ?? null) as OrgId | null);
 
-    if (provider !== "sso" && registerConfig?.value !== "true" && !isFirstUser) {
-      return appRedirect(c, "/login?oauthError=registration_disabled");
+    if (provider !== "sso" && !registrationEnabled && !isFirstUser) {
+      return appRedirect(c, "/login?oauthError=registration_disabled", returnTo);
     }
 
-    const insertedUser = await provisionUser({
+    const insertedUser = await provisionUser(requireOrg(c), {
       firstName: profile.firstName,
       lastName: profile.lastName,
       email: profile.email,
@@ -487,5 +580,5 @@ export const oauthRoutes = new Hono()
     await logRegister(insertedUser.id, clientInfo);
     await logOAuthLink(insertedUser.id, provider, clientInfo);
 
-    return appRedirect(c, redirectTo);
+    return appRedirect(c, redirectTo, returnTo);
   });

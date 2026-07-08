@@ -50,6 +50,7 @@ const { getLogBufferAdapter, setLogBufferAdapter } = await import("~shared/log-b
 function makeEntry(id: string): string {
   return JSON.stringify({
     id,
+    organizationId: null,
     action: "auth:login",
     actorId: "user-1",
     impersonatorId: null,
