@@ -280,6 +280,7 @@
     "saving": "Enregistrement en cours..."
   },
   "generic": {
+    "build": "Build",
     "language": "Langue",
     "no": "Non",
     "off": "Désactivé",

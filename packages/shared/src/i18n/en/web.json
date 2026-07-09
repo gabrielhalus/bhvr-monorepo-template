@@ -280,6 +280,7 @@
     "saving": "Saving..."
   },
   "generic": {
+    "build": "Build",
     "language": "Language",
     "no": "No",
     "off": "Off",
