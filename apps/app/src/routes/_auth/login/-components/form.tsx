@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { configQueryOptions } from "@/api/configs/configs.queries";
 import { OAuthButtons } from "@/components/oauth-buttons";
 import { PasswordInput } from "@/components/password-input";
+import { useOAuthProviders } from "@/hooks/oauth/use-oauth-providers";
 import { api } from "@/lib/http";
 import { getLastAuthMethod, rollbackAuthMethod, setLastAuthMethod } from "@/lib/last-auth-method";
 import { OAUTH_ERROR_CODES } from "@/lib/oauth-meta";
@@ -34,6 +35,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
   const oauthError = searchParams.get("oauthError");
 
   const lastMethod = getLastAuthMethod();
+
+  // With no OAuth provider enabled, password is the only method — the
+  // "last used" badge would just point at the only button on the page.
+  const { data: oauthData } = useOAuthProviders();
+  const hasMultipleMethods = (oauthData?.providers.length ?? 0) > 0;
 
   // Surface OAuth callback errors once, then strip the param from the URL.
   useEffect(() => {
@@ -142,7 +148,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                     </>
                   )
                 : t("login.submit")}
-              {lastMethod === "password" && !isSubmitting && (
+              {hasMultipleMethods && lastMethod === "password" && !isSubmitting && (
                 <Badge tone="accent" className="absolute -right-2 -top-2 ring-2 ring-paper">{t("login.lastUsed")}</Badge>
               )}
             </Button>
