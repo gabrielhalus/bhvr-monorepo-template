@@ -25,6 +25,10 @@ FROM install AS build
 ARG APP_URL
 ENV APP_URL=$APP_URL
 
+# Short commit hash injected into the bundle (no .git in the build context)
+ARG BUILD_HASH
+ENV BUILD_HASH=$BUILD_HASH
+
 RUN bun run build --filter=app...
 
 # -----------------------------

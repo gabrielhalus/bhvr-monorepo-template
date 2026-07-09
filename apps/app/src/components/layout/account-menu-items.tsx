@@ -134,6 +134,15 @@ export function AccountMenuItems() {
         <LogOut />
         {tAuth("logout.label")}
       </DropdownMenuItem>
+
+      <DropdownMenuSeparator />
+
+      {/* Build hash */}
+      <div className="px-2 py-1 text-[11px] text-faint">
+        {t("generic.build")}
+        {" "}
+        <span className="font-mono">{__BUILD_HASH__}</span>
+      </div>
     </>
   );
 }
