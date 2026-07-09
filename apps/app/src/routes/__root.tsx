@@ -3,6 +3,8 @@ import type { Session } from "~shared/types/auth.types";
 
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 
+import { BuildBadge } from "@/components/build-badge";
+
 export type RouterContext = {
   queryClient: QueryClient;
   session: Session | null;
@@ -13,5 +15,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 });
 
 function RootLayout() {
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      <BuildBadge />
+    </>
+  );
 }
