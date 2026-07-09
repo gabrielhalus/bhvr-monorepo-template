@@ -100,6 +100,9 @@ services:
     expose:
       - "3000"
     environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_HOST: ${APP_HOST}
+      API_URL: ${API_URL}
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       SYSTEM_RESET_PASSWORD: ${SYSTEM_RESET_PASSWORD:-false}
