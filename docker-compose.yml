@@ -119,6 +119,7 @@ services:
       dockerfile: apps/app/Dockerfile
       args:
         APP_URL: ${APP_URL}
+        BUILD_HASH: ${BUILD_HASH:-}
     restart: unless-stopped
     depends_on:
       - api
