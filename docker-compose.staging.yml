@@ -41,6 +41,10 @@ services:
     entrypoint: []
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
+      # Seeds the storage.s3.* configs on first boot (DB is the runtime source of truth).
+      S3_ENDPOINT: ${S3_ENDPOINT:-http://minio:9000}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-${MINIO_ROOT_USER:-minioadmin}}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-${MINIO_ROOT_PASSWORD:-minioadmin}}
 
   redis:
     image: redis:7-alpine
@@ -79,10 +83,11 @@ services:
     depends_on:
       minio:
         condition: service_healthy
+    # Buckets are provisioned by the API at boot (ensureStorageBuckets); this only
+    # gates readiness on MinIO being reachable.
     entrypoint: >
       /bin/sh -c "
         mc alias set local http://minio:9000 $${MINIO_ROOT_USER:-minioadmin} $${MINIO_ROOT_PASSWORD:-minioadmin};
-        mc mb --ignore-existing local/$${S3_BUCKET:-documents};
       "
 
   api:
@@ -107,11 +112,6 @@ services:
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       SYSTEM_RESET_PASSWORD: ${SYSTEM_RESET_PASSWORD:-false}
       APP_URL: ${APP_URL}
-      S3_ENDPOINT: ${S3_ENDPOINT:-http://minio:9000}
-      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-${MINIO_ROOT_USER:-minioadmin}}
-      S3_SECRET_KEY: ${S3_SECRET_KEY:-${MINIO_ROOT_PASSWORD:-minioadmin}}
-      S3_BUCKET: ${S3_BUCKET:-documents}
-      S3_REGION: ${S3_REGION:-us-east-1}
 
   app:
     build:
