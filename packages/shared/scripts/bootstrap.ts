@@ -40,6 +40,22 @@ await drizzle
   .values({ configKey: "authentication.jwt.secret", value: randomBytes(32).toString("base64") })
   .onConflictDoNothing();
 
+// Storage connection — seed the endpoint/credentials from env on first bootstrap so
+// docker & local dev work out of the box. The DB (Settings › Storage) is the runtime
+// source of truth; these env vars are a first-boot convenience only, never read at
+// request time. Bucket names come from the registry defaults (see config.registry.ts).
+// eslint-disable-next-line node/no-process-env
+const { S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY } = process.env;
+const storageSeed = [
+  { configKey: "storage.s3.endpoint", value: S3_ENDPOINT },
+  { configKey: "storage.s3.accessKey", value: S3_ACCESS_KEY },
+  { configKey: "storage.s3.secretKey", value: S3_SECRET_KEY },
+].filter((row): row is { configKey: string; value: string } => Boolean(row.value));
+
+if (storageSeed.length > 0) {
+  await drizzle.insert(ConfigModel).values(storageSeed).onConflictDoNothing();
+}
+
 // ============================================================================
 // Policies
 // ============================================================================
