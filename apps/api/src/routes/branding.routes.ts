@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { fetchImageFromUrl, ImageFetchError } from "@/lib/fetch-image-url";
-import { contentTypeFromKey, deleteObject, getObject, imageExtFromContentType, objectKeys, uploadImage } from "@/lib/s3/storage";
+import { contentTypeFromKey, deleteObject, getObject, imageExtFromContentType, objectKeys, putObject } from "@/lib/s3/storage";
 import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
@@ -40,7 +40,7 @@ function makeAssetRoutes(asset: BrandingAsset) {
       if (!s3Key) {
         return c.json({ success: false as const, error: "Not Found" }, 404);
       }
-      const { bytes, contentType } = await getObject(s3Key);
+      const { bytes, contentType } = await getObject("core", s3Key);
       return c.newResponse(bytes, 200, {
         "Content-Type": contentType || contentTypeFromKey(s3Key),
         "Cache-Control": "public, max-age=300",
@@ -94,12 +94,12 @@ function makeAssetRoutes(asset: BrandingAsset) {
         }
 
         const s3Key = asset.objectKey(ext);
-        await uploadImage(s3Key, bytes, contentType);
+        await putObject("core", s3Key, bytes, contentType);
 
         const previousKey = (await getConfig(asset.configKey))?.value ?? null;
         if (previousKey && previousKey !== s3Key) {
           try {
-            await deleteObject(previousKey);
+            await deleteObject("core", previousKey);
           } catch {}
         }
 
@@ -120,7 +120,7 @@ function makeAssetRoutes(asset: BrandingAsset) {
         const s3Key = (await getConfig(asset.configKey))?.value ?? null;
         if (s3Key) {
           try {
-            await deleteObject(s3Key);
+            await deleteObject("core", s3Key);
           } catch {}
         }
         await updateConfig(asset.configKey, null, user.id);

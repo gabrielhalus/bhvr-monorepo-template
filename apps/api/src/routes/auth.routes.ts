@@ -9,7 +9,7 @@ import { issueSession } from "@/helpers/issue-session";
 import { wrapEmailHtml } from "@/lib/email-template";
 import { fetchImageFromUrl, ImageFetchError } from "@/lib/fetch-image-url";
 import { createAccessToken, getCookieSettings, verifyToken } from "@/lib/jwt";
-import { contentTypeFromKey, deleteObject, getObject, imageExtFromContentType, objectKeys, uploadImage } from "@/lib/s3/storage";
+import { contentTypeFromKey, deleteObject, getObject, imageExtFromContentType, objectKeys, putObject } from "@/lib/s3/storage";
 import { getSessionContext } from "@/middlewares/auth";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { validationMiddleware } from "@/middlewares/validation";
@@ -449,12 +449,12 @@ export const authRoutes = new Hono()
     }
 
     const key = objectKeys.userAvatar(user.id, ext);
-    await uploadImage(key, bytes, contentType);
+    await putObject("core", key, bytes, contentType);
 
     // Best-effort cleanup of a previous avatar stored under a different extension.
     if (user.avatar && user.avatar !== key) {
       try {
-        await deleteObject(user.avatar);
+        await deleteObject("core", user.avatar);
       } catch {
         // ignore — orphaned object, not worth failing the upload
       }
@@ -478,7 +478,7 @@ export const authRoutes = new Hono()
       return c.json({ success: false as const, error: "Not Found" }, 404);
     }
 
-    const { bytes, contentType } = await getObject(user.avatar);
+    const { bytes, contentType } = await getObject("core", user.avatar);
 
     return c.newResponse(bytes, 200, {
       "Content-Type": contentType || contentTypeFromKey(user.avatar),
@@ -497,7 +497,7 @@ export const authRoutes = new Hono()
     const { user } = c.var.sessionContext;
     if (user.avatar) {
       try {
-        await deleteObject(user.avatar);
+        await deleteObject("core", user.avatar);
       } catch {
         // ignore — storage may be unconfigured or object already gone
       }

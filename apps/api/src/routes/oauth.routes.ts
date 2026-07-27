@@ -13,7 +13,7 @@ import { issueSession } from "@/helpers/issue-session";
 import { fetchImageFromUrl } from "@/lib/fetch-image-url";
 import { getCookieSettings, verifyToken } from "@/lib/jwt";
 import { generateCodeVerifier, generateState, getConfiguredProvider, getProvidersPayload, OAuthProfileError } from "@/lib/oauth/providers";
-import { objectKeys, uploadImage } from "@/lib/s3/storage";
+import { objectKeys, putObject } from "@/lib/s3/storage";
 import { getSessionContext } from "@/middlewares/auth";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { validationMiddleware } from "@/middlewares/validation";
@@ -93,7 +93,7 @@ async function importAvatar(userId: string, avatarUrl: string) {
   try {
     const { bytes, contentType, ext } = await fetchImageFromUrl(avatarUrl, { maxBytes: MAX_AVATAR_BYTES });
     const key = objectKeys.userAvatar(userId, ext);
-    await uploadImage(key, bytes, contentType);
+    await putObject("core", key, bytes, contentType);
     await updateUser(userId, { avatar: key });
   } catch {
     // ignore — avatar import is cosmetic

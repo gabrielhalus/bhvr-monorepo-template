@@ -59,6 +59,12 @@ if (startEmailWorker()) {
   console.log("📬 Email worker started");
 }
 
+// Provision the storage buckets registered in STORAGE_BUCKETS — best-effort, so a
+// fresh (unconfigured) or read-only-credential deployment boots fine. No-ops until
+// storage is configured; buckets otherwise exist without a manual step.
+const { ensureStorageBuckets } = await import("@/lib/s3/storage");
+ensureStorageBuckets().catch(() => {});
+
 console.log(`🚀 Server is running on port ${ENV.APP_PORT}`);
 
 Bun.serve({
