@@ -249,6 +249,7 @@
       "validation": "Certaines informations sont invalides."
     },
     "boundary": {
+      "contactSupport": "Contacter le support",
       "description": "Un grain de sable s'est glissé dans les rouages. Rien de cassé : réessayez, ou filez à l'accueil.",
       "eyebrow": "Erreur inattendue",
       "home": "Retour à l'accueil",
@@ -551,6 +552,10 @@
         "primaryColor": {
           "description": "Chaîne de couleur OKLCH, ex. oklch(0.61 0.22 42). Remplace la couleur d'accent principale.",
           "label": "Couleur principale"
+        },
+        "supportEmail": {
+          "description": "Adresse e-mail de support affichée aux utilisateurs (par ex. sur les écrans d'erreur) pour qu'ils puissent demander de l'aide.",
+          "label": "E-mail de support"
         }
       },
       "notifications": {
@@ -682,6 +687,8 @@
       "copyId": "Copier l'ID",
       "copyInvitationLink": "Copier le lien d'invitation",
       "copyUserId": "Copier l'ID utilisateur",
+      "createUserError": "Échec de la création de l'utilisateur",
+      "createUserSuccess": "Utilisateur créé avec succès",
       "deleteInvitation": "Supprimer l'invitation",
       "deleteInvitationConfirm": "Êtes-vous sûr de vouloir supprimer cette invitation ? L'utilisateur ne pourra plus utiliser ce lien.",
       "deleteInvitationError": "Échec de la suppression de l'invitation",
@@ -708,6 +715,17 @@
       "name": "Nom",
       "roles": "Rôles",
       "status": "Statut"
+    },
+    "create": {
+      "button": "Nouvel utilisateur",
+      "title": "Créer un utilisateur",
+      "description": "Créez directement un compte utilisateur. Il pourra se connecter immédiatement avec le mot de passe que vous définissez.",
+      "firstNameLabel": "Prénom",
+      "lastNameLabel": "Nom",
+      "emailLabel": "E-mail",
+      "passwordLabel": "Mot de passe",
+      "passwordHint": "N'importe quel mot de passe est accepté — aucune règle de complexité.",
+      "submit": "Créer l'utilisateur"
     },
     "detail": {
       "apiKeys": {

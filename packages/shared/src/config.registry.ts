@@ -45,6 +45,7 @@ export const CONFIG_REGISTRY: ConfigRegistryEntry[] = [
   { key: "branding.primaryColor", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 4 },
   { key: "branding.loginHeroTitle", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 5 },
   { key: "branding.loginHeroSubtitle", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 6 },
+  { key: "branding.supportEmail", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 7 },
 
   // ── Email ──────────────────────────────────────────────────────────────────
   { key: "email", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 4 },

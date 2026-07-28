@@ -249,6 +249,7 @@
       "validation": "Some of the information is invalid."
     },
     "boundary": {
+      "contactSupport": "Contact support",
       "description": "A grain of sand slipped into the gears. Nothing's broken — give it another try, or head back home.",
       "eyebrow": "Unexpected error",
       "home": "Back to home",
@@ -551,6 +552,10 @@
         "primaryColor": {
           "description": "OKLCH color string, e.g. oklch(0.61 0.22 42). Overrides the brand accent color.",
           "label": "Primary color"
+        },
+        "supportEmail": {
+          "description": "Support email address shown to users (e.g. on error screens) so they can reach out for help.",
+          "label": "Support email"
         }
       },
       "notifications": {
@@ -682,6 +687,8 @@
       "copyId": "Copy ID",
       "copyInvitationLink": "Copy Invitation Link",
       "copyUserId": "Copy User ID",
+      "createUserError": "Failed to create user",
+      "createUserSuccess": "User created successfully",
       "deleteInvitation": "Delete Invitation",
       "deleteInvitationConfirm": "Are you sure you want to delete this invitation? The user will no longer be able to use this link.",
       "deleteInvitationError": "Failed to delete invitation",
@@ -708,6 +715,17 @@
       "name": "Name",
       "roles": "Roles",
       "status": "Status"
+    },
+    "create": {
+      "button": "New user",
+      "title": "Create a user",
+      "description": "Create a user account directly. They can sign in immediately with the password you set.",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "passwordHint": "Any password is accepted — no complexity rules are enforced.",
+      "submit": "Create user"
     },
     "detail": {
       "apiKeys": {

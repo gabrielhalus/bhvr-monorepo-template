@@ -23,6 +23,20 @@ export const UserRelationsQuerySchema = z.object({
 });
 
 /**
+ * Schema for manually creating a user (admin action).
+ *
+ * Deliberately applies NO password-complexity rules — an admin may set any
+ * non-empty password. Name/email normalization (trim, casing) is handled by
+ * `InsertUserSchema` on insert.
+ */
+export const CreateUserSchema = z.object({
+  firstName: z.string().min(1).max(50),
+  lastName: z.string().min(1).max(50),
+  email: z.email(),
+  password: z.string().min(1),
+});
+
+/**
  * Schema for updating a user's password
  */
 export const UpdateUserPasswordSchema = z.object({
