@@ -1,5 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { ChangePasswordSchema, UpdateAccountSchema } from "~shared/schemas/api/auth.schemas";
+import type { CreateUserSchema } from "~shared/schemas/api/users.schemas";
 import type { User } from "~shared/types/db/users.types";
 import type { z } from "zod";
 
@@ -10,10 +11,22 @@ import { usersKeys } from "./users.keys";
 
 type UpdateUserData = z.infer<typeof UpdateAccountSchema>;
 type ChangePasswordData = z.infer<typeof ChangePasswordSchema>;
+type CreateUserData = z.infer<typeof CreateUserSchema>;
 
 // ============================================================================
 // Mutation Functions
 // ============================================================================
+
+async function createUser(data: CreateUserData) {
+  const res = await api.users.$post({ json: data });
+
+  if (!res.ok) {
+    const body = await res.json();
+    throw new Error("error" in body ? String(body.error) : "Failed to create user");
+  }
+
+  return res.json();
+}
 
 async function updateUser(id: string, data: UpdateUserData) {
   const res = await api.users[":id{[a-zA-Z0-9_-]{21}}"].$put({
@@ -111,6 +124,15 @@ async function updateUserRoles(id: string, roleIds: number[]) {
 // ============================================================================
 // Mutation Options
 // ============================================================================
+
+export function createUserMutationOptions(queryClient: QueryClient) {
+  return {
+    mutationFn: (data: CreateUserData) => createUser(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: usersKeys.paginated });
+    },
+  };
+}
 
 export function updateUserMutationOptions(queryClient: QueryClient) {
   return {

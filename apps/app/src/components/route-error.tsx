@@ -3,9 +3,10 @@ import type { ErrorComponentProps } from "@tanstack/react-router";
 import { Link, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
+import { useBranding } from "@/hooks/use-branding";
 import { ApiError } from "@/lib/http";
 import { Button } from "~orbit/components/ui/Button";
-import { Clock, RefreshCw, TriangleAlert } from "~orbit/components/ui/icons";
+import { Clock, LifeBuoy, RefreshCw, TriangleAlert } from "~orbit/components/ui/icons";
 
 const RISE = "motion-safe:animate-[error-rise_0.5s_ease-out_both]";
 
@@ -76,6 +77,7 @@ export function Stamp({ children }: { children: React.ReactNode }) {
 export function RouteError({ error, reset }: ErrorComponentProps) {
   const { t } = useTranslation("web");
   const router = useRouter();
+  const { supportEmail } = useBranding();
 
   function retry() {
     reset();
@@ -131,6 +133,14 @@ export function RouteError({ error, reset }: ErrorComponentProps) {
           <Button variant="outline" asChild>
             <Link to="/">{t("errors.boundary.home")}</Link>
           </Button>
+          {supportEmail && (
+            <Button variant="ghost" asChild>
+              <a href={`mailto:${supportEmail}`}>
+                <LifeBuoy className="size-4" />
+                {t("errors.boundary.contactSupport")}
+              </a>
+            </Button>
+          )}
         </>
       )}
     />

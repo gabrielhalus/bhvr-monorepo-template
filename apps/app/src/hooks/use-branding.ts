@@ -10,6 +10,8 @@ export type BrandingConfig = {
   primaryColor: string | null;
   loginHeroTitle: string | null;
   loginHeroSubtitle: string | null;
+  /** Support email surfaced to users (e.g. on error screens) as a mailto link. */
+  supportEmail: string | null;
 };
 
 export const brandingDefaults: BrandingConfig = {
@@ -20,6 +22,7 @@ export const brandingDefaults: BrandingConfig = {
   primaryColor: null,
   loginHeroTitle: null,
   loginHeroSubtitle: null,
+  supportEmail: null,
 };
 
 export const BrandingContext = createContext<BrandingConfig>(brandingDefaults);

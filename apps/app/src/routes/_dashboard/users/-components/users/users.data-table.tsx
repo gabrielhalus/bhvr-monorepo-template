@@ -9,6 +9,7 @@ import { usePaginatedUsers } from "@/hooks/users/use-paginated-users";
 import { useUsersRelations } from "@/hooks/users/use-users-relations";
 import { authorizeBatchQueryOptions } from "@/queries/auth";
 
+import { CreateUserDialog } from "./create-user-dialog";
 import { getUserColumns } from "./user.columns";
 
 export function UsersDataTable() {
@@ -48,9 +49,12 @@ export function UsersDataTable() {
 
   return (
     <div className="flex flex-col gap-3">
-      <div>
-        <h2 className="text-[15px] font-semibold tracking-tight text-ink">{t("users.title")}</h2>
-        <p className="mt-0.5 text-[13px] text-muted">{t("users.list.subtitle")}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-[15px] font-semibold tracking-tight text-ink">{t("users.title")}</h2>
+          <p className="mt-0.5 text-[13px] text-muted">{t("users.list.subtitle")}</p>
+        </div>
+        <CreateUserDialog />
       </div>
       <DataTable
         columns={columns}
