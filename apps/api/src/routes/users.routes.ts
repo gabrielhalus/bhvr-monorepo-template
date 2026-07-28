@@ -11,14 +11,15 @@ import { requirePermissionFactory } from "@/middlewares/access-control";
 import { auditList, auditRead } from "@/middlewares/audit";
 import { getSessionContext } from "@/middlewares/auth";
 import { validationMiddleware } from "@/middlewares/validation";
+import { provisionUser } from "@/services/user-provisioning";
 import { nanoid } from "~shared/lib/nanoid";
 import { getActiveApiKeysByUserId, insertApiKey, revokeApiKey } from "~shared/queries/api-key.queries";
-import { logPasswordReset, logSessionRevokeAll, logTokenRevoke, logUserDelete, logUserRolesUpdate, logUserUpdate } from "~shared/queries/logs.queries";
+import { logPasswordReset, logSessionRevokeAll, logTokenRevoke, logUserCreate, logUserDelete, logUserRolesUpdate, logUserUpdate } from "~shared/queries/logs.queries";
 import { getActiveTokensByUserId, revokeAllTokensByUserId, revokeToken } from "~shared/queries/tokens.queries";
 import { getUserRoleIds, updateUserRoles } from "~shared/queries/user-roles.queries";
 import { deleteUser, emailExists, getUser, getUsersPaginated, updateUser, updateUserPassword, userRelationCountLoaders, userRelationLoaders } from "~shared/queries/users.queries";
 import { PaginationQuerySchema } from "~shared/schemas/api/pagination.schemas";
-import { UpdateUserRolesSchema, UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
+import { CreateUserSchema, UpdateUserRolesSchema, UserRelationsQuerySchema } from "~shared/schemas/api/users.schemas";
 import { UpdateUserSchema } from "~shared/schemas/db/users.schemas";
 
 export const usersRoutes = new Hono()
@@ -39,6 +40,54 @@ export const usersRoutes = new Hono()
 
   // --- All routes below this point require authentication
   .use(getSessionContext)
+
+  /**
+   * Manually create a user (admin action).
+   *
+   * Unlike public registration, this endpoint enforces NO password-complexity
+   * rules — the admin may set any non-empty password. The new user's email is
+   * marked verified, since an admin creating the account vouches for it.
+   *
+   * @param c - The Hono context object with session context
+   * @returns JSON response with the created user
+   * @throws {400} If the email is already taken
+   * @access protected
+   * @permission user:create
+   */
+  .post("/", validationMiddleware("json", CreateUserSchema), requirePermissionFactory("user:create"), async (c) => {
+    const sessionContext = c.var.sessionContext;
+    const { firstName, lastName, email, password: rawPassword } = c.req.valid("json");
+    const clientInfo = getClientInfo(c);
+
+    if (await emailExists(email.trim().toLowerCase())) {
+      return c.json({ success: false as const, error: "Email is already taken" }, 400);
+    }
+
+    const hashedPassword = await password.hash(rawPassword);
+
+    try {
+      const insertedUser = await provisionUser({
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        verifiedAt: new Date().toISOString(),
+      });
+
+      await logUserCreate(insertedUser.id, {
+        actorId: sessionContext.user.id,
+        impersonatorId: sessionContext.impersonator?.id,
+        ...clientInfo,
+      });
+
+      return c.json({ success: true as const, user: insertedUser });
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("UNIQUE constraint failed: users.email")) {
+        return c.json({ success: false as const, error: "Email is already taken" }, 400);
+      }
+      throw error;
+    }
+  })
 
   /**
    * Get paginated users with optional relation include
