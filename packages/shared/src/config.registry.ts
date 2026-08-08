@@ -32,8 +32,9 @@ export const CONFIG_REGISTRY: ConfigRegistryEntry[] = [
   { key: "authentication.sso.clientId", type: "string", defaultValue: null, nullable: true, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 2 },
   { key: "authentication.sso.clientSecret", type: "string", defaultValue: null, nullable: true, multiline: false, secret: true, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 3 },
   { key: "authentication.sso.scopes", type: "string", defaultValue: "openid profile email", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 4 },
-  { key: "authentication.sso.buttonLabel", type: "string", defaultValue: "SSO", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 5 },
-  { key: "authentication.sso.autoLogin", type: "boolean", defaultValue: "false", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 6 },
+  { key: "authentication.sso.identifier", type: "string", defaultValue: "email", nullable: false, multiline: false, secret: false, rotatable: false, options: "email;preferred_username;sub", disabledWhen: "authentication.sso.enable!=true", order: 5 },
+  { key: "authentication.sso.buttonLabel", type: "string", defaultValue: "SSO", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 6 },
+  { key: "authentication.sso.autoLogin", type: "boolean", defaultValue: "false", nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: "authentication.sso.enable!=true", order: 7 },
 
   // ── Branding ───────────────────────────────────────────────────────────────
   { key: "branding", type: "node", defaultValue: null, nullable: false, multiline: false, secret: false, rotatable: false, options: null, disabledWhen: null, order: 2 },

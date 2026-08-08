@@ -491,6 +491,10 @@
             "description": "Active la connexion via un fournisseur d'identité OpenID Connect (Keycloak, Azure AD, Okta, Authentik…). Les utilisateurs authentifiés par le fournisseur sont créés automatiquement, même si l'inscription est désactivée.",
             "label": "Activer la connexion via SSO"
           },
+          "identifier": {
+            "description": "Claim OpenID Connect utilisé comme identifiant du compte. Choisissez preferred_username ou sub lorsque le fournisseur ne renvoie pas de claim email.",
+            "label": "Claim identifiant"
+          },
           "issuerUrl": {
             "description": "URL de base de l'émetteur OpenID Connect, sans le suffixe /.well-known/openid-configuration. Déclarez {API_URL}/auth/oauth/sso/callback comme redirect URI côté fournisseur.",
             "label": "URL de l'émetteur"
