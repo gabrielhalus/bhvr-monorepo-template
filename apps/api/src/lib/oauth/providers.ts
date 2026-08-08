@@ -91,11 +91,16 @@ type OIDCClaims = {
   picture?: string;
 };
 
-/** Read the admin-configured issuer and scopes of the generic SSO provider. */
-async function getSsoSettings(): Promise<{ issuerUrl: string; scopes: string[] }> {
-  const [issuerUrl, scopes] = await Promise.all([
+/** Claims usable as the SSO identifier, mirroring the config registry options. */
+const SSO_IDENTIFIER_CLAIMS = ["email", "preferred_username", "sub"] as const;
+type SsoIdentifierClaim = (typeof SSO_IDENTIFIER_CLAIMS)[number];
+
+/** Read the admin-configured issuer, scopes and identifier claim of the generic SSO provider. */
+async function getSsoSettings(): Promise<{ issuerUrl: string; scopes: string[]; identifierClaim: SsoIdentifierClaim }> {
+  const [issuerUrl, scopes, identifier] = await Promise.all([
     getConfig("authentication.sso.issuerUrl"),
     getConfig("authentication.sso.scopes"),
+    getConfig("authentication.sso.identifier"),
   ]);
 
   if (!issuerUrl?.value) {
@@ -107,25 +112,36 @@ async function getSsoSettings(): Promise<{ issuerUrl: string; scopes: string[] }
     parsed.unshift("openid");
   }
 
-  return { issuerUrl: issuerUrl.value, scopes: parsed };
+  const identifierClaim = SSO_IDENTIFIER_CLAIMS.find(claim => claim === identifier?.value) ?? "email";
+
+  return { issuerUrl: issuerUrl.value, scopes: parsed, identifierClaim };
 }
 
-/** Normalize userinfo/id_token claims into the shared profile shape. */
-function normalizeOIDCClaims(claims: OIDCClaims): NormalizedProfile {
-  if (!claims.email) {
+/**
+ * Normalize userinfo/id_token claims into the shared profile shape.
+ * @param claims - The claims returned by the IdP.
+ * @param identifierClaim - The claim holding the account identifier. IdPs that
+ * expose no `email` claim (Azure AD with a UPN, LDAP-backed Keycloak realms…)
+ * can point this at `preferred_username` or `sub` instead.
+ */
+function normalizeOIDCClaims(claims: OIDCClaims, identifierClaim: SsoIdentifierClaim): NormalizedProfile {
+  const identifier = claims[identifierClaim];
+
+  if (!identifier) {
     throw new OAuthProfileError("email_missing");
   }
 
-  const email = claims.email.toLowerCase();
+  const email = identifier.toLowerCase();
   const name = claims.name ?? [claims.given_name, claims.family_name].filter(Boolean).join(" ");
 
   return {
     providerAccountId: claims.sub,
     email,
-    // Enterprise IdPs (Azure AD notably) often omit the claim entirely; the
-    // IdP is the source of truth, so only an explicit `false` marks the email
-    // as unverified.
-    emailVerified: claims.email_verified !== false,
+    // `email_verified` only describes the `email` claim: when the identifier
+    // comes from elsewhere, the IdP itself vouches for it. Enterprise IdPs
+    // (Azure AD notably) often omit the claim entirely, so only an explicit
+    // `false` marks the email as unverified.
+    emailVerified: identifierClaim !== "email" || claims.email_verified !== false,
     ...splitName(name, claims.preferred_username ?? email.split("@")[0] ?? "user"),
     avatarUrl: claims.picture ?? null,
   };
@@ -217,7 +233,7 @@ const PROVIDERS: Record<OAuthProviderId, OAuthProviderDef> = {
       return client.validateAuthorizationCode(doc.token_endpoint, code, codeVerifier ?? "");
     },
     fetchProfile: async (tokens) => {
-      const { issuerUrl } = await getSsoSettings();
+      const { issuerUrl, identifierClaim } = await getSsoSettings();
       const doc = await getDiscoveryDocument(issuerUrl);
 
       if (doc.userinfo_endpoint) {
@@ -227,12 +243,12 @@ const PROVIDERS: Record<OAuthProviderId, OAuthProviderDef> = {
         // A JWT-encoded userinfo response (signed_response_alg configured on
         // the IdP) is not parseable as JSON — fall back to the id_token.
         if (res.ok && !res.headers.get("content-type")?.includes("application/jwt")) {
-          return normalizeOIDCClaims(await res.json() as OIDCClaims);
+          return normalizeOIDCClaims(await res.json() as OIDCClaims, identifierClaim);
         }
       }
 
       try {
-        return normalizeOIDCClaims(decodeIdToken(tokens.idToken()) as OIDCClaims);
+        return normalizeOIDCClaims(decodeIdToken(tokens.idToken()) as OIDCClaims, identifierClaim);
       } catch (error) {
         if (error instanceof OAuthProfileError) {
           throw error;
