@@ -491,6 +491,10 @@
             "description": "Enables sign-in via an OpenID Connect identity provider (Keycloak, Azure AD, Okta, Authentik…). Users authenticated by the provider are created automatically, even when registration is disabled.",
             "label": "Enable login via SSO"
           },
+          "identifier": {
+            "description": "OpenID Connect claim used as the account identifier. Pick preferred_username or sub when the provider returns no email claim.",
+            "label": "Identifier claim"
+          },
           "issuerUrl": {
             "description": "Base URL of the OpenID Connect issuer, without the /.well-known/openid-configuration suffix. Register {API_URL}/auth/oauth/sso/callback as the redirect URI on the provider side.",
             "label": "Issuer URL"
