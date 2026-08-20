@@ -13,7 +13,10 @@ import { LoginForm } from "./-components/form";
 const searchSchema = z.object({
   redirect: z.string().optional(),
   oauthError: z.string().optional(),
-  manual: z.boolean().optional(),
+  // Hand-written URLs carry any of `?manual`, `?manual=1` or `?manual=true`,
+  // which the router parses as "", a number and a boolean — normalize instead
+  // of rejecting the whole search object.
+  manual: z.preprocess(value => (value === "" ? true : value), z.coerce.boolean()).optional(),
 });
 
 export const Route = createFileRoute("/_auth/login/")({

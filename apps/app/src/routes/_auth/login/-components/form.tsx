@@ -51,12 +51,13 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
     const code = OAUTH_ERROR_CODES.includes(oauthError) ? oauthError : "oauth_failed";
     toast.error(t(`oauth.errors.${code}` as never));
 
-    const params = new URLSearchParams(location.searchStr);
-    params.delete("oauthError");
     // Stay in manual mode: without it, SSO auto-login would immediately
     // bounce the visitor back to the IdP they just failed at.
-    params.set("manual", "1");
-    navigate({ href: `/login?${params}`, replace: true });
+    navigate({
+      to: "/login",
+      search: prev => ({ ...prev, oauthError: undefined, manual: true }),
+      replace: true,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [oauthError]);
 
