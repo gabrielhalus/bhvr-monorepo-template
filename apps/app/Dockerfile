@@ -25,9 +25,12 @@ FROM install AS build
 ARG APP_URL
 ENV APP_URL=$APP_URL
 
-# Short commit hash injected into the bundle (no .git in the build context)
+# Short commit hash injected into the bundle. The build reads it straight from
+# .git (see apps/app/vite.config.ts) so no BUILD_HASH need be passed; the ARG
+# remains an optional explicit override for contexts without a .git.
 ARG BUILD_HASH
 ENV BUILD_HASH=$BUILD_HASH
+COPY .git ./.git
 
 RUN bun run build --filter=app...
 

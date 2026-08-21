@@ -245,6 +245,11 @@ export function AdminMenu({ links }: { links: NavLink[] }) {
             </DropdownMenuItem>
           );
         })}
+        <DropdownMenuSeparator />
+        <div className="flex items-center justify-between px-2.5 py-1.5 text-[11px] text-faint">
+          <span>{t("generic.build" as never)}</span>
+          <span className="font-mono">{__BUILD_HASH__}</span>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
