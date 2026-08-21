@@ -1,5 +1,6 @@
 # --- Global ignores ---
-.git
+# NOTE: .git is intentionally NOT ignored — apps/app/Dockerfile copies it so the
+# frontend build can bake the commit hash into the bundle (see vite.config.ts).
 .gitignore
 Dockerfile
 .dockerignore
