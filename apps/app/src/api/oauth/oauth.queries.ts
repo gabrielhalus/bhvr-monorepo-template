@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 
 import { QUERY_STALE_TIMES } from "../query-config";
-import { fetchLinkedAccounts, fetchOAuthProviders, fetchPendingLink } from "./oauth.api";
+import { fetchLinkedAccounts, fetchOAuthProviders, fetchPendingLink, fetchPendingSignup } from "./oauth.api";
 import { oauthKeys } from "./oauth.keys";
 
 export const oauthProvidersQueryOptions = queryOptions({
@@ -20,6 +20,15 @@ export function pendingLinkQueryOptions(token: string) {
   return queryOptions({
     queryKey: oauthKeys.pendingLink(token),
     queryFn: () => fetchPendingLink(token),
+    staleTime: QUERY_STALE_TIMES.VALIDATION,
+    retry: false,
+  });
+}
+
+export function pendingSignupQueryOptions(token: string) {
+  return queryOptions({
+    queryKey: oauthKeys.pendingSignup(token),
+    queryFn: () => fetchPendingSignup(token),
     staleTime: QUERY_STALE_TIMES.VALIDATION,
     retry: false,
   });

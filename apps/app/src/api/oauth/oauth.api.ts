@@ -44,6 +44,26 @@ export async function completePendingLink(data: { token: string; password: strin
   return res.json();
 }
 
+export async function fetchPendingSignup(token: string) {
+  const res = await api.auth.oauth["pending-signup"].$get({ query: { token } });
+
+  if (!res.ok) {
+    throw await ApiError.fromResponse(res);
+  }
+
+  return res.json();
+}
+
+export async function completePendingSignup(data: { token: string; firstName: string; lastName: string }) {
+  const res = await api.auth.oauth["pending-signup"].complete.$post({ json: data });
+
+  if (!res.ok) {
+    throw await ApiError.fromResponse(res);
+  }
+
+  return res.json();
+}
+
 export async function unlinkAccount(provider: OAuthProviderId) {
   const res = await api.auth.oauth.accounts[":provider"].$delete({ param: { provider } });
 
