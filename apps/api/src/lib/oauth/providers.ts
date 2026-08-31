@@ -1,11 +1,11 @@
-import type { OAuthProviderId } from "~shared/types/db/oauth-accounts.types";
+import type { OAuth2ProviderId, OAuthProviderId } from "~shared/types/db/oauth-accounts.types";
 import type { OAuth2Tokens } from "arctic";
 
 import { CodeChallengeMethod, decodeIdToken, generateCodeVerifier, generateState, GitHub, Google, OAuth2Client } from "arctic";
 import { ENV } from "varlock/env";
 
 import { getConfig } from "~shared/queries/configs.queries";
-import { OAUTH_PROVIDER_IDS } from "~shared/schemas/api/oauth.schemas";
+import { OAUTH2_PROVIDER_IDS } from "~shared/schemas/api/oauth.schemas";
 
 import { getDiscoveryDocument } from "./oidc-discovery";
 
@@ -29,14 +29,14 @@ export type NormalizedProfile = {
 };
 
 type OAuthProviderDef = {
-  id: OAuthProviderId;
+  id: OAuth2ProviderId;
   usesPKCE: boolean;
   createAuthorizationURL: (clientId: string, clientSecret: string, state: string, codeVerifier: string | null) => URL | Promise<URL>;
   validateCode: (clientId: string, clientSecret: string, code: string, codeVerifier: string | null) => Promise<OAuth2Tokens>;
   fetchProfile: (tokens: OAuth2Tokens) => Promise<NormalizedProfile>;
 };
 
-function redirectUri(provider: OAuthProviderId): string {
+function redirectUri(provider: OAuth2ProviderId): string {
   return `${ENV.API_URL}/auth/oauth/${provider}/callback`;
 }
 
@@ -155,7 +155,7 @@ function normalizeOIDCClaims(claims: OIDCClaims, identifierClaim: SsoIdentifierC
   };
 }
 
-const PROVIDERS: Record<OAuthProviderId, OAuthProviderDef> = {
+const PROVIDERS: Record<OAuth2ProviderId, OAuthProviderDef> = {
   google: {
     id: "google",
     usesPKCE: true,
@@ -280,7 +280,7 @@ export class OAuthProfileError extends Error {
  * @returns The definition and credentials, or null when the provider is
  * disabled or not fully configured.
  */
-export async function getConfiguredProvider(id: OAuthProviderId) {
+export async function getConfiguredProvider(id: OAuth2ProviderId) {
   const [enable, clientId, clientSecret, issuerUrl] = await Promise.all([
     getConfig(`authentication.${id}.enable`),
     getConfig(`authentication.${id}.clientId`),
@@ -307,29 +307,57 @@ export async function getConfiguredProvider(id: OAuthProviderId) {
  * List the providers that are enabled and fully configured.
  * @returns The provider ids usable for sign-in.
  */
-export async function getEnabledProviders(): Promise<OAuthProviderId[]> {
+export async function getEnabledProviders(): Promise<OAuth2ProviderId[]> {
   const results = await Promise.all(
-    OAUTH_PROVIDER_IDS.map(async id => ((await getConfiguredProvider(id)) ? id : null)),
+    OAUTH2_PROVIDER_IDS.map(async id => ((await getConfiguredProvider(id)) ? id : null)),
   );
 
-  return results.filter((id): id is OAuthProviderId => id !== null);
+  return results.filter((id): id is OAuth2ProviderId => id !== null);
 }
 
-const PROVIDER_LABELS: Record<Exclude<OAuthProviderId, "sso">, string> = {
+const PROVIDER_LABELS: Record<Exclude<OAuth2ProviderId, "sso">, string> = {
   google: "Google",
   github: "GitHub",
 };
 
 /**
+ * Whether the SAML provider is enabled and carries the minimum an IdP needs:
+ * where to send the request, who signed the answer, and who it claims to be.
+ */
+async function getConfiguredSaml(): Promise<{ label: string; autoLogin: boolean } | null> {
+  const [enable, entryPoint, idpCert, idpIssuer, buttonLabel, autoLogin] = await Promise.all([
+    getConfig("authentication.saml.enable"),
+    getConfig("authentication.saml.entryPoint"),
+    getConfig("authentication.saml.idpCert"),
+    getConfig("authentication.saml.idpIssuer"),
+    getConfig("authentication.saml.buttonLabel"),
+    getConfig("authentication.saml.autoLogin"),
+  ]);
+
+  if (enable?.value !== "true" || !entryPoint?.value || !idpCert?.value || !idpIssuer?.value) {
+    return null;
+  }
+
+  return {
+    label: buttonLabel?.value || "SAML",
+    autoLogin: autoLogin?.value === "true",
+  };
+}
+
+/**
  * Build the public payload of the providers endpoint: enabled providers with
- * their display label, plus the SSO auto-login flag.
+ * their display label, plus the auto-login flag.
+ *
+ * SAML is appended here rather than in `getEnabledProviders`, which only knows
+ * about the OAuth 2.0 code flow.
+ *
  * @returns The providers usable for sign-in and whether the login page should
- * redirect to the SSO provider automatically.
+ * redirect to an enterprise provider automatically.
  */
 export async function getProvidersPayload() {
-  const enabled = await getEnabledProviders();
+  const [enabled, saml] = await Promise.all([getEnabledProviders(), getConfiguredSaml()]);
 
-  const providers = await Promise.all(enabled.map(async (id) => {
+  const providers: { id: OAuthProviderId; label: string }[] = await Promise.all(enabled.map(async (id) => {
     if (id === "sso") {
       const label = await getConfig("authentication.sso.buttonLabel");
       return { id, label: label?.value || "SSO" };
@@ -337,10 +365,18 @@ export async function getProvidersPayload() {
     return { id, label: PROVIDER_LABELS[id] };
   }));
 
+  if (saml) {
+    providers.push({ id: "saml", label: saml.label });
+  }
+
+  // Only one provider can claim auto-login; SSO wins if both ask for it.
   let autoLogin = false;
   if (enabled.includes("sso")) {
     const config = await getConfig("authentication.sso.autoLogin");
     autoLogin = config?.value === "true";
+  }
+  if (!autoLogin && saml) {
+    autoLogin = saml.autoLogin;
   }
 
   return { providers, autoLogin };

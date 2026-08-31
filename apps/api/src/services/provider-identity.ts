@@ -78,12 +78,12 @@ export async function peekSessionUserId(c: Context): Promise<string | null> {
 /**
  * Whether an unknown provider identity may open an account.
  *
- * SSO bypasses the registration policy: the identity provider is the source of
- * truth for who may sign in. The very first account always goes through — it
- * bootstraps the instance.
+ * Enterprise identity providers bypass the registration policy: the IdP is the
+ * source of truth for who may sign in. The very first account always goes
+ * through — it bootstraps the instance.
  */
 export async function isRegistrationAllowed(provider: OAuthProviderId): Promise<boolean> {
-  if (provider === "sso") {
+  if (provider === "sso" || provider === "saml") {
     return true;
   }
 

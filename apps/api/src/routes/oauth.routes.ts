@@ -18,7 +18,7 @@ import { countOAuthAccountsByUserId, createOAuthAccount, deleteOAuthAccount, get
 import { getValidOAuthLinkToken, markOAuthLinkTokenUsed } from "~shared/queries/oauth-link-tokens.queries";
 import { getValidOAuthSignupToken, markOAuthSignupTokenUsed } from "~shared/queries/oauth-signup-tokens.queries";
 import { getUser, getUserByEmail } from "~shared/queries/users.queries";
-import { CompletePendingLinkSchema, CompletePendingSignupSchema, OAuthProfileSchema, OAuthProviderIdSchema, OAuthProviderParamSchema, OAuthStartQuerySchema, PendingLinkQuerySchema, PendingSignupQuerySchema } from "~shared/schemas/api/oauth.schemas";
+import { AnyProviderParamSchema, CompletePendingLinkSchema, CompletePendingSignupSchema, OAuthProfileSchema, OAuthProviderIdSchema, OAuthProviderParamSchema, OAuthStartQuerySchema, PendingLinkQuerySchema, PendingSignupQuerySchema } from "~shared/schemas/api/oauth.schemas";
 
 const OAUTH_FLOW_COOKIE = "oauthFlow";
 
@@ -264,7 +264,7 @@ export const oauthRoutes = new Hono()
    * @throws {400} If the provider is the last sign-in method or is not linked
    * @access protected
    */
-  .delete("/accounts/:provider", getSessionContext, validationMiddleware("param", OAuthProviderParamSchema), async (c) => {
+  .delete("/accounts/:provider", getSessionContext, validationMiddleware("param", AnyProviderParamSchema), async (c) => {
     const { user } = c.var.sessionContext;
     const { provider } = c.req.valid("param");
     const clientInfo = getClientInfo(c);
