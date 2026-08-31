@@ -1,9 +1,12 @@
 import type { OAuthAccountsModel } from "~shared/models/oauth-accounts.model";
 import type { OAuthLinkTokensModel } from "~shared/models/oauth-link-tokens.model";
-import type { OAUTH_PROVIDER_IDS } from "~shared/schemas/api/oauth.schemas";
+import type { OAUTH2_PROVIDER_IDS, OAUTH_PROVIDER_IDS } from "~shared/schemas/api/oauth.schemas";
 
 export type OAuthAccount = typeof OAuthAccountsModel.$inferSelect;
 
 export type OAuthLinkToken = typeof OAuthLinkTokensModel.$inferSelect;
 
 export type OAuthProviderId = (typeof OAUTH_PROVIDER_IDS)[number];
+
+/** The providers reachable through the OAuth 2.0 authorization-code routes. */
+export type OAuth2ProviderId = (typeof OAUTH2_PROVIDER_IDS)[number];

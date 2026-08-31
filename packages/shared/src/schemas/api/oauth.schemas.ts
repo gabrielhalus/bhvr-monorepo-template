@@ -1,10 +1,33 @@
 import { z } from "zod";
 
-export const OAUTH_PROVIDER_IDS = ["google", "github", "sso"] as const;
+/**
+ * Every identity provider that can back an account in `oauth_accounts`.
+ *
+ * SAML sits in this list despite not being an OAuth protocol: an account linked
+ * to an IdP is the same domain object whichever protocol vouched for it, and
+ * reusing the table keeps linking, unlinking and the uniqueness constraints in
+ * one place.
+ */
+export const OAUTH_PROVIDER_IDS = ["google", "github", "sso", "saml"] as const;
+
+/**
+ * The subset reachable through the OAuth 2.0 authorization-code routes.
+ *
+ * SAML is excluded: it has no code exchange and lives under `/auth/saml`.
+ */
+export const OAUTH2_PROVIDER_IDS = ["google", "github", "sso"] as const;
 
 export const OAuthProviderIdSchema = z.enum(OAUTH_PROVIDER_IDS);
 
+export const OAuth2ProviderIdSchema = z.enum(OAUTH2_PROVIDER_IDS);
+
+/** Param schema for the OAuth 2.0 routes, which SAML must not reach. */
 export const OAuthProviderParamSchema = z.object({
+  provider: OAuth2ProviderIdSchema,
+});
+
+/** Param schema for routes that accept any linked provider (unlinking…). */
+export const AnyProviderParamSchema = z.object({
   provider: OAuthProviderIdSchema,
 });
 
