@@ -22,12 +22,14 @@ import { getConfig } from "~shared/queries/configs.queries";
 import { logLogin, logOAuthLink, logOAuthUnlink, logRegister } from "~shared/queries/logs.queries";
 import { countOAuthAccountsByUserId, createOAuthAccount, deleteOAuthAccount, getOAuthAccountByProvider, getOAuthAccountsByUserId } from "~shared/queries/oauth-accounts.queries";
 import { createOAuthLinkToken, getValidOAuthLinkToken, markOAuthLinkTokenUsed } from "~shared/queries/oauth-link-tokens.queries";
+import { createOAuthSignupToken, getValidOAuthSignupToken, markOAuthSignupTokenUsed } from "~shared/queries/oauth-signup-tokens.queries";
 import { getToken } from "~shared/queries/tokens.queries";
 import { countUsers, getUser, getUserByEmail, updateUser } from "~shared/queries/users.queries";
-import { CompletePendingLinkSchema, OAuthProfileSchema, OAuthProviderParamSchema, OAuthStartQuerySchema, PendingLinkQuerySchema } from "~shared/schemas/api/oauth.schemas";
+import { CompletePendingLinkSchema, CompletePendingSignupSchema, OAuthProfileSchema, OAuthProviderIdSchema, OAuthProviderParamSchema, OAuthStartQuerySchema, PendingLinkQuerySchema, PendingSignupQuerySchema } from "~shared/schemas/api/oauth.schemas";
 
 const OAUTH_FLOW_COOKIE = "oauthFlow";
 const PENDING_LINK_EXPIRATION_MS = 10 * 60 * 1000; // 10 minutes
+const PENDING_SIGNUP_EXPIRATION_MS = 10 * 60 * 1000; // 10 minutes
 const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
 
 type OAuthFlow = {
@@ -83,6 +85,67 @@ async function peekSessionUserId(c: Context): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+/**
+ * Whether an unknown provider identity may open an account.
+ *
+ * SSO bypasses the registration policy: the identity provider is the source of
+ * truth for who may sign in. The very first account always goes through — it
+ * bootstraps the instance.
+ */
+async function isRegistrationAllowed(provider: OAuthProviderId): Promise<boolean> {
+  if (provider === "sso") {
+    return true;
+  }
+
+  const isFirstUser = (await countUsers()) === 0;
+  const registerConfig = await getConfig("authentication.register.enable");
+
+  return registerConfig?.value === "true" || isFirstUser;
+}
+
+/**
+ * Provision an account from a provider identity, link it, and open a session.
+ *
+ * Shared by the two ways a signup can end: straight through when the provider
+ * supplied everything, or after the visitor completed what it did not. No
+ * password is ever set — the provider is the sign-in method.
+ */
+async function createOAuthUser(c: Context, data: {
+  provider: OAuthProviderId;
+  providerAccountId: string;
+  email: string;
+  emailVerified: boolean;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  clientInfo: ReturnType<typeof getClientInfo>;
+}) {
+  const insertedUser = await provisionUser({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    ...(data.emailVerified && { verifiedAt: new Date().toISOString() }),
+  });
+
+  await createOAuthAccount({
+    userId: insertedUser.id,
+    provider: data.provider,
+    providerAccountId: data.providerAccountId,
+    email: data.email,
+  });
+
+  if (data.avatarUrl) {
+    await importAvatar(insertedUser.id, data.avatarUrl);
+  }
+
+  await issueSession(c, insertedUser.id);
+
+  await logRegister(insertedUser.id, data.clientInfo);
+  await logOAuthLink(insertedUser.id, data.provider, data.clientInfo);
+
+  return insertedUser;
 }
 
 /**
@@ -202,6 +265,97 @@ export const oauthRoutes = new Hono()
     if (error) {
       return c.json({ success: false as const, error }, 400);
     }
+
+    return c.json({ success: true as const });
+  })
+
+  /**
+   * Describe a pending signup so the frontend can ask for the missing fields
+   *
+   * Like the pending-link token, a valid token is itself proof the caller just
+   * completed the OAuth dance — it is handed to no one else.
+   *
+   * @param c - The Hono context object
+   * @returns JSON response with the provider, the email the provider vouched
+   * for, and whichever name parts it did supply
+   * @throws {400} If the token is missing, used, or expired
+   * @access public
+   */
+  .get("/pending-signup", validationMiddleware("query", PendingSignupQuerySchema), async (c) => {
+    const { token } = c.req.valid("query");
+
+    const pending = await getValidOAuthSignupToken(token);
+
+    if (!pending) {
+      return c.json({ success: false as const, error: "invalid_token" }, 400);
+    }
+
+    const profile = OAuthProfileSchema.parse(pending.profile);
+
+    return c.json({
+      success: true as const,
+      pendingSignup: {
+        provider: pending.provider,
+        email: profile.email,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+      },
+    });
+  })
+
+  /**
+   * Complete an OAuth signup with the fields the provider did not supply
+   *
+   * Creates the account and opens a session. No password is set: the provider
+   * stays the sign-in method.
+   *
+   * @param c - The Hono context object
+   * @returns JSON response indicating success; session cookies are set on success
+   * @throws {400} If the token is invalid, registration is closed, or the
+   * identity was claimed while the form was open
+   * @access public
+   */
+  .post("/pending-signup/complete", rateLimiter(rateLimitPresets.register), validationMiddleware("json", CompletePendingSignupSchema), async (c) => {
+    const { token, firstName, lastName } = c.req.valid("json");
+    const clientInfo = getClientInfo(c);
+
+    const pending = await getValidOAuthSignupToken(token);
+    if (!pending) {
+      return c.json({ success: false as const, error: "invalid_token" }, 400);
+    }
+
+    const provider = OAuthProviderIdSchema.parse(pending.provider);
+    const profile = OAuthProfileSchema.parse(pending.profile);
+
+    // The policy may have been tightened while the form sat open.
+    if (!(await isRegistrationAllowed(provider))) {
+      return c.json({ success: false as const, error: "registration_disabled" }, 400);
+    }
+
+    // …and the email or the provider identity may have been claimed since.
+    // Signing in again lands on the link challenge, which is the right place
+    // for an address that now belongs to someone.
+    const [existingUser, linkedAccount] = await Promise.all([
+      getUserByEmail(profile.email),
+      getOAuthAccountByProvider(provider, pending.providerAccountId),
+    ]);
+
+    if (existingUser || linkedAccount) {
+      return c.json({ success: false as const, error: "account_exists" }, 400);
+    }
+
+    await markOAuthSignupTokenUsed(pending.id);
+
+    await createOAuthUser(c, {
+      provider,
+      providerAccountId: pending.providerAccountId,
+      email: profile.email,
+      emailVerified: profile.emailVerified,
+      firstName,
+      lastName,
+      avatarUrl: profile.avatarUrl,
+      clientInfo,
+    });
 
     return c.json({ success: true as const });
   })
@@ -462,30 +616,42 @@ export const oauthRoutes = new Hono()
 
     // Flow A: unknown email → OAuth signup, honoring the registration policy.
     // SSO bypasses it: the IdP is the source of truth for who may sign in.
-    const isFirstUser = (await countUsers()) === 0;
-    const registerConfig = await getConfig("authentication.register.enable");
-
-    if (provider !== "sso" && registerConfig?.value !== "true" && !isFirstUser) {
+    if (!(await isRegistrationAllowed(provider))) {
       return appRedirect(c, "/login?oauthError=registration_disabled");
     }
 
-    const insertedUser = await provisionUser({
-      firstName: profile.firstName,
-      lastName: profile.lastName,
-      email: profile.email,
-      ...(profile.emailVerified && { verifiedAt: new Date().toISOString() }),
-    });
+    // Flow A′: the provider gave no usable name → hold the signup open and ask
+    // the visitor. Nothing is written to `users` until they answer, so an
+    // abandoned signup expires without leaving a half-built account behind.
+    if (!profile.firstName || !profile.lastName) {
+      const token = randomBytes(32).toString("base64url");
+      await createOAuthSignupToken({
+        provider,
+        providerAccountId: profile.providerAccountId,
+        token,
+        profile: {
+          email: profile.email,
+          emailVerified: profile.emailVerified,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          avatarUrl: profile.avatarUrl,
+        },
+        expiresAt: new Date(Date.now() + PENDING_SIGNUP_EXPIRATION_MS),
+      });
 
-    await createOAuthAccount({ userId: insertedUser.id, provider, providerAccountId: profile.providerAccountId, email: profile.email });
-
-    if (profile.avatarUrl) {
-      await importAvatar(insertedUser.id, profile.avatarUrl);
+      return appRedirect(c, `/complete-signup?token=${token}&redirect=${encodeURIComponent(redirectTo)}`);
     }
 
-    await issueSession(c, insertedUser.id);
-
-    await logRegister(insertedUser.id, clientInfo);
-    await logOAuthLink(insertedUser.id, provider, clientInfo);
+    await createOAuthUser(c, {
+      provider,
+      providerAccountId: profile.providerAccountId,
+      email: profile.email,
+      emailVerified: profile.emailVerified,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      avatarUrl: profile.avatarUrl,
+      clientInfo,
+    });
 
     return appRedirect(c, redirectTo);
   });

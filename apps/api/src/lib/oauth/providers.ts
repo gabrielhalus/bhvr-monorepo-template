@@ -12,13 +12,19 @@ import { getDiscoveryDocument } from "./oidc-discovery";
 export { generateCodeVerifier, generateState };
 export { OAuth2RequestError } from "arctic";
 
-/** Profile shape shared by every provider after normalization. */
+/**
+ * Profile shape shared by every provider after normalization.
+ *
+ * Names are nullable — plenty of providers expose none (an LDAP-backed realm
+ * with no name claims, a GitHub account with an empty profile). The signup
+ * flow collects them from the visitor instead of deriving a placeholder.
+ */
 export type NormalizedProfile = {
   providerAccountId: string;
   email: string;
   emailVerified: boolean;
-  firstName: string;
-  lastName: string;
+  firstName: string | null;
+  lastName: string | null;
   avatarUrl: string | null;
 };
 
@@ -35,17 +41,19 @@ function redirectUri(provider: OAuthProviderId): string {
 }
 
 /**
- * Split a display name into first/last, falling back to a login handle when
- * the provider exposes no usable name. Both parts are guaranteed non-empty —
- * the shared UserSchema rejects empty names.
+ * Split a display name into first/last.
+ *
+ * A single-word name fills the first name only: the missing half is reported
+ * as absent so the signup flow can ask for it, which beats duplicating the
+ * one word into both fields.
  */
-function splitName(name: string | null | undefined, fallback: string): { firstName: string; lastName: string } {
+function splitName(name: string | null | undefined): { firstName: string | null; lastName: string | null } {
   const parts = (name ?? "").trim().split(/\s+/).filter(Boolean);
   const [first, ...rest] = parts;
 
   return {
-    firstName: first ?? fallback,
-    lastName: rest.join(" ") || (first ?? fallback),
+    firstName: first ?? null,
+    lastName: rest.join(" ") || null,
   };
 }
 
@@ -142,7 +150,7 @@ function normalizeOIDCClaims(claims: OIDCClaims, identifierClaim: SsoIdentifierC
     // (Azure AD notably) often omit the claim entirely, so only an explicit
     // `false` marks the email as unverified.
     emailVerified: identifierClaim !== "email" || claims.email_verified !== false,
-    ...splitName(name, claims.preferred_username ?? email.split("@")[0] ?? "user"),
+    ...splitName(name),
     avatarUrl: claims.picture ?? null,
   };
 }
@@ -170,7 +178,7 @@ const PROVIDERS: Record<OAuthProviderId, OAuthProviderDef> = {
         providerAccountId: claims.sub,
         email: claims.email.toLowerCase(),
         emailVerified: claims.email_verified === true,
-        ...splitName(claims.name ?? [claims.given_name, claims.family_name].filter(Boolean).join(" "), claims.email.split("@")[0] ?? "user"),
+        ...splitName(claims.name ?? [claims.given_name, claims.family_name].filter(Boolean).join(" ")),
         avatarUrl: claims.picture ?? null,
       };
     },
@@ -212,7 +220,7 @@ const PROVIDERS: Record<OAuthProviderId, OAuthProviderDef> = {
         providerAccountId: String(user.id),
         email: primary.email.toLowerCase(),
         emailVerified: true,
-        ...splitName(user.name, user.login),
+        ...splitName(user.name),
         avatarUrl: user.avatar_url,
       };
     },
