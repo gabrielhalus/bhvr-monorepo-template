@@ -27,6 +27,7 @@ import { Route as AuthRegisterIndexRouteImport } from './routes/_auth/register/i
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as AuthLinkAccountIndexRouteImport } from './routes/_auth/link-account/index'
 import { Route as AuthForgotPasswordIndexRouteImport } from './routes/_auth/forgot-password/index'
+import { Route as AuthCompleteSignupIndexRouteImport } from './routes/_auth/complete-signup/index'
 import { Route as DashboardSettingsSplatRouteImport } from './routes/_dashboard/settings/$'
 import { Route as DashboardCronTaskIdRouteImport } from './routes/_dashboard/cron/$taskId'
 import { Route as DashboardUsersUserIdIndexRouteImport } from './routes/_dashboard/users/$userId/index'
@@ -119,6 +120,11 @@ const AuthForgotPasswordIndexRoute = AuthForgotPasswordIndexRouteImport.update({
   path: '/forgot-password/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AuthCompleteSignupIndexRoute = AuthCompleteSignupIndexRouteImport.update({
+  id: '/complete-signup/',
+  path: '/complete-signup/',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 const DashboardSettingsSplatRoute = DashboardSettingsSplatRouteImport.update({
   id: '/$',
   path: '/$',
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/users': typeof DashboardUsersRouteRouteWithChildren
   '/cron/$taskId': typeof DashboardCronTaskIdRoute
   '/settings/$': typeof DashboardSettingsSplatRoute
+  '/complete-signup/': typeof AuthCompleteSignupIndexRoute
   '/forgot-password/': typeof AuthForgotPasswordIndexRoute
   '/link-account/': typeof AuthLinkAccountIndexRoute
   '/login/': typeof AuthLoginIndexRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/settings': typeof DashboardSettingsRouteRouteWithChildren
   '/cron/$taskId': typeof DashboardCronTaskIdRoute
   '/settings/$': typeof DashboardSettingsSplatRoute
+  '/complete-signup': typeof AuthCompleteSignupIndexRoute
   '/forgot-password': typeof AuthForgotPasswordIndexRoute
   '/link-account': typeof AuthLinkAccountIndexRoute
   '/login': typeof AuthLoginIndexRoute
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/cron/$taskId': typeof DashboardCronTaskIdRoute
   '/_dashboard/settings/$': typeof DashboardSettingsSplatRoute
+  '/_auth/complete-signup/': typeof AuthCompleteSignupIndexRoute
   '/_auth/forgot-password/': typeof AuthForgotPasswordIndexRoute
   '/_auth/link-account/': typeof AuthLinkAccountIndexRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/cron/$taskId'
     | '/settings/$'
+    | '/complete-signup/'
     | '/forgot-password/'
     | '/link-account/'
     | '/login/'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/cron/$taskId'
     | '/settings/$'
+    | '/complete-signup'
     | '/forgot-password'
     | '/link-account'
     | '/login'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/_dashboard/'
     | '/_dashboard/cron/$taskId'
     | '/_dashboard/settings/$'
+    | '/_auth/complete-signup/'
     | '/_auth/forgot-password/'
     | '/_auth/link-account/'
     | '/_auth/login/'
@@ -398,6 +410,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/_auth/complete-signup/': {
+      id: '/_auth/complete-signup/'
+      path: '/complete-signup'
+      fullPath: '/complete-signup/'
+      preLoaderRoute: typeof AuthCompleteSignupIndexRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
     '/_dashboard/settings/$': {
       id: '/_dashboard/settings/$'
       path: '/$'
@@ -423,6 +442,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthRouteRouteChildren {
+  AuthCompleteSignupIndexRoute: typeof AuthCompleteSignupIndexRoute
   AuthForgotPasswordIndexRoute: typeof AuthForgotPasswordIndexRoute
   AuthLinkAccountIndexRoute: typeof AuthLinkAccountIndexRoute
   AuthLoginIndexRoute: typeof AuthLoginIndexRoute
@@ -431,6 +451,7 @@ interface AuthRouteRouteChildren {
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthCompleteSignupIndexRoute: AuthCompleteSignupIndexRoute,
   AuthForgotPasswordIndexRoute: AuthForgotPasswordIndexRoute,
   AuthLinkAccountIndexRoute: AuthLinkAccountIndexRoute,
   AuthLoginIndexRoute: AuthLoginIndexRoute,
