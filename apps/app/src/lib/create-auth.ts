@@ -1,7 +1,6 @@
 import type { Session } from "~shared/types/auth.types";
 
 import { redirect } from "@tanstack/react-router";
-import { ENV } from "varlock/env";
 
 import { authQueryOptions } from "../queries/auth";
 import { queryClient } from "./query-client";
@@ -44,21 +43,23 @@ export function createAuth({
       redirectOnAuthenticated = false,
     } = options ?? {};
 
-    const currentUrl = getCurrentUrl();
-    const origin = typeof window !== "undefined" ? window.location.origin : ENV.VITE_APP_URL;
+    // Path-only throughout: the app has no configured URL, and the API rejects
+    // an absolute `redirect` value as a potential open redirect — passing one
+    // would silently drop the destination after an OAuth round trip.
+    const { pathname, search } = new URL(getCurrentUrl());
+    const currentPath = `${pathname}${search}`;
 
     const session = await queryClient.ensureQueryData(authQueryOptions);
 
     if (session) {
-      if (redirectOnAuthenticated && currentUrl !== origin) {
-        throw redirect({ href: origin, replace: true });
+      if (redirectOnAuthenticated && pathname !== "/") {
+        throw redirect({ to: "/", replace: true });
       }
       return session;
     }
 
-    if (redirectOnUnauthenticated && currentUrl !== origin) {
-      const authUrl = `${origin}/login?redirect=${encodeURIComponent(currentUrl)}`;
-      throw redirect({ href: authUrl, replace: true });
+    if (redirectOnUnauthenticated && pathname !== "/login") {
+      throw redirect({ to: "/login", search: { redirect: currentPath }, replace: true });
     }
 
     return null;

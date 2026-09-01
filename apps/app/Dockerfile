@@ -10,7 +10,7 @@ WORKDIR /usr/src/app
 FROM base AS install
 
 # Copy only essential files for install
-COPY bun.lock package.json turbo.json .env.shared.schema ./
+COPY bun.lock package.json turbo.json ./
 COPY apps ./apps
 COPY packages ./packages
 
@@ -21,9 +21,6 @@ RUN bun install --frozen-lockfile
 # Build the app
 # -----------------------------
 FROM install AS build
-
-ARG APP_URL
-ENV APP_URL=$APP_URL
 
 # Short commit hash injected into the bundle (no .git in the build context)
 ARG BUILD_HASH
