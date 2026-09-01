@@ -457,11 +457,11 @@ apps/api/src/
 │   ├── validation.ts     # Zod validation wrapper
 │   ├── rate-limit.ts     # In-memory rate limiter
 │   ├── audit.ts          # auditList / auditRead helpers
-│   └── cors.ts           # Dynamic CORS (reads runtime_configs)
+│   └── cors.ts           # Same-origin by default; ALLOWED_ORIGINS opt-in
 └── lib/
     ├── jwt.ts            # createToken, verifyToken
     ├── auth.ts           # getSessionContext, setTokenCookies
-    └── session.ts        # Cookie settings per environment
+    └── trusted-proxy.ts  # clientIp / publicOrigin from trusted X-Forwarded-*
 ```
 
 ### Response Format
@@ -933,7 +933,7 @@ If you want to build the same system in a different stack, here is what you need
 ### What to Seed
 
 1. **Default roles**: at minimum `admin` (with all permissions) and `user` (basic read access), with `isDefault: true` on the user role
-2. **Runtime configs**: CORS allowed origins, feature flags, any env-dependent config
+2. **Runtime configs**: branding, mail/S3 credentials, OAuth clients, `app.publicOrigin`, feature flags
 3. **Policies**: ABAC rules for "can edit own profile" etc.
 4. **Demo admin user**: email + known password so the system is immediately usable
 

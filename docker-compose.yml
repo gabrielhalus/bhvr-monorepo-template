@@ -106,25 +106,30 @@ services:
       - "3000"
     environment:
       APP_ENV: ${APP_ENV:-production}
-      APP_HOST: ${APP_HOST}
-      API_URL: ${API_URL}
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       SYSTEM_RESET_PASSWORD: ${SYSTEM_RESET_PASSWORD:-false}
-      APP_URL: ${APP_URL}
+      # One proxy in front of the API: the app container's nginx.
+      TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS:-1}
+      # Both empty by default — the API derives its origin from each request, so
+      # the stack runs on any hostname with no configuration.
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
+      OAUTH_REDIRECT_BASE: ${OAUTH_REDIRECT_BASE:-}
 
   app:
     build:
       context: .
       dockerfile: apps/app/Dockerfile
       args:
-        APP_URL: ${APP_URL}
         BUILD_HASH: ${BUILD_HASH:-}
     restart: unless-stopped
     depends_on:
       - api
-    expose:
-      - "80"
+    # The only published port: nginx serves the SPA and proxies /api to the API,
+    # so the whole stack lives behind one origin — reachable on whatever host
+    # the operator points at it.
+    ports:
+      - "${PORT:-3000}:80"
 
 volumes:
   pgdata:

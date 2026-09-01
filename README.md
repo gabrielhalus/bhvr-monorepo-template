@@ -8,6 +8,32 @@
   <img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff&style=for-the-badge" alt="Docker Badge">
 </p>
 
+## Deployment
+
+The stack needs **no URL configuration**. It discovers the origin it is served
+from at runtime, so the same image runs behind `localhost`, a LAN IP, a `.local`
+hostname or a real domain:
+
+```bash
+docker compose up
+# → http://<any-host>:3000
+```
+
+Change the host port with `PORT`, and set a real `POSTGRES_PASSWORD` before
+exposing the stack. Everything else — branding, mail, S3, OAuth credentials — is
+configured from the Settings screen and stored in the database.
+
+Behind an extra reverse proxy (Caddy, Traefik, nginx), forward the standard
+`X-Forwarded-*` headers and set `TRUSTED_PROXY_HOPS=2`:
+
+```caddyfile
+example.com {
+    reverse_proxy localhost:3000
+}
+```
+
+> Full reference: [Environment variables](docs/env.md).
+
 ## Development
 
 ### 1. Clone the repository
@@ -17,120 +43,60 @@ git clone https://github.com/gabrielhalus/bunstack.git --depth=1
 cd bunstack
 ```
 
-### 2. Install Dependencies
+### 2. Install dependencies
 
 ```bash
 bun install
 ```
 
-### 3. Create `.env` Files
+### 3. Start the infrastructure
 
-Each app/package has its own `.env.example` file. Copy it to `.env.local` (ignored by Git) and customize values as needed.
-
-```bash
-# Backend
-cp apps/api/.env.example apps/api/.env.local
-
-# Web frontend
-cp apps/web/.env.example apps/web/.env.local
-```
-
-> For a complete list of all environment variables, their purpose, default values, and which apps use them, check the [Environment Variables Documentation](docs/env.md).
-
-### 4. Generate SQLite Database
+Postgres, Redis and MinIO run in Docker; the apps run on the host.
 
 ```bash
-bun run drizzle:push
+docker compose -f docker-compose.dev.yml up -d
 ```
 
-> This will create the SQLite database with the required schema.
+### 4. Set up the database
 
-### 5. Start the Dev Servers
+```bash
+bun run drizzle:migrate
+bun run bootstrap
+```
 
-Run all apps concurently:
+`bootstrap` seeds the runtime configuration and prints the credentials of the
+initial system account — store them, they are shown once.
+
+### 5. Configure the environment (optional)
+
+Defaults in `apps/api/.env.schema` and `apps/app/.env.schema` match the compose
+file above, so no `.env` is required. To override a value, create an `.env` next
+to the schema:
+
+```bash
+# apps/api/.env
+REDIS_URL=redis://localhost:6379
+```
+
+> See [Environment variables](docs/env.md) for the full list.
+
+### 6. Start the dev servers
 
 ```bash
 bun run dev
 ```
 
-Or start individually:
+The Vite dev server proxies `/api` to the API on port 3000, so the browser talks
+to a single origin — the same shape as production.
+
+Or start them individually:
 
 ```bash
-# API
-cd apps/api
-bun run dev
+# API — http://localhost:3000
+cd apps/api && bun run dev
 
-# Dashboard (includes auth routes)
-cd apps/web
-bun run dev
-```
-
-### 6. Local Reverse Proxy with Caddy (HTTPS Subdomains)
-
-To test production-like cookie behavior (cross-subdomain cookies with SameSite=None), we serve apps via HTTPS subdomains using `Caddyfile.dev`.
-
-#### 1. Install Caddy
-
-##### macOS (Homebrew):
-
-```bash
-brew install caddy
-```
-
-##### Linux (Debian/Ubuntu)
-
-```bash
-sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo apt-key add -
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
-sudo apt update
-sudo apt install caddy
-```
-
-#### 2. Configure `/etc/hosts` (Linux/macOS)
-
-Add these lines to map custom local domains to `127.0.0.1`:
-
-```text
-127.0.0.1 localhost.dev api.localhost
-```
-
-- On Linux: `sudo vim /etc/hosts`
-- On macOS: `sudo vim /etc/hosts`
-
-#### 3. Run Caddy
-
-```bash
-PROJECT_ROOT=$(pwd) caddy run --config Caddyfile.dev
-```
-
-- Your apps are now available at:
-   - https://localhost.dev → dashboard (includes auth routes: /, /register, /verify)
-   - https://api.localhost.dev → API
-
-> Optional: You can also use caddy stop and caddy start to manage it in the background.
-
-#### 4. Trust the Caddy Root Certificate
-
-Caddy generates a local CA for HTTPS. Add it to your system trust store to avoid browser warnings:
-
-##### macOS:
-
-- Open `~/Library/Application Support/Caddy/pki/authorities/local/root.crt`
-- Add to Keychain → Always Trust
-
-##### Windows:
-
-- Open `%AppData%\Caddy\pki/authorities/local/root.crt`
-- Install → Local Machine → Trusted Root Certification Authorities
-
-Once trusted, cross-subdomain cookies will work correctly in dev.
-
-##### Linux (Ubuntu/Debian):
-
-```bash
-sudo cp $HOME/.local/share/caddy/pki/authorities/local/root.crt /usr/local/share/ca-certificates/caddy-root.crt
-sudo update-ca-certificates
+# Dashboard — http://localhost:5173
+cd apps/app && bun run dev
 ```
 
 ## Linting (ESLint)
