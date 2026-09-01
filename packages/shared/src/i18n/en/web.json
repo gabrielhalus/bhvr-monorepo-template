@@ -497,7 +497,7 @@
             "label": "Identifier claim"
           },
           "issuerUrl": {
-            "description": "Base URL of the OpenID Connect issuer, without the /.well-known/openid-configuration suffix. Register {API_URL}/auth/oauth/sso/callback as the redirect URI on the provider side.",
+            "description": "Base URL of the OpenID Connect issuer, without the /.well-known/openid-configuration suffix. Register the redirect URI shown by the API (GET /api/auth/oauth/redirect-uris) on the provider side.",
             "label": "Issuer URL"
           },
           "label": "SSO (OpenID Connect)",
@@ -644,6 +644,13 @@
         "fromName": {
           "label": "Sender name",
           "description": "Display name shown as the sender of transactional emails."
+        }
+      },
+      "app": {
+        "label": "Application",
+        "publicOrigin": {
+          "label": "Public URL",
+          "description": "Absolute URL users reach this instance at, e.g. https://example.com. Leave empty to derive it from each request — set it to pin the links sent by email (password reset) to a known host."
         }
       }
     },

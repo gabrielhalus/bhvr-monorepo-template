@@ -497,7 +497,7 @@
             "label": "Claim identifiant"
           },
           "issuerUrl": {
-            "description": "URL de base de l'émetteur OpenID Connect, sans le suffixe /.well-known/openid-configuration. Déclarez {API_URL}/auth/oauth/sso/callback comme redirect URI côté fournisseur.",
+            "description": "URL de base de l'émetteur OpenID Connect, sans le suffixe /.well-known/openid-configuration. Déclarez côté fournisseur le redirect URI indiqué par l'API (GET /api/auth/oauth/redirect-uris).",
             "label": "URL de l'émetteur"
           },
           "label": "SSO (OpenID Connect)",
@@ -644,6 +644,13 @@
         "fromName": {
           "label": "Nom d’expéditeur",
           "description": "Nom affiché comme expéditeur des emails transactionnels."
+        }
+      },
+      "app": {
+        "label": "Application",
+        "publicOrigin": {
+          "label": "URL publique",
+          "description": "URL absolue par laquelle les utilisateurs accèdent à cette instance, ex. https://example.com. Laisser vide pour la déduire de chaque requête — la renseigner fige les liens envoyés par e-mail (réinitialisation de mot de passe) sur un hôte connu."
         }
       }
     },
