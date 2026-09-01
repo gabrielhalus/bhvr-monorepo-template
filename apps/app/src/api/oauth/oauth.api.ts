@@ -80,9 +80,11 @@ export async function unlinkAccount(provider: OAuthProviderId) {
  * fetch — use `window.location.assign(oauthStartUrl(...))`.
  */
 export function oauthStartUrl(provider: OAuthProviderId, opts?: { redirect?: string; linkToken?: string }) {
+  // SAML has no authorization-code exchange and lives under its own prefix.
+  const path = provider === "saml" ? "/auth/saml/login" : `/auth/oauth/${provider}`;
   // VITE_API_URL is a relative path in dev (Vite proxy) — resolve it against
   // the page origin; an absolute URL ignores the base.
-  const url = new URL(`${ENV.VITE_API_URL}/auth/oauth/${provider}`, window.location.origin);
+  const url = new URL(`${ENV.VITE_API_URL}${path}`, window.location.origin);
 
   if (opts?.redirect) {
     url.searchParams.set("redirect", opts.redirect);
