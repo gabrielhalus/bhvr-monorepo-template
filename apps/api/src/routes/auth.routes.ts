@@ -2,7 +2,6 @@ import { password } from "bun";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 import { randomBytes } from "node:crypto";
-import { ENV } from "varlock/env";
 
 import { getClientInfo } from "@/helpers/get-client-info";
 import { issueSession } from "@/helpers/issue-session";
@@ -10,6 +9,7 @@ import { wrapEmailHtml } from "@/lib/email-template";
 import { fetchImageFromUrl, ImageFetchError } from "@/lib/fetch-image-url";
 import { createAccessToken, getCookieSettings, verifyToken } from "@/lib/jwt";
 import { contentTypeFromKey, deleteObject, getObject, imageExtFromContentType, objectKeys, putObject } from "@/lib/s3/storage";
+import { publicOrigin } from "@/lib/trusted-proxy";
 import { getSessionContext } from "@/middlewares/auth";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { validationMiddleware } from "@/middlewares/validation";
@@ -174,8 +174,8 @@ export const authRoutes = new Hono()
       }
     }
 
-    setCookie(c, "accessToken", "", getCookieSettings("clear"));
-    setCookie(c, "refreshToken", "", getCookieSettings("clear"));
+    setCookie(c, "accessToken", "", getCookieSettings(c, "clear"));
+    setCookie(c, "refreshToken", "", getCookieSettings(c, "clear"));
 
     // Audit log: logout (if we could identify the user)
     if (userId) {
@@ -206,7 +206,14 @@ export const authRoutes = new Hono()
       const expiresAt = new Date(Date.now() + PASSWORD_RESET_EXPIRATION_MS);
       await createPasswordResetToken(user.id, token, expiresAt);
 
-      const resetUrl = `${ENV.APP_URL.replace(/\/$/, "")}/reset-password?token=${token}`;
+      // A mail is read outside any HTTP context, so this link has to be
+      // absolute. Prefer the operator-pinned origin: falling back to the
+      // request's own origin keeps a fresh install working on any hostname,
+      // but a pinned value is what stops a forged Host header from pointing
+      // the reset link at an attacker's domain.
+      const configuredOrigin = (await getConfig("app.publicOrigin"))?.value;
+      const origin = configuredOrigin?.trim() || publicOrigin(c);
+      const resetUrl = `${origin.replace(/\/$/, "")}/reset-password?token=${token}`;
 
       const businessName = (await getConfig("branding.appName"))?.value ?? undefined;
       const subject = "Réinitialisation de votre mot de passe";
@@ -541,7 +548,7 @@ export const authRoutes = new Hono()
     }
 
     const accessToken = await createAccessToken(targetUserId, sessionContext.user.id);
-    setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
+    setCookie(c, "accessToken", accessToken, getCookieSettings(c, "access"));
 
     const clientInfo = getClientInfo(c);
     await logImpersonationStart(sessionContext.user.id, targetUserId, clientInfo);
@@ -565,7 +572,7 @@ export const authRoutes = new Hono()
     }
 
     const accessToken = await createAccessToken(sessionContext.impersonator.id);
-    setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
+    setCookie(c, "accessToken", accessToken, getCookieSettings(c, "access"));
 
     const clientInfo = getClientInfo(c);
     await logImpersonationStop(sessionContext.impersonator.id, sessionContext.user.id, clientInfo);
@@ -637,8 +644,8 @@ export const authRoutes = new Hono()
         try {
           const payload = await verifyToken(refreshToken, "refresh");
           if (payload?.jti === tokenId) {
-            setCookie(c, "accessToken", "", getCookieSettings("clear"));
-            setCookie(c, "refreshToken", "", getCookieSettings("clear"));
+            setCookie(c, "accessToken", "", getCookieSettings(c, "clear"));
+            setCookie(c, "refreshToken", "", getCookieSettings(c, "clear"));
           }
         } catch {
           // ignore
@@ -686,8 +693,8 @@ export const authRoutes = new Hono()
         await revokeAllTokensByUserIdExcept(sessionContext.user.id, currentTokenId);
       } else {
         await revokeAllTokensByUserId(sessionContext.user.id);
-        setCookie(c, "accessToken", "", getCookieSettings("clear"));
-        setCookie(c, "refreshToken", "", getCookieSettings("clear"));
+        setCookie(c, "accessToken", "", getCookieSettings(c, "clear"));
+        setCookie(c, "refreshToken", "", getCookieSettings(c, "clear"));
       }
 
       await logSessionRevokeAll(sessionContext.user.id, {

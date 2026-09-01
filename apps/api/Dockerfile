@@ -10,7 +10,7 @@ WORKDIR /usr/src/app
 FROM base AS install
 
 # Copy only essential files for install
-COPY bun.lock package.json turbo.json .env.shared.schema ./
+COPY bun.lock package.json turbo.json ./
 COPY apps ./apps
 COPY packages ./packages
 
@@ -40,7 +40,7 @@ RUN apt-get update \
 COPY --from=install /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/apps ./apps
 COPY --from=build /usr/src/app/packages ./packages
-COPY package.json bun.lock turbo.json .env.shared.schema ./
+COPY package.json bun.lock turbo.json ./
 
 EXPOSE 3000/tcp
 ENTRYPOINT ["bun", "run", "apps/api/src/index.ts"]

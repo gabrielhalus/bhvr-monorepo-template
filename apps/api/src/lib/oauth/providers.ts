@@ -1,9 +1,11 @@
 import type { OAuthProviderId } from "~shared/types/db/oauth-accounts.types";
 import type { OAuth2Tokens } from "arctic";
+import type { Context } from "hono";
 
 import { CodeChallengeMethod, decodeIdToken, generateCodeVerifier, generateState, GitHub, Google, OAuth2Client } from "arctic";
 import { ENV } from "varlock/env";
 
+import { publicOrigin } from "@/lib/trusted-proxy";
 import { getConfig } from "~shared/queries/configs.queries";
 import { OAUTH_PROVIDER_IDS } from "~shared/schemas/api/oauth.schemas";
 
@@ -25,13 +27,35 @@ export type NormalizedProfile = {
 type OAuthProviderDef = {
   id: OAuthProviderId;
   usesPKCE: boolean;
-  createAuthorizationURL: (clientId: string, clientSecret: string, state: string, codeVerifier: string | null) => URL | Promise<URL>;
-  validateCode: (clientId: string, clientSecret: string, code: string, codeVerifier: string | null) => Promise<OAuth2Tokens>;
+  createAuthorizationURL: (redirectUri: string, clientId: string, clientSecret: string, state: string, codeVerifier: string | null) => URL | Promise<URL>;
+  validateCode: (redirectUri: string, clientId: string, clientSecret: string, code: string, codeVerifier: string | null) => Promise<OAuth2Tokens>;
   fetchProfile: (tokens: OAuth2Tokens) => Promise<NormalizedProfile>;
 };
 
-function redirectUri(provider: OAuthProviderId): string {
-  return `${ENV.API_URL}/auth/oauth/${provider}/callback`;
+/**
+ * The callback URL handed to the provider.
+ *
+ * Derived from the origin the browser actually used, so a self-hosted instance
+ * works on any hostname without configuration. Providers require the value to
+ * match what was registered in their console *exactly*, and to be identical
+ * between the authorization request and the code exchange — a spoofed `Host`
+ * therefore produces a rejected authorization, not a redirect to an attacker.
+ *
+ * `OAUTH_REDIRECT_BASE` overrides it for deployments where the browser-facing
+ * origin differs from the registered one (edge rewrite, vanity domain, or the
+ * app mounted under a sub-path).
+ *
+ * The `/api` segment is the prefix the proxy strips before reaching this
+ * service: the browser sees `https://host/api/auth/oauth/x/callback` while the
+ * route is mounted at `/auth/oauth/x/callback`.
+ *
+ * @param c - The Hono context object
+ * @param provider - The provider the callback belongs to
+ * @returns The absolute redirect URI
+ */
+export function oauthRedirectUri(c: Context, provider: OAuthProviderId): string {
+  const base = ENV.OAUTH_REDIRECT_BASE?.replace(/\/$/, "") ?? `${publicOrigin(c)}/api`;
+  return `${base}/auth/oauth/${provider}/callback`;
 }
 
 /**
@@ -151,12 +175,12 @@ const PROVIDERS: Record<OAuthProviderId, OAuthProviderDef> = {
   google: {
     id: "google",
     usesPKCE: true,
-    createAuthorizationURL: (clientId, clientSecret, state, codeVerifier) => {
-      const client = new Google(clientId, clientSecret, redirectUri("google"));
+    createAuthorizationURL: (redirectUri, clientId, clientSecret, state, codeVerifier) => {
+      const client = new Google(clientId, clientSecret, redirectUri);
       return client.createAuthorizationURL(state, codeVerifier ?? "", ["openid", "profile", "email"]);
     },
-    validateCode: (clientId, clientSecret, code, codeVerifier) => {
-      const client = new Google(clientId, clientSecret, redirectUri("google"));
+    validateCode: (redirectUri, clientId, clientSecret, code, codeVerifier) => {
+      const client = new Google(clientId, clientSecret, redirectUri);
       return client.validateAuthorizationCode(code, codeVerifier ?? "");
     },
     fetchProfile: async (tokens) => {
@@ -178,12 +202,12 @@ const PROVIDERS: Record<OAuthProviderId, OAuthProviderDef> = {
   github: {
     id: "github",
     usesPKCE: false,
-    createAuthorizationURL: (clientId, clientSecret, state) => {
-      const client = new GitHub(clientId, clientSecret, redirectUri("github"));
+    createAuthorizationURL: (redirectUri, clientId, clientSecret, state) => {
+      const client = new GitHub(clientId, clientSecret, redirectUri);
       return client.createAuthorizationURL(state, ["user:email"]);
     },
-    validateCode: (clientId, clientSecret, code) => {
-      const client = new GitHub(clientId, clientSecret, redirectUri("github"));
+    validateCode: (redirectUri, clientId, clientSecret, code) => {
+      const client = new GitHub(clientId, clientSecret, redirectUri);
       return client.validateAuthorizationCode(code);
     },
     fetchProfile: async (tokens) => {
@@ -220,16 +244,16 @@ const PROVIDERS: Record<OAuthProviderId, OAuthProviderDef> = {
   sso: {
     id: "sso",
     usesPKCE: true,
-    createAuthorizationURL: async (clientId, clientSecret, state, codeVerifier) => {
+    createAuthorizationURL: async (redirectUri, clientId, clientSecret, state, codeVerifier) => {
       const { issuerUrl, scopes } = await getSsoSettings();
       const doc = await getDiscoveryDocument(issuerUrl);
-      const client = new OAuth2Client(clientId, clientSecret, redirectUri("sso"));
+      const client = new OAuth2Client(clientId, clientSecret, redirectUri);
       return client.createAuthorizationURLWithPKCE(doc.authorization_endpoint, state, CodeChallengeMethod.S256, codeVerifier ?? "", scopes);
     },
-    validateCode: async (clientId, clientSecret, code, codeVerifier) => {
+    validateCode: async (redirectUri, clientId, clientSecret, code, codeVerifier) => {
       const { issuerUrl } = await getSsoSettings();
       const doc = await getDiscoveryDocument(issuerUrl);
-      const client = new OAuth2Client(clientId, clientSecret, redirectUri("sso"));
+      const client = new OAuth2Client(clientId, clientSecret, redirectUri);
       return client.validateAuthorizationCode(doc.token_endpoint, code, codeVerifier ?? "");
     },
     fetchProfile: async (tokens) => {

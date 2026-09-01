@@ -1,10 +1,10 @@
 import type { Context } from "hono";
 
-export function getClientInfo(c: Context) {
-  const raw = c.req.raw;
-  const forwardedFor = raw.headers.get("x-forwarded-for");
-  const ip = forwardedFor?.split(",")[0]?.trim() ?? "::1";
-  const userAgent = raw.headers.get("user-agent") ?? "";
+import { clientIp } from "@/lib/trusted-proxy";
 
-  return { ip, userAgent };
+export function getClientInfo(c: Context) {
+  return {
+    ip: clientIp(c),
+    userAgent: c.req.header("user-agent") ?? "",
+  };
 }

@@ -113,11 +113,27 @@ describe("rateLimiter", () => {
       expect(res2.status).toBe(200);
     });
 
-    it("uses x-real-ip when x-forwarded-for is absent", async () => {
+    // A caller that rotates the leftmost X-Forwarded-For entry on every request
+    // used to get a fresh counter each time, i.e. no rate limit at all. Only the
+    // entry the trusted proxy appended counts, so the limit still bites.
+    it("cannot be bypassed by rotating a forged x-forwarded-for prefix", async () => {
+      const app = buildApp({ limit: 2, windowMs: 60_000 });
+
+      await hit(app, { "x-forwarded-for": "1.1.1.1, 10.0.0.9" });
+      await hit(app, { "x-forwarded-for": "2.2.2.2, 10.0.0.9" });
+      const blocked = await hit(app, { "x-forwarded-for": "3.3.3.3, 10.0.0.9" });
+
+      expect(blocked.status).toBe(429);
+    });
+
+    // x-real-ip is deliberately not consulted: a client can set it just as
+    // freely, and the X-Forwarded-For chain already carries the trusted value.
+    it("ignores x-real-ip", async () => {
       const app = buildApp({ limit: 1, windowMs: 60_000 });
-      const ip = "11.0.0.1";
-      await hit(app, { "x-real-ip": ip });
-      const blocked = await hit(app, { "x-real-ip": ip });
+
+      await hit(app, { "x-real-ip": "11.0.0.1" });
+      const blocked = await hit(app, { "x-real-ip": "11.0.0.2" });
+
       expect(blocked.status).toBe(429);
     });
 

@@ -1,9 +1,10 @@
 import type { CookieType } from "./types";
 import type { JwtPayload } from "~shared/types/db/tokens.types";
+import type { Context } from "hono";
 
 import { sign, verify } from "hono/jwt";
-import { ENV } from "varlock/env";
 
+import { isSecureRequest } from "@/lib/trusted-proxy";
 import { getConfig } from "~shared/queries/configs.queries";
 
 export async function getJwtSecret(): Promise<string> {
@@ -88,26 +89,31 @@ export async function verifyToken<T extends JwtPayload["ttyp"]>(token: string, t
 
 /**
  * Get the settings for a cookie.
+ *
+ * The SPA and this API are served from a single origin (the proxy routes
+ * `/api` here), so the cookie is deliberately **host-only**: no `Domain`
+ * attribute. A `Domain` only makes sense to share a cookie across subdomains,
+ * and browsers reject one built from a bare IP or a single-label host —
+ * setting it broke sign-in on `http://192.168.x.x` and `http://localhost`.
+ *
+ * `SameSite=Lax` is enough here and blocks the cross-site POSTs that
+ * `SameSite=None` used to allow. The OAuth callback still works: it is a
+ * top-level GET navigation, which Lax cookies accompany.
+ *
+ * `Secure` follows the scheme the browser actually used, so a plain-HTTP LAN
+ * deployment works while an HTTPS one keeps the flag.
+ *
+ * @param c - The Hono context object
  * @param type - The type of cookie to get the settings for.
  * @returns The settings for the cookie.
  * @throws An error if the cookie type is invalid.
  */
-export function getCookieSettings(type: CookieType) {
-  const isProd = ENV.APP_ENV === "production";
-
-  const primaryHost = (ENV.APP_HOST.split(",")[0] ?? ENV.APP_HOST).trim();
-  const isSubdomainDev = !isProd && primaryHost?.endsWith(".localhost.dev");
-
+export function getCookieSettings(c: Context, type: CookieType) {
   const base = {
     httpOnly: true,
     path: "/",
-    domain: isProd
-      ? `.${primaryHost}` // prod: example.com → .example.com
-      : isSubdomainDev
-        ? `.${primaryHost}` // dev subdomains → .localhost.dev
-        : undefined, // real dev with ports → no domain, host-only
-    secure: isProd || isSubdomainDev, // must be true for SameSite=None
-    sameSite: isProd || isSubdomainDev ? "none" as const : "lax" as const,
+    secure: isSecureRequest(c),
+    sameSite: "lax" as const,
   };
 
   switch (type) {

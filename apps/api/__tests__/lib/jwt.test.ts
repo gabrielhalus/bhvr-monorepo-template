@@ -3,9 +3,7 @@ import { beforeEach, describe, expect, it, mock } from "bun:test";
 // Mutable ENV object — functions read it at call time, so mutations take effect.
 const mockEnv = {
   APP_ENV: "development" as "development" | "production",
-  APP_HOST: "localhost" as string | undefined,
   APP_PORT: 3000,
-  APP_URL: "http://localhost:3001",
   DATABASE_URL: "postgresql://test@localhost/test",
 };
 
@@ -177,105 +175,102 @@ describe("verifyToken", () => {
 });
 
 describe("getCookieSettings", () => {
-  beforeEach(() => {
-    mockEnv.APP_ENV = "development";
-    mockEnv.APP_HOST = "localhost";
+  /** A context standing in for a request that reached the given origin. */
+  function ctx(url: string, headers: Record<string, string> = {}): any {
+    return {
+      req: {
+        url,
+        header: (name: string) => headers[name.toLowerCase()],
+      },
+    };
+  }
+
+  const httpCtx = () => ctx("http://localhost:3000/auth/login");
+  const httpsCtx = () => ctx("https://example.com/auth/login", {
+    "x-forwarded-proto": "https",
+    "x-forwarded-host": "example.com",
   });
 
   describe("access token cookie", () => {
     it("returns maxAge equal to ACCESS_TOKEN_EXPIRATION_SECONDS", () => {
-      const settings = getCookieSettings("access");
-      expect(settings.maxAge).toBe(ACCESS_TOKEN_EXPIRATION_SECONDS);
+      expect(getCookieSettings(httpCtx(), "access").maxAge).toBe(ACCESS_TOKEN_EXPIRATION_SECONDS);
     });
 
     it("always sets httpOnly to true", () => {
-      expect(getCookieSettings("access").httpOnly).toBe(true);
+      expect(getCookieSettings(httpCtx(), "access").httpOnly).toBe(true);
     });
 
     it("always sets path to '/'", () => {
-      expect(getCookieSettings("access").path).toBe("/");
+      expect(getCookieSettings(httpCtx(), "access").path).toBe("/");
     });
   });
 
   describe("refresh token cookie", () => {
     it("returns maxAge equal to REFRESH_TOKEN_EXPIRATION_SECONDS", () => {
-      const settings = getCookieSettings("refresh");
-      expect(settings.maxAge).toBe(REFRESH_TOKEN_EXPIRATION_SECONDS);
+      expect(getCookieSettings(httpCtx(), "refresh").maxAge).toBe(REFRESH_TOKEN_EXPIRATION_SECONDS);
     });
   });
 
   describe("clear cookie", () => {
     it("returns maxAge of 0", () => {
-      const settings = getCookieSettings("clear");
-      expect(settings.maxAge).toBe(0);
+      expect(getCookieSettings(httpCtx(), "clear").maxAge).toBe(0);
     });
 
     it("sets expires to epoch zero", () => {
-      const settings = getCookieSettings("clear");
-      expect((settings as any).expires).toEqual(new Date(0));
+      expect((getCookieSettings(httpCtx(), "clear") as any).expires).toEqual(new Date(0));
     });
   });
 
   describe("invalid cookie type", () => {
     it("throws for an unknown cookie type", () => {
-      expect(() => getCookieSettings("invalid" as any)).toThrow("Invalid cookie type: invalid");
+      expect(() => getCookieSettings(httpCtx(), "invalid" as any)).toThrow("Invalid cookie type: invalid");
     });
   });
 
-  describe("production environment", () => {
-    beforeEach(() => {
-      mockEnv.APP_ENV = "production";
-      mockEnv.APP_HOST = "example.com";
+  // The cookie must never carry a Domain: browsers reject one built from a bare
+  // IP or a single-label host, which used to break sign-in on a LAN address.
+  describe("host-only cookie", () => {
+    const hosts = [
+      "http://localhost:3000/",
+      "http://192.168.1.50:3000/",
+      "http://myapp.local/",
+      "https://example.com/",
+    ];
+
+    for (const url of hosts) {
+      it(`sets no domain for ${url}`, () => {
+        expect((getCookieSettings(ctx(url), "access") as any).domain).toBeUndefined();
+      });
+    }
+  });
+
+  // SameSite=Lax still accompanies the OAuth callback (a top-level GET) while
+  // blocking the cross-site POSTs that SameSite=None used to allow.
+  describe("sameSite", () => {
+    it("is lax over plain HTTP", () => {
+      expect(getCookieSettings(httpCtx(), "access").sameSite).toBe("lax");
     });
 
-    it("sets secure to true", () => {
-      expect(getCookieSettings("access").secure).toBe(true);
-    });
-
-    it("sets sameSite to 'none'", () => {
-      expect(getCookieSettings("access").sameSite).toBe("none");
-    });
-
-    it("sets domain with leading dot", () => {
-      expect(getCookieSettings("access").domain).toBe(".example.com");
+    it("is lax over HTTPS", () => {
+      expect(getCookieSettings(httpsCtx(), "access").sameSite).toBe("lax");
     });
   });
 
-  describe("development environment with normal host", () => {
-    beforeEach(() => {
-      mockEnv.APP_ENV = "development";
-      mockEnv.APP_HOST = "localhost";
+  describe("secure flag", () => {
+    it("is false over plain HTTP so a LAN deployment can sign in", () => {
+      expect(getCookieSettings(httpCtx(), "access").secure).toBe(false);
     });
 
-    it("sets secure to false", () => {
-      expect(getCookieSettings("access").secure).toBe(false);
+    it("is false for a plain-HTTP IP address", () => {
+      expect(getCookieSettings(ctx("http://192.168.1.50:3000/"), "access").secure).toBe(false);
     });
 
-    it("sets sameSite to 'lax'", () => {
-      expect(getCookieSettings("access").sameSite).toBe("lax");
+    it("is true when the browser reached the proxy over HTTPS", () => {
+      expect(getCookieSettings(httpsCtx(), "access").secure).toBe(true);
     });
 
-    it("sets domain to undefined (host-only cookie)", () => {
-      expect(getCookieSettings("access").domain).toBeUndefined();
-    });
-  });
-
-  describe("development environment with subdomain host", () => {
-    beforeEach(() => {
-      mockEnv.APP_ENV = "development";
-      mockEnv.APP_HOST = "api.localhost.dev";
-    });
-
-    it("sets secure to true for subdomain dev", () => {
-      expect(getCookieSettings("access").secure).toBe(true);
-    });
-
-    it("sets sameSite to 'none' for subdomain dev", () => {
-      expect(getCookieSettings("access").sameSite).toBe("none");
-    });
-
-    it("sets domain with leading dot for subdomain dev", () => {
-      expect(getCookieSettings("access").domain).toBe(".api.localhost.dev");
+    it("is true when only the request URL is HTTPS", () => {
+      expect(getCookieSettings(ctx("https://example.com/"), "access").secure).toBe(true);
     });
   });
 });

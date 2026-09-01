@@ -2,6 +2,7 @@ import type { Context, Next } from "hono";
 import type { Redis } from "ioredis";
 
 import { getRedis } from "@/lib/redis";
+import { clientIp } from "@/lib/trusted-proxy";
 
 type HitResult = { count: number; resetAt: number };
 
@@ -131,23 +132,14 @@ export function rateLimiter(options: RateLimitOptions) {
 }
 
 /**
- * Default key generator using IP address
+ * Default key generator using IP address.
+ *
+ * Goes through `clientIp`, which only trusts the `X-Forwarded-For` entries our
+ * own proxies appended. Reading the leftmost entry instead would let a caller
+ * rotate the header on every request and never hit a limit.
  */
 function defaultKeyGenerator(c: Context): string {
-  // Try various headers for IP address (handles proxies)
-  const forwarded = c.req.header("x-forwarded-for");
-  if (forwarded) {
-    const firstIp = forwarded.split(",")[0];
-    return firstIp?.trim() ?? "unknown";
-  }
-
-  const realIp = c.req.header("x-real-ip");
-  if (realIp) {
-    return realIp;
-  }
-
-  // Fallback to a default key if no IP available
-  return "unknown";
+  return clientIp(c);
 }
 
 /**

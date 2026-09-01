@@ -83,16 +83,16 @@ export const getSessionContext = factory.createMiddleware(async (c, next) => {
   }
 
   if (!decoded) {
-    setCookie(c, "accessToken", "", getCookieSettings("clear"));
-    setCookie(c, "refreshToken", "", getCookieSettings("clear"));
+    setCookie(c, "accessToken", "", getCookieSettings(c, "clear"));
+    setCookie(c, "refreshToken", "", getCookieSettings(c, "clear"));
     return c.json({ error: "Unauthorized" }, 401);
   }
 
   const user = await getUser(decoded.sub, ["roles"]);
 
   if (!user) {
-    setCookie(c, "accessToken", "", getCookieSettings("clear"));
-    setCookie(c, "refreshToken", "", getCookieSettings("clear"));
+    setCookie(c, "accessToken", "", getCookieSettings(c, "clear"));
+    setCookie(c, "refreshToken", "", getCookieSettings(c, "clear"));
     return c.json({ error: "Unauthorized" }, 401);
   }
 
@@ -161,7 +161,7 @@ async function attemptTokenRefresh(c: AppContext): Promise<AccessToken | null> {
     }
 
     const newAccessToken = await createAccessToken(decoded.sub);
-    setCookie(c, "accessToken", newAccessToken, getCookieSettings("access"));
+    setCookie(c, "accessToken", newAccessToken, getCookieSettings(c, "access"));
 
     const newVerified = await verify(newAccessToken, await getJwtSecret());
     const newDecoded = AccessTokenSchema.parse(newVerified);

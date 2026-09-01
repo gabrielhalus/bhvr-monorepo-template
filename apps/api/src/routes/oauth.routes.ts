@@ -6,14 +6,15 @@ import { password } from "bun";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 import { randomBytes } from "node:crypto";
-import { ENV } from "varlock/env";
 
 import { getClientInfo } from "@/helpers/get-client-info";
 import { issueSession } from "@/helpers/issue-session";
 import { fetchImageFromUrl } from "@/lib/fetch-image-url";
 import { getCookieSettings, verifyToken } from "@/lib/jwt";
-import { generateCodeVerifier, generateState, getConfiguredProvider, getProvidersPayload, OAuthProfileError } from "@/lib/oauth/providers";
+import { generateCodeVerifier, generateState, getConfiguredProvider, getProvidersPayload, OAuthProfileError, oauthRedirectUri } from "@/lib/oauth/providers";
 import { objectKeys, putObject } from "@/lib/s3/storage";
+import { sanitizeRedirect } from "@/lib/safe-redirect";
+import { requirePermissionFactory } from "@/middlewares/access-control";
 import { getSessionContext } from "@/middlewares/auth";
 import { rateLimiter, rateLimitPresets } from "@/middlewares/rate-limit";
 import { validationMiddleware } from "@/middlewares/validation";
@@ -24,7 +25,7 @@ import { countOAuthAccountsByUserId, createOAuthAccount, deleteOAuthAccount, get
 import { createOAuthLinkToken, getValidOAuthLinkToken, markOAuthLinkTokenUsed } from "~shared/queries/oauth-link-tokens.queries";
 import { getToken } from "~shared/queries/tokens.queries";
 import { countUsers, getUser, getUserByEmail, updateUser } from "~shared/queries/users.queries";
-import { CompletePendingLinkSchema, OAuthProfileSchema, OAuthProviderParamSchema, OAuthStartQuerySchema, PendingLinkQuerySchema } from "~shared/schemas/api/oauth.schemas";
+import { CompletePendingLinkSchema, OAUTH_PROVIDER_IDS, OAuthProfileSchema, OAuthProviderParamSchema, OAuthStartQuerySchema, PendingLinkQuerySchema } from "~shared/schemas/api/oauth.schemas";
 
 const OAUTH_FLOW_COOKIE = "oauthFlow";
 const PENDING_LINK_EXPIRATION_MS = 10 * 60 * 1000; // 10 minutes
@@ -40,16 +41,14 @@ type OAuthFlow = {
 };
 
 /**
- * Accept only same-origin absolute paths so provider callbacks can never be
- * turned into an open redirect.
+ * Redirect to a path on the frontend.
+ *
+ * The SPA and this API share an origin (the proxy routes `/api` here), so a
+ * relative `Location` resolves against whatever public origin the browser
+ * actually used — no configured app URL needed.
  */
-function sanitizeRedirect(raw: string | undefined): string {
-  return raw && /^\/(?!\/)/.test(raw) ? raw : "/";
-}
-
-/** Redirect to a path on the frontend origin. */
 function appRedirect(c: Context, path: string) {
-  return c.redirect(`${ENV.APP_URL}${path}`);
+  return c.redirect(path);
 }
 
 /** Mask an email for display during the link challenge (g•••@example.com). */
@@ -112,6 +111,26 @@ export const oauthRoutes = new Hono()
   .get("/providers", async (c) => {
     const { providers, autoLogin } = await getProvidersPayload();
     return c.json({ success: true as const, providers, autoLogin });
+  })
+
+  /**
+   * Report the callback URL to register with each provider
+   *
+   * The redirect URI is derived from the request instead of being configured,
+   * so the operator needs a way to read back the exact value to paste into the
+   * provider console.
+   *
+   * @param c - The Hono context object
+   * @returns JSON response mapping each provider id to its redirect URI
+   * @access protected
+   * @permission config:list
+   */
+  .get("/redirect-uris", getSessionContext, requirePermissionFactory("config:list"), async (c) => {
+    const redirectUris = Object.fromEntries(
+      OAUTH_PROVIDER_IDS.map(id => [id, oauthRedirectUri(c, id)]),
+    ) as Record<OAuthProviderId, string>;
+
+    return c.json({ success: true as const, redirectUris });
   })
 
   /**
@@ -297,7 +316,7 @@ export const oauthRoutes = new Hono()
     // an unreachable IdP — surface it as a login error instead of a 500.
     let url: URL;
     try {
-      url = await configured.def.createAuthorizationURL(configured.clientId, configured.clientSecret, state, codeVerifier ?? null);
+      url = await configured.def.createAuthorizationURL(oauthRedirectUri(c, provider), configured.clientId, configured.clientSecret, state, codeVerifier ?? null);
     } catch {
       return appRedirect(c, "/login?oauthError=oauth_failed");
     }
@@ -310,7 +329,7 @@ export const oauthRoutes = new Hono()
       redirectTo: sanitizeRedirect(redirect),
       linkToken,
     };
-    setCookie(c, OAUTH_FLOW_COOKIE, JSON.stringify(flow), getCookieSettings("oauth"));
+    setCookie(c, OAUTH_FLOW_COOKIE, JSON.stringify(flow), getCookieSettings(c, "oauth"));
 
     return c.redirect(url.toString());
   })
@@ -333,7 +352,7 @@ export const oauthRoutes = new Hono()
 
     // Consume the flow cookie no matter how the callback ends.
     const rawFlow = getCookie(c, OAUTH_FLOW_COOKIE);
-    setCookie(c, OAUTH_FLOW_COOKIE, "", getCookieSettings("clear"));
+    setCookie(c, OAUTH_FLOW_COOKIE, "", getCookieSettings(c, "clear"));
 
     let flow: OAuthFlow | null = null;
     try {
@@ -359,7 +378,10 @@ export const oauthRoutes = new Hono()
 
     let profile: NormalizedProfile;
     try {
-      const tokens = await configured.def.validateCode(configured.clientId, configured.clientSecret, code, flow.codeVerifier ?? null);
+      // Must be byte-identical to the URI sent at authorization time — both are
+      // derived from the same public origin, which the browser preserves across
+      // the round trip through the provider.
+      const tokens = await configured.def.validateCode(oauthRedirectUri(c, provider), configured.clientId, configured.clientSecret, code, flow.codeVerifier ?? null);
       profile = await configured.def.fetchProfile(tokens);
     } catch (error) {
       const errorCode = error instanceof OAuthProfileError ? error.code : "oauth_failed";

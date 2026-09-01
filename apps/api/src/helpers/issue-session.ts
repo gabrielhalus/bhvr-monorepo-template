@@ -24,8 +24,8 @@ export async function issueSession(c: Context, userId: string) {
   });
 
   const accessToken = await createAccessToken(userId);
-  setCookie(c, "accessToken", accessToken, getCookieSettings("access"));
+  setCookie(c, "accessToken", accessToken, getCookieSettings(c, "access"));
 
   const refreshToken = await createRefreshToken(userId, insertedToken.id);
-  setCookie(c, "refreshToken", refreshToken, getCookieSettings("refresh"));
+  setCookie(c, "refreshToken", refreshToken, getCookieSettings(c, "refresh"));
 }
