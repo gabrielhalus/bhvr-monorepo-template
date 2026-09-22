@@ -16,10 +16,11 @@ services:
       timeout: 5s
       retries: 5
 
+  # The one-shot jobs (migrations, bootstrap) reuse the image built by the `api`
+  # service: same Dockerfile, same context. Without that sharing, Compose builds
+  # and exports the same 1.3 GB image three times.
   migrations:
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
+    image: ${COMPOSE_PROJECT_NAME:-bunstack}-api:latest
     depends_on:
       postgres:
         condition: service_healthy
@@ -30,9 +31,7 @@ services:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-bunstack}
 
   bootstrap:
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
+    image: ${COMPOSE_PROJECT_NAME:-bunstack}-api:latest
     depends_on:
       migrations:
         condition: service_completed_successfully
@@ -61,7 +60,7 @@ services:
       retries: 5
 
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
@@ -79,7 +78,7 @@ services:
       retries: 3
 
   minio-init:
-    image: minio/mc:latest
+    image: quay.io/minio/mc:latest
     depends_on:
       minio:
         condition: service_healthy
@@ -94,6 +93,8 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+    # Explicit tag: the one-shot jobs above refer to it.
+    image: ${COMPOSE_PROJECT_NAME:-bunstack}-api:latest
     restart: unless-stopped
     depends_on:
       bootstrap:
