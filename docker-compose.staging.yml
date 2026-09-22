@@ -126,11 +126,11 @@ services:
     restart: unless-stopped
     depends_on:
       - api
-    # The only published port: nginx serves the SPA and proxies /api to the API,
-    # so the whole stack lives behind one origin — reachable on whatever host
-    # the operator points at it.
-    ports:
-      - "${PORT:-3000}:80"
+    # Nothing is bound on the host: nginx serves the SPA and proxies /api to the
+    # API, so the whole stack lives behind one origin, reached through the host's
+    # own reverse proxy.
+    expose:
+      - "80"
 
 volumes:
   pgdata:
